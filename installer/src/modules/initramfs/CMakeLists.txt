@@ -13,8 +13,7 @@ calamares_add_plugin(initramfs
 
 calamares_add_test(
     initramfstest
-    SOURCES
-        Tests.cpp
+    SOURCES Tests.cpp
     LIBRARIES
         calamares_job_initramfs # From above
         yamlcpp::yamlcpp

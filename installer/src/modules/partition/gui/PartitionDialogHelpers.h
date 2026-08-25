@@ -13,13 +13,22 @@
 #define PARTITION_GUI_PARTITIONDIALOGHELPERS
 
 #include <kpmcore/core/partitiontable.h>
+#include <kpmcore/fs/filesystem.h>
 
 #include <QStringList>
+#include <QSet>
 
+class PartitionCoreModule;
 class QPushButton;
 class QComboBox;
 class QLabel;
 class QListWidget;
+
+static QSet< FileSystem::Type > s_unmountableFS( { FileSystem::Unformatted,
+                                                   FileSystem::LinuxSwap,
+                                                   FileSystem::Extended,
+                                                   FileSystem::Unknown,
+                                                   FileSystem::Lvm2_PV } );
 
 /**
  * Returns a list of standard mount points (e.g. /, /usr, ...).
@@ -68,7 +77,7 @@ setSelectedMountPoint( QComboBox* combo, const QString& selected )
  * If it is not valid, returns @c false and sets the UI
  * to explain why.
  */
-bool validateMountPoint( const QString& mountPoint, const QStringList& inUse, QLabel* label, QPushButton* button );
+bool validateMountPoint( PartitionCoreModule* core, const QString& mountPoint, const QStringList& inUse, const QString& fileSystem, QLabel* label, QPushButton* button );
 
 /**
  * Get the flags that have been checked in the list widget.

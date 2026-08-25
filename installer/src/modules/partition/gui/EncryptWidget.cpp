@@ -2,20 +2,22 @@
  *
  *   SPDX-FileCopyrightText: 2016 Teo Mrnjavac <teo@kde.org>
  *   SPDX-FileCopyrightText: 2020 Adriaan de Groot <groot@kde.org>
+ *   SPDX-FileCopyrightText: 2023 Evan James <dalto@fastmail.com>
  *   SPDX-License-Identifier: GPL-3.0-or-later
  *
  *   Calamares is Free Software: see the License-Identifier above.
  *
  */
 
-
 #include "EncryptWidget.h"
 
 #include "ui_EncryptWidget.h"
 
 #include "Branding.h"
-#include "utils/CalamaresUtilsGui.h"
+#include "utils/Gui.h"
 #include "utils/Retranslator.h"
+
+constexpr int ZFS_MIN_LENGTH = 8;
 
 /** @brief Does this system support whole-disk encryption?
  *
@@ -58,7 +60,8 @@ EncryptWidget::EncryptWidget( QWidget* parent )
         m_ui->m_encryptionUnsupportedLabel->show();
     }
 
-    connect( m_ui->m_encryptCheckBox, &QCheckBox::stateChanged, this, &EncryptWidget::onCheckBoxStateChanged );
+    connect(
+        m_ui->m_encryptCheckBox, Calamares::checkBoxStateChangedSignal, this, &EncryptWidget::onCheckBoxStateChanged );
     connect( m_ui->m_passphraseLineEdit, &QLineEdit::textEdited, this, &EncryptWidget::onPassphraseEdited );
     connect( m_ui->m_confirmLineEdit, &QLineEdit::textEdited, this, &EncryptWidget::onPassphraseEdited );
 
@@ -68,6 +71,17 @@ EncryptWidget::EncryptWidget( QWidget* parent )
     CALAMARES_RETRANSLATE_SLOT( &EncryptWidget::retranslate );
 }
 
+bool
+EncryptWidget::isEncryptionCheckboxChecked()
+{
+    return m_ui->m_encryptCheckBox->isChecked();
+}
+
+void
+EncryptWidget::setEncryptionCheckbox( bool preCheckEncrypt )
+{
+    m_ui->m_encryptCheckBox->setChecked( preCheckEncrypt );
+}
 
 void
 EncryptWidget::reset( bool checkVisible )
@@ -107,13 +121,11 @@ EncryptWidget::state() const
     return newState;
 }
 
-
 void
 EncryptWidget::setText( const QString& text )
 {
     m_ui->m_encryptCheckBox->setText( text );
 }
-
 
 QString
 EncryptWidget::passphrase() const
@@ -125,7 +137,6 @@ EncryptWidget::passphrase() const
     return QString();
 }
 
-
 void
 EncryptWidget::retranslate()
 {
@@ -133,17 +144,16 @@ EncryptWidget::retranslate()
     onPassphraseEdited();  // For the tooltip
 }
 
-
 ///@brief Give @p label the @p pixmap from the standard-pixmaps
 static void
-applyPixmap( QLabel* label, CalamaresUtils::ImageType pixmap )
+applyPixmap( QLabel* label, Calamares::ImageType pixmap )
 {
     label->setFixedWidth( label->height() );
-    label->setPixmap( CalamaresUtils::defaultPixmap( pixmap, CalamaresUtils::Original, label->size() ) );
+    label->setPixmap( Calamares::defaultPixmap( pixmap, Calamares::Original, label->size() ) );
 }
 
 void
-EncryptWidget::updateState()
+EncryptWidget::updateState( const bool notify )
 {
     if ( m_ui->m_passphraseLineEdit->isVisible() )
     {
@@ -152,26 +162,32 @@ EncryptWidget::updateState()
 
         if ( p1.isEmpty() && p2.isEmpty() )
         {
-            applyPixmap( m_ui->m_iconLabel, CalamaresUtils::StatusWarning );
-            m_ui->m_iconLabel->setToolTip( tr( "Please enter the same passphrase in both boxes." ) );
+            applyPixmap( m_ui->m_iconLabel, Calamares::StatusWarning );
+            m_ui->m_iconLabel->setToolTip( tr( "Please enter the same passphrase in both boxes.", "@tooltip" ) );
+        }
+        else if ( m_filesystem == FileSystem::Zfs && p1.length() < ZFS_MIN_LENGTH )
+        {
+            applyPixmap( m_ui->m_iconLabel, Calamares::StatusError );
+            m_ui->m_iconLabel->setToolTip(
+                tr( "Password must be a minimum of %1 characters.", "@tooltip" ).arg( ZFS_MIN_LENGTH ) );
         }
         else if ( p1 == p2 )
         {
-            applyPixmap( m_ui->m_iconLabel, CalamaresUtils::StatusOk );
+            applyPixmap( m_ui->m_iconLabel, Calamares::StatusOk );
             m_ui->m_iconLabel->setToolTip( QString() );
         }
         else
         {
-            applyPixmap( m_ui->m_iconLabel, CalamaresUtils::StatusError );
-            m_ui->m_iconLabel->setToolTip( tr( "Please enter the same passphrase in both boxes." ) );
+            applyPixmap( m_ui->m_iconLabel, Calamares::StatusError );
+            m_ui->m_iconLabel->setToolTip( tr( "Please enter the same passphrase in both boxes.", "@tooltip" ) );
         }
     }
 
     Encryption newState = state();
 
-    if ( newState != m_state )
+    m_state = newState;
+    if ( notify )
     {
-        m_state = newState;
         Q_EMIT stateChanged( m_state );
     }
 }
@@ -187,17 +203,26 @@ EncryptWidget::onPassphraseEdited()
     updateState();
 }
 
-
 void
-EncryptWidget::onCheckBoxStateChanged( int checked )
+EncryptWidget::onCheckBoxStateChanged( Calamares::checkBoxStateType checked )
 {
-    // @p checked is a Qt::CheckState, 0 is "unchecked" and 2 is "checked"
-    m_ui->m_passphraseLineEdit->setVisible( checked );
-    m_ui->m_confirmLineEdit->setVisible( checked );
-    m_ui->m_iconLabel->setVisible( checked );
+    const bool visible = ( checked != Calamares::checkBoxUncheckedValue );
+    m_ui->m_passphraseLineEdit->setVisible( visible );
+    m_ui->m_confirmLineEdit->setVisible( visible );
+    m_ui->m_iconLabel->setVisible( visible );
     m_ui->m_passphraseLineEdit->clear();
     m_ui->m_confirmLineEdit->clear();
     m_ui->m_iconLabel->clear();
 
     updateState();
+}
+
+void
+EncryptWidget::setFilesystem( const FileSystem::Type fs )
+{
+    m_filesystem = fs;
+    if ( m_state != Encryption::Disabled )
+    {
+        updateState( false );
+    }
 }

@@ -13,8 +13,8 @@
 #include "JobQueue.h"
 #include "Settings.h"
 
-#include "utils/CalamaresUtilsSystem.h"
 #include "utils/Logger.h"
+#include "utils/System.h"
 #include "utils/Yaml.h"
 
 #include <QtTest/QtTest>
@@ -34,7 +34,7 @@ InitramfsTests::initTestCase()
     Logger::setupLogLevel( Logger::LOGDEBUG );
 
     (void)new Calamares::JobQueue();
-    (void)new CalamaresUtils::System( true );
+    (void)new Calamares::System( true );
 }
 
 static const char contents[] = "UMASK=0077\n";
@@ -51,7 +51,7 @@ InitramfsTests::testCreateTargetFile()
 {
     static const char short_confFile[] = "/calamares-safe-umask";
 
-    auto* s = CalamaresUtils::System::instance();
+    auto* s = Calamares::System::instance();
     auto r = s->createTargetFile( short_confFile, QByteArray( contents ) );
     QVERIFY( r.failed() );
     QVERIFY( !r );

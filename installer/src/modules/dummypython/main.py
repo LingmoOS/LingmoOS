@@ -41,30 +41,37 @@ def pretty_status_message():
 
 def run():
     """Dummy python job."""
-    libcalamares.utils.debug("LocaleDir=" +
-                             str(libcalamares.utils.gettext_path()))
-    libcalamares.utils.debug("Languages=" +
-                             str(libcalamares.utils.gettext_languages()))
+    libcalamares.utils.debug(f"Calamares version: {libcalamares.VERSION} date: {strftime('%Y-%m-%d %H:%M:%S', gmtime())}")
+    libcalamares.utils.debug(f"Job name         : {libcalamares.job.pretty_name}")
+    libcalamares.utils.debug(f"Job path         : {libcalamares.job.working_path}")
+
+    libcalamares.utils.debug(f"LocaleDir        : {libcalamares.utils.gettext_path()}")
+    libcalamares.utils.debug(f"Languages         : {libcalamares.utils.gettext_languages()}")
 
     os.system("/bin/sh -c \"touch ~/calamares-dummypython\"")
-    accumulator = strftime("%Y-%m-%d %H:%M:%S", gmtime()) + "\n"
-    accumulator += "Calamares version: " + libcalamares.VERSION_SHORT + "\n"
-    accumulator += "This job's name: " + libcalamares.job.pretty_name + "\n"
-    accumulator += "This job's path: " + libcalamares.job.working_path
-    libcalamares.utils.debug(accumulator)
 
-    accumulator = "*** Job configuration "
-    accumulator += str(libcalamares.job.configuration)
-    libcalamares.utils.debug(accumulator)
+    libcalamares.utils.debug("*** JOB CONFIGURATION ***")
+    for k, v in libcalamares.job.configuration.items():
+        libcalamares.utils.debug(f"    {k}={v}")
 
-    accumulator = "*** globalstorage test ***"
-    accumulator += "lala: "
-    accumulator += str(libcalamares.globalstorage.contains("lala")) + "\n"
-    accumulator += "foo: "
-    accumulator += str(libcalamares.globalstorage.contains("foo")) + "\n"
-    accumulator += "count: " + str(libcalamares.globalstorage.count())
-    libcalamares.utils.debug(accumulator)
+    libcalamares.utils.debug("*** GLOBAL STORAGE ***")
+    for k in libcalamares.globalstorage.keys():
+        libcalamares.utils.debug(f"    {k}={libcalamares.globalstorage.value(k)}")
 
+    libcalamares.utils.debug("*** GLOBAL STORAGE BOGUS KEYS ***")
+    #
+    # This is a demonstration of issue #2237, load this module
+    # with the dummypython/tests/1.global configuration, e.g.
+    #       ./loadmodule -g ../src/modules/dummypython/tests/1.global dummypython
+    # in the build directory.
+    #
+    for k in ("nonexistent", "empty", "numeric", "boolvalue"):
+        if libcalamares.globalstorage.value(k) is None:
+            libcalamares.utils.debug(f"NONE  {k}={libcalamares.globalstorage.value(k)}")
+        else:
+            libcalamares.utils.debug(f"      {k}={libcalamares.globalstorage.value(k)}")
+
+    libcalamares.utils.debug("*** GLOBAL STORAGE MODIFICATION ***")
     libcalamares.globalstorage.insert("item2", "value2")
     libcalamares.globalstorage.insert("item3", 3)
     accumulator = "keys: {}\n".format(str(libcalamares.globalstorage.keys()))
@@ -78,9 +85,21 @@ def run():
         str(libcalamares.globalstorage.value("item3")))
     libcalamares.utils.debug(accumulator)
 
-    libcalamares.utils.debug("Run dummy python")
+    libcalamares.utils.debug("*** ACTIVITY ***")
+
+    # Expect error message that rootMountPoint is not set
+    libcalamares.utils.target_env_call(["ls"])
+    libcalamares.utils.target_env_call("ls")
+
+    # Expect error message can't chroot to /tmp
+    libcalamares.globalstorage.insert("rootMountPoint", "/tmp")
+    libcalamares.utils.target_env_call(["ls"])
 
     sleep(1)
+
+    million = 1000000
+    for i in range(million):
+        libcalamares.job.setprogress(i / million)
 
     try:
         configlist = list(libcalamares.job.configuration["a_list"])

@@ -23,7 +23,7 @@
 
 #include "modulesystem/ModuleManager.h"
 #include "modulesystem/RequirementsModel.h"
-#include "utils/CalamaresUtilsGui.h"
+#include "utils/Gui.h"
 #include "utils/Logger.h"
 #include "utils/NamedEnum.h"
 #include "utils/Retranslator.h"
@@ -45,7 +45,7 @@ WelcomePage::WelcomePage( Config* config, QWidget* parent )
 {
     using Branding = Calamares::Branding;
 
-    const int defaultFontHeight = CalamaresUtils::defaultFontHeight();
+    const int defaultFontHeight = Calamares::defaultFontHeight();
     ui->setupUi( this );
 
     // insert system-check widget below welcome text
@@ -124,25 +124,25 @@ void
 WelcomePage::setupButton( Button role, const QString& url )
 {
     QPushButton* button = nullptr;
-    CalamaresUtils::ImageType icon = CalamaresUtils::Information;
+    Calamares::ImageType icon = Calamares::Information;
 
     switch ( role )
     {
     case Button::Donate:
         button = ui->donateButton;
-        icon = CalamaresUtils::Donate;
+        icon = Calamares::Donate;
         break;
     case Button::KnownIssues:
         button = ui->knownIssuesButton;
-        icon = CalamaresUtils::Bugs;
+        icon = Calamares::Bugs;
         break;
     case Button::ReleaseNotes:
         button = ui->releaseNotesButton;
-        icon = CalamaresUtils::Release;
+        icon = Calamares::Release;
         break;
     case Button::Support:
         button = ui->supportButton;
-        icon = CalamaresUtils::Help;
+        icon = Calamares::Help;
         break;
     }
     if ( !button )
@@ -160,8 +160,8 @@ WelcomePage::setupButton( Button role, const QString& url )
     QUrl u( url );
     if ( u.isValid() )
     {
-        auto size = 2 * QSize( CalamaresUtils::defaultFontHeight(), CalamaresUtils::defaultFontHeight() );
-        button->setIcon( CalamaresUtils::defaultPixmap( icon, CalamaresUtils::Original, size ) );
+        auto size = 2 * QSize( Calamares::defaultFontHeight(), Calamares::defaultFontHeight() );
+        button->setIcon( Calamares::defaultPixmap( icon, Calamares::Original, size ) );
         connect( button, &QPushButton::clicked, [ u ]() { QDesktopServices::openUrl( u ); } );
     }
     else
@@ -209,7 +209,8 @@ WelcomePage::retranslate()
 
     ui->mainText->setText( message.arg( Calamares::Branding::instance()->versionedName() ) );
     ui->retranslateUi( this );
-    ui->supportButton->setText( tr( "%1 support" ).arg( Calamares::Branding::instance()->shortProductName() ) );
+    ui->supportButton->setText(
+        tr( "%1 Support", "@action" ).arg( Calamares::Branding::instance()->shortProductName() ) );
 }
 
 void
@@ -222,5 +223,5 @@ LocaleTwoColumnDelegate::paint( QPainter* painter, const QStyleOptionViewItem& o
         Qt::AlignRight | Qt::AlignVCenter,
         option.palette,
         false,
-        index.data( CalamaresUtils::Locale::TranslationsModel::EnglishLabelRole ).toString() );
+        index.data( Calamares::Locale::TranslationsModel::EnglishLabelRole ).toString() );
 }

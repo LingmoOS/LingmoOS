@@ -11,7 +11,7 @@
 #ifndef UTILS_RUNNER_H
 #define UTILS_RUNNER_H
 
-#include "CalamaresUtilsSystem.h"
+#include "System.h"
 
 #include <QDir>
 #include <QObject>
@@ -26,8 +26,8 @@ namespace Calamares
 namespace Utils
 {
 
-using RunLocation = CalamaresUtils::System::RunLocation;
-using ProcessResult = CalamaresUtils::ProcessResult;
+using RunLocation = Calamares::System::RunLocation;
+using ProcessResult = Calamares::ProcessResult;
 
 /** @brief A Runner wraps a process and handles running it and processing output
  *
@@ -44,7 +44,7 @@ using ProcessResult = CalamaresUtils::ProcessResult;
  *
  * Processes are always run with LC_ALL and LANG set to "C".
  */
-class Runner : public QObject
+class DLLEXPORT Runner : public QObject
 {
     Q_OBJECT
 

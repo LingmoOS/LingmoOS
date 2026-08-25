@@ -8,7 +8,6 @@
  *
  */
 
-
 #include "CalamaresApplication.h"
 
 #include "Settings.h"
@@ -16,21 +15,19 @@
 #include "utils/Logger.h"
 #include "utils/Retranslator.h"
 
-#ifndef WITH_KF5DBus
-#include "3rdparty/kdsingleapplicationguard/kdsingleapplicationguard.h"
-#endif
+// From 3rdparty/
+#include "kdsingleapplication.h"
 
-#include <KCoreAddons/KAboutData>
-#ifdef WITH_KF5DBus
-#include <KDBusAddons/KDBusService>
-#endif
-#ifdef WITH_KF5Crash
-#include <KCrash/KCrash>
+#include <KAboutData>
+#ifdef BUILD_CRASH_REPORTING
+#include <KCrash>
 #endif
 
 #include <QCommandLineParser>
 #include <QDebug>
 #include <QDir>
+
+#include <memory>
 
 /** @brief Gets debug-level from -D command-line-option
  *
@@ -95,13 +92,13 @@ handle_args( CalamaresApplication& a )
     Logger::setupLogLevel( parser.isSet( debugOption ) ? Logger::LOGVERBOSE : debug_level( parser, debugLevelOption ) );
     if ( parser.isSet( configOption ) )
     {
-        CalamaresUtils::setAppDataDir( QDir( parser.value( configOption ) ) );
+        Calamares::setAppDataDir( QDir( parser.value( configOption ) ) );
     }
     if ( parser.isSet( xdgOption ) )
     {
-        CalamaresUtils::setXdgDirs();
+        Calamares::setXdgDirs();
     }
-    CalamaresUtils::setAllowLocalTranslation( parser.isSet( debugOption ) || parser.isSet( debugTxOption ) );
+    Calamares::setAllowLocalTranslation( parser.isSet( debugOption ) || parser.isSet( debugTxOption ) );
 
     return parser.isSet( debugOption );
 }
@@ -109,6 +106,10 @@ handle_args( CalamaresApplication& a )
 int
 main( int argc, char* argv[] )
 {
+#if QT_VERSION < QT_VERSION_CHECK( 6, 0, 0 )
+    // Not needed in Qt6
+    QApplication::setAttribute( Qt::AA_EnableHighDpiScaling );
+#endif
     CalamaresApplication a( argc, argv );
 
     KAboutData aboutData( "calamares",
@@ -123,37 +124,24 @@ main( int argc, char* argv[] )
     KAboutData::setApplicationData( aboutData );
     a.setApplicationDisplayName( QString() );  // To avoid putting an extra "Calamares/" into the log-file
 
-#ifdef WITH_KF5Crash
+#ifdef BUILD_CRASH_REPORTING
     KCrash::initialize();
     // KCrash::setCrashHandler();
     KCrash::setDrKonqiEnabled( true );
     KCrash::setFlags( KCrash::SaferDialog | KCrash::AlwaysDirectly );
-    // TODO: umount anything in /tmp/calamares-... as an emergency save function
 #endif
 
-    bool is_debug = handle_args( a );
-
-#ifdef WITH_KF5DBus
-    KDBusService service( is_debug ? KDBusService::Multiple : KDBusService::Unique );
-#else
-    KDSingleApplicationGuard guard( is_debug ? KDSingleApplicationGuard::NoPolicy
-                                             : KDSingleApplicationGuard::AutoKillOtherInstances );
-    if ( !is_debug && !guard.isPrimaryInstance() )
+    std::unique_ptr< KDSingleApplication > possiblyUnique;
+    const bool is_debug = handle_args( a );
+    if ( !is_debug )
     {
-        // Here we have not yet set-up the logger system, so qDebug() is ok
-        auto instancelist = guard.instances();
-        qDebug() << "Calamares is already running, shutting down.";
-        if ( instancelist.count() > 0 )
+        possiblyUnique = std::make_unique< KDSingleApplication >();
+        if ( !possiblyUnique->isPrimaryInstance() )
         {
-            qDebug() << "Other running Calamares instances:";
+            qCritical() << "Calamares is already running.";
+            return 87;  // EUSERS on Linux
         }
-        for ( const auto& i : instancelist )
-        {
-            qDebug() << "  " << i.isValid() << i.pid() << i.arguments();
-        }
-        return 69;  // EX_UNAVAILABLE on FreeBSD
     }
-#endif
 
     Calamares::Settings::init( is_debug );
     if ( !Calamares::Settings::instance() || !Calamares::Settings::instance()->isValid() )

@@ -9,11 +9,12 @@
 
 #include "GeoIPXML.h"
 
+#include "compat/Xml.h"
 #include "utils/Logger.h"
 
 #include <QtXml/QDomDocument>
 
-namespace CalamaresUtils
+namespace Calamares
 {
 namespace GeoIP
 {
@@ -28,11 +29,9 @@ getElementTexts( const QByteArray& data, const QString& tag )
 {
     QStringList elements;
 
-    QString domError;
-    int errorLine, errorColumn;
-
     QDomDocument doc;
-    if ( doc.setContent( data, false, &domError, &errorLine, &errorColumn ) )
+    const auto p = Calamares::setXmlContent( doc, data );
+    if ( p.errorMessage.isEmpty() )
     {
         const auto tzElements = doc.elementsByTagName( tag );
         cDebug() << "GeoIP found" << tzElements.length() << "elements";
@@ -48,7 +47,8 @@ getElementTexts( const QByteArray& data, const QString& tag )
     }
     else
     {
-        cWarning() << "GeoIP XML data error:" << domError << "(line" << errorLine << errorColumn << ')';
+        cWarning() << "GeoIP XML data error:" << p.errorMessage << "(line" << p.errorLine << ':' << p.errorColumn
+                   << ')';
     }
 
     if ( elements.count() < 1 )
@@ -58,7 +58,6 @@ getElementTexts( const QByteArray& data, const QString& tag )
 
     return elements;
 }
-
 
 QString
 GeoIPXML::rawReply( const QByteArray& data )
@@ -80,9 +79,9 @@ GeoIPXML::processReply( const QByteArray& data )
     for ( const auto& e : getElementTexts( data, m_element ) )
     {
         auto tz = splitTZString( e );
-        if ( !tz.first.isEmpty() )
+        if ( tz.isValid() )
         {
-            return tz;
+            return RegionZonePair( tz );
         }
     }
 
@@ -90,4 +89,4 @@ GeoIPXML::processReply( const QByteArray& data )
 }
 
 }  // namespace GeoIP
-}  // namespace CalamaresUtils
+}  // namespace Calamares

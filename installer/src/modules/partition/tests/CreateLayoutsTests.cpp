@@ -19,14 +19,14 @@
 
 #include <QtTest/QtTest>
 
-using namespace CalamaresUtils::Units;
+using namespace Calamares::Units;
 
 class PartitionTable;
 class SmartStatus;
 
 QTEST_GUILESS_MAIN( CreateLayoutsTests )
 
-static CalamaresUtils::Partition::KPMManager* kpmcore = nullptr;
+static Calamares::Partition::KPMManager* kpmcore = nullptr;
 static Calamares::JobQueue* jobqueue = nullptr;
 
 #define LOGICAL_SIZE 512
@@ -40,7 +40,7 @@ void
 CreateLayoutsTests::init()
 {
     jobqueue = new Calamares::JobQueue( nullptr );
-    kpmcore = new CalamaresUtils::Partition::KPMManager();
+    kpmcore = new Calamares::Partition::KPMManager();
 }
 
 void
@@ -53,18 +53,19 @@ CreateLayoutsTests::cleanup()
 void
 CreateLayoutsTests::testFixedSizePartition()
 {
+    const PartitionRole role( PartitionRole::Role::Any );
+
     PartitionLayout layout = PartitionLayout();
     TestDevice dev( QString( "test" ), LOGICAL_SIZE, 5_GiB / LOGICAL_SIZE );
-    PartitionRole role( PartitionRole::Role::Any );
-    QList< Partition* > partitions;
+    PartitionTable table( PartitionTable::TableType::msdos, 0, 5_GiB );
 
     if ( !layout.addEntry( { FileSystem::Type::Ext4, QString( "/" ), QString( "5MiB" ) } ) )
     {
         QFAIL( qPrintable( "Unable to create / partition" ) );
     }
 
-    partitions
-        = layout.createPartitions( static_cast< Device* >( &dev ), 0, dev.totalLogical(), nullptr, nullptr, role );
+    const auto partitions = layout.createPartitions(
+        static_cast< Device* >( &dev ), 0, dev.totalLogical(), Config::LuksGeneration::Luks1, nullptr, &table, role );
 
     QCOMPARE( partitions.count(), 1 );
 
@@ -74,18 +75,19 @@ CreateLayoutsTests::testFixedSizePartition()
 void
 CreateLayoutsTests::testPercentSizePartition()
 {
+    const PartitionRole role( PartitionRole::Role::Any );
+
     PartitionLayout layout = PartitionLayout();
     TestDevice dev( QString( "test" ), LOGICAL_SIZE, 5_GiB / LOGICAL_SIZE );
-    PartitionRole role( PartitionRole::Role::Any );
-    QList< Partition* > partitions;
+    PartitionTable table( PartitionTable::TableType::msdos, 0, 5_GiB );
 
     if ( !layout.addEntry( { FileSystem::Type::Ext4, QString( "/" ), QString( "50%" ) } ) )
     {
         QFAIL( qPrintable( "Unable to create / partition" ) );
     }
 
-    partitions
-        = layout.createPartitions( static_cast< Device* >( &dev ), 0, dev.totalLogical(), nullptr, nullptr, role );
+    const auto partitions = layout.createPartitions(
+        static_cast< Device* >( &dev ), 0, dev.totalLogical(), Config::LuksGeneration::Luks1, nullptr, &table, role );
 
     QCOMPARE( partitions.count(), 1 );
 
@@ -95,10 +97,11 @@ CreateLayoutsTests::testPercentSizePartition()
 void
 CreateLayoutsTests::testMixedSizePartition()
 {
+    const PartitionRole role( PartitionRole::Role::Any );
+
     PartitionLayout layout = PartitionLayout();
     TestDevice dev( QString( "test" ), LOGICAL_SIZE, 5_GiB / LOGICAL_SIZE );
-    PartitionRole role( PartitionRole::Role::Any );
-    QList< Partition* > partitions;
+    PartitionTable table( PartitionTable::TableType::msdos, 0, 5_GiB );
 
     if ( !layout.addEntry( { FileSystem::Type::Ext4, QString( "/" ), QString( "5MiB" ) } ) )
     {
@@ -115,8 +118,8 @@ CreateLayoutsTests::testMixedSizePartition()
         QFAIL( qPrintable( "Unable to create /bkup partition" ) );
     }
 
-    partitions
-        = layout.createPartitions( static_cast< Device* >( &dev ), 0, dev.totalLogical(), nullptr, nullptr, role );
+    const auto partitions = layout.createPartitions(
+        static_cast< Device* >( &dev ), 0, dev.totalLogical(), Config::LuksGeneration::Luks1, nullptr, &table, role );
 
     QCOMPARE( partitions.count(), 3 );
 
@@ -125,7 +128,6 @@ CreateLayoutsTests::testMixedSizePartition()
     QCOMPARE( partitions[ 2 ]->length(), ( ( 5_GiB - 5_MiB ) / 2 ) / LOGICAL_SIZE );
 }
 
-#ifdef WITH_KPMCORE4API
 // TODO: Get a clean way to instantiate a test Device from KPMCore
 class DevicePrivate
 {
@@ -150,11 +152,5 @@ TestDevice::TestDevice( const QString& name, const qint64 logicalSectorSize, con
               Device::Type::Unknown_Device )
 {
 }
-#else
-TestDevice::TestDevice( const QString& name, const qint64 logicalSectorSize, const qint64 totalLogicalSectors )
-    : Device( name, QString( "node" ), logicalSectorSize, totalLogicalSectors, QString(), Device::Type::Unknown_Device )
-{
-}
-#endif
 
 TestDevice::~TestDevice() {}

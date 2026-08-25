@@ -12,14 +12,14 @@
 #include "Mount.h"
 
 #include "partition/Sync.h"
-#include "utils/CalamaresUtilsSystem.h"
 #include "utils/Logger.h"
 #include "utils/String.h"
+#include "utils/System.h"
 
 #include <QDir>
 #include <QTemporaryDir>
 
-namespace CalamaresUtils
+namespace Calamares
 {
 namespace Partition
 {
@@ -38,7 +38,7 @@ mount( const QString& devicePath, const QString& mountPoint, const QString& file
             cWarning() << "Can't mount on an empty mountpoint.";
         }
 
-        return static_cast< int >( ProcessResult::Code::NoWorkingDirectory );
+        return static_cast< int >( Calamares::ProcessResult::Code::NoWorkingDirectory );
     }
 
     QDir mountPointDir( mountPoint );
@@ -48,7 +48,7 @@ mount( const QString& devicePath, const QString& mountPoint, const QString& file
         if ( !ok )
         {
             cWarning() << "Could not create mountpoint" << mountPoint;
-            return static_cast< int >( ProcessResult::Code::NoWorkingDirectory );
+            return static_cast< int >( Calamares::ProcessResult::Code::NoWorkingDirectory );
         }
     }
 
@@ -71,7 +71,7 @@ mount( const QString& devicePath, const QString& mountPoint, const QString& file
     }
     args << devicePath << mountPoint;
 
-    auto r = CalamaresUtils::System::runCommand( args, std::chrono::seconds( 10 ) );
+    auto r = Calamares::System::runCommand( args, std::chrono::seconds( 10 ) );
     sync();
     return r.getExitCode();
 }
@@ -79,8 +79,7 @@ mount( const QString& devicePath, const QString& mountPoint, const QString& file
 int
 unmount( const QString& path, const QStringList& options )
 {
-    auto r
-        = CalamaresUtils::System::runCommand( QStringList { "umount" } << options << path, std::chrono::seconds( 10 ) );
+    auto r = Calamares::System::runCommand( QStringList { "umount" } << options << path, std::chrono::seconds( 10 ) );
     sync();
     return r.getExitCode();
 }
@@ -90,7 +89,6 @@ struct TemporaryMount::Private
     QString m_devicePath;
     QTemporaryDir m_mountDir;
 };
-
 
 TemporaryMount::TemporaryMount( const QString& devicePath, const QString& filesystemName, const QString& options )
     : m_d( std::make_unique< Private >() )
@@ -158,4 +156,4 @@ MtabInfo::fromMtabFilteredByPrefix( const QString& mountPrefix, const QString& m
 }
 
 }  // namespace Partition
-}  // namespace CalamaresUtils
+}  // namespace Calamares

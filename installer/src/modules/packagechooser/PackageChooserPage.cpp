@@ -11,7 +11,7 @@
 
 #include "ui_page_package.h"
 
-#include "utils/CalamaresUtilsGui.h"
+#include "utils/Gui.h"
 #include "utils/Logger.h"
 #include "utils/Retranslator.h"
 
@@ -43,7 +43,7 @@ PackageChooserPage::PackageChooserPage( PackageChooserMode mode, QWidget* parent
         ui->products->setSelectionMode( QAbstractItemView::ExtendedSelection );
     }
 
-    ui->products->setMinimumWidth( 10 * CalamaresUtils::defaultFontHeight() );
+    ui->products->setMinimumWidth( 10 * Calamares::defaultFontHeight() );
 }
 
 void

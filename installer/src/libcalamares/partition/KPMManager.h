@@ -16,11 +16,13 @@
 #ifndef PARTITION_KPMMANAGER_H
 #define PARTITION_KPMMANAGER_H
 
+#include "DllMacro.h"
+
 #include <memory>
 
 class CoreBackend;
 
-namespace CalamaresUtils
+namespace Calamares
 {
 namespace Partition
 {
@@ -39,7 +41,7 @@ class InternalManager;
  * environment variable KPMCORE_BACKEND. Setting it to
  * "dummy" will load the dummy plugin instead.
  */
-class KPMManager
+class DLLEXPORT KPMManager
 {
 public:
     KPMManager();
@@ -56,6 +58,6 @@ private:
 };
 
 }  // namespace Partition
-}  // namespace CalamaresUtils
+}  // namespace Calamares
 
 #endif  // PARTITION_KPMMANAGER_H

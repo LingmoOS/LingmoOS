@@ -16,8 +16,8 @@
 
 #include "partition/FileSystem.h"
 #include "partition/PartitionQuery.h"
-#include "utils/CalamaresUtilsSystem.h"
 #include "utils/Logger.h"
+#include "utils/System.h"
 #include "utils/Units.h"
 
 #include <kpmcore/core/device.h>
@@ -31,8 +31,8 @@
 #include <qcoreapplication.h>
 #include <qregularexpression.h>
 
-using CalamaresUtils::Partition::untranslatedFS;
-using CalamaresUtils::Partition::userVisibleFS;
+using Calamares::Partition::untranslatedFS;
+using Calamares::Partition::userVisibleFS;
 
 /** @brief Create
  *
@@ -43,7 +43,7 @@ using CalamaresUtils::Partition::userVisibleFS;
 static Calamares::JobResult
 createZfs( Partition* partition, Device* device )
 {
-    auto r = CalamaresUtils::System::instance()->runCommand(
+    auto r = Calamares::System::instance()->runCommand(
         { "sh",
           "-c",
           "echo start=" + QString::number( partition->firstSector() ) + " size="
@@ -83,7 +83,7 @@ createZfs( Partition* partition, Device* device )
     // If it is a gpt device, set the partition UUID
     if ( device->partitionTable()->type() == PartitionTable::gpt && partition->uuid().isEmpty() )
     {
-        r = CalamaresUtils::System::instance()->runCommand(
+        r = Calamares::System::instance()->runCommand(
             { "sfdisk", "--list", "--output", "Device,UUID", partition->devicePath() }, std::chrono::seconds( 5 ) );
         if ( r.getExitCode() == 0 )
         {
@@ -100,18 +100,15 @@ createZfs( Partition* partition, Device* device )
     return Calamares::JobResult::ok();
 }
 
-
 CreatePartitionJob::CreatePartitionJob( Device* device, Partition* partition )
     : PartitionJob( partition )
     , m_device( device )
 {
 }
 
-
 static QString
 prettyGptType( const Partition* partition )
 {
-#ifdef WITH_KPMCORE42API
     static const QMap< QString, QString > gptTypePrettyStrings = {
         { "44479540-f297-41b2-9af7-d131d5f0458a", "Linux Root Partition (x86)" },
         { "4f68bce3-e8cd-4db1-96e7-fbcaf984b709", "Linux Root Partition (x86-64)" },
@@ -146,9 +143,6 @@ prettyGptType( const Partition* partition )
 
     auto type = partition->type();
     return gptTypePrettyStrings.value( type.toLower(), type );
-#else
-    return QString();
-#endif
 }
 
 static QString
@@ -178,73 +172,73 @@ prettyGptEntries( const Partition* partition )
 QString
 CreatePartitionJob::prettyName() const
 {
-    const PartitionTable* table = CalamaresUtils::Partition::getPartitionTable( m_partition );
+    const PartitionTable* table = Calamares::Partition::getPartitionTable( m_partition );
     if ( table && table->type() == PartitionTable::TableType::gpt )
     {
         QString entries = prettyGptEntries( m_partition );
         if ( !entries.isEmpty() )
         {
-            return tr( "Create new %1MiB partition on %3 (%2) with entries %4." )
-                .arg( CalamaresUtils::BytesToMiB( m_partition->capacity() ) )
+            return tr( "Create new %1MiB partition on %3 (%2) with entries %4", "@title" )
+                .arg( Calamares::BytesToMiB( m_partition->capacity() ) )
                 .arg( m_device->name() )
                 .arg( m_device->deviceNode() )
                 .arg( entries );
         }
         else
         {
-            return tr( "Create new %1MiB partition on %3 (%2)." )
-                .arg( CalamaresUtils::BytesToMiB( m_partition->capacity() ) )
+            return tr( "Create new %1MiB partition on %3 (%2)", "@title" )
+                .arg( Calamares::BytesToMiB( m_partition->capacity() ) )
                 .arg( m_device->name() )
                 .arg( m_device->deviceNode() );
         }
     }
 
-    return tr( "Create new %2MiB partition on %4 (%3) with file system %1." )
+    return tr( "Create new %2MiB partition on %4 (%3) with file system %1", "@title" )
         .arg( userVisibleFS( m_partition->fileSystem() ) )
-        .arg( CalamaresUtils::BytesToMiB( m_partition->capacity() ) )
+        .arg( Calamares::BytesToMiB( m_partition->capacity() ) )
         .arg( m_device->name() )
         .arg( m_device->deviceNode() );
 }
 
-
 QString
 CreatePartitionJob::prettyDescription() const
 {
-    const PartitionTable* table = CalamaresUtils::Partition::getPartitionTable( m_partition );
+    const PartitionTable* table = Calamares::Partition::getPartitionTable( m_partition );
     if ( table && table->type() == PartitionTable::TableType::gpt )
     {
         QString entries = prettyGptEntries( m_partition );
         if ( !entries.isEmpty() )
         {
             return tr( "Create new <strong>%1MiB</strong> partition on <strong>%3</strong> (%2) with entries "
-                       "<em>%4</em>." )
-                .arg( CalamaresUtils::BytesToMiB( m_partition->capacity() ) )
+                       "<em>%4</em>",
+                       "@info" )
+                .arg( Calamares::BytesToMiB( m_partition->capacity() ) )
                 .arg( m_device->name() )
                 .arg( m_device->deviceNode() )
                 .arg( entries );
         }
         else
         {
-            return tr( "Create new <strong>%1MiB</strong> partition on <strong>%3</strong> (%2)." )
-                .arg( CalamaresUtils::BytesToMiB( m_partition->capacity() ) )
+            return tr( "Create new <strong>%1MiB</strong> partition on <strong>%3</strong> (%2)", "@info" )
+                .arg( Calamares::BytesToMiB( m_partition->capacity() ) )
                 .arg( m_device->name() )
                 .arg( m_device->deviceNode() );
         }
     }
 
     return tr( "Create new <strong>%2MiB</strong> partition on <strong>%4</strong> "
-               "(%3) with file system <strong>%1</strong>." )
+               "(%3) with file system <strong>%1</strong>",
+               "@info" )
         .arg( userVisibleFS( m_partition->fileSystem() ) )
-        .arg( CalamaresUtils::BytesToMiB( m_partition->capacity() ) )
+        .arg( Calamares::BytesToMiB( m_partition->capacity() ) )
         .arg( m_device->name() )
         .arg( m_device->deviceNode() );
 }
 
-
 QString
 CreatePartitionJob::prettyStatusMessage() const
 {
-    const PartitionTable* table = CalamaresUtils::Partition::getPartitionTable( m_partition );
+    const PartitionTable* table = Calamares::Partition::getPartitionTable( m_partition );
     if ( table && table->type() == PartitionTable::TableType::gpt )
     {
         QString type = prettyGptType( m_partition );
@@ -257,10 +251,10 @@ CreatePartitionJob::prettyStatusMessage() const
             type = userVisibleFS( m_partition->fileSystem() );
         }
 
-        return tr( "Creating new %1 partition on %2." ).arg( type ).arg( m_device->deviceNode() );
+        return tr( "Creating new %1 partition on %2…", "@status" ).arg( type ).arg( m_device->deviceNode() );
     }
 
-    return tr( "Creating new %1 partition on %2." )
+    return tr( "Creating new %1 partition on %2…", "@status" )
         .arg( userVisibleFS( m_partition->fileSystem() ) )
         .arg( m_device->deviceNode() );
 }
@@ -277,7 +271,7 @@ CreatePartitionJob::exec()
 
     return KPMHelpers::execute(
         NewOperation( *m_device, m_partition ),
-        tr( "The installer failed to create partition on disk '%1'." ).arg( m_device->name() ) );
+        tr( "The installer failed to create partition on disk '%1'.", "@info" ).arg( m_device->name() ) );
 }
 
 void

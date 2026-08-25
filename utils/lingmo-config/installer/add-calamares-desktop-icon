@@ -13,15 +13,32 @@ mkdir -p $DESKTOP
 # Among the Debian desktop environments, LXDE is the only one
 # that behaves completely different.
 if [ -f /usr/bin/lxsession ]; then
-    echo "[Desktop Entry]" > $DESKTOP/install-lingmo.desktop
-    echo "Type=Link" >> $DESKTOP/install-lingmo.desktop
-    echo "Name=Install Lingmo" >> $DESKTOP/install-lingmo.desktop
-    echo "Icon=install-lingmo" >> $DESKTOP/install-lingmo.desktop
-    echo "URL=/usr/share/applications/install-lingmo.desktop" \
-          >> $DESKTOP/install-lingmo.desktop
+    echo "[Desktop Entry]" > $DESKTOP/lingmo-installer-config.desktop
+    echo "Type=Link" >> $DESKTOP/lingmo-installer-config.desktop
+    echo "Name=Installer" >> $DESKTOP/lingmo-installer-config.desktop
+    echo "Icon=calamares" >> $DESKTOP/lingmo-installer-config.desktop
+    echo "URL=/usr/share/applications/lingmo-installer-config.desktop" \
+          >> $DESKTOP/lingmo-installer-config.desktop
 else
-    cp /usr/share/applications/install-lingmo.desktop $DESKTOP
+    cp /usr/share/applications/lingmo-installer-config.desktop $DESKTOP
     # Xfce needs this executable otherwise it complains, everything
     # else doesn't seem to care either way.
-    chmod +x $DESKTOP/install-lingmo.desktop
+    chmod +x $DESKTOP/lingmo-installer-config.desktop
 fi
+
+# Set desktop launcher as trusted under Xfce (See: #1037299)
+if [ "$XDG_CURRENT_DESKTOP" = "XFCE" ]; then
+    gio set --type=string ~/Desktop/lingmo-installer-config.desktop \
+        metadata::trusted true
+    gio set --type=string ~/Desktop/lingmo-installer-config.desktop \
+        metadata::xfce-exe-checksum \
+        "$(sha256sum ~/Desktop/lingmo-installer-config.desktop | cut -f1 -d' ')"
+    touch ~/Desktop/lingmo-installer-config.desktop
+fi
+
+# Preload calamares binaries and libraries using idle disk cycles
+# so that it launches faster
+ionice -C Idle cat /usr/bin/calamares > /dev/null
+for file in $(ldd /usr/bin/calamares | awk '{print $3}'): do
+    ionice -C Idle cat $file > /dev/null
+done

@@ -9,6 +9,8 @@
 
 #include "ChangeFilesystemLabelJob.h"
 
+#include "core/KPMHelpers.h"
+
 #include "utils/Logger.h"
 
 #include <kpmcore/backend/corebackend.h>
@@ -29,15 +31,14 @@ ChangeFilesystemLabelJob::ChangeFilesystemLabelJob( Device* device, Partition* p
 QString
 ChangeFilesystemLabelJob::prettyName() const
 {
-    return tr( "Set filesystem label on %1." ).arg( partition()->partitionPath() );
+    return tr( "Set filesystem label on %1", "@title" ).arg( partition()->partitionPath() );
 }
 
 
 QString
 ChangeFilesystemLabelJob::prettyDescription() const
 {
-    return tr( "Set filesystem label <strong>%1</strong> to partition "
-               "<strong>%2</strong>." )
+    return tr( "Set filesystem label <strong>%1</strong> to partition <strong>%2</strong>", "@info" )
         .arg( m_label )
         .arg( partition()->partitionPath() );
 }
@@ -46,7 +47,9 @@ ChangeFilesystemLabelJob::prettyDescription() const
 QString
 ChangeFilesystemLabelJob::prettyStatusMessage() const
 {
-    return prettyDescription();
+    return tr( "Setting filesystem label <strong>%1</strong> to partition <strong>%2</strong>…", "@status" )
+        .arg( m_label )
+        .arg( partition()->partitionPath() );
 }
 
 
@@ -58,6 +61,17 @@ ChangeFilesystemLabelJob::exec()
         return Calamares::JobResult::ok();
     }
 
+    // Check for luks device
+    if ( partition()->fileSystem().type() == FileSystem::Luks )
+    {
+        if ( KPMHelpers::cryptLabel( partition(), m_label ) )
+        {
+            return Calamares::JobResult::ok();
+        }
+        return Calamares::JobResult::error(
+            tr( "The installer failed to update partition table on disk '%1'.", "@info" ).arg( m_device->name() ) );
+    }
+
     Report report( nullptr );
     SetFileSystemLabelOperation op( *partition(), m_label );
     op.setStatus( Operation::StatusRunning );
@@ -67,5 +81,6 @@ ChangeFilesystemLabelJob::exec()
         return Calamares::JobResult::ok();
     }
     return Calamares::JobResult::error(
-        tr( "The installer failed to update partition table on disk '%1'." ).arg( m_device->name() ), report.toText() );
+        tr( "The installer failed to update partition table on disk '%1'.", "@info" ).arg( m_device->name() ),
+        report.toText() );
 }

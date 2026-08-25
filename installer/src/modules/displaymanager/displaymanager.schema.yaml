@@ -10,7 +10,7 @@ properties:
         type: array
         items:
             type: string
-            enum: [slim, sddm, lightdm, gdm, mdm, lxdm, kdm, greetd]
+            enum: [slim, sddm, lightdm, gdm, mdm, lxdm, greetd]
         minItems: 1  # Must be non-empty, if present at all
     defaultDesktopEnvironment:
         type: object
@@ -20,3 +20,20 @@ properties:
         required: [ executable, desktopFile ]
     basicSetup: { type: boolean, default: false }
     sysconfigSetup: { type: boolean, default: false }
+    greetd:
+        type: object
+        properties:
+            greeter_user: { type: string }
+            greeter_group: { type: string }
+            greeter_css_location: { type: string }
+        additionalProperties: false
+    lightdm:
+        type: object
+        properties:
+            preferred_greeters: { type: array, items: { type: string } }
+        additionalProperties: false
+    sddm:
+        type: object
+        properties:
+            configuration_file: { type: string }
+        additionalProperties: false

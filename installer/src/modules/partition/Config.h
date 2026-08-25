@@ -31,7 +31,16 @@ class Config : public QObject
     Q_PROPERTY(
         QString eraseModeFilesystem READ eraseFsType WRITE setEraseFsTypeChoice NOTIFY eraseModeFilesystemChanged )
 
+    Q_PROPERTY( QString replaceModeFilesystem READ replaceModeFilesystem WRITE setReplaceFilesystemChoice NOTIFY
+                    replaceModeFilesystemChanged )
+
     Q_PROPERTY( bool allowManualPartitioning READ allowManualPartitioning CONSTANT FINAL )
+    Q_PROPERTY( bool preCheckEncryption READ preCheckEncryption CONSTANT FINAL )
+    Q_PROPERTY( bool showNotEncryptedBootMessage READ showNotEncryptedBootMessage CONSTANT FINAL )
+
+    Q_PROPERTY( bool lvmEnabled READ isLVMEnabled CONSTANT FINAL )
+
+    Q_PROPERTY( QStringList essentialMounts READ essentialMounts CONSTANT FINAL )
 
 public:
     Config( QObject* parent );
@@ -62,6 +71,15 @@ public:
     using SwapChoiceSet = QSet< SwapChoice >;
 
     using EraseFsTypesSet = QStringList;
+
+    /** @brief Choice of LUKS disk encryption generation */
+    enum class LuksGeneration
+    {
+        Luks1,  // First generation of LUKS
+        Luks2,  // Second generation of LUKS, default since cryptsetup >= 2.1.0
+    };
+    Q_ENUM( LuksGeneration )
+    static const NamedEnumTable< LuksGeneration >& luksGenerationNames();
 
     void setConfigurationMap( const QVariantMap& );
     /** @brief Set GS values where other modules configuration has priority
@@ -122,6 +140,9 @@ public:
      */
     QString eraseFsType() const { return m_eraseFsTypeChoice; }
 
+    /// @brief Currently-selected FS type for *replace* mode
+    QString replaceModeFilesystem() const { return m_replaceFileSystemChoice; }
+
     /** @brief Configured default FS type (for other modes than erase)
      *
      * This is not "Unknown" or "Unformatted"
@@ -130,6 +151,16 @@ public:
 
     /// @brief Is manual partitioning allowed (not explicitly disabled in the config file)?
     bool allowManualPartitioning() const { return m_allowManualPartitioning; }
+
+    /** @brief Pre-check encryption checkbox.
+     *
+     * This is meaningful only if enableLuksAutomatedPartitioning is @c true.
+     * Default value is @c false
+     */
+    bool preCheckEncryption() const { return m_preCheckEncryption; }
+
+    /// @brief Show "Boot partition not encrypted" warning (not explicitly disabled in the config file)?
+    bool showNotEncryptedBootMessage() const { return m_showNotEncryptedBootMessage; }
 
     /** @brief Will @p tableType be ok?
      *
@@ -140,34 +171,59 @@ public:
     /// @brief Returns list of acceptable types. May be empty.
     QStringList partitionTableTypes() const { return m_requiredPartitionTableType; }
 
+    /** @brief The configured LUKS generation (1 or 2)
+     */
+    LuksGeneration luksFileSystemType() const { return m_luksFileSystemType; }
+
+    /// @brief If zfs encryption should be allowed
+    bool allowZfsEncryption() const { return m_allowZfsEncryption; }
+
+    bool isLVMEnabled() const { return m_isLVMEnabled; }
+
+    /** @brief A list of names that can follow /dev/mapper/ that must not be closed
+     *
+     * These names (if any) are skipped by the ClearMountsJob.
+     * The names may contain a trailing '*' which acts as a wildcard.
+     * In any other position, '*' is interpreted literally.
+     */
+    QStringList essentialMounts() const { return m_essentialMounts; }
+
 public Q_SLOTS:
     void setInstallChoice( int );  ///< Translates a button ID or so to InstallChoice
     void setInstallChoice( InstallChoice );
     void setSwapChoice( int );  ///< Translates a button ID or so to SwapChoice
     void setSwapChoice( SwapChoice );
     void setEraseFsTypeChoice( const QString& filesystemName );  ///< See property eraseModeFilesystem
+    void setReplaceFilesystemChoice( const QString& filesystemName );
 
 Q_SIGNALS:
     void installChoiceChanged( InstallChoice );
     void swapChoiceChanged( SwapChoice );
     void eraseModeFilesystemChanged( const QString& );
+    void replaceModeFilesystemChanged( const QString& );
 
 private:
     /** @brief Handle FS-type configuration, for erase and default */
     void fillConfigurationFSTypes( const QVariantMap& configurationMap );
     EraseFsTypesSet m_eraseFsTypes;
     QString m_eraseFsTypeChoice;
+    QString m_replaceFileSystemChoice;
     FileSystem::Type m_defaultFsType;
 
     SwapChoiceSet m_swapChoices;
     SwapChoice m_initialSwapChoice = NoSwap;
     SwapChoice m_swapChoice = NoSwap;
+    LuksGeneration m_luksFileSystemType = LuksGeneration::Luks1;
     InstallChoice m_initialInstallChoice = NoChoice;
     InstallChoice m_installChoice = NoChoice;
     qreal m_requiredStorageGiB = 0.0;  // May duplicate setting in the welcome module
     QStringList m_requiredPartitionTableType;
-
+    bool m_allowZfsEncryption = true;
     bool m_allowManualPartitioning = true;
+    bool m_preCheckEncryption = false;
+    bool m_showNotEncryptedBootMessage = true;
+    bool m_isLVMEnabled = true;
+    QStringList m_essentialMounts;
 };
 
 /** @brief Given a set of swap choices, return a sensible value from it.

@@ -93,20 +93,17 @@ ViewManager::ViewManager( QObject* parent )
 #endif
 }
 
-
 ViewManager::~ViewManager()
 {
     m_widget->deleteLater();
     s_instance = nullptr;
 }
 
-
 QWidget*
 ViewManager::centralWidget()
 {
     return m_widget;
 }
-
 
 void
 ViewManager::addViewStep( ViewStep* step )
@@ -119,7 +116,6 @@ ViewManager::addViewStep( ViewStep* step )
         emit nextEnabledChanged( m_nextEnabled );
     }
 }
-
 
 void
 ViewManager::insertViewStep( int before, ViewStep* step )
@@ -156,11 +152,11 @@ ViewManager::onInstallationFailed( const QString& message, const QString& detail
     cDebug() << Logger::SubEntry << "- message:" << message;
     cDebug() << Logger::SubEntry << "- details:" << Logger::NoQuote << details;
 
-    QString heading
-        = Calamares::Settings::instance()->isSetupMode() ? tr( "Setup Failed" ) : tr( "Installation Failed" );
+    QString heading = Calamares::Settings::instance()->isSetupMode() ? tr( "Setup Failed", "@title" )
+                                                                     : tr( "Installation Failed", "@title" );
 
     ErrorDialog* errorDialog = new ErrorDialog();
-    errorDialog->setWindowTitle( tr( "Error" ) );
+    errorDialog->setWindowTitle( tr( "Error", "@title" ) );
     errorDialog->setHeading( "<strong>" + heading + "</strong>" );
     errorDialog->setInformativeText( message );
     errorDialog->setShouldOfferWebPaste( Calamares::Branding::instance()->uploadServer() );
@@ -174,26 +170,30 @@ ViewManager::onInstallationFailed( const QString& message, const QString& detail
              {
                  if ( result == QDialog::Accepted && errorDialog->shouldOfferWebPaste() )
                  {
-                     CalamaresUtils::Paste::doLogUploadUI( errorDialog );
+                     Calamares::Paste::doLogUploadUI( errorDialog );
                  }
+#if QT_VERSION < QT_VERSION_CHECK( 6, 0, 0 )
                  QApplication::quit();
+#else
+                 QApplication::exit( EXIT_SUCCESS );
+#endif
              } );
 }
-
 
 void
 ViewManager::onInitFailed( const QStringList& modules )
 {
     // Because this means the installer / setup program is broken by the distributor,
     // don't bother being precise about installer / setup wording.
-    QString title( tr( "Calamares Initialization Failed" ) );
+    QString title( tr( "Calamares Initialization Failed", "@title" ) );
     QString description( tr( "%1 can not be installed. Calamares was unable to load all of the configured modules. "
-                             "This is a problem with the way Calamares is being used by the distribution." ) );
+                             "This is a problem with the way Calamares is being used by the distribution.",
+                             "@info" ) );
     QString detailString;
 
     if ( modules.count() > 0 )
     {
-        description.append( tr( "<br/>The following modules could not be loaded:" ) );
+        description.append( tr( "<br/>The following modules could not be loaded:", "@info" ) );
         QStringList details;
         details << QLatin1String( "<ul>" );
         for ( const auto& m : modules )
@@ -237,20 +237,17 @@ ViewManager::updateNextStatus( bool status )
     }
 }
 
-
 ViewStepList
 ViewManager::viewSteps() const
 {
     return m_steps;
 }
 
-
 ViewStep*
 ViewManager::currentStep() const
 {
     return currentStepValid() ? m_steps.value( m_currentStep ) : nullptr;
 }
-
 
 int
 ViewManager::currentStepIndex() const
@@ -287,6 +284,36 @@ isAtVeryEnd( const ViewStepList& steps, int index )
     return ( index >= steps.count() ) || ( index == steps.count() - 1 && steps.last()->isAtEnd() );
 }
 
+static int
+questionBox( QWidget* parent,
+             const QString& title,
+             const QString& question,
+             const QString& button0,
+             const QString& button1 )
+{
+
+#if QT_VERSION < QT_VERSION_CHECK( 6, 0, 0 )
+    return QMessageBox::question( parent,
+                                  title,
+                                  question,
+                                  button0,
+                                  button1,
+                                  QString(),
+                                  0 /* default first button, i.e. confirm */,
+                                  1 /* escape is second button, i.e. cancel */ );
+#else
+    QMessageBox mb( QMessageBox::Question, title, question, QMessageBox::StandardButton::NoButton, parent );
+    const auto* const okButton = mb.addButton( button0, QMessageBox::AcceptRole );
+    mb.addButton( button1, QMessageBox::RejectRole );
+    mb.exec();
+    if ( mb.clickedButton() == okButton )
+    {
+        return 0;
+    }
+    return 1;  // Cancel
+#endif
+}
+
 void
 ViewManager::next()
 {
@@ -306,27 +333,26 @@ ViewManager::next()
         // Depending on Calamares::Settings, we show an "are you sure" prompt or not.
         if ( settings->showPromptBeforeExecution() && stepIsExecute( m_steps, m_currentStep + 1 ) )
         {
-            QString title
-                = settings->isSetupMode() ? tr( "Continue with setup?" ) : tr( "Continue with installation?" );
+            QString title = settings->isSetupMode() ? tr( "Continue with Setup?", "@title" )
+                                                    : tr( "Continue with Installation?", "@title" );
             QString question = settings->isSetupMode()
                 ? tr( "The %1 setup program is about to make changes to your "
                       "disk in order to set up %2.<br/><strong>You will not be able "
-                      "to undo these changes.</strong>" )
+                      "to undo these changes.</strong>",
+                      "%1 is short product name, %2 is short product name with version" )
                 : tr( "The %1 installer is about to make changes to your "
                       "disk in order to install %2.<br/><strong>You will not be able "
-                      "to undo these changes.</strong>" );
-            QString confirm = settings->isSetupMode() ? tr( "&Set up now" ) : tr( "&Install now" );
+                      "to undo these changes.</strong>",
+                      "%1 is short product name, %2 is short product name with version" );
+            QString confirm
+                = settings->isSetupMode() ? tr( "&Set Up Now", "@button" ) : tr( "&Install Now", "@button" );
 
             const auto* branding = Calamares::Branding::instance();
-            int reply
-                = QMessageBox::question( m_widget,
-                                         title,
-                                         question.arg( branding->shortProductName(), branding->shortVersionedName() ),
-                                         confirm,
-                                         tr( "Go &back" ),
-                                         QString(),
-                                         0 /* default first button, i.e. confirm */,
-                                         1 /* escape is second button, i.e. cancel */ );
+            int reply = questionBox( m_widget,
+                                     title,
+                                     question.arg( branding->shortProductName(), branding->shortVersionedName() ),
+                                     confirm,
+                                     tr( "Go &Back", "@button" ) );
             if ( reply == 1 )
             {
                 return;
@@ -373,13 +399,13 @@ ViewManager::updateButtonLabels()
 {
     const auto* const settings = Calamares::Settings::instance();
 
-    QString nextIsInstallationStep = settings->isSetupMode() ? tr( "&Set up" ) : tr( "&Install" );
+    QString nextIsInstallationStep = settings->isSetupMode() ? tr( "&Set Up", "@button" ) : tr( "&Install", "@button" );
     QString quitOnCompleteTooltip = settings->isSetupMode()
-        ? tr( "Setup is complete. Close the setup program." )
-        : tr( "The installation is complete. Close the installer." );
+        ? tr( "Setup is complete. Close the setup program.", "@tooltip" )
+        : tr( "The installation is complete. Close the installer.", "@tooltip" );
     QString cancelBeforeInstallationTooltip = settings->isSetupMode()
-        ? tr( "Cancel setup without changing the system." )
-        : tr( "Cancel installation without changing the system." );
+        ? tr( "Cancel the setup process without changing the system.", "@tooltip" )
+        : tr( "Cancel the installation process without changing the system.", "@tooltip" );
 
     // If we're going into the execution step / install phase, other message
     if ( stepIsExecute( m_steps, m_currentStep + 1 ) )
@@ -389,18 +415,18 @@ ViewManager::updateButtonLabels()
     }
     else
     {
-        UPDATE_BUTTON_PROPERTY( nextLabel, tr( "&Next" ) );
+        UPDATE_BUTTON_PROPERTY( nextLabel, tr( "&Next", "@button" ) );
         UPDATE_BUTTON_PROPERTY( nextIcon, "go-next" );
     }
 
     // Going back is always simple
-    UPDATE_BUTTON_PROPERTY( backLabel, tr( "&Back" ) );
+    UPDATE_BUTTON_PROPERTY( backLabel, tr( "&Back", "@button" ) );
     UPDATE_BUTTON_PROPERTY( backIcon, "go-previous" );
 
     // Cancel button changes label at the end
     if ( isAtVeryEnd( m_steps, m_currentStep ) )
     {
-        UPDATE_BUTTON_PROPERTY( quitLabel, tr( "&Done" ) );
+        UPDATE_BUTTON_PROPERTY( quitLabel, tr( "&Done", "@button" ) );
         UPDATE_BUTTON_PROPERTY( quitTooltip, quitOnCompleteTooltip );
         UPDATE_BUTTON_PROPERTY( quitVisible, true );
         UPDATE_BUTTON_PROPERTY( quitIcon, "dialog-ok-apply" );
@@ -419,7 +445,7 @@ ViewManager::updateButtonLabels()
         updateCancelEnabled( !settings->disableCancel()
                              && !( stepIsExecute( m_steps, m_currentStep ) && settings->disableCancelDuringExec() ) );
 
-        UPDATE_BUTTON_PROPERTY( quitLabel, tr( "&Cancel" ) );
+        UPDATE_BUTTON_PROPERTY( quitLabel, tr( "&Cancel", "@button" ) );
         UPDATE_BUTTON_PROPERTY( quitTooltip, cancelBeforeInstallationTooltip );
         UPDATE_BUTTON_PROPERTY( quitIcon, "dialog-cancel" );
     }
@@ -460,17 +486,34 @@ ViewManager::back()
     updateButtonLabels();
 }
 
-
 void
 ViewManager::quit()
 {
-    if ( confirmCancelInstallation() )
+    const auto r = confirmCancelInstallation();
+    if ( r == Confirmation::Continue )
     {
-        qApp->quit();
+        return;
     }
+
+    if ( r == Confirmation::CancelInstallation )
+    {
+        // Cancel view steps in reverse
+        for ( int i = m_currentStep; i >= 0; --i )
+        {
+            auto* step = m_steps.at( i );
+            cDebug() << "Cancelling view step" << step->moduleInstanceKey();
+            step->onCancel();
+        }
+    }
+
+#if QT_VERSION < QT_VERSION_CHECK( 6, 0, 0 )
+    QApplication::quit();
+#else
+    QApplication::exit( EXIT_SUCCESS );
+#endif
 }
 
-bool
+ViewManager::Confirmation
 ViewManager::confirmCancelInstallation()
 {
     const auto* const settings = Calamares::Settings::instance();
@@ -478,21 +521,21 @@ ViewManager::confirmCancelInstallation()
     // When we're at the very end, then it's always OK to exit.
     if ( isAtVeryEnd( m_steps, m_currentStep ) )
     {
-        return true;
+        return Confirmation::EndOfInstallation;
     }
 
     // Not at the very end, cancel/quit might be disabled
     if ( settings->disableCancel() )
     {
-        return false;
+        return Confirmation::Continue;
     }
     if ( settings->disableCancelDuringExec() && stepIsExecute( m_steps, m_currentStep ) )
     {
-        return false;
+        return Confirmation::Continue;
     }
 
     // Otherwise, confirm cancel/quit.
-    QString title = settings->isSetupMode() ? tr( "Cancel setup?" ) : tr( "Cancel installation?" );
+    QString title = settings->isSetupMode() ? tr( "Cancel Setup?", "@title" ) : tr( "Cancel Installation?", "@title" );
     QString question = settings->isSetupMode() ? tr( "Do you really want to cancel the current setup process?\n"
                                                      "The setup program will quit and all changes will be lost." )
                                                : tr( "Do you really want to cancel the current install process?\n"
@@ -501,7 +544,7 @@ ViewManager::confirmCancelInstallation()
     mb.setDefaultButton( QMessageBox::No );
     Calamares::fixButtonLabels( &mb );
     int response = mb.exec();
-    return response == QMessageBox::Yes;
+    return ( response == QMessageBox::Yes ) ? Confirmation::CancelInstallation : Confirmation::Continue;
 }
 
 void
@@ -544,7 +587,11 @@ ViewManager::data( const QModelIndex& index, int role ) const
         if ( Calamares::Settings::instance()->debugMode() )
         {
             auto key = step->moduleInstanceKey();
-            QString toolTip( "<b>Debug information</b>" );
+            // The tooltip is intentionally not translated:
+            // we must be in debug-mode (-d) so presumably it
+            // is a distro-developer or Calamares-developer
+            // running it, and we don't need translation for them.
+            QString toolTip( "<b>Debug information</b>" );  // Intentionally no translation here
             toolTip.append( "<br/>Type:\tViewStep" );
             toolTip.append( QString( "<br/>Pretty:\t%1" ).arg( step->prettyName() ) );
             toolTip.append( QString( "<br/>Status:\t%1" ).arg( step->prettyStatus() ) );
@@ -562,7 +609,6 @@ ViewManager::data( const QModelIndex& index, int role ) const
         return QVariant();
     }
 }
-
 
 int
 ViewManager::rowCount( const QModelIndex& parent ) const

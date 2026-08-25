@@ -22,6 +22,8 @@ calamares_add_plugin(keyboardq
         ${_keyboard}/SetKeyboardLayoutJob.cpp
         ${_keyboard}/keyboardwidget/keyboardglobal.cpp
     RESOURCES
-        keyboardq.qrc
+        keyboardq${QT_VERSION_SUFFIX}.qrc
     SHARED_LIB
+    LINK_LIBRARIES
+        ${qtname}::DBus
 )

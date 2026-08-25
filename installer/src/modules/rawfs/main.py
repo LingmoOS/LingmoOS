@@ -126,7 +126,7 @@ class RawFSItem:
                 config["source"], device))
         self.source = os.path.realpath(config["source"])
         # If source is a mount point, look for the actual device mounted on it
-        if os.path.ismount(self.source):
+        if os.path.ismount(self.source) and not libcalamares.job.configuration.get("bogus", False):
             procmounts = open("/proc/mounts", "r")
             for line in procmounts:
                 if self.source in line.split():
@@ -146,9 +146,10 @@ def update_global_storage(item, gs):
             ret = subprocess.run(["blkid", "-s", "UUID", "-o", "value", item.destination],
                     stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
             if ret.returncode == 0:
+                uuid = ret.stdout.rstrip()
                 libcalamares.utils.debug("Setting {} UUID to {}".format(item.destination,
-                        ret.stdout.rstrip()))
-                gs[gs.index(partition)]["uuid"] = ret.stdout.rstrip()
+                        uuid or "<empty>"))
+                gs[gs.index(partition)]["uuid"] = uuid
                 gs[gs.index(partition)]["source"] = item.source
 
     libcalamares.globalstorage.remove("partitions")

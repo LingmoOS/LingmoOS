@@ -28,7 +28,7 @@ NetworkTests::initTestCase()
 void
 NetworkTests::testInstance()
 {
-    auto& nam = CalamaresUtils::Network::Manager::instance();
+    Calamares::Network::Manager nam;
     QVERIFY( !nam.hasInternet() );
     QCOMPARE( nam.getCheckInternetUrls().count(), 0 );
 }
@@ -36,9 +36,9 @@ NetworkTests::testInstance()
 void
 NetworkTests::testPing()
 {
-    using namespace CalamaresUtils::Network;
+    using namespace Calamares::Network;
     Logger::setupLogLevel( Logger::LOGVERBOSE );
-    auto& nam = Manager::instance();
+    Manager nam;
 
     // On FreeBSD, the SSL handling depends on the presence of root keys
     // (from the ca_nss port) which may not be available. So HTTPS requests
@@ -65,9 +65,9 @@ NetworkTests::testPing()
 void
 NetworkTests::testCheckUrl()
 {
-    using namespace CalamaresUtils::Network;
+    using namespace Calamares::Network;
     Logger::setupLogLevel( Logger::LOGVERBOSE );
-    auto& nam = Manager::instance();
+    Manager nam;
 
     {
         QUrl u( "http://example.com" );
@@ -95,9 +95,9 @@ NetworkTests::testCheckUrl()
 void
 NetworkTests::testCheckMultiUrl()
 {
-    using namespace CalamaresUtils::Network;
+    using namespace Calamares::Network;
     Logger::setupLogLevel( Logger::LOGVERBOSE );
-    auto& nam = Manager::instance();
+    Manager nam;
 
     {
         QUrl u0( "http://example.com" );

@@ -12,9 +12,9 @@
 
 #include "GlobalStorage.h"
 #include "JobQueue.h"
-#include "utils/CalamaresUtilsSystem.h"
 #include "utils/Entropy.h"
 #include "utils/Logger.h"
+#include "utils/System.h"
 
 #include <QDir>
 
@@ -25,7 +25,6 @@
 #endif
 #include <unistd.h>
 
-
 SetPasswordJob::SetPasswordJob( const QString& userName, const QString& newPassword )
     : Calamares::Job()
     , m_userName( userName )
@@ -33,21 +32,19 @@ SetPasswordJob::SetPasswordJob( const QString& userName, const QString& newPassw
 {
 }
 
-
 QString
 SetPasswordJob::prettyName() const
 {
     return tr( "Set password for user %1" ).arg( m_userName );
 }
 
-
 QString
 SetPasswordJob::prettyStatusMessage() const
 {
-    return tr( "Setting password for user %1." ).arg( m_userName );
+    return tr( "Setting password for user %1…", "@status" ).arg( m_userName );
 }
 
-
+#ifndef HAVE_CRYPT_GENSALT
 /// Returns a modular hashing salt for method 6 (SHA512) with a 16 character random salt.
 QString
 SetPasswordJob::make_salt( int length )
@@ -56,21 +53,22 @@ SetPasswordJob::make_salt( int length )
     Q_ASSERT( length <= 128 );
 
     QString salt_string;
-    CalamaresUtils::EntropySource source = CalamaresUtils::getPrintableEntropy( length, salt_string );
+    Calamares::EntropySource source = Calamares::getPrintableEntropy( length, salt_string );
     if ( salt_string.length() != length )
     {
         cWarning() << "getPrintableEntropy returned string of length" << salt_string.length() << "expected" << length;
         salt_string.truncate( length );
     }
-    if ( source != CalamaresUtils::EntropySource::URandom )
+    if ( source != Calamares::EntropySource::URandom )
     {
         cWarning() << "Entropy data for salt is low-quality.";
     }
 
-    salt_string.insert( 0, "$6$" );
+    salt_string.insert( 0, "$y$" );
     salt_string.append( '$' );
     return salt_string;
 }
+#endif
 
 Calamares::JobResult
 SetPasswordJob::exec()
@@ -78,24 +76,37 @@ SetPasswordJob::exec()
     Calamares::GlobalStorage* gs = Calamares::JobQueue::instance()->globalStorage();
     QDir destDir( gs->value( "rootMountPoint" ).toString() );
     if ( !destDir.exists() )
+    {
         return Calamares::JobResult::error( tr( "Bad destination system path." ),
                                             tr( "rootMountPoint is %1" ).arg( destDir.absolutePath() ) );
+    }
 
     if ( m_userName == "root" && m_newPassword.isEmpty() )  //special case for disabling root account
     {
-        int ec = CalamaresUtils::System::instance()->targetEnvCall( { "passwd", "-dl", m_userName } );
+        int ec = Calamares::System::instance()->targetEnvCall( { "usermod", "-p", "!", m_userName } );
         if ( ec )
+        {
             return Calamares::JobResult::error( tr( "Cannot disable root account." ),
-                                                tr( "passwd terminated with error code %1." ).arg( ec ) );
+                                                tr( "usermod terminated with error code %1." ).arg( ec ) );
+        }
         return Calamares::JobResult::ok();
     }
 
-    QString encrypted = QString::fromLatin1( crypt( m_newPassword.toUtf8(), make_salt( 16 ).toUtf8() ) );
+    QString salt;
+#ifdef HAVE_CRYPT_GENSALT
+    salt = crypt_gensalt( NULL, 0, NULL, 0 );
+#else
+    salt = make_salt( 16 );
+#endif
 
-    int ec = CalamaresUtils::System::instance()->targetEnvCall( { "usermod", "-p", encrypted, m_userName } );
+    QString encrypted = QString::fromLatin1( crypt( m_newPassword.toUtf8(), salt.toUtf8() ) );
+
+    int ec = Calamares::System::instance()->targetEnvCall( { "usermod", "-p", encrypted, m_userName } );
     if ( ec )
+    {
         return Calamares::JobResult::error( tr( "Cannot set password for user %1." ).arg( m_userName ),
                                             tr( "usermod terminated with error code %1." ).arg( ec ) );
+    }
 
     return Calamares::JobResult::ok();
 }

@@ -14,6 +14,7 @@
 #include "IDJob.h"
 
 #include "utils/Retranslator.h"
+#include "utils/StringExpander.h"
 #include "utils/Variant.h"
 
 #include <QDate>
@@ -38,7 +39,6 @@ public:
 };
 
 OEMPage::~OEMPage() {}
-
 
 OEMViewStep::OEMViewStep( QObject* parent )
     : Calamares::ViewStep( parent )
@@ -82,14 +82,10 @@ OEMViewStep::isAtEnd() const
 static QString
 substitute( QString s )
 {
-    QString t_date = QStringLiteral( "@@DATE@@" );
-    if ( s.contains( t_date ) )
-    {
-        auto date = QDate::currentDate();
-        s = s.replace( t_date, date.toString( Qt::ISODate ) );
-    }
+    Calamares::String::DictionaryExpander d;
+    d.insert( QStringLiteral( "DATE" ), QDate::currentDate().toString( Qt::ISODate ) );
 
-    return s;
+    return d.expand( s );
 }
 
 void
@@ -128,7 +124,6 @@ OEMViewStep::prettyStatus() const
     return tr( "Set the OEM Batch Identifier to <code>%1</code>." ).arg( m_user_batchIdentifier );
 }
 
-
 QWidget*
 OEMViewStep::widget()
 {
@@ -148,7 +143,7 @@ OEMViewStep::jobs() const
 void
 OEMViewStep::setConfigurationMap( const QVariantMap& configurationMap )
 {
-    m_conf_batchIdentifier = CalamaresUtils::getString( configurationMap, "batch-identifier" );
+    m_conf_batchIdentifier = Calamares::getString( configurationMap, "batch-identifier" );
     m_user_batchIdentifier = substitute( m_conf_batchIdentifier );
 }
 

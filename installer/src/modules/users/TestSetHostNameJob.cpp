@@ -16,8 +16,8 @@ extern bool setSystemdHostname( const QString& );
 
 #include "GlobalStorage.h"
 #include "JobQueue.h"
-#include "utils/CalamaresUtilsSystem.h"
 #include "utils/Logger.h"
+#include "utils/System.h"
 #include "utils/Yaml.h"
 
 #include <QTemporaryDir>
@@ -59,7 +59,7 @@ UsersTests::initTestCase()
     cDebug() << "Test dir" << m_dir.path();
 
     // Ensure we have a system object, expect it to be a "bogus" one
-    CalamaresUtils::System* system = CalamaresUtils::System::instance();
+    Calamares::System* system = Calamares::System::instance();
     QVERIFY( system );
     QVERIFY( system->doChroot() );
 
@@ -96,7 +96,7 @@ UsersTests::testEtcHostname()
     // Doesn't create intermediate directories
     QVERIFY( !setFileHostname( testHostname ) );
 
-    QVERIFY( CalamaresUtils::System::instance()->createTargetDirs( "/etc" ) );
+    QVERIFY( Calamares::System::instance()->createTargetDirs( "/etc" ) );
     QVERIFY( QFile::exists( m_dir.filePath( "etc" ) ) );
 
     // Does write the file
@@ -131,7 +131,10 @@ UsersTests::testHostnamed()
     // root, assume it will succeed.
     if ( geteuid() != 0 )
     {
-        QEXPECT_FAIL( "", "Hostname changes are access-controlled", Continue );
+        if ( !setSystemdHostname( QStringLiteral( "tubophone.calamares.io" ) ) )
+        {
+            QEXPECT_FAIL( "", "Hostname changes are access-controlled", Continue );
+        }
     }
     QVERIFY( setSystemdHostname( QStringLiteral( "tubophone.calamares.io" ) ) );
     if ( !m_originalHostName.isEmpty() )
@@ -144,7 +147,6 @@ UsersTests::testHostnamed()
     }
 }
 
-
 void
 UsersTests::cleanup()
 {
@@ -153,7 +155,6 @@ UsersTests::cleanup()
         m_dir.setAutoRemove( false );
     }
 }
-
 
 QTEST_GUILESS_MAIN( UsersTests )
 

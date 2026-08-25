@@ -18,7 +18,14 @@
 #include <QObject>
 #include <QString>
 
-namespace CalamaresUtils
+///@brief Define to 1 if the Qt version being used supports Interlingue fully
+#if QT_VERSION < QT_VERSION_CHECK( 6, 7, 0 )
+#define CALAMARES_QT_SUPPORT_INTERLINGUE 0
+#else
+#define CALAMARES_QT_SUPPORT_INTERLINGUE 1
+#endif
+
+namespace Calamares
 {
 namespace Locale
 {
@@ -35,8 +42,10 @@ namespace Locale
  *   Serbian written with Latin characters (not Cyrillic).
  * - `ca@valencia` is the Catalan dialect spoken in Valencia.
  *   There is no Qt code for it.
+ *
+ * (There are more special cases, not documented here)
  */
-class Translation : public QObject
+class DLLEXPORT Translation : public QObject
 {
     Q_OBJECT
 
@@ -63,7 +72,6 @@ public:
      * in the label (human-readable form) or only if needed for disambiguation.
      */
     Translation( const Id& localeId, LabelFormat format = LabelFormat::IfNeededWithCountry, QObject* parent = nullptr );
-
 
     /** @brief Define a sorting order.
      *
@@ -97,7 +105,15 @@ public:
     QLocale::Language language() const { return m_locale.language(); }
 
     /// @brief Convenience accessor to the country part (if any) of the locale
-    QLocale::Country country() const { return m_locale.country(); }
+    QLocale::Country country() const
+    {
+#if QT_VERSION < QT_VERSION_CHECK( 6, 6, 0 )
+
+        return m_locale.country();
+#else
+        return m_locale.territory();
+#endif
+    }
 
     /** @brief Get a Qt locale for the given @p localeName
      *
@@ -124,6 +140,6 @@ operator==( const Translation::Id& lhs, const Translation::Id& rhs )
 }
 
 }  // namespace Locale
-}  // namespace CalamaresUtils
+}  // namespace Calamares
 
 #endif

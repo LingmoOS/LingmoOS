@@ -11,21 +11,19 @@
 #include "LocaleViewStep.h"
 
 #include "LocalePage.h"
-#include "widgets/WaitingWidget.h"
 
 #include "GlobalStorage.h"
 #include "JobQueue.h"
 
 #include "geoip/Handler.h"
 #include "network/Manager.h"
-#include "utils/CalamaresUtilsGui.h"
+#include "utils/Gui.h"
 #include "utils/Logger.h"
 #include "utils/Variant.h"
 #include "utils/Yaml.h"
 
 #include <QBoxLayout>
 #include <QLabel>
-
 
 CALAMARES_PLUGIN_FACTORY_DEFINITION( LocaleViewStepFactory, registerPlugin< LocaleViewStep >(); )
 
@@ -38,11 +36,10 @@ LocaleViewStep::LocaleViewStep( QObject* parent )
 {
     QBoxLayout* mainLayout = new QHBoxLayout;
     m_widget->setLayout( mainLayout );
-    CalamaresUtils::unmarginLayout( mainLayout );
+    Calamares::unmarginLayout( mainLayout );
 
     emit nextStatusChanged( m_nextEnabled );
 }
-
 
 LocaleViewStep::~LocaleViewStep()
 {
@@ -51,7 +48,6 @@ LocaleViewStep::~LocaleViewStep()
         m_widget->deleteLater();
     }
 }
-
 
 void
 LocaleViewStep::setUpPage()
@@ -69,13 +65,11 @@ LocaleViewStep::setUpPage()
     emit nextStatusChanged( m_nextEnabled );
 }
 
-
 QString
 LocaleViewStep::prettyName() const
 {
-    return tr( "Location" );
+    return tr( "Location", "@label" );
 }
-
 
 QString
 LocaleViewStep::prettyStatus() const
@@ -83,13 +77,11 @@ LocaleViewStep::prettyStatus() const
     return m_config->prettyStatus();
 }
 
-
 QWidget*
 LocaleViewStep::widget()
 {
     return m_widget;
 }
-
 
 bool
 LocaleViewStep::isNextEnabled() const
@@ -97,13 +89,11 @@ LocaleViewStep::isNextEnabled() const
     return m_nextEnabled;
 }
 
-
 bool
 LocaleViewStep::isBackEnabled() const
 {
     return true;
 }
-
 
 bool
 LocaleViewStep::isAtBeginning() const
@@ -111,20 +101,17 @@ LocaleViewStep::isAtBeginning() const
     return true;
 }
 
-
 bool
 LocaleViewStep::isAtEnd() const
 {
     return true;
 }
 
-
 Calamares::JobList
 LocaleViewStep::jobs() const
 {
     return m_config->createJobs();
 }
-
 
 void
 LocaleViewStep::onActivate()
@@ -137,13 +124,17 @@ LocaleViewStep::onActivate()
     m_actualWidget->onActivate();
 }
 
-
 void
 LocaleViewStep::onLeave()
 {
     m_config->finalizeGlobalStorage();
 }
 
+void
+LocaleViewStep::onCancel()
+{
+    m_config->cancel();
+}
 
 void
 LocaleViewStep::setConfigurationMap( const QVariantMap& configurationMap )

@@ -279,15 +279,20 @@ class PMApt(PackageManager):
 
 
 class PMDnf(PackageManager):
+    """
+    This is "legacy" DNF, called DNF-4 even though the
+    executable is dnf-3 in modern Fedora. Executable dnf
+    is a symlink to dnf-3 in systems that use it.
+    """
     backend = "dnf"
 
     def install(self, pkgs, from_local=False):
-        check_target_env_call(["dnf", "-y", "install"] + pkgs)
+        check_target_env_call(["dnf-3", "-y", "install"] + pkgs)
 
     def remove(self, pkgs):
         # ignore the error code for now because dnf thinks removing a
         # nonexistent package is an error
-        target_env_call(["dnf", "--disablerepo=*", "-C", "-y",
+        target_env_call(["dnf-3", "--disablerepo=*", "-C", "-y",
                          "remove"] + pkgs)
 
     def update_db(self):
@@ -295,7 +300,31 @@ class PMDnf(PackageManager):
         pass
 
     def update_system(self):
-        check_target_env_call(["dnf", "-y", "upgrade"])
+        check_target_env_call(["dnf-3", "-y", "upgrade"])
+
+
+class PMDnf5(PackageManager):
+    """
+    This is "modern" DNF, DNF-5 which is for Fedora 41 (presumably)
+    and later. Executable dnf is a symlink to dnf5 in systems that use it.
+    """
+    backend = "dnf5"
+
+    def install(self, pkgs, from_local=False):
+        check_target_env_call(["dnf5", "-y", "install"] + pkgs)
+
+    def remove(self, pkgs):
+        # ignore the error code for now because dnf thinks removing a
+        # nonexistent package is an error
+        target_env_call(["dnf5", "--disablerepo=*", "-C", "-y",
+                         "remove"] + pkgs)
+
+    def update_db(self):
+        # Doesn't need updates
+        pass
+
+    def update_system(self):
+        check_target_env_call(["dnf5", "-y", "upgrade"])
 
 
 class PMDummy(PackageManager):
@@ -337,6 +366,21 @@ class PMEntropy(PackageManager):
         # Doesn't need to update the system explicitly
         pass
 
+class PMFlatpak(PackageManager):
+    backend = "flatpak"
+
+    def install(self, pkgs, from_local=False):
+        check_target_env_call(["flatpak", "install", "--assumeyes"] + pkgs)
+
+    def remove(self, pkgs):
+        check_target_env_call(["flatpak", "uninstall", "--noninteractive"] + pkgs)
+
+    def update_db(self):
+        pass
+
+    def update_system(self):
+        # Doesn't need to update the system explicitly
+        pass
 
 class PMLuet(PackageManager):
     backend = "luet"
@@ -539,17 +583,23 @@ class PMPortage(PackageManager):
 class PMXbps(PackageManager):
     backend = "xbps"
 
+    def line_cb(self, line):
+        libcalamares.utils.debug(line)
+
+    def run_xbps(self, command):
+        libcalamares.utils.target_env_process_output(command, self.line_cb);
+
     def install(self, pkgs, from_local=False):
-        check_target_env_call(["xbps-install", "-Sy"] + pkgs)
+        self.run_xbps(["xbps-install", "-Sy"] + pkgs)
 
     def remove(self, pkgs):
-        check_target_env_call(["xbps-remove", "-Ry", "--noconfirm"] + pkgs)
+        self.run_xbps(["xbps-remove", "-Ry"] + pkgs)
 
     def update_db(self):
-        check_target_env_call(["xbps-install", "-S"])
+        self.run_xbps(["xbps-install", "-S"])
 
     def update_system(self):
-        check_target_env_call(["xbps", "-Suy"])
+        self.run_xbps(["xbps", "-Suy"])
 
 
 class PMYum(PackageManager):

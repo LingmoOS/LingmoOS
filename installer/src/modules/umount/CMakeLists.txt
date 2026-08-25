@@ -12,8 +12,4 @@ calamares_add_plugin(umount
     EMERGENCY
 )
 
-calamares_add_test(
-    umounttest
-    SOURCES
-        Tests.cpp
-)
+calamares_add_test(umounttest SOURCES Tests.cpp)

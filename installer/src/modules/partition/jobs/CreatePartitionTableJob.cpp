@@ -12,8 +12,8 @@
 #include "CreatePartitionTableJob.h"
 
 #include "partition/PartitionIterator.h"
-#include "utils/CalamaresUtilsSystem.h"
 #include "utils/Logger.h"
+#include "utils/System.h"
 
 #include "core/KPMHelpers.h"
 
@@ -27,7 +27,7 @@
 // Qt
 #include <QProcess>
 
-using CalamaresUtils::Partition::PartitionIterator;
+using Calamares::Partition::PartitionIterator;
 
 CreatePartitionTableJob::CreatePartitionTableJob( Device* device, PartitionTable::TableType type )
     : m_device( device )
@@ -38,7 +38,7 @@ CreatePartitionTableJob::CreatePartitionTableJob( Device* device, PartitionTable
 QString
 CreatePartitionTableJob::prettyName() const
 {
-    return tr( "Create new %1 partition table on %2." )
+    return tr( "Creating new %1 partition table on %2…", "@status" )
         .arg( PartitionTable::tableTypeToName( m_type ) )
         .arg( m_device->deviceNode() );
 }
@@ -46,21 +46,19 @@ CreatePartitionTableJob::prettyName() const
 QString
 CreatePartitionTableJob::prettyDescription() const
 {
-    return tr( "Create new <strong>%1</strong> partition table on <strong>%2</strong> (%3)." )
+    return tr( "Creating new <strong>%1</strong> partition table on <strong>%2</strong> (%3)…", "@status" )
         .arg( PartitionTable::tableTypeToName( m_type ).toUpper() )
         .arg( m_device->deviceNode() )
         .arg( m_device->name() );
 }
 
-
 QString
 CreatePartitionTableJob::prettyStatusMessage() const
 {
-    return tr( "Creating new %1 partition table on %2." )
+    return tr( "Creating new %1 partition table on %2…", "@status" )
         .arg( PartitionTable::tableTypeToName( m_type ).toUpper() )
         .arg( m_device->deviceNode() );
 }
-
 
 Calamares::JobResult
 CreatePartitionTableJob::exec()
@@ -76,10 +74,10 @@ CreatePartitionTableJob::exec()
             cDebug() << Logger::SubEntry << ( ( *it ) ? ( *it )->deviceNode() : QString( "<null device>" ) );
         }
 
-        auto lsblkResult = CalamaresUtils::System::runCommand( { "lsblk" }, std::chrono::seconds( 30 ) );
+        auto lsblkResult = Calamares::System::runCommand( { "lsblk" }, std::chrono::seconds( 30 ) );
         cDebug() << Logger::SubEntry << "lsblk output:\n" << Logger::NoQuote << lsblkResult.getOutput();
 
-        auto mountResult = CalamaresUtils::System::runCommand( { "mount" }, std::chrono::seconds( 30 ) );
+        auto mountResult = Calamares::System::runCommand( { "mount" }, std::chrono::seconds( 30 ) );
         cDebug() << Logger::SubEntry << "mount output:\n" << Logger::NoQuote << mountResult.getOutput();
     }
 

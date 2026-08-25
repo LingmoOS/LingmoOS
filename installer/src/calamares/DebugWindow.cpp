@@ -21,18 +21,11 @@
 #include "VariantModel.h"
 #include "modulesystem/Module.h"
 #include "modulesystem/ModuleManager.h"
-#include "utils/CalamaresUtilsGui.h"
+#include "utils/Gui.h"
 #include "utils/Logger.h"
 #include "utils/Paste.h"
 #include "utils/Retranslator.h"
 #include "widgets/TranslationFix.h"
-
-#ifdef WITH_PYTHONQT
-#include "ViewManager.h"
-#include "viewpages/PythonQtViewStep.h"
-
-#include <gui/PythonQtScriptingConsole.h>
-#endif
 
 #include <QMessageBox>
 #include <QSplitter>
@@ -40,14 +33,16 @@
 #include <QTreeView>
 #include <QWidget>
 
+#include <signal.h>
+#include <unistd.h>
+
 /**
  * @brief crash makes Calamares crash immediately.
  */
 static void
 crash()
 {
-    volatile int* a = nullptr;
-    *a = 1;
+    kill( getpid(), SIGTRAP );
 }
 
 /// @brief Print out the widget tree (names) in indented form.
@@ -120,79 +115,10 @@ DebugWindow::DebugWindow()
 
     m_ui->moduleConfigView->setModel( m_module_model.get() );
 
-#ifdef WITH_PYTHONQT
-    QPushButton* pythonConsoleButton = new QPushButton;
-    pythonConsoleButton->setText( "Attach Python console" );
-    m_ui->modulesVerticalLayout->insertWidget( 1, pythonConsoleButton );
-    pythonConsoleButton->hide();
-
-    QObject::connect(
-        pythonConsoleButton,
-        &QPushButton::clicked,
-        this,
-        [ this, moduleConfigModel ]
-        {
-            QString moduleName = m_ui->modulesListView->currentIndex().data().toString();
-            Module* module = ModuleManager::instance()->moduleInstance( moduleName );
-            if ( module->interface() != Module::Interface::PythonQt || module->type() != Module::Type::View )
-                return;
-
-            for ( ViewStep* step : ViewManager::instance()->viewSteps() )
-            {
-                if ( step->moduleInstanceKey() == module->instanceKey() )
-                {
-                    PythonQtViewStep* pqvs = qobject_cast< PythonQtViewStep* >( step );
-                    if ( pqvs )
-                    {
-                        QWidget* consoleWindow = new QWidget;
-
-                        QWidget* console = pqvs->createScriptingConsole();
-                        console->setParent( consoleWindow );
-
-                        QVBoxLayout* layout = new QVBoxLayout;
-                        consoleWindow->setLayout( layout );
-                        layout->addWidget( console );
-
-                        QHBoxLayout* bottomLayout = new QHBoxLayout;
-                        layout->addLayout( bottomLayout );
-
-                        QLabel* bottomLabel = new QLabel( consoleWindow );
-                        bottomLayout->addWidget( bottomLabel );
-                        QString line = QString( "Module: <font color=\"#008000\"><code>%1</code></font><br/>"
-                                                "Python class: <font color=\"#008000\"><code>%2</code></font>" )
-                                           .arg( module->instanceKey() )
-                                           .arg( console->property( "classname" ).toString() );
-                        bottomLabel->setText( line );
-
-                        QPushButton* closeButton = new QPushButton( consoleWindow );
-                        closeButton->setText( "&Close" );
-                        QObject::connect(
-                            closeButton, &QPushButton::clicked, [ consoleWindow ] { consoleWindow->close(); } );
-                        bottomLayout->addWidget( closeButton );
-                        bottomLabel->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred );
-
-                        consoleWindow->setParent( this );
-                        consoleWindow->setWindowFlags( Qt::Window );
-                        consoleWindow->setWindowTitle( "Calamares Python console" );
-                        consoleWindow->setAttribute( Qt::WA_DeleteOnClose, true );
-                        consoleWindow->showNormal();
-                        break;
-                    }
-                }
-            }
-        } );
-
-#endif
-
     connect( m_ui->modulesListView->selectionModel(),
              &QItemSelectionModel::selectionChanged,
              this,
-             [ this
-#ifdef WITH_PYTHONQT
-               ,
-               pythonConsoleButton
-#endif
-    ]
+             [ this ]
              {
                  QString moduleName = m_ui->modulesListView->currentIndex().data().toString();
                  Module* module
@@ -204,10 +130,6 @@ DebugWindow::DebugWindow()
                      m_ui->moduleConfigView->expandAll();
                      m_ui->moduleTypeLabel->setText( module->typeString() );
                      m_ui->moduleInterfaceLabel->setText( module->interfaceString() );
-#ifdef WITH_PYTHONQT
-                     pythonConsoleButton->setVisible( module->interface() == Module::Interface::PythonQt
-                                                      && module->type() == Module::Type::View );
-#endif
                  }
              } );
 
@@ -238,12 +160,11 @@ DebugWindow::DebugWindow()
              } );
 
     // Send Log button only if it would be useful
-    m_ui->sendLogButton->setVisible( CalamaresUtils::Paste::isEnabled() );
-    connect( m_ui->sendLogButton, &QPushButton::clicked, [ this ]() { CalamaresUtils::Paste::doLogUploadUI( this ); } );
+    m_ui->sendLogButton->setVisible( Calamares::Paste::isEnabled() );
+    connect( m_ui->sendLogButton, &QPushButton::clicked, [ this ]() { Calamares::Paste::doLogUploadUI( this ); } );
 
-    CALAMARES_RETRANSLATE( m_ui->retranslateUi( this ); setWindowTitle( tr( "Debug information" ) ); );
+    CALAMARES_RETRANSLATE( m_ui->retranslateUi( this ); setWindowTitle( tr( "Debug Information", "@title" ) ); );
 }
-
 
 void
 DebugWindow::closeEvent( QCloseEvent* e )
@@ -252,12 +173,10 @@ DebugWindow::closeEvent( QCloseEvent* e )
     emit closed();
 }
 
-
 DebugWindowManager::DebugWindowManager( QObject* parent )
     : QObject( parent )
 {
 }
-
 
 bool
 DebugWindowManager::enabled() const
@@ -265,7 +184,6 @@ DebugWindowManager::enabled() const
     const auto* s = Settings::instance();
     return ( Logger::logLevel() >= Logger::LOGVERBOSE ) || ( s ? s->debugMode() : false );
 }
-
 
 void
 DebugWindowManager::show( bool visible )
@@ -316,22 +234,22 @@ void
 DebugWindowManager::about()
 {
     QString title = Calamares::Settings::instance()->isSetupMode()
-        ? QCoreApplication::translate( "WelcomePage", "About %1 setup" )
-        : QCoreApplication::translate( "WelcomePage", "About %1 installer" );
+        ? QCoreApplication::translate( "WelcomePage", "About %1 Setup", "@title" )
+        : QCoreApplication::translate( "WelcomePage", "About %1 Installer", "@title" );
     QMessageBox mb( QMessageBox::Information,
                     title.arg( CALAMARES_APPLICATION_NAME ),
                     Calamares::aboutString().arg( Calamares::Branding::instance()->versionedName() ),
                     QMessageBox::Ok,
                     nullptr );
     Calamares::fixButtonLabels( &mb );
-    mb.setIconPixmap( CalamaresUtils::defaultPixmap(
-        CalamaresUtils::Squid,
-        CalamaresUtils::Original,
-        QSize( CalamaresUtils::defaultFontHeight() * 6, CalamaresUtils::defaultFontHeight() * 6 ) ) );
+    mb.setIconPixmap(
+        Calamares::defaultPixmap( Calamares::Squid,
+                                  Calamares::Original,
+                                  QSize( Calamares::defaultFontHeight() * 6, Calamares::defaultFontHeight() * 6 ) ) );
     QGridLayout* layout = reinterpret_cast< QGridLayout* >( mb.layout() );
     if ( layout )
     {
-        layout->setColumnMinimumWidth( 2, CalamaresUtils::defaultFontHeight() * 24 );
+        layout->setColumnMinimumWidth( 2, Calamares::defaultFontHeight() * 24 );
     }
     mb.exec();
 }

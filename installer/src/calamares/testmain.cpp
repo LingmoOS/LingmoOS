@@ -25,19 +25,24 @@
 #include "modulesystem/ViewModule.h"
 #include "utils/Logger.h"
 #include "utils/Retranslator.h"
+#include "utils/System.h"
 #include "utils/Yaml.h"
 #include "viewpages/ExecutionViewStep.h"
 
 // Optional features of Calamares
-// - Python support
+// - Python support with pybind11
+// - Python support with older Boost implementation
 // - QML support
 #ifdef WITH_PYTHON
-#include "PythonJob.h"
+#ifdef WITH_PYBIND11
+#include "pybind11/PythonJob.h"
+#else
+#include "pyboost/PythonJob.h"
+#endif
 #endif
 #ifdef WITH_QML
 #include "utils/Qml.h"
 #endif
-
 
 #include <QApplication>
 #include <QCommandLineOption>
@@ -47,6 +52,7 @@
 #include <QLabel>
 #include <QMainWindow>
 #include <QThread>
+#include <QTimer>
 
 #include <memory>
 
@@ -60,6 +66,7 @@ struct ModuleConfig
     QString m_module;
     QString m_jobConfig;
     QString m_globalConfig;
+    QString m_settingsConfig;
     QString m_language;
     QString m_branding;
     bool m_ui;
@@ -71,8 +78,11 @@ handle_args( QCoreApplication& a )
 {
     QCommandLineOption debugLevelOption(
         QStringLiteral( "D" ), "Verbose output for debugging purposes (0-8), ignored.", "level" );
+    QCommandLineOption settingsOption( { QStringLiteral( "S" ), QStringLiteral( "settings" ) },
+                                       QStringLiteral( "Settings.conf document" ),
+                                       QString( "settings.conf" ) );
     QCommandLineOption globalOption( { QStringLiteral( "g" ), QStringLiteral( "global" ) },
-                                     QStringLiteral( "Global settings document" ),
+                                     QStringLiteral( "Global storage settings document" ),
                                      "global.yaml" );
     QCommandLineOption jobOption(
         { QStringLiteral( "j" ), QStringLiteral( "job" ) }, QStringLiteral( "Job settings document" ), "job.yaml" );
@@ -92,6 +102,7 @@ handle_args( QCoreApplication& a )
     parser.addVersionOption();
 
     parser.addOption( debugLevelOption );
+    parser.addOption( settingsOption );
     parser.addOption( globalOption );
     parser.addOption( jobOption );
     parser.addOption( langOption );
@@ -138,6 +149,7 @@ handle_args( QCoreApplication& a )
         return ModuleConfig { parser.isSet( slideshowOption ) ? QStringLiteral( "-" ) : args.first(),
                               jobSettings,
                               parser.value( globalOption ),
+                              parser.value( settingsOption ),
                               parser.value( langOption ),
                               parser.value( brandOption ),
                               parser.isSet( slideshowOption ) || parser.isSet( uiOption ),
@@ -241,7 +253,6 @@ ExecViewModule::type() const
     return Module::Type::View;
 }
 
-
 Calamares::Module::Interface
 ExecViewModule::interface() const
 {
@@ -298,13 +309,13 @@ load_module( const ModuleConfig& moduleConfig )
     QVariantMap descriptor;
 
     QStringList moduleDirectories { "./", "src/modules/", "modules/", CMAKE_INSTALL_FULL_LIBDIR "/calamares/modules/" };
-    for ( const QString& prefix : qAsConst( moduleDirectories ) )
+    for ( const QString& prefix : std::as_const( moduleDirectories ) )
     {
         // Could be a complete path, eg. src/modules/dummycpp/module.desc
         fi = QFileInfo( prefix + moduleName );
         if ( fi.exists() && fi.isFile() )
         {
-            descriptor = CalamaresUtils::loadYaml( fi, &ok );
+            descriptor = Calamares::YAML::load( fi, &ok );
         }
         if ( ok )
         {
@@ -318,7 +329,7 @@ load_module( const ModuleConfig& moduleConfig )
             fi = QFileInfo( prefix + moduleName + "/module.desc" );
             if ( fi.exists() && fi.isFile() )
             {
-                descriptor = CalamaresUtils::loadYaml( fi, &ok );
+                descriptor = Calamares::YAML::load( fi, &ok );
             }
             if ( ok )
             {
@@ -445,19 +456,21 @@ libcalamares.utils.debug('pre-script for testing purposes injected')
 int
 main( int argc, char* argv[] )
 {
-    QCoreApplication* aw = createApplication( argc, argv );
+    QCoreApplication* application = createApplication( argc, argv );
 
     Logger::setupLogLevel( Logger::LOGVERBOSE );
 
-    ModuleConfig module = handle_args( *aw );
+    ModuleConfig module = handle_args( *application );
     if ( module.moduleName().isEmpty() )
     {
         return 1;
     }
 
-    std::unique_ptr< Calamares::Settings > settings_p( Calamares::Settings::init( QString() ) );
+    std::unique_ptr< Calamares::Settings > settings_p( Calamares::Settings::init( module.m_settingsConfig ) );
     std::unique_ptr< Calamares::JobQueue > jobqueue_p( new Calamares::JobQueue( nullptr ) );
-    QMainWindow* mw = nullptr;
+    std::unique_ptr< Calamares::System > system_p( new Calamares::System( settings_p->doChroot() ) );
+
+    QMainWindow* mainWindow = nullptr;
 
     auto* gs = jobqueue_p->globalStorage();
     if ( !module.globalConfigFile().isEmpty() )
@@ -474,15 +487,21 @@ main( int argc, char* argv[] )
 #ifdef WITH_PYTHON
     if ( module.m_pythonInjection )
     {
+#ifdef WITH_PYBIND11
+        Calamares::Python::Job::setInjectedPreScript( pythonPreScript );
+#else
+        // Old Boost approach
         Calamares::PythonJob::setInjectedPreScript( pythonPreScript );
+#endif
     }
 #endif
 #ifdef WITH_QML
-    CalamaresUtils::initQmlModulesDir();  // don't care if failed
+    Calamares::initQmlModulesDir();  // don't care if failed
 #endif
 
     cDebug() << "Calamares module-loader testing" << module.moduleName();
-    Calamares::Module* m = load_module( module );
+    std::unique_ptr<Calamares::Module> m( load_module( module ) );
+    std::unique_ptr<Calamares::ModuleManager> modulemanager;
     if ( !m )
     {
         cError() << "Could not load module" << module.moduleName();
@@ -496,22 +515,22 @@ main( int argc, char* argv[] )
         // tries to create the widget **which won't be used anyway**.
         //
         // To avoid that crash, re-create the QApplication, now with GUI
-        if ( !qobject_cast< QApplication* >( aw ) )
+        if ( !qobject_cast< QApplication* >( application ) )
         {
             auto* replace_app = new QApplication( argc, argv );
             replace_app->setQuitOnLastWindowClosed( true );
-            aw = replace_app;
+            application = replace_app;
         }
-        mw = module.m_ui ? new QMainWindow() : nullptr;
-        if ( mw )
+        mainWindow = module.m_ui ? new QMainWindow() : nullptr;
+        if ( mainWindow )
         {
-            mw->installEventFilter( CalamaresUtils::Retranslator::instance() );
+            mainWindow->installEventFilter( Calamares::Retranslator::instance() );
         }
 
         (void)new Calamares::Branding( module.m_branding );
-        auto* modulemanager = new Calamares::ModuleManager( QStringList(), nullptr );
-        (void)Calamares::ViewManager::instance( mw );
-        modulemanager->addModule( m );
+        modulemanager = std::make_unique<Calamares::ModuleManager>( QStringList(), nullptr );
+        (void)Calamares::ViewManager::instance( mainWindow );
+        modulemanager->addModule( m.release() ); // Transfers ownership
     }
 
     if ( !m->isLoaded() )
@@ -525,16 +544,16 @@ main( int argc, char* argv[] )
         return 1;
     }
 
-    if ( mw )
+    if ( mainWindow )
     {
         auto* vm = Calamares::ViewManager::instance();
         vm->onInitComplete();
         QWidget* w = vm->currentStep()->widget();
-        w->setParent( mw );
-        mw->setCentralWidget( w );
+        w->setParent( mainWindow );
+        mainWindow->setCentralWidget( w );
         w->show();
-        mw->show();
-        return aw->exec();
+        mainWindow->show();
+        return application->exec();
     }
 
     using TR = Logger::DebugRow< const char*, const QString >;
@@ -542,30 +561,13 @@ main( int argc, char* argv[] )
     cDebug() << Logger::SubEntry << "Module metadata" << TR( "name", m->name() ) << TR( "type", m->typeString() )
              << TR( "interface", m->interfaceString() );
 
-    Calamares::JobList jobList = m->jobs();
-    unsigned int failure_count = 0;
-    unsigned int count = 1;
-    for ( const auto& p : jobList )
-    {
-        // This doesn't get a SubEntry because the jobs may log a bunch of
-        // things; print the function-header to make clear that we're back in main.
-        cDebug() << "Job #" << count << "name" << p->prettyName();
-        Calamares::JobResult r = p->exec();
-        if ( !r )
-        {
-            cError() << "Job #" << count << "failed" << TR( "summary", r.message() ) << TR( "details", r.details() );
-            if ( r.errorCode() > 0 )
-            {
-                ++failure_count;
-            }
-        }
-        ++count;
-    }
+    Calamares::JobQueue::instance()->enqueue( 100, m->jobs() );
 
-    if ( aw )
-    {
-        delete aw;
-    }
+    QObject::connect( Calamares::JobQueue::instance(),
+                      &Calamares::JobQueue::finished,
+                      [ application ]()
+                      { QTimer::singleShot( std::chrono::seconds( 3 ), application, &QApplication::quit ); } );
+    QTimer::singleShot( 0, []() { Calamares::JobQueue::instance()->start(); } );
 
-    return failure_count ? 1 : 0;
+    return application->exec();
 }

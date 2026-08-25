@@ -23,13 +23,13 @@ class WelcomePage;
 class GeneralRequirements;
 class Config;
 
-namespace CalamaresUtils
+namespace Calamares
 {
 namespace GeoIP
 {
 class Handler;
-}
-}  // namespace CalamaresUtils
+}  // namespace GeoIP
+}  // namespace Calamares
 
 class PLUGINDLLEXPORT WelcomeViewStep : public Calamares::ViewStep
 {
@@ -59,7 +59,7 @@ public:
      * the given 2-letter country code. Uses the handler's information (if
      * given) for error reporting.
      */
-    void setCountry( const QString&, CalamaresUtils::GeoIP::Handler* handler );
+    void setCountry( const QString&, Calamares::GeoIP::Handler* handler );
 
     Calamares::RequirementsList checkRequirements() override;
 

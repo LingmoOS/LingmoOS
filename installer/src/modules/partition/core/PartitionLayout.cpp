@@ -61,6 +61,7 @@ PartitionLayout::PartitionEntry::PartitionEntry( const QString& label,
                                                  quint64 attributes,
                                                  const QString& mountPoint,
                                                  const QString& fs,
+                                                 const bool& noEncrypt,
                                                  const QVariantMap& features,
                                                  const QString& size,
                                                  const QString& minSize,
@@ -70,6 +71,7 @@ PartitionLayout::PartitionEntry::PartitionEntry( const QString& label,
     , partType( type )
     , partAttributes( attributes )
     , partMountPoint( mountPoint )
+    , partNoEncrypt( noEncrypt )
     , partFeatures( features )
     , partSize( size )
     , partMinSize( minSize )
@@ -77,7 +79,6 @@ PartitionLayout::PartitionEntry::PartitionEntry( const QString& label,
 {
     PartUtils::canonicalFilesystemName( fs, &partFileSystem );
 }
-
 
 bool
 PartitionLayout::addEntry( const PartitionEntry& entry )
@@ -111,16 +112,17 @@ PartitionLayout::init( FileSystem::Type defaultFsType, const QVariantList& confi
             break;
         }
 
-        if ( !addEntry( { CalamaresUtils::getString( pentry, "name" ),
-                          CalamaresUtils::getString( pentry, "uuid" ),
-                          CalamaresUtils::getString( pentry, "type" ),
-                          CalamaresUtils::getUnsignedInteger( pentry, "attributes", 0 ),
-                          CalamaresUtils::getString( pentry, "mountPoint" ),
-                          CalamaresUtils::getString( pentry, "filesystem", "unformatted" ),
-                          CalamaresUtils::getSubMap( pentry, "features", ok ),
-                          CalamaresUtils::getString( pentry, "size", QStringLiteral( "0" ) ),
-                          CalamaresUtils::getString( pentry, "minSize", QStringLiteral( "0" ) ),
-                          CalamaresUtils::getString( pentry, "maxSize", QStringLiteral( "0" ) ) } ) )
+        if ( !addEntry( { Calamares::getString( pentry, "name" ),
+                          Calamares::getString( pentry, "uuid" ),
+                          Calamares::getString( pentry, "type" ),
+                          Calamares::getUnsignedInteger( pentry, "attributes", 0 ),
+                          Calamares::getString( pentry, "mountPoint" ),
+                          Calamares::getString( pentry, "filesystem", "unformatted" ),
+                          Calamares::getBool( pentry, "noEncrypt", false ),
+                          Calamares::getSubMap( pentry, "features", ok ),
+                          Calamares::getString( pentry, "size", QStringLiteral( "0" ) ),
+                          Calamares::getString( pentry, "minSize", QStringLiteral( "0" ) ),
+                          Calamares::getString( pentry, "maxSize", QStringLiteral( "0" ) ) } ) )
         {
             cError() << "Partition layout entry #" << config.indexOf( r ) << "is invalid, switching to default layout.";
             m_partLayout.clear();
@@ -154,11 +156,9 @@ PartitionLayout::setDefaultFsType( FileSystem::Type defaultFsType )
     case FileSystem::Lvm2_PV:
     case FileSystem::Udf:
     case FileSystem::Iso9660:
-#ifdef WITH_KPMCORE4API
     case FileSystem::Luks2:
     case FileSystem::LinuxRaidMember:
     case FileSystem::BitLocker:
-#endif
         // bad bad
         cWarning() << "The selected default FS" << defaultFsType << "is not suitable."
                    << "Using ext4 instead.";
@@ -185,11 +185,9 @@ PartitionLayout::setDefaultFsType( FileSystem::Type defaultFsType )
     case FileSystem::Hpfs:
     case FileSystem::Zfs:
     case FileSystem::Nilfs2:
-#ifdef WITH_KPMCORE4API
     case FileSystem::Fat12:
     case FileSystem::Apfs:
     case FileSystem::Minix:
-#endif
         // weird
         cWarning() << "The selected default FS" << defaultFsType << "is unusual, but not wrong.";
         break;
@@ -203,11 +201,11 @@ PartitionLayout::setDefaultFsType( FileSystem::Type defaultFsType )
     m_defaultFsType = defaultFsType;
 }
 
-
 QList< Partition* >
 PartitionLayout::createPartitions( Device* dev,
                                    qint64 firstSector,
                                    qint64 lastSector,
+                                   Config::LuksGeneration luksFsType,
                                    QString luksPassphrase,
                                    PartitionNode* parent,
                                    const PartitionRole& role )
@@ -223,7 +221,7 @@ PartitionLayout::createPartitions( Device* dev,
 
     // Let's check if we have enough space for each partitions, using the size
     // propery or the min-size property if unit is in percentage.
-    for ( const auto& entry : qAsConst( m_partLayout ) )
+    for ( const auto& entry : std::as_const( m_partLayout ) )
     {
         if ( !entry.partSize.isValid() )
         {
@@ -235,7 +233,7 @@ PartitionLayout::createPartitions( Device* dev,
         // warnings to ensure that all the cases are covered below.
         // We need to ignore the percent-defined until later
         qint64 sectors = 0;
-        if ( entry.partSize.unit() != CalamaresUtils::Partition::SizeUnit::Percent )
+        if ( entry.partSize.unit() != Calamares::Partition::SizeUnit::Percent )
         {
             sectors = entry.partSize.toSectors( totalSectors, dev->logicalSize() );
         }
@@ -252,7 +250,7 @@ PartitionLayout::createPartitions( Device* dev,
     if ( availableSectors < 0 )
     {
         availableSectors = totalSectors;
-        for ( const auto& entry : qAsConst( m_partLayout ) )
+        for ( const auto& entry : std::as_const( m_partLayout ) )
         {
             qint64 sectors = partSectorsMap.value( &entry );
             if ( entry.partMinSize.isValid() )
@@ -265,9 +263,9 @@ PartitionLayout::createPartitions( Device* dev,
     }
 
     // Assign sectors for percentage-defined partitions.
-    for ( const auto& entry : qAsConst( m_partLayout ) )
+    for ( const auto& entry : std::as_const( m_partLayout ) )
     {
-        if ( entry.partSize.unit() == CalamaresUtils::Partition::SizeUnit::Percent )
+        if ( entry.partSize.unit() == Calamares::Partition::SizeUnit::Percent )
         {
             qint64 sectors
                 = entry.partSize.toSectors( availableSectors + partSectorsMap.value( &entry ), dev->logicalSize() );
@@ -288,7 +286,7 @@ PartitionLayout::createPartitions( Device* dev,
     // Create the partitions.
     currentSector = firstSector;
     availableSectors = totalSectors;
-    for ( const auto& entry : qAsConst( m_partLayout ) )
+    for ( const auto& entry : std::as_const( m_partLayout ) )
     {
         // Adjust partition size based on available space.
         qint64 sectors = partSectorsMap.value( &entry );
@@ -300,8 +298,8 @@ PartitionLayout::createPartitions( Device* dev,
 
         Partition* part = nullptr;
 
-        // Encryption for zfs is handled in the zfs module
-        if ( luksPassphrase.isEmpty() || correctFS( entry.partFileSystem ) == FileSystem::Zfs )
+        // Encryption for zfs is handled in the zfs module, skip encryption on noEncrypt partitions
+        if ( luksPassphrase.isEmpty() || correctFS( entry.partFileSystem ) == FileSystem::Zfs || entry.partNoEncrypt )
         {
             part = KPMHelpers::createNewPartition( parent,
                                                    *dev,
@@ -321,6 +319,7 @@ PartitionLayout::createPartitions( Device* dev,
                                                             entry.partLabel,
                                                             currentSector,
                                                             currentSector + sectors - 1,
+                                                            luksFsType,
                                                             luksPassphrase,
                                                             KPM_PARTITION_FLAG( None ) );
         }
@@ -333,7 +332,7 @@ PartitionLayout::createPartitions( Device* dev,
             QVariantMap zfsInfo;
 
             // Save the information subsequent modules will need
-            zfsInfo[ "encrypted" ] = !luksPassphrase.isEmpty();
+            zfsInfo[ "encrypted" ] = !luksPassphrase.isEmpty() && !entry.partNoEncrypt;
             zfsInfo[ "passphrase" ] = luksPassphrase;
             zfsInfo[ "mountpoint" ] = entry.partMountPoint;
 
@@ -355,30 +354,18 @@ PartitionLayout::createPartitions( Device* dev,
         }
         if ( !entry.partType.isEmpty() )
         {
-#if defined( WITH_KPMCORE42API )
             part->setType( entry.partType );
-#else
-            cWarning() << "Ignoring type; requires KPMcore >= 4.2.0.";
-#endif
         }
         if ( entry.partAttributes )
         {
-#if defined( WITH_KPMCORE42API )
             part->setAttributes( entry.partAttributes );
-#else
-            cWarning() << "Ignoring attributes; requires KPMcore >= 4.2.0.";
-#endif
         }
         if ( !entry.partFeatures.isEmpty() )
         {
-#if defined( WITH_KPMCORE42API )
             for ( const auto& k : entry.partFeatures.keys() )
             {
                 part->fileSystem().addFeature( k, entry.partFeatures.value( k ) );
             }
-#else
-            cWarning() << "Ignoring features; requires KPMcore >= 4.2.0.";
-#endif
         }
         // Some buggy (legacy) BIOSes test if the bootflag of at least one partition is set.
         // Otherwise they ignore the device in boot-order, so add it here.

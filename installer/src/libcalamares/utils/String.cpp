@@ -19,7 +19,9 @@
 
 #include <QStringList>
 
-namespace CalamaresUtils
+namespace Calamares
+{
+namespace String
 {
 QString
 removeDiacritics( const QString& string )
@@ -84,8 +86,7 @@ removeDiacritics( const QString& string )
     return output;
 }
 
-
-// Function CalamaresUtils::obscure based on KStringHandler::obscure,
+// Function Calamares::obscure based on KStringHandler::obscure,
 // part of KDElibs by KDE, file kstringhandler.cpp.
 // Original copyright statement follows.
 /* This file is part of the KDE libraries
@@ -122,9 +123,8 @@ obscure( const QString& string )
     return result;
 }
 
-
 QString
-truncateMultiLine( const QString& string, CalamaresUtils::LinesStartEnd lines, CalamaresUtils::CharCount chars )
+truncateMultiLine( const QString& string, LinesStartEnd lines, CharCount chars )
 {
     const char NEWLINE = '\n';
     const int maxLines = lines.atStart + lines.atEnd;
@@ -246,4 +246,5 @@ removeTrailing( QString& string, QChar c )
     string.remove( lastIndex, string.length() );
 }
 
-}  // namespace CalamaresUtils
+}  // namespace String
+}  // namespace Calamares

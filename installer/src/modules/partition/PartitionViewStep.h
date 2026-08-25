@@ -39,6 +39,21 @@ class PLUGINDLLEXPORT PartitionViewStep : public Calamares::ViewStep
     Q_OBJECT
 
 public:
+    struct FSConflictEntry
+    {
+        QString conflictingPath;
+        QString conflictingFilesystem;
+        QString conflictedPath;
+        QStringList allowableFilesystems;
+
+        FSConflictEntry();
+        FSConflictEntry( const QString& conflictingPathArg,
+                         const QString& conflictingFilesystemArg,
+                         const QString& conflictedPathArg,
+                         QStringList allowableFilesystemsArg );
+        FSConflictEntry( const FSConflictEntry& e ) = default;
+    };
+
     explicit PartitionViewStep( QObject* parent = nullptr );
     ~PartitionViewStep() override;
 

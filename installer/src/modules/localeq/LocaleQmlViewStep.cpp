@@ -29,7 +29,7 @@ LocaleQmlViewStep::getConfig()
 QString
 LocaleQmlViewStep::prettyName() const
 {
-    return tr( "Location" );
+    return tr( "Location", "@label" );
 }
 
 QString
@@ -81,6 +81,12 @@ void
 LocaleQmlViewStep::onLeave()
 {
     m_config->finalizeGlobalStorage();
+}
+
+void
+LocaleQmlViewStep::onCancel()
+{
+    m_config->cancel();
 }
 
 void

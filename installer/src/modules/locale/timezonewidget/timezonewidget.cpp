@@ -27,13 +27,13 @@
 #endif
 
 static QPoint
-getLocationPosition( const CalamaresUtils::Locale::TimeZoneData* l )
+getLocationPosition( const Calamares::Locale::TimeZoneData* l )
 {
     return TimeZoneImageList::getLocationPosition( l->longitude(), l->latitude() );
 }
 
 
-TimeZoneWidget::TimeZoneWidget( const CalamaresUtils::Locale::ZonesModel* zones, QWidget* parent )
+TimeZoneWidget::TimeZoneWidget( const Calamares::Locale::ZonesModel* zones, QWidget* parent )
     : QWidget( parent )
     , timeZoneImages( TimeZoneImageList::fromQRC() )
     , m_zonesData( zones )
@@ -137,14 +137,8 @@ TimeZoneWidget::paintEvent( QPaintEvent* )
     painter.drawImage( point.x() - pin.width() / 2, point.y() - pin.height() / 2, pin );
 
     // Draw text and box
-    // .. the lambda manages deprecations: the old one works in Qt 5.9 and Qt 5.10,
-    //    while the new one avoids deprecation messages in Qt 5.13 and later.
-#if QT_VERSION >= QT_VERSION_CHECK( 5, 11, 0 )
-    auto textwidth = [ & ]( const QString& s ) { return fontMetrics.horizontalAdvance( s ); };
-#else
-    auto textwidth = [ & ]( const QString& s ) { return fontMetrics.width( s ); };
-#endif
-    const int textWidth = textwidth( m_currentLocation ? m_currentLocation->tr() : QString() );
+    const int textWidth
+        = fontMetrics.horizontalAdvance( m_currentLocation ? m_currentLocation->translated() : QString() );
     const int textHeight = fontMetrics.height();
 
     QRect rect = QRect( point.x() - textWidth / 2 - 5, point.y() - textHeight - 8, textWidth + 10, textHeight - 2 );
@@ -170,7 +164,8 @@ TimeZoneWidget::paintEvent( QPaintEvent* )
     painter.setBrush( QColor( 40, 40, 40 ) );
     painter.drawRoundedRect( rect, 3, 3 );
     painter.setPen( Qt::white );
-    painter.drawText( rect.x() + 5, rect.bottom() - 4, m_currentLocation ? m_currentLocation->tr() : QString() );
+    painter.drawText(
+        rect.x() + 5, rect.bottom() - 4, m_currentLocation ? m_currentLocation->translated() : QString() );
 #endif
 }
 
@@ -185,7 +180,7 @@ TimeZoneWidget::mousePressEvent( QMouseEvent* event )
 
     int mX = event->pos().x();
     int mY = event->pos().y();
-    auto distance = [ & ]( const CalamaresUtils::Locale::TimeZoneData* zone )
+    auto distance = [ & ]( const Calamares::Locale::TimeZoneData* zone )
     {
         QPoint locPos = TimeZoneImageList::getLocationPosition( zone->longitude(), zone->latitude() );
         return double( abs( mX - locPos.x() ) + abs( mY - locPos.y() ) );

@@ -10,7 +10,7 @@
 
 #include "ScanningDialog.h"
 
-#include "3rdparty/waitingspinnerwidget.h"
+#include "widgets/waitingspinnerwidget.h"
 
 #include <QBoxLayout>
 #include <QFutureWatcher>
@@ -65,7 +65,8 @@ ScanningDialog::run( const QFuture< void >& future,
 void
 ScanningDialog::run( const QFuture< void >& future, const std::function< void() >& callback, QWidget* parent )
 {
-    ScanningDialog::run( future, tr( "Scanning storage devices..." ), tr( "Partitioning" ), callback, parent );
+    ScanningDialog::run(
+        future, tr( "Scanning storage devices…", "@status" ), tr( "Partitioning…", "@status" ), callback, parent );
 }
 
 void

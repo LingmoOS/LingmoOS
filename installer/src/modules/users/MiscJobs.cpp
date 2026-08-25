@@ -14,9 +14,9 @@
 
 #include "GlobalStorage.h"
 #include "JobQueue.h"
-#include "utils/CalamaresUtilsSystem.h"
 #include "utils/Logger.h"
 #include "utils/Permissions.h"
+#include "utils/System.h"
 
 #include <QDir>
 #include <QFile>
@@ -31,7 +31,7 @@ SetupSudoJob::SetupSudoJob( const QString& group, Config::SudoStyle style )
 QString
 SetupSudoJob::prettyName() const
 {
-    return tr( "Configure <pre>sudo</pre> users." );
+    return tr( "Configuring <pre>sudo</pre> users…", "@status" );
 }
 
 static QString
@@ -59,14 +59,13 @@ SetupSudoJob::exec()
     // One % for the sudo format, keep it outside of the string to avoid accidental replacement
     QString sudoersLine
         = QChar( '%' ) + QString( "%1 ALL=%2 ALL\n" ).arg( m_sudoGroup, designatorForStyle( m_sudoStyle ) );
-    auto fileResult
-        = CalamaresUtils::System::instance()->createTargetFile( QStringLiteral( "/etc/sudoers.d/10-installer" ),
-                                                                sudoersLine.toUtf8().constData(),
-                                                                CalamaresUtils::System::WriteMode::Overwrite );
+    auto fileResult = Calamares::System::instance()->createTargetFile( QStringLiteral( "/etc/sudoers.d/10-installer" ),
+                                                                       sudoersLine.toUtf8().constData(),
+                                                                       Calamares::System::WriteMode::Overwrite );
 
     if ( fileResult )
     {
-        if ( !CalamaresUtils::Permissions::apply( fileResult.path(), 0440 ) )
+        if ( !Calamares::Permissions::apply( fileResult.path(), 0440 ) )
         {
             return Calamares::JobResult::error( tr( "Cannot chmod sudoers file." ) );
         }
@@ -157,7 +156,7 @@ ensureGroupsExistInTarget( const QList< GroupDescription >& wantedGroups,
             }
             cmd << group.name();
 #endif
-            if ( CalamaresUtils::System::instance()->targetEnvCall( cmd ) )
+            if ( Calamares::System::instance()->targetEnvCall( cmd ) )
             {
                 failureCount++;
                 missingGroups.append( group.name() + QChar( '*' ) );
@@ -179,7 +178,7 @@ SetupGroupsJob::SetupGroupsJob( const Config* config )
 QString
 SetupGroupsJob::prettyName() const
 {
-    return tr( "Preparing groups." );
+    return tr( "Preparing groups…", "@status" );
 }
 
 Calamares::JobResult

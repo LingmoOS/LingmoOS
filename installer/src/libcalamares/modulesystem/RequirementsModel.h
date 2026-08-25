@@ -33,8 +33,6 @@ class RequirementsChecker;
  */
 class DLLEXPORT RequirementsModel : public QAbstractListModel
 {
-    friend class RequirementsChecker;
-
     Q_OBJECT
     Q_PROPERTY( bool satisfiedRequirements READ satisfiedRequirements NOTIFY satisfiedRequirementsChanged FINAL )
     Q_PROPERTY( bool satisfiedMandatory READ satisfiedMandatory NOTIFY satisfiedMandatoryChanged FINAL )
@@ -45,11 +43,11 @@ public:
 
     enum Roles : short
     {
-        Name,
+        NegatedText = Qt::DisplayRole,
+        Details = Qt::ToolTipRole,
+        Name = Qt::UserRole,
         Satisfied,
         Mandatory,
-        Details,
-        NegatedText,
         HasDetails
     };
     // No Q_ENUM because these are exposed through roleNames()
@@ -63,11 +61,20 @@ public:
 
 
     QVariant data( const QModelIndex& index, int role ) const override;
-    int rowCount( const QModelIndex& ) const override;
-    int count() const { return m_requirements.count(); }
+    int rowCount( const QModelIndex& ) const override;  // TODO 3.4 use qsizetype
+    int count() const { return static_cast< int >( m_requirements.count() ); }  // TODO 3.4 use qsizetype
 
     ///@brief Debugging tool, describe the checking-state
     void describe() const;
+
+    ///@brief Update progress message (called by the checker)
+    void setProgressMessage( const QString& m );
+
+    ///@brief Append some requirements; resets the model
+    void addRequirementsList( const Calamares::RequirementsList& requirements );
+
+    ///@brief Check the whole list, emit signals satisfied...()
+    void reCheckList();
 
 signals:
     void satisfiedRequirementsChanged( bool value );
@@ -77,16 +84,10 @@ signals:
 protected:
     QHash< int, QByteArray > roleNames() const override;
 
-    ///@brief Append some requirements; resets the model
-    void addRequirementsList( const Calamares::RequirementsList& requirements );
-
-    ///@brief Update progress message (called by the checker)
-    void setProgressMessage( const QString& m );
+    ///@brief Clears the requirements; resets the model
+    void clear();
 
 private:
-    ///@brief Implementation for {set,add}RequirementsList
-    void changeRequirementsList();
-
     QString m_progressMessage;
     QMutex m_addLock;
     RequirementsList m_requirements;

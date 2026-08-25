@@ -48,7 +48,7 @@ class UnpackEntry:
     :param destination:
     """
     __slots__ = ('source', 'sourcefs', 'destination', 'copied', 'total', 'exclude', 'excludeFile',
-                 'mountPoint', 'weight')
+                 'mountPoint', 'weight', 'condition', 'optional')
 
     def __init__(self, source, sourcefs, destination):
         """
@@ -71,6 +71,8 @@ class UnpackEntry:
         self.total = 0
         self.mountPoint = None
         self.weight = 1
+        self.condition = True
+        self.optional = False
 
     def is_file(self):
         return self.sourcefs == "file"
@@ -176,7 +178,7 @@ def file_copy(source, entry, progress_cb):
     num_files_total_local = 0
     num_files_copied = 0  # Gets updated through rsync output
 
-    args = ['rsync', '-aHAXr', '--filter=-x trusted.overlay.*']
+    args = ['rsync', '-aHAXSr', '--filter=-x trusted.overlay.*']
     args.extend(global_excludes())
     if entry.excludeFile:
         args.extend(["--exclude-from=" + entry.excludeFile])
@@ -419,6 +421,18 @@ def extract_weight(entry):
     return 1
 
 
+def fetch_from_globalstorage(keys_list):
+    value = libcalamares.globalstorage.value(keys_list[0])
+    if value is None:
+        return None
+    for key in keys_list[1:]:
+        if isinstance(value, dict) and key in value:
+            value = value[key]
+        else:
+            return None
+    return value
+
+
 def run():
     """
     Unsquash filesystem.
@@ -448,6 +462,7 @@ def run():
     for entry in libcalamares.job.configuration["unpack"]:
         source = os.path.abspath(entry["source"])
         sourcefs = entry["sourcefs"]
+        optional = entry.get("optional", False)
 
         if sourcefs not in supported_filesystems:
             libcalamares.utils.warning("The filesystem for \"{}\" ({}) is not supported by your current kernel".format(source, sourcefs))
@@ -455,9 +470,14 @@ def run():
             return (_("Bad unpackfs configuration"),
                     _("The filesystem for \"{}\" ({}) is not supported by your current kernel").format(source, sourcefs))
         if not os.path.exists(source):
-            libcalamares.utils.warning("The source filesystem \"{}\" does not exist".format(source))
-            return (_("Bad unpackfs configuration"),
-                    _("The source filesystem \"{}\" does not exist").format(source))
+            if optional:
+                libcalamares.utils.warning("The source filesystem \"{}\" does not exist but is marked as optional, skipping".format(source))
+                entry["condition"] = False
+                continue
+            else:
+                libcalamares.utils.warning("The source filesystem \"{}\" does not exist".format(source))
+                return (_("Bad unpackfs configuration"),
+                        _("The source filesystem \"{}\" does not exist").format(source))
         if sourcefs == "squashfs":
             if shutil.which("unsquashfs") is None:
                 libcalamares.utils.warning("Failed to find unsquashfs")
@@ -473,6 +493,28 @@ def run():
         source = os.path.abspath(entry["source"])
         sourcefs = entry["sourcefs"]
         destination = os.path.abspath(root_mount_point + entry["destination"])
+
+        condition = entry.get("condition", True)
+        if isinstance(condition, bool):
+            pass  # 'condition' is already True or False
+        elif isinstance(condition, str):
+            keys = condition.split(".")
+            gs_value = fetch_from_globalstorage(keys)
+            if gs_value is None:
+                libcalamares.utils.warning("Condition key '{}' not found in global storage, assuming False".format(condition))
+                condition = False
+            elif isinstance(gs_value, bool):
+                condition = gs_value
+            else:
+                libcalamares.utils.warning("Condition key '{}' is not a boolean, assuming True".format(condition))
+                condition = True
+        else:
+            libcalamares.utils.warning("Invalid 'condition' value '{}', assuming True".format(condition))
+            condition = True
+
+        if not condition:
+            libcalamares.utils.debug("Skipping unpack of {} due to 'condition' being False".format(source))
+            continue
 
         if not os.path.isdir(destination) and sourcefs != "file":
             libcalamares.utils.warning(("The destination \"{}\" in the target system is not a directory").format(destination))

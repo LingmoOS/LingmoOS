@@ -226,6 +226,10 @@ public:
     bool permitWeakPasswords() const { return m_permitWeakPasswords; }
     /// Current setting for "require strong password"?
     bool requireStrongPasswords() const { return m_requireStrongPasswords; }
+    /// Is Active Directory enabled in the config file?
+    bool getActiveDirectoryEnabled() const;
+    /// Is it both enabled and activated by user choice (checkbox)?
+    bool getActiveDirectoryUsed() const;
 
     const QList< GroupDescription >& defaultGroups() const { return m_defaultGroups; }
     /** @brief the names of all the groups for the current user
@@ -254,6 +258,9 @@ public:
 
     const QStringList& forbiddenLoginNames() const;
     const QStringList& forbiddenHostNames() const;
+
+    int homePermissions() const { return m_homeDirPermissions; }
+    int homeUMask() const { return m_homeDirPermissions >= 0 ? ( ( ~m_homeDirPermissions ) & 0777 ) : -1; }
 
 public Q_SLOTS:
     /** @brief Sets the user's shell if possible
@@ -291,6 +298,12 @@ public Q_SLOTS:
     void setUserPasswordSecondary( const QString& );
     void setRootPassword( const QString& );
     void setRootPasswordSecondary( const QString& );
+
+    void setActiveDirectoryUsed( bool used );
+    void setActiveDirectoryAdminUsername( const QString& );
+    void setActiveDirectoryAdminPassword( const QString& );
+    void setActiveDirectoryDomain( const QString& );
+    void setActiveDirectoryIP( const QString& );
 
 signals:
     void userShellChanged( const QString& );
@@ -343,6 +356,13 @@ private:
 
     bool m_isReady = false;  ///< Used to reduce readyChanged signals
 
+    bool m_activeDirectory = false;
+    bool m_activeDirectoryUsed = false;
+    QString m_activeDirectoryAdminUsername;
+    QString m_activeDirectoryAdminPassword;
+    QString m_activeDirectoryDomain;
+    QString m_activeDirectoryIP;
+
     HostNameAction m_hostnameAction = HostNameAction::EtcHostname;
     bool m_writeEtcHosts = false;
     QString m_hostnameTemplate;
@@ -351,6 +371,8 @@ private:
     QStringList m_forbiddenLoginNames;
 
     PasswordCheckList m_passwordChecks;
+
+    int m_homeDirPermissions = -1;
 };
 
 #endif

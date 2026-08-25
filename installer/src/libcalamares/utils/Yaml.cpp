@@ -12,15 +12,16 @@
  */
 #include "Yaml.h"
 
+#include "compat/Variant.h"
 #include "utils/Logger.h"
 
 #include <QByteArray>
 #include <QFile>
 #include <QFileInfo>
-#include <QRegExp>
+#include <QRegularExpression>
 
 void
-operator>>( const YAML::Node& node, QStringList& v )
+operator>>( const ::YAML::Node& node, QStringList& v )
 {
     for ( size_t i = 0; i < node.size(); ++i )
     {
@@ -28,84 +29,84 @@ operator>>( const YAML::Node& node, QStringList& v )
     }
 }
 
-namespace CalamaresUtils
+namespace Calamares
 {
-
-const QRegExp _yamlScalarTrueValues = QRegExp( "true|True|TRUE|on|On|ON" );
-const QRegExp _yamlScalarFalseValues = QRegExp( "false|False|FALSE|off|Off|OFF" );
-
+namespace YAML
+{
 QVariant
-yamlToVariant( const YAML::Node& node )
+toVariant( const ::YAML::Node& node )
 {
     switch ( node.Type() )
     {
-    case YAML::NodeType::Scalar:
-        return yamlScalarToVariant( node );
+    case ::YAML::NodeType::Scalar:
+        return scalarToVariant( node );
 
-    case YAML::NodeType::Sequence:
-        return yamlSequenceToVariant( node );
+    case ::YAML::NodeType::Sequence:
+        return sequenceToVariant( node );
 
-    case YAML::NodeType::Map:
-        return yamlMapToVariant( node );
+    case ::YAML::NodeType::Map:
+        return mapToVariant( node );
 
-    case YAML::NodeType::Null:
-    case YAML::NodeType::Undefined:
+    case ::YAML::NodeType::Null:
+    case ::YAML::NodeType::Undefined:
         return QVariant();
     }
     __builtin_unreachable();
 }
 
-
 QVariant
-yamlScalarToVariant( const YAML::Node& scalarNode )
+scalarToVariant( const ::YAML::Node& scalarNode )
 {
+    static const auto yamlScalarTrueValues = QRegularExpression( "^(true|True|TRUE|on|On|ON)$" );
+    static const auto yamlScalarFalseValues = QRegularExpression( "^(false|False|FALSE|off|Off|OFF)$" );
+    static const auto yamlIntegerValues = QRegularExpression( "^[-+]?\\d+$" );
+    static const auto yamlFloatValues = QRegularExpression( "^[-+]?\\d*\\.?\\d+$" );
+
     std::string stdScalar = scalarNode.as< std::string >();
     QString scalarString = QString::fromStdString( stdScalar );
-    if ( _yamlScalarTrueValues.exactMatch( scalarString ) )
+    if ( yamlScalarTrueValues.match( scalarString ).hasMatch() )
     {
         return QVariant( true );
     }
-    if ( _yamlScalarFalseValues.exactMatch( scalarString ) )
+    if ( yamlScalarFalseValues.match( scalarString ).hasMatch() )
     {
         return QVariant( false );
     }
-    if ( QRegExp( "[-+]?\\d+" ).exactMatch( scalarString ) )
+    if ( yamlIntegerValues.match( scalarString ).hasMatch() )
     {
         return QVariant( scalarString.toLongLong() );
     }
-    if ( QRegExp( "[-+]?\\d*\\.?\\d+" ).exactMatch( scalarString ) )
+    if ( yamlFloatValues.match( scalarString ).hasMatch() )
     {
         return QVariant( scalarString.toDouble() );
     }
     return QVariant( scalarString );
 }
 
-
 QVariantList
-yamlSequenceToVariant( const YAML::Node& sequenceNode )
+sequenceToVariant( const ::YAML::Node& sequenceNode )
 {
     QVariantList vl;
-    for ( YAML::const_iterator it = sequenceNode.begin(); it != sequenceNode.end(); ++it )
+    for ( ::YAML::const_iterator it = sequenceNode.begin(); it != sequenceNode.end(); ++it )
     {
-        vl << yamlToVariant( *it );
+        vl << toVariant( *it );
     }
     return vl;
 }
 
-
 QVariantMap
-yamlMapToVariant( const YAML::Node& mapNode )
+mapToVariant( const ::YAML::Node& mapNode )
 {
     QVariantMap vm;
-    for ( YAML::const_iterator it = mapNode.begin(); it != mapNode.end(); ++it )
+    for ( ::YAML::const_iterator it = mapNode.begin(); it != mapNode.end(); ++it )
     {
-        vm.insert( QString::fromStdString( it->first.as< std::string >() ), yamlToVariant( it->second ) );
+        vm.insert( QString::fromStdString( it->first.as< std::string >() ), toVariant( it->second ) );
     }
     return vm;
 }
 
 QStringList
-yamlToStringList( const YAML::Node& listNode )
+toStringList( const ::YAML::Node& listNode )
 {
     QStringList l;
     listNode >> l;
@@ -113,21 +114,21 @@ yamlToStringList( const YAML::Node& listNode )
 }
 
 void
-explainYamlException( const YAML::Exception& e, const QByteArray& yamlData, const char* label )
+explainException( const ::YAML::Exception& e, const QByteArray& yamlData, const char* label )
 {
     cWarning() << "YAML error " << e.what() << "in" << label << '.';
-    explainYamlException( e, yamlData );
+    explainException( e, yamlData );
 }
 
 void
-explainYamlException( const YAML::Exception& e, const QByteArray& yamlData, const QString& label )
+explainException( const ::YAML::Exception& e, const QByteArray& yamlData, const QString& label )
 {
     cWarning() << "YAML error " << e.what() << "in" << label << '.';
-    explainYamlException( e, yamlData );
+    explainException( e, yamlData );
 }
 
 void
-explainYamlException( const YAML::Exception& e, const QByteArray& yamlData )
+explainException( const ::YAML::Exception& e, const QByteArray& yamlData )
 {
     if ( ( e.mark.line >= 0 ) && ( e.mark.column >= 0 ) )
     {
@@ -173,13 +174,13 @@ explainYamlException( const YAML::Exception& e, const QByteArray& yamlData )
 }
 
 QVariantMap
-loadYaml( const QFileInfo& fi, bool* ok )
+load( const QFileInfo& fi, bool* ok )
 {
-    return loadYaml( fi.absoluteFilePath(), ok );
+    return load( fi.absoluteFilePath(), ok );
 }
 
 QVariantMap
-loadYaml( const QString& filename, bool* ok )
+load( const QString& filename, bool* ok )
 {
     if ( ok )
     {
@@ -193,18 +194,18 @@ loadYaml( const QString& filename, bool* ok )
         QByteArray ba = yamlFile.readAll();
         try
         {
-            YAML::Node doc = YAML::Load( ba.constData() );
-            yamlContents = CalamaresUtils::yamlToVariant( doc );
+            ::YAML::Node doc = ::YAML::Load( ba.constData() );
+            yamlContents = toVariant( doc );
         }
-        catch ( YAML::Exception& e )
+        catch ( ::YAML::Exception& e )
         {
-            explainYamlException( e, ba, filename );
+            explainException( e, ba, filename );
             return QVariantMap();
         }
     }
 
-
-    if ( yamlContents.isValid() && !yamlContents.isNull() && yamlContents.type() == QVariant::Map )
+    if ( yamlContents.isValid() && !yamlContents.isNull()
+         && Calamares::typeOf( yamlContents ) == Calamares::MapVariantType )
     {
         if ( ok )
         {
@@ -237,35 +238,36 @@ static const char newline[] = "\n";
 static void
 dumpYamlElement( QFile& f, const QVariant& value, int indent )
 {
-    if ( value.type() == QVariant::Type::Bool )
+    const auto t = Calamares::typeOf( value );
+    if ( t == Calamares::BoolVariantType )
     {
         f.write( value.toBool() ? "true" : "false" );
     }
-    else if ( value.type() == QVariant::Type::String )
+    else if ( t == Calamares::StringVariantType )
     {
         f.write( quote );
         f.write( value.toString().toUtf8() );
         f.write( quote );
     }
-    else if ( value.type() == QVariant::Type::Int )
+    else if ( t == Calamares::IntVariantType )
     {
         f.write( QString::number( value.toInt() ).toUtf8() );
     }
-    else if ( value.type() == QVariant::Type::LongLong )
+    else if ( t == Calamares::LongLongVariantType )
     {
         f.write( QString::number( value.toLongLong() ).toUtf8() );
     }
-    else if ( value.type() == QVariant::Type::Double )
+    else if ( t == Calamares::DoubleVariantType )
     {
         f.write( QString::number( value.toDouble(), 'f', 2 ).toUtf8() );
     }
-    else if ( value.canConvert( QVariant::Type::ULongLong ) )
+    else if ( value.canConvert< qulonglong >() )
     {
         // This one needs to be *after* bool, int, double to avoid this branch
         // .. grabbing those convertible types un-necessarily.
         f.write( QString::number( value.toULongLong() ).toUtf8() );
     }
-    else if ( value.type() == QVariant::Type::List )
+    else if ( t == Calamares::ListVariantType )
     {
         int c = 0;
         for ( const auto& it : value.toList() )
@@ -281,7 +283,7 @@ dumpYamlElement( QFile& f, const QVariant& value, int indent )
             f.write( "[]" );
         }
     }
-    else if ( value.type() == QVariant::Type::Map )
+    else if ( t == Calamares::MapVariantType )
     {
         f.write( newline );
         dumpYaml( f, value.toMap(), indent + 1 );
@@ -312,7 +314,7 @@ dumpYaml( QFile& f, const QVariantMap& map, int indent )
 }
 
 bool
-saveYaml( const QString& filename, const QVariantMap& map )
+save( const QString& filename, const QVariantMap& map )
 {
     QFile f( filename );
     if ( !f.open( QFile::WriteOnly ) )
@@ -324,5 +326,5 @@ saveYaml( const QString& filename, const QVariantMap& map )
     return dumpYaml( f, map, 0 );
 }
 
-
-}  // namespace CalamaresUtils
+}  // namespace YAML
+}  // namespace Calamares

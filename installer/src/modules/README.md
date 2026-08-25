@@ -180,26 +180,41 @@ it is possible to take the whole installation-process into account
 for determining the relative weights there.
 
 
-## Global storage keys
+## Global Storage keys
 
-Some modules place values in global storage so that they can be referenced later by other modules or even other parts of the same module.  The following table represents a partial list of the values available as well as where they originate from and which module consume them.
+Some modules place values in Global Storage so that they can be referenced later by other modules or even other parts of the same module.  The following table represents a partial list of the values available as well as where they originate from and which module consume them.
+Keys whose name is followed by a `+` are **structured** data, and have
+entries (which start with `+`) below the parent key describing subkeys.
+Some structured keys refer to other documentation sources.
 
-Key               |Source          |Consumers|Description
-------------------|----------------|---|---
-btrfsSubvolumes   |mount           |fstab|List of maps containing the mountpoint and btrtfs subvolume
+Key               |Source          |Consumers      |Description
+------------------|----------------|---------------|---
+bootloader +      |partition       |               |Bootloader location
+\+ installPath    |                |               |Device (e.g. `/dev/sda`) where the bootloader is installed
+branding +        |                |               |See `src/branding/README.md`
+btrfsSubvolumes   |mount           |fstab          |List of maps containing the mountpoint and btrtfs subvolume
 btrfsRootSubvolume|mount           |bootloader, luksopenswaphook|String containing the subvolume mounted at root
 efiSystemPartition|partition       |bootloader, fstab|String containing the path to the ESP relative to the installed system
 extraMounts       |mount           |unpackfs|List of maps holding metadata for the temporary mountpoints used by the installer
-fullname          |users           ||The full username (e.g. "Jane Q. Public")
-hostname          |users           ||A string containing the hostname of the new system
-netinstallAdd     |packagechooser  |netinstall|Data to add to netinstall tree. Same format as netinstall.yaml
-netinstallSelect  |packagechooser  |netinstall|List of group names to select in the netinstall tree
-partitions        |partition, rawfs|numerous modules|List of maps of metadata about each partition
-rootMountPoint    |mount           |numerous modules|A string with the absolute path to the root mountpoint
+fullname          |users           |               |The full username (e.g. "Jane Q. Public")
+hostname          |users           |               |A string containing the hostname of the new system
+luksPassphrase    |partition       |               |Obfuscated passphrase used on luks partition
+netinstallAdd     |packagechooser  |netinstall     |Data to add to netinstall tree. Same format as netinstall.yaml
+netinstallSelect  |packagechooser  |netinstall     |List of group names to select in the netinstall tree
+packageOperations +|packagechooser, netinstall|packages|Operations to perform
+\+ (list data)    |                |               |See `packages.conf`
+partitions +      |partition, rawfs|(many)         |List of maps of metadata about each partition
+\+ device         |                |               |path to the partition device
+\+ fs             |                |               |the name of the file system
+\+ mountPoint     |                |               |where the device should be mounted
+\+ uuid           |                |               |the UUID of the partition device
+rootMountPoint    |mount           |(many)         |A string with the absolute path to the root mountpoint
 username          |users           |networkcfg, plasmainf, preservefiles|A string containing the username of the new user
 zfsDatasets       |zfs             |bootloader, grubcfg, mount|List of maps of zfs datasets including the name and mount information
-zfsInfo           |partition       |mount, zfs|List of encrypted zfs partitions and the encription info
-zfsPoolInfo       |zfs             |mount, umount|List of maps of zfs pool info including the name and mountpoint
+zfsInfo           |partition       |mount, zfs     |List of encrypted zfs partitions and the encription info
+zfsPoolInfo       |zfs             |mount, umount  |List of maps of zfs pool info including the name and mountpoint
+
+
 
 
 ## C++ modules
@@ -320,7 +335,8 @@ description if something went wrong.
 The interface from a Python module to Calamares internals is
 found in the *libcalamares* module. This is not a standard Python
 module, and is only available inside the Calamares "runtime" for
-Python modules (it is implemented through Boost::Python in C++).
+Python modules (it is implemented in C++ and injected into the Python
+environment by Calamares).
 
 A module should start by importing the Calamares internals:
 
@@ -482,7 +498,8 @@ LC_ALL and LANG to "C" for the called command.
 
 ## Process modules
 
-Use of this kind of module is **not** recommended.
+Use of this kind of module is **not** recommended. Use *shellprocess*
+instead, which is more configurable.
 
 > Type: jobmodule
 > Interface: process
@@ -491,9 +508,14 @@ A process jobmodule runs a (single) command. The interface is *process*,
 while the module type must be *job* or *jobmodule*.
 
 The module-descriptor key *command* should have a string as value, which is
-passed to the shell -- remember to quote it properly. It is generally
+passed to the shell -- remember to quote it properly in YAML. It is generally
 recommended to use a *shellprocess* job module instead (less configuration,
-easier to have multiple instances).
+easier to have multiple instances). There is no configuration outside
+of the module-descriptor. The *command* undergoes Calamares variable-
+expansion (e.g. replacing `${ROOT}` by the target of the installation).
+See *shellprocess* documentation for details.
+
+Optional keys are *timeout* and *chroot*.
 
 `CMakeLists.txt` is *not* used for process jobmodules.
 

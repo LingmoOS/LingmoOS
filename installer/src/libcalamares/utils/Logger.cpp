@@ -14,6 +14,8 @@
 #include "Logger.h"
 
 #include "CalamaresVersionX.h"
+#include "compat/Mutex.h"
+#include "compat/Variant.h"
 #include "utils/Dirs.h"
 
 #include <QCoreApplication>
@@ -42,7 +44,6 @@ static QMutex s_mutex;
 static const char s_Continuation[] = "\n    ";
 static const char s_SubEntry[] = "    .. ";
 
-
 namespace Logger
 {
 
@@ -53,7 +54,14 @@ setupLogLevel( unsigned int level )
     {
         level = LOGVERBOSE;
     }
-    s_threshold = level + 1;  // Comparison is < in log() function
+    s_threshold = level + 1;  // Comparison is < in logLevelEnabled() function
+}
+
+unsigned int
+logLevel()
+{
+    // Undo the +1 in setupLogLevel()
+    return s_threshold > 0 ? s_threshold - 1 : 0;
 }
 
 bool
@@ -62,73 +70,93 @@ logLevelEnabled( unsigned int level )
     return level < s_threshold;
 }
 
-unsigned int
-logLevel()
+/** @brief Should we call the log_implementation() function with this level?
+ *
+ * The implementation logs everything for which logLevelEnabled() is
+ * true to the file **and** to stdout; it logs everything at debug-level
+ * or below to the file regardless.
+ */
+static inline bool
+log_enabled( unsigned int level )
 {
-    return s_threshold > 0 ? s_threshold - 1 : 0;
+    return level <= LOGDEBUG || logLevelEnabled( level );
 }
 
 static void
-log( const char* msg, unsigned int debugLevel, bool withTime = true )
+log_implementation( const char* msg, unsigned int debugLevel, const char* funcinfo )
 {
+    Calamares::MutexLocker lock( &s_mutex );
+
+    const auto date = QDate::currentDate().toString( Qt::ISODate );
+    const auto time = QTime::currentTime().toString();
+
+    // If we don't format the date as a Qt::ISODate then we get a crash when
+    // logging at exit as Qt tries to use QLocale to format, but QLocale is
+    // on its way out.
+    if ( funcinfo )
+    {
+        logfile << date.toUtf8().data() << " - " << time.toUtf8().data() << " [" << debugLevel << "]: " << funcinfo
+                << '\n';
+    }
+    if ( msg )
+    {
+        logfile << date.toUtf8().data() << " - " << time.toUtf8().data() << " [" << debugLevel
+                << ( funcinfo ? "]:     " : "]: " ) << msg << '\n';
+    }
+    logfile.flush();
+
     if ( logLevelEnabled( debugLevel ) )
     {
-        QMutexLocker lock( &s_mutex );
-
-        // If we don't format the date as a Qt::ISODate then we get a crash when
-        // logging at exit as Qt tries to use QLocale to format, but QLocale is
-        // on its way out.
-        logfile << QDate::currentDate().toString( Qt::ISODate ).toUtf8().data() << " - "
-                << QTime::currentTime().toString().toUtf8().data() << " ["
-                << QString::number( debugLevel ).toUtf8().data() << "]: " << msg << std::endl;
-
-        logfile.flush();
-
-        if ( withTime )
+        if ( funcinfo )
         {
-            std::cout << QTime::currentTime().toString().toUtf8().data() << " ["
-                      << QString::number( debugLevel ).toUtf8().data() << "]: ";
+            std::cout << time.toUtf8().data() << " [" << debugLevel << "]: " << funcinfo
+                      << ( msg ? s_Continuation : "" );
         }
-        std::cout << msg << std::endl;
+        // The endl is desired, since it also flushes (like the logfile, above)
+        std::cout << ( msg ? msg : "" ) << std::endl;
     }
 }
-
 
 static void
 CalamaresLogHandler( QtMsgType type, const QMessageLogContext&, const QString& msg )
 {
-    static QMutex s_mutex;
-
-    QByteArray ba = msg.toUtf8();
-    const char* message = ba.constData();
-
-    QMutexLocker locker( &s_mutex );
-
+    unsigned int level = LOGVERBOSE;
+    const char* funcinfo = nullptr;
     switch ( type )
     {
     case QtInfoMsg:
-        log( message, LOGVERBOSE );
+        level = LOGVERBOSE;
+        funcinfo = "INFO";
         break;
     case QtDebugMsg:
-        log( message, LOGDEBUG );
+        level = LOGDEBUG;
+        funcinfo = "DEBUG";
         break;
     case QtWarningMsg:
-        log( message, LOGWARNING );
+        level = LOGWARNING;
+        funcinfo = "WARNING";
         break;
     case QtCriticalMsg:
     case QtFatalMsg:
-        log( message, LOGERROR );
+        level = LOGERROR;
+        funcinfo = "ERROR";
         break;
     }
-}
 
+    if ( !log_enabled( level ) )
+    {
+        return;
+    }
+
+    log_implementation(
+        nullptr, level, ( QString( funcinfo ) + QStringLiteral( " (Qt): " ) + msg ).toUtf8().constData() );
+}
 
 QString
 logFile()
 {
-    return CalamaresUtils::appLogDir().filePath( "session.log" );
+    return Calamares::appLogDir().filePath( "session.log" );
 }
-
 
 void
 setupLogfile()
@@ -158,7 +186,7 @@ setupLogfile()
 
     // Lock while (re-)opening the logfile
     {
-        QMutexLocker lock( &s_mutex );
+        Calamares::MutexLocker lock( &s_mutex );
         logfile.open( logFile().toLocal8Bit(), std::ios::app );
         if ( logfile.tellp() )
         {
@@ -185,17 +213,11 @@ CDebug::CDebug( unsigned int debugLevel, const char* func )
     }
 }
 
-
 CDebug::~CDebug()
 {
-    if ( logLevelEnabled( m_debugLevel ) )
+    if ( log_enabled( m_debugLevel ) )
     {
-        if ( m_funcinfo )
-        {
-            m_msg.prepend( s_Continuation );  // Prepending, so back-to-front
-            m_msg.prepend( m_funcinfo );
-        }
-        log( m_msg.toUtf8().data(), m_debugLevel, m_funcinfo );
+        log_implementation( m_msg.toUtf8().data(), m_debugLevel, m_funcinfo );
     }
 }
 
@@ -212,9 +234,9 @@ const constexpr Quote_t Quote {};
 QString
 toString( const QVariant& v )
 {
-    auto t = v.type();
+    auto t = Calamares::typeOf( v );
 
-    if ( t == QVariant::List )
+    if ( t == Calamares::ListVariantType )
     {
         QStringList s;
         auto l = v.toList();
@@ -237,6 +259,7 @@ operator<<( QDebug& s, const RedactedCommand& l )
     if ( l.list.contains( "usermod" ) )
     {
         for ( const auto& item : l.list )
+        {
             if ( item.startsWith( "$6$" ) )
             {
                 s << "<password>";
@@ -245,6 +268,7 @@ operator<<( QDebug& s, const RedactedCommand& l )
             {
                 s << item;
             }
+        }
     }
     else
     {

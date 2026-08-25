@@ -12,12 +12,14 @@
 
 #include "GlobalStorage.h"
 #include "JobQueue.h"
-#include "utils/CalamaresUtilsSystem.h"
 #include "utils/Logger.h"
+#include "utils/System.h"
 
 #include <QDir>
 #include <QFile>
 #include <QtTest/QtTest>
+
+#include <KOSRelease>
 
 // Internals of Workers.cpp
 extern int getUrandomPoolSize();
@@ -104,7 +106,6 @@ MachineIdTests::testConfigEntropyFiles()
     }
 }
 
-
 void
 MachineIdTests::testCopyFile()
 {
@@ -126,18 +127,18 @@ MachineIdTests::testCopyFile()
     QVERIFY( source.exists() );
 
     // This should fail since "example" isn't standard in our test directory
-    auto r0 = MachineId::copyFile( tempRoot.path(), "example" );
+    auto r0 = copyFile( tempRoot.path(), "example" );
     QVERIFY( !r0 );
 
     const QString sampleFile = QStringLiteral( "CMakeCache.txt" );
     if ( QFile::exists( sampleFile ) )
     {
-        auto r1 = MachineId::copyFile( tempRoot.path(), sampleFile );
+        auto r1 = copyFile( tempRoot.path(), sampleFile );
         // Also fail, because it's not an absolute path
         QVERIFY( !r1 );
 
         QVERIFY( QFile::copy( sampleFile, tempISOdir.path() + '/' + sampleFile ) );
-        auto r2 = MachineId::copyFile( tempRoot.path(), tempISOdir.path() + '/' + sampleFile );
+        auto r2 = copyFile( tempRoot.path(), tempISOdir.path() + '/' + sampleFile );
         QVERIFY( r2 );
     }
 }
@@ -149,8 +150,21 @@ MachineIdTests::testPoolSize()
     // It hardly makes sense, but also the /proc entry is missing
     QCOMPARE( getUrandomPoolSize(), 512 );
 #else
-    // Based on a sample size of 1, Netrunner
-    QCOMPARE( getUrandomPoolSize(), 4096 );
+    // Based on a sample size of 1, Netrunner had 4096.
+    // Physical HW KDE neon had 256, which gets reported as 512,
+    //   but regular CI builds pass, so leave that special case
+    //   #if-fed out.
+#if 0
+    KOSRelease r;
+    if ( r.id() == QStringLiteral( "neon" ) )
+    {
+        QCOMPARE( getUrandomPoolSize(), 512 );
+    }
+    else
+#endif
+    {
+        QVERIFY( getUrandomPoolSize() >= 512 );
+    }
 #endif
 }
 
@@ -165,7 +179,7 @@ MachineIdTests::testJob()
     cDebug() << "Temporary files as" << QDir::tempPath();
 
     // Ensure we have a system object, expect it to be a "bogus" one
-    CalamaresUtils::System* system = CalamaresUtils::System::instance();
+    Calamares::System* system = Calamares::System::instance();
     QVERIFY( system );
     QVERIFY( system->doChroot() );
 

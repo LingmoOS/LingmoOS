@@ -10,6 +10,8 @@
 
 #include "RequirementsChecker.h"
 
+#include "compat/Mutex.h"
+#include "compat/Size.h"
 #include "modulesystem/Module.h"
 #include "modulesystem/Requirement.h"
 #include "modulesystem/RequirementsModel.h"
@@ -43,12 +45,16 @@ RequirementsChecker::run()
 {
     m_progressTimer = new QTimer( this );
     connect( m_progressTimer, &QTimer::timeout, this, &RequirementsChecker::reportProgress );
-    m_progressTimer->start( 1200 );  // msec
+    m_progressTimer->start( std::chrono::milliseconds( 1200 ) );
 
     for ( const auto& module : m_modules )
     {
         Watcher* watcher = new Watcher( this );
+#if QT_VERSION < QT_VERSION_CHECK( 6, 0, 0 )
         watcher->setFuture( QtConcurrent::run( this, &RequirementsChecker::addCheckedRequirements, module ) );
+#else
+        watcher->setFuture( QtConcurrent::run( &RequirementsChecker::addCheckedRequirements, this, module ) );
+#endif
         watcher->setObjectName( module->name() );
         m_watchers.append( watcher );
         connect( watcher, &Watcher::finished, this, &RequirementsChecker::finished );
@@ -61,7 +67,7 @@ void
 RequirementsChecker::finished()
 {
     static QMutex finishedMutex;
-    QMutexLocker lock( &finishedMutex );
+    Calamares::MutexLocker lock( &finishedMutex );
 
     if ( m_progressTimer
          && std::all_of(
@@ -76,7 +82,7 @@ RequirementsChecker::finished()
         }
 
         m_model->describe();
-        m_model->changeRequirementsList();
+        m_model->reCheckList();
         QTimer::singleShot( 0, this, &RequirementsChecker::done );
     }
 }
@@ -91,7 +97,7 @@ RequirementsChecker::addCheckedRequirements( Module* m )
         m_model->addRequirementsList( l );
     }
 
-    requirementsProgress( tr( "Requirements checking for module <i>%1</i> is complete." ).arg( m->name() ) );
+    Q_EMIT requirementsProgress( tr( "Requirements checking for module '%1' is complete.", "@info" ).arg( m->name() ) );
 }
 
 void
@@ -115,13 +121,13 @@ RequirementsChecker::reportProgress()
     {
         cDebug() << "Remaining modules:" << remaining << Logger::DebugList( remainingNames );
         unsigned int posInterval = ( m_progressTimer->interval() < 0 ) ? 1000 : uint( m_progressTimer->interval() );
-        QString waiting = tr( "Waiting for %n module(s).", "", remaining );
-        QString elapsed = tr( "(%n second(s))", "", m_progressTimeouts * posInterval / 1000 );
-        emit requirementsProgress( waiting + QString( " " ) + elapsed );
+        QString waiting = tr( "Waiting for %n module(s)…", "@status", static_cast<Calamares::NumberForTr>(remaining) );
+        QString elapsed = tr( "(%n second(s))", "@status", m_progressTimeouts * posInterval / 999 );
+        Q_EMIT requirementsProgress( waiting + QString( " " ) + elapsed );
     }
     else
     {
-        emit requirementsProgress( tr( "System-requirements checking is complete." ) );
+        Q_EMIT requirementsProgress( tr( "System-requirements checking is complete.", "@info" ) );
     }
 }
 

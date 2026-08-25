@@ -16,16 +16,18 @@
 #ifndef PARTITION_KPMHELPER_H
 #define PARTITION_KPMHELPER_H
 
+#include <qglobal.h>
+
 // The kpmcore headers are not C++17 warning-proof, especially
 // with picky compilers like Clang 10. Since we use Clang for the
 // find-all-the-warnings case, switch those warnings off for
 // the we-can't-change-them system headers.
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdocumentation"
-#pragma clang diagnostic ignored "-Wsuggest-destructor-override"
-#pragma clang diagnostic ignored "-Winconsistent-missing-destructor-override"
-#endif
+QT_WARNING_PUSH
+QT_WARNING_DISABLE_CLANG( "-Wdocumentation" )
+QT_WARNING_DISABLE_CLANG( "-Wsuggest-destructor-override" )
+QT_WARNING_DISABLE_CLANG( "-Winconsistent-missing-destructor-override" )
+// Because of __lastType
+QT_WARNING_DISABLE_CLANG( "-Wreserved-identifier" )
 
 #include <backend/corebackend.h>
 #include <core/device.h>
@@ -36,8 +38,6 @@
 #include <fs/filesystem.h>
 #include <fs/filesystemfactory.h>
 
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
+QT_WARNING_POP
 
 #endif

@@ -12,9 +12,11 @@
 #ifndef PARTITIONCOREMODULE_H
 #define PARTITIONCOREMODULE_H
 
+#include "Config.h"
 #include "core/KPMHelpers.h"
 #include "core/PartitionLayout.h"
 #include "core/PartitionModel.h"
+#include "core/DirFSRestrictLayout.h"
 #include "jobs/PartitionJob.h"
 
 #include "Job.h"
@@ -166,10 +168,18 @@ public:
      */
     PartitionLayout& partitionLayout() { return m_partLayout; }
 
-    void layoutApply( Device* dev, qint64 firstSector, qint64 lastSector, QString luksPassphrase );
+    /// @brief Get the directory filesystem restriction layout.
+    DirFSRestrictLayout& dirFSRestrictLayout() { return m_dirFSRestrictLayout; }
+
     void layoutApply( Device* dev,
                       qint64 firstSector,
                       qint64 lastSector,
+                      Config::LuksGeneration luksFsType,
+                      QString luksPassphrase );
+    void layoutApply( Device* dev,
+                      qint64 firstSector,
+                      qint64 lastSector,
+                      Config::LuksGeneration luksFsType,
                       QString luksPassphrase,
                       PartitionNode* parent,
                       const PartitionRole& role );
@@ -212,6 +222,7 @@ public:
     void asyncRevertDevice( Device* dev, std::function< void() > callback );  //like revertDevice, but asynchronous
 
     void clearJobs();  // only clear jobs, the Device* states are preserved
+    void clearJobs( Device* device, Partition* partition );  // clears all jobs changing @p partition
 
     bool isDirty();  // true if there are pending changes, otherwise false
 
@@ -251,7 +262,7 @@ private:
 
     DeviceInfo* infoForDevice( const Device* ) const;
 
-    CalamaresUtils::Partition::KPMManager m_kpmcore;
+    Calamares::Partition::KPMManager m_kpmcore;
 
     QList< DeviceInfo* > m_deviceInfos;
     QList< Partition* > m_efiSystemPartitions;
@@ -263,6 +274,7 @@ private:
     bool m_isDirty = false;
     QString m_bootLoaderInstallPath;
     PartitionLayout m_partLayout;
+    DirFSRestrictLayout m_dirFSRestrictLayout;
 
     OsproberEntryList m_osproberLines;
 

@@ -16,6 +16,7 @@
 
 #include "Branding.h"
 #include "Settings.h"
+#include "compat/CheckBox.h"
 #include "utils/Retranslator.h"
 
 #include <QFocusEvent>
@@ -42,8 +43,9 @@ FinishedPage::FinishedPage( Config* config, QWidget* parent )
              } );
     connect( config, &Config::restartNowWantedChanged, ui->restartCheckBox, &QCheckBox::setChecked );
     connect( ui->restartCheckBox,
-             &QCheckBox::stateChanged,
-             [ config ]( int state ) { config->setRestartNowWanted( state != 0 ); } );
+             Calamares::checkBoxStateChangedSignal,
+             [ config ]( Calamares::checkBoxStateType state )
+             { config->setRestartNowWanted( state != Calamares::checkBoxUncheckedValue ); } );
 
     CALAMARES_RETRANSLATE_SLOT( &FinishedPage::retranslate );
 }
@@ -74,26 +76,30 @@ FinishedPage::retranslate()
         {
             ui->mainText->setText( tr( "<h1>All done.</h1><br/>"
                                        "%1 has been set up on your computer.<br/>"
-                                       "You may now start using your new system." )
+                                       "You may now start using your new system.",
+                                       "@info" )
                                        .arg( branding->versionedName() ) );
             ui->restartCheckBox->setToolTip( tr( "<html><head/><body>"
                                                  "<p>When this box is checked, your system will "
                                                  "restart immediately when you click on "
                                                  "<span style=\"font-style:italic;\">Done</span> "
-                                                 "or close the setup program.</p></body></html>" ) );
+                                                 "or close the setup program.</p></body></html>",
+                                                 "@tooltip" ) );
         }
         else
         {
             ui->mainText->setText( tr( "<h1>All done.</h1><br/>"
                                        "%1 has been installed on your computer.<br/>"
                                        "You may now restart into your new system, or continue "
-                                       "using the %2 Live environment." )
+                                       "using the %2 Live environment.",
+                                       "@info" )
                                        .arg( branding->versionedName(), branding->productName() ) );
             ui->restartCheckBox->setToolTip( tr( "<html><head/><body>"
                                                  "<p>When this box is checked, your system will "
                                                  "restart immediately when you click on "
                                                  "<span style=\"font-style:italic;\">Done</span> "
-                                                 "or close the installer.</p></body></html>" ) );
+                                                 "or close the installer.</p></body></html>",
+                                                 "@tooltip" ) );
         }
     }
     else
@@ -104,7 +110,8 @@ FinishedPage::retranslate()
         {
             ui->mainText->setText( tr( "<h1>Setup Failed</h1><br/>"
                                        "%1 has not been set up on your computer.<br/>"
-                                       "The error message was: %2." )
+                                       "The error message was: %2.",
+                                       "@info, %1 is product name with version" )
                                        .arg( branding->versionedName() )
                                        .arg( message ) );
         }
@@ -112,7 +119,8 @@ FinishedPage::retranslate()
         {
             ui->mainText->setText( tr( "<h1>Installation Failed</h1><br/>"
                                        "%1 has not been installed on your computer.<br/>"
-                                       "The error message was: %2." )
+                                       "The error message was: %2.",
+                                       "@info, %1 is product name with version" )
                                        .arg( branding->versionedName() )
                                        .arg( message ) );
         }

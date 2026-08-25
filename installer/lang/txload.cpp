@@ -18,6 +18,8 @@
  * differences in translation are.
  */
 
+#include "compat/Xml.h"
+
 #include <QCoreApplication>
 #include <QDebug>
 #include <QFile>
@@ -39,8 +41,6 @@ bool
 load_file( const char* filename, QDomDocument& doc )
 {
     QFile file( filename );
-    QString err;
-    int err_line, err_column;
     if ( !file.open( QIODevice::ReadOnly ) )
     {
         qDebug() << "Could not open" << filename;
@@ -49,9 +49,10 @@ load_file( const char* filename, QDomDocument& doc )
     QByteArray ba( file.read( 1024 * 1024 ) );
     qDebug() << "Read" << ba.length() << "bytes from" << filename;
 
-    if ( !doc.setContent( ba, &err, &err_line, &err_column ) )
+    auto p = Calamares::setXmlContent( doc, ba );
+    if ( !p.errorMessage.isEmpty() )
     {
-        qDebug() << "Could not read" << filename << ':' << err_line << ':' << err_column << ' ' << err;
+        qDebug() << "Could not read" << filename << ':' << p.errorLine << ':' << p.errorColumn << ' ' << p.errorMessage;
         file.close();
         return false;
     }
@@ -177,10 +178,12 @@ merge_into( QDomDocument& originDocument, QDomDocument& alternateDocument )
         {
             QDomElement e = n.toElement();
             if ( e.tagName() == "context" )
+            {
                 if ( !merge_into( originDocument, e ) )
                 {
                     return false;
                 }
+            }
         }
         n = n.nextSibling();
     }

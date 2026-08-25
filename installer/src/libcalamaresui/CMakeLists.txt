@@ -8,11 +8,7 @@
 # view modules, view steps, widgets, and branding.
 
 # The UI libs use the non-UI library
-include_directories(
-    ${CMAKE_SOURCE_DIR}/src/libcalamares
-    ${CMAKE_BINARY_DIR}/src/libcalamares
-    ${CMAKE_SOURCE_DIR}
-)
+include_directories(${CMAKE_SOURCE_DIR}/src/libcalamares ${CMAKE_BINARY_DIR}/src/libcalamares ${CMAKE_SOURCE_DIR})
 
 set(calamaresui_SOURCES
     modulesystem/CppJobModule.cpp
@@ -20,7 +16,7 @@ set(calamaresui_SOURCES
     modulesystem/ModuleManager.cpp
     modulesystem/ProcessJobModule.cpp
     modulesystem/ViewModule.cpp
-    utils/CalamaresUtilsGui.cpp
+    utils/Gui.cpp
     utils/ImageRegistry.cpp
     utils/Paste.cpp
     viewpages/BlankViewStep.cpp
@@ -34,31 +30,13 @@ set(calamaresui_SOURCES
     widgets/LogWidget.cpp
     widgets/TranslationFix.cpp
     widgets/WaitingWidget.cpp
-    ${CMAKE_SOURCE_DIR}/3rdparty/waitingspinnerwidget.cpp
+    widgets/waitingspinnerwidget.cpp
     Branding.cpp
     ViewManager.cpp
 )
 
-# Don't warn about third-party sources
-mark_thirdparty_code(
-    ${CMAKE_SOURCE_DIR}/3rdparty/waitingspinnerwidget.cpp
-)
-
 if(WITH_PYTHON)
     list(APPEND calamaresui_SOURCES modulesystem/PythonJobModule.cpp)
-endif()
-
-if(WITH_PYTHONQT)
-    list(
-        APPEND
-        calamaresui_SOURCES
-        modulesystem/PythonQtViewModule.cpp
-        utils/PythonQtUtils.cpp
-        viewpages/PythonQtJob.cpp
-        viewpages/PythonQtViewStep.cpp
-        viewpages/PythonQtGlobalStorageWrapper.cpp
-        viewpages/PythonQtUtilsWrapper.cpp
-    )
 endif()
 
 if(WITH_QML)
@@ -67,33 +45,29 @@ endif()
 
 calamares_add_library(calamaresui
     SOURCES ${calamaresui_SOURCES}
+    TARGET_TYPE SHARED
     EXPORT_MACRO UIDLLEXPORT_PRO
     LINK_LIBRARIES
-        Qt5::Svg
+        ${qtname}::Svg
     RESOURCES libcalamaresui.qrc
     EXPORT Calamares
     UI
         utils/ErrorDialog/ErrorDialog.ui
     VERSION ${CALAMARES_VERSION_SHORT}
+    SOVERSION ${CALAMARES_SOVERSION}
 )
 target_link_libraries(calamaresui PRIVATE yamlcpp::yamlcpp)
-if(KF5CoreAddons_FOUND AND KF5CoreAddons_VERSION VERSION_GREATER_EQUAL 5.58)
-    target_compile_definitions(calamaresui PRIVATE WITH_KOSRelease)
-endif()
-if(WITH_PYTHONQT)
-    # *_DIRS because we also use extensions
-    target_include_directories(
-        calamaresui
-        PRIVATE ${PYTHON_INCLUDE_DIRS} ${PYTHONQT_INCLUDE_DIRS}
-    )
-    target_link_libraries(
-        calamaresui
-        PRIVATE ${PYTHON_LIBRARIES} ${PYTHONQT_LIBRARIES}
-    )
-endif()
+target_link_libraries(calamaresui PRIVATE ${kfname}::CoreAddons)
+
 if(WITH_QML)
-    target_link_libraries(calamaresui PUBLIC Qt5::QuickWidgets)
+    target_link_libraries(calamaresui PUBLIC ${qtname}::QuickWidgets)
 endif()
+
+set_target_properties(
+    calamaresui
+    PROPERTIES
+        CXX_VISIBILITY_PRESET hidden
+)
 
 add_library(Calamares::calamaresui ALIAS calamaresui)
 
@@ -113,11 +87,4 @@ foreach(subdir modulesystem utils viewpages widgets)
     install(FILES ${subdir_headers} DESTINATION include/libcalamares/${subdir})
 endforeach()
 
-calamares_add_test(
-    test_libcalamaresuipaste
-    SOURCES
-        utils/TestPaste.cpp
-        utils/Paste.cpp
-    LIBRARIES
-        calamaresui
-)
+calamares_add_test(test_libcalamaresuipaste SOURCES utils/TestPaste.cpp utils/Paste.cpp LIBRARIES calamaresui)

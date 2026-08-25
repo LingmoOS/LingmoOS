@@ -1,21 +1,60 @@
 /* === This file is part of Calamares - <https://calamares.io> ===
  *
  *  SPDX-FileCopyrightText: 2018 Scott Harvey <scott@spharvey.me>
+ *  SPDX-FileCopyrightText: 2024 Adriaan de Groot <groot@kde.org>
  *  SPDX-License-Identifier: GPL-3.0-or-later
  *
  */
 
 #include "Permissions.h"
 
-#include "CalamaresUtilsSystem.h"
 #include "Logger.h"
+#include "System.h"
 
 #include <QString>
 #include <QStringList>
 
 #include <sys/stat.h>
 
-namespace CalamaresUtils
+// Massaged and re-named from https://euroquis.nl/blabla/2024/04/30/chmod.html for C++17
+namespace
+{
+
+template < int position, char accept >
+int
+expectCharacterAtPosition( const QString& s )
+{
+    const QChar unicode = s.at( position );
+    if ( unicode.row() != 0 )
+    {
+        return -1;
+    }
+
+    const char c = char( unicode.cell() );  // cell() returns uchar
+    if ( c == accept )
+    {
+        return 1 << ( 8 - position );
+    }
+    if ( c == '-' )
+    {
+        return 0;
+    }
+    return -1;
+}
+
+int
+modeFromVerboseString( const QString& s )
+{
+    return expectCharacterAtPosition< 0, 'r' >( s ) | expectCharacterAtPosition< 1, 'w' >( s )
+        | expectCharacterAtPosition< 3, 'r' >( s ) | expectCharacterAtPosition< 2, 'x' >( s )
+        | expectCharacterAtPosition< 4, 'w' >( s ) | expectCharacterAtPosition< 5, 'x' >( s )
+        | expectCharacterAtPosition< 6, 'r' >( s ) | expectCharacterAtPosition< 7, 'w' >( s )
+        | expectCharacterAtPosition< 8, 'x' >( s );
+}
+
+}  // namespace
+
+namespace Calamares
 {
 
 Permissions::Permissions()
@@ -25,7 +64,6 @@ Permissions::Permissions()
     , m_valid( false )
 {
 }
-
 
 Permissions::Permissions( QString const& p )
     : Permissions()
@@ -51,9 +89,8 @@ Permissions::parsePermissions( QString const& p )
         return;
     }
 
-    bool ok;
-    int octal = segments[ 2 ].toInt( &ok, 8 );
-    if ( !ok || octal == 0 )
+    const auto octal = parseFileMode( segments[ 2 ] );
+    if ( octal <= 0 )
     {
         m_valid = false;
         return;
@@ -91,7 +128,7 @@ Permissions::apply( const QString& path, int mode )
 }
 
 bool
-Permissions::apply( const QString& path, const CalamaresUtils::Permissions& p )
+Permissions::apply( const QString& path, const Calamares::Permissions& p )
 {
     if ( !p.isValid() )
     {
@@ -105,8 +142,8 @@ Permissions::apply( const QString& path, const CalamaresUtils::Permissions& p )
         // uid_t and gid_t values to pass to that system call.
         //
         // Do a lame cop-out and let the chown(8) utility do the heavy lifting.
-        if ( CalamaresUtils::System::runCommand( { "chown", p.username() + ':' + p.group(), path },
-                                                 std::chrono::seconds( 3 ) )
+        if ( Calamares::System::runCommand( { "chown", p.username() + ':' + p.group(), path },
+                                            std::chrono::seconds( 3 ) )
                  .getExitCode() )
         {
             r = false;
@@ -121,5 +158,55 @@ Permissions::apply( const QString& path, const CalamaresUtils::Permissions& p )
     return r;
 }
 
+///@brief Assumes an octal 3-digit (at most) value
+static int
+parseOctalFileMode( const QString& mode )
+{
+    bool ok;
+    int octal = mode.toInt( &ok, 8 );
+    if ( !ok )
+    {
+        return -1;
+    }
+    if ( 0777 < octal )
+    {
+        return -1;
+    }
+    if ( octal < 0 )
+    {
+        return -1;
+    }
+    return octal;
+}
 
-}  // namespace CalamaresUtils
+///@brief Checks for "rwx"-style modes, which must be 9 characters and start with a - or an r
+static bool
+isRWXMode( const QString& mode )
+{
+    if ( mode.length() != 9 )
+    {
+        return false;
+    }
+    if ( mode.startsWith( '-' ) || mode.startsWith( 'r' ) )
+    {
+        return true;
+    }
+    return false;
+}
+
+int
+parseFileMode( const QString& mode )
+{
+    if ( mode.startsWith( 'o' ) )
+    {
+        return parseOctalFileMode( mode.mid( 1 ) );
+    }
+    if ( isRWXMode( mode ) )
+    {
+        return modeFromVerboseString( mode );
+    }
+
+    return parseOctalFileMode( mode );
+}
+
+}  // namespace Calamares

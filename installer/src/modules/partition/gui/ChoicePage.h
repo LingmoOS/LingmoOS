@@ -3,6 +3,7 @@
  *   SPDX-FileCopyrightText: 2014-2016 Teo Mrnjavac <teo@kde.org>
  *   SPDX-FileCopyrightText: 2018-2019 Adriaan de Groot <groot@kde.org>
  *   SPDX-FileCopyrightText: 2019 Collabora Ltd
+ *   SPDX-FileCopyrightText: 2023 Evan James <dalto@fastmail.com>
  *   SPDX-License-Identifier: GPL-3.0-or-later
  *
  *   Calamares is Free Software: see the License-Identifier above.
@@ -30,8 +31,11 @@ class QListView;
 
 namespace Calamares
 {
+namespace Widgets
+{
 class PrettyRadioButton;
-}
+}  // namespace Widgets
+}  // namespace Calamares
 
 class Config;
 class DeviceInfoWidget;
@@ -108,7 +112,12 @@ private:
     void updateNextEnabled();
     void setupChoices();
     void checkInstallChoiceRadioButton( Config::InstallChoice choice );  ///< Sets the chosen button to "on"
-    QComboBox* createBootloaderComboBox( QWidget* parentButton );
+    /** @brief Create a panel with "boot loader location:"
+     *
+     * Panel + dropdown and handling for model updates. Returns a pointer
+     * to the panel's widget.
+     */
+    QWidget* createBootloaderPanel();
     Device* selectedDevice();
 
     /* Change the UI depending on the device selected. */
@@ -118,6 +127,7 @@ private:
 
     void updateDeviceStatePreview();
     void updateActionChoicePreview( Config::InstallChoice choice );
+    bool shouldShowEncryptWidget( Config::InstallChoice choice ) const;
     void setupActions();
     OsproberEntryList getOsproberEntriesForDevice( Device* device ) const;
     void doAlongsideApply();
@@ -126,6 +136,7 @@ private:
     // Translations support
     void updateSwapChoicesTr();
     void updateChoiceButtonsTr();
+    void updateActionDescriptionsTr();
 
     Config* m_config;
     bool m_nextEnabled;
@@ -137,12 +148,13 @@ private:
     QComboBox* m_drivesCombo;
 
     QButtonGroup* m_grp;
-    Calamares::PrettyRadioButton* m_alongsideButton;
-    Calamares::PrettyRadioButton* m_eraseButton;
-    Calamares::PrettyRadioButton* m_replaceButton;
-    Calamares::PrettyRadioButton* m_somethingElseButton;
+    Calamares::Widgets::PrettyRadioButton* m_alongsideButton;
+    Calamares::Widgets::PrettyRadioButton* m_eraseButton;
+    Calamares::Widgets::PrettyRadioButton* m_replaceButton;
+    Calamares::Widgets::PrettyRadioButton* m_somethingElseButton;
     QComboBox* m_eraseSwapChoiceComboBox = nullptr;  // UI, see also Config's swap choice
     QComboBox* m_eraseFsTypesChoiceComboBox = nullptr;  // UI, see also Config's erase-mode FS
+    QComboBox* m_replaceFsTypesChoiceComboBox = nullptr;  // UI, see also Config's erase-mode FS
 
 
     DeviceInfoWidget* m_deviceInfoWidget;
@@ -157,9 +169,11 @@ private:
     QPointer< QComboBox > m_efiComboBox;
 
     int m_lastSelectedDeviceIndex = -1;
-    int m_lastSelectedActionIndex = -1;
+    int m_osproberEntriesCount = -1;
+    QString m_osproberOneEntryName;
 
-    bool m_enableEncryptionWidget;
+    bool m_enableEncryptionWidget = false;
+    bool m_preCheckActivated = false;
 
     QMutex m_coreMutex;
 };

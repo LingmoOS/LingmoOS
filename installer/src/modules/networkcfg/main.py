@@ -14,6 +14,7 @@
 #
 
 import os
+import glob
 import shutil
 
 import libcalamares
@@ -130,6 +131,41 @@ def run():
                     )
             except FileExistsError:
                 pass
+
+    # Also install netplan files
+    source_netplan = "/etc/netplan"
+    root_mount_point = libcalamares.globalstorage.value("rootMountPoint")
+    target_netplan = os.path.join(root_mount_point, source_netplan.lstrip('/'))
+
+    if os.path.exists(source_netplan) and os.path.exists(target_netplan):
+        # Set NetworkManager to be the default renderer if Netplan is installed
+        # TODO: We might rather do that inside the network-manager package, see:
+        # https://bugs.launchpad.net/ubuntu/+source/ubuntu-settings/+bug/2020110
+        default_renderer = os.path.join(root_mount_point, "usr/lib/netplan",
+                                        "00-network-manager-all.yaml")
+        if not os.path.exists(default_renderer):
+            renderer_file = os.path.join(target_netplan,
+                                         "01-network-manager-all.yaml")
+            nm_renderer = """# This file was written by calamares.
+# Let NetworkManager manage all devices on this system.
+# For more information, see netplan(5).
+network:
+  version: 2
+  renderer: NetworkManager
+"""
+            with open(renderer_file, 'w') as f:
+                f.writelines(nm_renderer)
+                os.chmod(f.fileno(), 0o600)
+
+        # Copy existing Netplan configuration
+        for cfg in glob.glob(os.path.join(source_netplan, "*.yaml")):
+            source_cfg = os.path.join(source_netplan, cfg)
+            target_cfg = os.path.join(target_netplan, os.path.basename(cfg))
+
+            if os.path.exists(target_cfg):
+                continue
+
+            shutil.copy(source_cfg, target_cfg)
 
     # We need to overwrite the default resolv.conf in the chroot.
     source_resolv, target_resolv = path_pair(root_mount_point, "etc/resolv.conf")

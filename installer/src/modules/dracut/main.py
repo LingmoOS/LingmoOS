@@ -7,13 +7,15 @@
 #   SPDX-FileCopyrightText: 2014 Teo Mrnjavac <teo@kde.org>
 #   SPDX-FileCopyrightText: 2017 Alf Gaida <agaid@siduction.org>
 #   SPDX-FileCopyrightText: 2019 Adriaan de Groot <groot@kde.org>
+#   SPDX-FileCopyrightText: 2022 Anke Boersma <demm@kaosx.us>
 #   SPDX-License-Identifier: GPL-3.0-or-later
 #
 #   Calamares is Free Software: see the License-Identifier above.
 #
+import subprocess
 
 import libcalamares
-from libcalamares.utils import target_env_call
+from libcalamares.utils import target_env_process_output
 
 
 import gettext
@@ -33,7 +35,20 @@ def run_dracut():
 
     :return:
     """
-    return target_env_call(['dracut', '-f'])
+    # Fetch the job configuration
+    initramfs_name = libcalamares.job.configuration.get('initramfsName', None)
+    dracut_options = libcalamares.job.configuration.get('options', ['-f'])
+
+    if initramfs_name:
+        dracut_options.append(initramfs_name)
+
+    try:
+        target_env_process_output(['dracut'] + dracut_options)
+    except subprocess.CalledProcessError as cpe:
+        libcalamares.utils.warning(f"Dracut failed with output: {cpe.output}")
+        return cpe.returncode
+
+    return 0
 
 
 def run():
@@ -44,7 +59,6 @@ def run():
     :return:
     """
     return_code = run_dracut()
-
     if return_code != 0:
-        return ( _("Failed to run dracut on the target"),
-                 _("The exit code was {}").format(return_code) )
+        return (_("Failed to run dracut"),
+                _(f"Dracut failed to run on the target with return code: {return_code}"))

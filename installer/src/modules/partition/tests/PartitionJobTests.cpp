@@ -27,8 +27,9 @@
 
 QTEST_GUILESS_MAIN( PartitionJobTests )
 
-using namespace Calamares;
-using namespace CalamaresUtils::Units;
+using Calamares::job_ptr;
+using Calamares::JobList;
+using namespace Calamares::Units;
 
 class PartitionMounter
 {
@@ -99,25 +100,27 @@ writeFile( const QString& path, const QByteArray data )
     }
 }
 
-static Partition*
+static ::Partition*
 firstFreePartition( PartitionNode* parent )
 {
     for ( auto child : parent->children() )
-        if ( CalamaresUtils::Partition::isPartitionFreeSpace( child ) )
+    {
+        if ( Calamares::Partition::isPartitionFreeSpace( child ) )
         {
             return child;
         }
+    }
     return nullptr;
 }
 
 //- QueueRunner ---------------------------------------------------------------
-QueueRunner::QueueRunner( JobQueue* queue )
+QueueRunner::QueueRunner( Calamares::JobQueue* queue )
     : m_queue( queue )
     , m_finished( false )  // Same initalizations as in ::run()
     , m_success( true )
 {
-    connect( m_queue, &JobQueue::finished, this, &QueueRunner::onFinished );
-    connect( m_queue, &JobQueue::failed, this, &QueueRunner::onFailed );
+    connect( m_queue, &Calamares::JobQueue::finished, this, &QueueRunner::onFinished );
+    connect( m_queue, &Calamares::JobQueue::failed, this, &QueueRunner::onFailed );
 }
 
 QueueRunner::~QueueRunner()
@@ -153,7 +156,7 @@ QueueRunner::onFailed( const QString& message, const QString& details )
     QFAIL( qPrintable( msg ) );
 }
 
-static CalamaresUtils::Partition::KPMManager* kpmcore = nullptr;
+static Calamares::Partition::KPMManager* kpmcore = nullptr;
 
 //- PartitionJobTests ------------------------------------------------------------------
 PartitionJobTests::PartitionJobTests()
@@ -172,7 +175,7 @@ PartitionJobTests::initTestCase()
                0 );
     }
 
-    kpmcore = new CalamaresUtils::Partition::KPMManager();
+    kpmcore = new Calamares::Partition::KPMManager();
     FileSystemFactory::init();
 
     refreshDevice();
@@ -364,7 +367,7 @@ PartitionJobTests::testResizePartition()
     // Make the test data file smaller than the full size of the partition to
     // accomodate for the file system overhead
     const unsigned long long minSizeMiB = qMin( oldSizeMiB, newSizeMiB );
-    const QByteArray testData = generateTestData( CalamaresUtils::MiBtoBytes( minSizeMiB ) * 3 / 4 );
+    const QByteArray testData = generateTestData( Calamares::MiBtoBytes( minSizeMiB ) * 3 / 4 );
     const QString testName = "test.data";
 
     // Setup: create the test partition
@@ -425,7 +428,6 @@ PartitionJobTests::testResizePartition()
         QCOMPARE( partition->lastSector(), newLast );
         QCOMPARE( partition->fileSystem().firstSector(), newFirst );
         QCOMPARE( partition->fileSystem().lastSector(), newLast );
-
 
         PartitionMounter mounter( partition->partitionPath() );
         QString mountPoint = mounter.mountPoint();

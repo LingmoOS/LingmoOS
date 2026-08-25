@@ -52,10 +52,10 @@ PackagesTests::testEmpty()
     QCOMPARE( k.toString(), "this@that" );
 
     // Adding nothing at all does nothing
-    QVERIFY( !CalamaresUtils::Packages::setGSPackageAdditions( &gs, k, QVariantList(), QVariantList() ) );
+    QVERIFY( !Calamares::Packages::setGSPackageAdditions( &gs, k, QVariantList(), QVariantList() ) );
     QVERIFY( !gs.contains( topKey ) );
 
-    QVERIFY( !CalamaresUtils::Packages::setGSPackageAdditions( &gs, k, QStringList() ) );
+    QVERIFY( !Calamares::Packages::setGSPackageAdditions( &gs, k, QStringList() ) );
     QVERIFY( !gs.contains( topKey ) );
 }
 
@@ -88,8 +88,7 @@ PackagesTests::testAdd()
 
     {
         QVERIFY( !gs.contains( topKey ) );
-        QVERIFY(
-            CalamaresUtils::Packages::setGSPackageAdditions( &gs, k, QVariant( packages ).toList(), QVariantList() ) );
+        QVERIFY( Calamares::Packages::setGSPackageAdditions( &gs, k, QVariant( packages ).toList(), QVariantList() ) );
         QVERIFY( gs.contains( topKey ) );
         auto actionList = gs.value( topKey ).toList();
         QCOMPARE( actionList.length(), 1 );
@@ -97,14 +96,14 @@ PackagesTests::testAdd()
         QVERIFY( action.contains( "install" ) );
         auto op = action[ "install" ].toList();
         QCOMPARE( op.length(), packages.length() );
-        for ( const auto& s : qAsConst( packages ) )
+        for ( const auto& s : std::as_const( packages ) )
         {
             QVERIFY( op.contains( s ) );
         }
         cDebug() << op;
     }
     {
-        QVERIFY( CalamaresUtils::Packages::setGSPackageAdditions( &gs, otherInstance, packages ) );
+        QVERIFY( Calamares::Packages::setGSPackageAdditions( &gs, otherInstance, packages ) );
         QVERIFY( gs.contains( topKey ) );
         auto actionList = gs.value( topKey ).toList();
         QCOMPARE( actionList.length(), 2 );  // One for each instance key!
@@ -118,11 +117,11 @@ PackagesTests::testAdd()
     {
         // Replace one and expect differences
         packages << extraEditor;
-        QVERIFY( CalamaresUtils::Packages::setGSPackageAdditions( &gs, otherInstance, packages ) );
+        QVERIFY( Calamares::Packages::setGSPackageAdditions( &gs, otherInstance, packages ) );
         QVERIFY( gs.contains( topKey ) );
         auto actionList = gs.value( topKey ).toList();
         QCOMPARE( actionList.length(), 2 );  // One for each instance key!
-        for ( const auto& actionVariant : qAsConst( actionList ) )
+        for ( const auto& actionVariant : std::as_const( actionList ) )
         {
             auto action = actionVariant.toMap();
             QVERIFY( action.contains( "install" ) );
@@ -131,7 +130,7 @@ PackagesTests::testAdd()
             {
                 auto op = action[ "install" ].toList();
                 QCOMPARE( op.length(), packages.length() );  // changed from original length, though
-                for ( const auto& s : qAsConst( packages ) )
+                for ( const auto& s : std::as_const( packages ) )
                 {
                     QVERIFY( op.contains( s ) );
                 }
@@ -160,8 +159,8 @@ PackagesTests::testAddMixed()
     // Just one
     {
         QVERIFY( !gs.contains( topKey ) );
-        QVERIFY( CalamaresUtils::Packages::setGSPackageAdditions(
-            &gs, k, QVariantList { QString( "vim" ) }, QVariantList() ) );
+        QVERIFY(
+            Calamares::Packages::setGSPackageAdditions( &gs, k, QVariantList { QString( "vim" ) }, QVariantList() ) );
         QVERIFY( gs.contains( topKey ) );
         auto actionList = gs.value( topKey ).toList();
         QCOMPARE( actionList.length(), 1 );
@@ -175,7 +174,7 @@ PackagesTests::testAddMixed()
 
     // Replace with two packages
     {
-        QVERIFY( CalamaresUtils::Packages::setGSPackageAdditions(
+        QVERIFY( Calamares::Packages::setGSPackageAdditions(
             &gs, k, QVariantList { QString( "vim" ), QString( "emacs" ) }, QVariantList() ) );
         QVERIFY( gs.contains( topKey ) );
         auto actionList = gs.value( topKey ).toList();
@@ -192,8 +191,8 @@ PackagesTests::testAddMixed()
 
     // Replace with one (different) package
     {
-        QVERIFY( CalamaresUtils::Packages::setGSPackageAdditions(
-            &gs, k, QVariantList { QString( "nano" ) }, QVariantList() ) );
+        QVERIFY(
+            Calamares::Packages::setGSPackageAdditions( &gs, k, QVariantList { QString( "nano" ) }, QVariantList() ) );
         QVERIFY( gs.contains( topKey ) );
         auto actionList = gs.value( topKey ).toList();
         QCOMPARE( actionList.length(), 1 );
@@ -208,12 +207,12 @@ PackagesTests::testAddMixed()
 
     // Now we have two sources
     {
-        QVERIFY( CalamaresUtils::Packages::setGSPackageAdditions( &gs, otherInstance, QStringList( extraEditor ) ) );
+        QVERIFY( Calamares::Packages::setGSPackageAdditions( &gs, otherInstance, QStringList( extraEditor ) ) );
         QVERIFY( gs.contains( topKey ) );
         auto actionList = gs.value( topKey ).toList();
         QCOMPARE( actionList.length(), 2 );
 
-        for ( const auto& actionVariant : qAsConst( actionList ) )
+        for ( const auto& actionVariant : std::as_const( actionList ) )
         {
             auto action = actionVariant.toMap();
             QVERIFY( action.contains( "install" ) );

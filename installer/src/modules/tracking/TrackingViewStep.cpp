@@ -16,8 +16,8 @@
 #include "GlobalStorage.h"
 #include "JobQueue.h"
 
-#include "utils/CalamaresUtilsSystem.h"
 #include "utils/Logger.h"
+#include "utils/System.h"
 #include "utils/Variant.h"
 
 #include <QDesktopServices>
@@ -46,7 +46,7 @@ TrackingViewStep::~TrackingViewStep()
 QString
 TrackingViewStep::prettyName() const
 {
-    return tr( "Feedback" );
+    return tr( "Feedback", "@title" );
 }
 
 

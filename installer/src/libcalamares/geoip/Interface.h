@@ -12,13 +12,15 @@
 
 #include "DllMacro.h"
 
-#include <QPair>
+#include <QDebug>
 #include <QString>
 #include <QUrl>
 
+#include <tuple>
+
 class QByteArray;
 
-namespace CalamaresUtils
+namespace Calamares
 {
 namespace GeoIP
 {
@@ -29,27 +31,53 @@ namespace GeoIP
  * pasting the strings back together with a "/" is the right thing to
  * do. The Zone **may** contain a "/" (e.g. "Kentucky/Monticello").
  */
-class DLLEXPORT RegionZonePair : public QPair< QString, QString >
+class DLLEXPORT RegionZonePair
 {
 public:
-    /** @brief Construct from an existing pair. */
-    explicit RegionZonePair( const QPair& p )
-        : QPair( p )
-    {
-    }
     /** @brief Construct from two strings, like qMakePair(). */
     RegionZonePair( const QString& region, const QString& zone )
-        : QPair( region, zone )
-    {
-    }
-    /** @brief An invalid zone pair (empty strings). */
-    RegionZonePair()
-        : QPair( QString(), QString() )
+        : m_region( region )
+        , m_zone( zone )
     {
     }
 
-    bool isValid() const { return !first.isEmpty(); }
+    /** @brief Construct from an existing pair. */
+    RegionZonePair( const RegionZonePair& p )
+        : RegionZonePair( p.m_region, p.m_zone )
+    {
+    }
+
+    /** @brief An invalid zone pair (empty strings). */
+    RegionZonePair() = default;
+
+    bool isValid() const { return !m_region.isEmpty(); }
+
+    QString region() const { return m_region; }
+    QString zone() const { return m_zone; }
+
+    friend bool operator==( const RegionZonePair& lhs, const RegionZonePair& rhs ) noexcept
+    {
+        return std::tie( lhs.m_region, lhs.m_zone ) == std::tie( rhs.m_region, rhs.m_zone );
+    }
+
+    QString asString() const { return isValid() ? region() + QChar( '/' ) + zone() : QString(); }
+
+private:
+    QString m_region;
+    QString m_zone;
 };
+
+inline QDebug&
+operator<<( QDebug&& s, const RegionZonePair& tz )
+{
+    return s << tz.asString();
+}
+
+inline QDebug&
+operator<<( QDebug& s, const RegionZonePair& tz )
+{
+    return s << tz.asString();
+}
 
 /** @brief Splits a region/zone string into a pair.
  *
@@ -95,5 +123,5 @@ protected:
 };
 
 }  // namespace GeoIP
-}  // namespace CalamaresUtils
+}  // namespace Calamares
 #endif

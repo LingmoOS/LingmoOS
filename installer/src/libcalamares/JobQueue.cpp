@@ -13,16 +13,324 @@
 #include "CalamaresConfig.h"
 #include "GlobalStorage.h"
 #include "Job.h"
+#include "compat/Mutex.h"
 #include "utils/Logger.h"
 
+#include <QDBusConnection>
+#include <QDBusConnectionInterface>
+#include <QDBusMessage>
+#include <QDBusPendingCall>
+#include <QDBusPendingReply>
 #include <QMutex>
-#include <QMutexLocker>
 #include <QThread>
 
 #include <memory>
+#include <optional>
+#include <unistd.h>  // for close()
+
+namespace
+{
+// This power-management code is largely cribbed from KDE Discover,
+// https://invent.kde.org/plasma/discover/-/blob/master/discover/PowerManagementInterface.cpp
+//
+// Upstream license text says:
+//
+//   SPDX-FileCopyrightText: 2019 (c) Matthieu Gallien <matthieu_gallien@yahoo.fr>
+//   SPDX-License-Identifier: LGPL-3.0-or-later
+
+
+/** @brief Class to manage sleep / suspend on inactivity (via fd.o Inhibit service on the user bus)
+ *
+ * Create an object of this class on the heap. Call inhibitSleep()
+ * to (try to) stop system sleep / suspend. Call uninhibitSleep()
+ * when the object is no longer needed. The object self-deletes
+ * after uninhibitSleep() completes.
+ */
+class PowerManagementInterface : public QObject
+{
+    Q_OBJECT
+public:
+    PowerManagementInterface( QObject* parent = nullptr );
+    ~PowerManagementInterface() override;
+
+public Q_SLOTS:
+    void inhibitSleep();
+    void uninhibitSleep();
+
+private Q_SLOTS:
+    void hostSleepInhibitChanged();
+    void inhibitDBusCallFinished( QDBusPendingCallWatcher* aWatcher );
+    void uninhibitDBusCallFinished( QDBusPendingCallWatcher* aWatcher );
+
+private:
+    uint m_inhibitSleepCookie = 0;
+    bool m_inhibitedSleep = false;
+};
+
+PowerManagementInterface::PowerManagementInterface( QObject* parent )
+    : QObject( parent )
+{
+    auto sessionBus = QDBusConnection::sessionBus();
+
+    sessionBus.connect( QStringLiteral( "org.freedesktop.PowerManagement.Inhibit" ),
+                        QStringLiteral( "/org/freedesktop/PowerManagement/Inhibit" ),
+                        QStringLiteral( "org.freedesktop.PowerManagement.Inhibit" ),
+                        QStringLiteral( "HasInhibitChanged" ),
+                        this,
+                        SLOT( hostSleepInhibitChanged() ) );
+}
+
+PowerManagementInterface::~PowerManagementInterface() = default;
+
+void
+PowerManagementInterface::hostSleepInhibitChanged()
+{
+    // We don't actually care
+}
+
+void
+PowerManagementInterface::inhibitDBusCallFinished( QDBusPendingCallWatcher* aWatcher )
+{
+    QDBusPendingReply< uint > reply = *aWatcher;
+    if ( reply.isError() )
+    {
+        cError() << "Could not inhibit sleep:" << reply.error();
+        // m_inhibitedSleep = false; // unchanged
+    }
+    else
+    {
+        m_inhibitSleepCookie = reply.argumentAt< 0 >();
+        m_inhibitedSleep = true;
+        cDebug() << "Sleep inhibited, cookie" << m_inhibitSleepCookie;
+    }
+    aWatcher->deleteLater();
+}
+
+void
+PowerManagementInterface::uninhibitDBusCallFinished( QDBusPendingCallWatcher* aWatcher )
+{
+    QDBusPendingReply<> reply = *aWatcher;
+    if ( reply.isError() )
+    {
+        cError() << "Could not uninhibit sleep:" << reply.error();
+    }
+    else
+    {
+        m_inhibitedSleep = false;
+        m_inhibitSleepCookie = 0;
+        cDebug() << "Sleep uninhibited.";
+    }
+    aWatcher->deleteLater();
+    this->deleteLater();
+}
+
+void
+PowerManagementInterface::inhibitSleep()
+{
+    if ( m_inhibitedSleep )
+    {
+        cDebug() << "Sleep is already inhibited.";
+        return;
+    }
+
+    auto sessionBus = QDBusConnection::sessionBus();
+    auto inhibitCall = QDBusMessage::createMethodCall( QStringLiteral( "org.freedesktop.PowerManagement.Inhibit" ),
+                                                       QStringLiteral( "/org/freedesktop/PowerManagement/Inhibit" ),
+                                                       QStringLiteral( "org.freedesktop.PowerManagement.Inhibit" ),
+                                                       QStringLiteral( "Inhibit" ) );
+    inhibitCall.setArguments( { { tr( "Calamares" ) }, { tr( "Installation in progress", "@status" ) } } );
+
+    auto asyncReply = sessionBus.asyncCall( inhibitCall );
+    auto* replyWatcher = new QDBusPendingCallWatcher( asyncReply, this );
+    QObject::connect(
+        replyWatcher, &QDBusPendingCallWatcher::finished, this, &PowerManagementInterface::inhibitDBusCallFinished );
+}
+
+void
+PowerManagementInterface::uninhibitSleep()
+{
+    if ( !m_inhibitedSleep )
+    {
+        cDebug() << "Sleep was never inhibited.";
+        this->deleteLater();
+        return;
+    }
+
+    auto sessionBus = QDBusConnection::sessionBus();
+    auto uninhibitCall = QDBusMessage::createMethodCall( QStringLiteral( "org.freedesktop.PowerManagement.Inhibit" ),
+                                                         QStringLiteral( "/org/freedesktop/PowerManagement/Inhibit" ),
+                                                         QStringLiteral( "org.freedesktop.PowerManagement.Inhibit" ),
+                                                         QStringLiteral( "UnInhibit" ) );
+    uninhibitCall.setArguments( { { m_inhibitSleepCookie } } );
+
+    auto asyncReply = sessionBus.asyncCall( uninhibitCall );
+    auto replyWatcher = new QDBusPendingCallWatcher( asyncReply, this );
+    QObject::connect(
+        replyWatcher, &QDBusPendingCallWatcher::finished, this, &PowerManagementInterface::uninhibitDBusCallFinished );
+}
+
+
+/** @brief Class to manage sleep / suspend on inactivity (via logind/CK2 service on the system bus)
+ *
+ * Create an object of this class on the heap. Call inhibitSleep()
+ * to (try to) stop system sleep / suspend. Call uninhibitSleep()
+ * when the object is no longer needed. The object self-deletes
+ * after uninhibitSleep() completes.
+ */
+class LoginManagerInterface : public QObject
+{
+    Q_OBJECT
+public:
+    static LoginManagerInterface* makeForRegisteredService( QObject* parent = nullptr );
+    ~LoginManagerInterface() override;
+
+public Q_SLOTS:
+    void inhibitSleep();
+    void uninhibitSleep();
+
+private Q_SLOTS:
+    void inhibitDBusCallFinished( QDBusPendingCallWatcher* aWatcher );
+
+private:
+    enum class Service
+    {
+        Logind,
+        ConsoleKit,
+    };
+    LoginManagerInterface( Service service, QObject* parent = nullptr );
+
+    int m_inhibitFd = -1;
+    Service m_service;
+};
+
+LoginManagerInterface*
+LoginManagerInterface::makeForRegisteredService( QObject* parent )
+{
+    if ( QDBusConnection::systemBus().interface()->isServiceRegistered( QStringLiteral( "org.freedesktop.login1" ) ) )
+    {
+        return new LoginManagerInterface( Service::Logind, parent );
+    }
+    else if ( QDBusConnection::systemBus().interface()->isServiceRegistered(
+                  QStringLiteral( "org.freedesktop.ConsoleKit" ) ) )
+    {
+        return new LoginManagerInterface( Service::ConsoleKit, parent );
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+LoginManagerInterface::LoginManagerInterface( Service service, QObject* parent )
+    : QObject( parent )
+    , m_service( service )
+{
+}
+
+LoginManagerInterface::~LoginManagerInterface() = default;
+
+void
+LoginManagerInterface::inhibitDBusCallFinished( QDBusPendingCallWatcher* aWatcher )
+{
+    QDBusPendingReply< uint > reply = *aWatcher;
+    if ( reply.isError() )
+    {
+        cError() << "Could not inhibit sleep:" << reply.error();
+        // m_inhibitFd = -1; // unchanged
+    }
+    else
+    {
+        m_inhibitFd = reply.argumentAt< 0 >();
+        cDebug() << "Sleep inhibited, file descriptor" << m_inhibitFd;
+    }
+    aWatcher->deleteLater();
+}
+
+void
+LoginManagerInterface::inhibitSleep()
+{
+    if ( m_inhibitFd == -1 )
+    {
+        cDebug() << "Sleep is already inhibited.";
+        return;
+    }
+
+    auto systemBus = QDBusConnection::systemBus();
+    QDBusMessage inhibitCall;
+
+    if ( m_service == Service::Logind )
+    {
+        inhibitCall = QDBusMessage::createMethodCall( QStringLiteral( "org.freedesktop.login1" ),
+                                                      QStringLiteral( "/org/freedesktop/login1" ),
+                                                      QStringLiteral( "org.freedesktop.login1.Manager" ),
+                                                      QStringLiteral( "Inhibit" ) );
+    }
+    else if ( m_service == Service::ConsoleKit )
+    {
+        inhibitCall = QDBusMessage::createMethodCall( QStringLiteral( "org.freedesktop.ConsoleKit" ),
+                                                      QStringLiteral( "/org/freedesktop/ConsoleKit/Manager" ),
+                                                      QStringLiteral( "org.freedesktop.ConsoleKit.Manager" ),
+                                                      QStringLiteral( "Inhibit" ) );
+    }
+    else
+    {
+        cError() << "System sleep interface not supported.";
+        return;
+    }
+
+    inhibitCall.setArguments(
+        { { "sleep:shutdown" }, { tr( "Calamares" ) }, { tr( "Installation in progress", "@status" ) }, { "block" } } );
+
+    auto asyncReply = systemBus.asyncCall( inhibitCall );
+    auto* replyWatcher = new QDBusPendingCallWatcher( asyncReply, this );
+    QObject::connect(
+        replyWatcher, &QDBusPendingCallWatcher::finished, this, &LoginManagerInterface::inhibitDBusCallFinished );
+}
+
+
+void
+LoginManagerInterface::uninhibitSleep()
+{
+    if ( m_inhibitFd == -1 )
+    {
+        cDebug() << "Sleep was never inhibited.";
+        this->deleteLater();
+        return;
+    }
+
+    if ( close( m_inhibitFd ) != 0 )
+    {
+        cError() << "Could not uninhibit sleep:" << strerror( errno );
+    }
+    this->deleteLater();
+}
+
+}  // namespace
 
 namespace Calamares
 {
+SleepInhibitor::SleepInhibitor()
+{
+    // Create a LoginManagerInterface object with intentionally no parent
+    // so it is not destroyed along with this. Instead, when this
+    // is destroyed, **start** the uninhibit-sleep call which will (later)
+    // destroy the LoginManagerInterface object.
+    if ( auto* l = LoginManagerInterface::makeForRegisteredService( nullptr ) )
+    {
+        l->inhibitSleep();
+        connect( this, &QObject::destroyed, l, &LoginManagerInterface::uninhibitSleep );
+    }
+    // If no login manager service was present, try the same thing
+    // with PowerManagementInterface.
+    else
+    {
+        auto* p = new PowerManagementInterface( nullptr );
+        p->inhibitSleep();
+        connect( this, &QObject::destroyed, p, &PowerManagementInterface::uninhibitSleep );
+    }
+}
+
+SleepInhibitor::~SleepInhibitor() = default;
 
 struct WeightedJob
 {
@@ -61,8 +369,8 @@ public:
     void finalize()
     {
         Q_ASSERT( m_runningJobs->isEmpty() );
-        QMutexLocker qlock( &m_enqueMutex );
-        QMutexLocker rlock( &m_runMutex );
+        Calamares::MutexLocker qlock( &m_enqueMutex );
+        Calamares::MutexLocker rlock( &m_runMutex );
         std::swap( m_runningJobs, m_queuedJobs );
         m_overallQueueWeight
             = m_runningJobs->isEmpty() ? 0.0 : ( m_runningJobs->last().cumulative + m_runningJobs->last().weight );
@@ -83,7 +391,7 @@ public:
 
     void enqueue( int moduleWeight, const JobList& jobs )
     {
-        QMutexLocker qlock( &m_enqueMutex );
+        Calamares::MutexLocker qlock( &m_enqueMutex );
 
         qreal cumulative
             = m_queuedJobs->isEmpty() ? 0.0 : ( m_queuedJobs->last().cumulative + m_queuedJobs->last().weight );
@@ -108,7 +416,7 @@ public:
 
     void run() override
     {
-        QMutexLocker rlock( &m_runMutex );
+        Calamares::MutexLocker rlock( &m_runMutex );
         bool failureEncountered = false;
         QString message;  ///< Filled in with errors
         QString details;
@@ -159,7 +467,7 @@ public:
      */
     QStringList queuedJobs() const
     {
-        QMutexLocker qlock( &m_enqueMutex );
+        Calamares::MutexLocker qlock( &m_enqueMutex );
         QStringList l;
         l.reserve( m_queuedJobs->count() );
         for ( const auto& j : *m_queuedJobs )
@@ -188,6 +496,13 @@ private:
             // starts the job, or if the job itself reports 0.0) be more
             // accepting in what gets reported: jobs with no status fall
             // back to description and name, whichever is non-empty.
+            //
+            // Later calls (e.g. when percentage > 0) use the status unchanged.
+            // It may be empty, but the ExecutionViewStep knows about empty
+            // status messages and does not update the text in that case.
+            //
+            // This means that a Job can implement just prettyName() and get
+            // a reasonable "status" message which will update only once.
             if ( percentage == 0.0 && message.isEmpty() )
             {
                 message = jobitem.job->prettyDescription();
@@ -267,6 +582,10 @@ JobQueue::start()
     m_thread->finalize();
     m_finished = false;
     m_thread->start();
+
+    auto* inhibitor = new PowerManagementInterface( this );
+    inhibitor->inhibitSleep();
+    connect( this, &JobQueue::finished, inhibitor, &PowerManagementInterface::uninhibitSleep );
 }
 
 

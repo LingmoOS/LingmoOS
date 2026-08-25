@@ -15,6 +15,7 @@
 #include "PartitionPage.h"
 
 // Local
+#include "Config.h"
 #include "core/BootLoaderModel.h"
 #include "core/DeviceModel.h"
 #include "core/KPMHelpers.h"
@@ -39,16 +40,12 @@
 #include "utils/Retranslator.h"
 #include "widgets/TranslationFix.h"
 
-// KPMcore
 #include <kpmcore/core/device.h>
 #include <kpmcore/core/partition.h>
-#ifdef WITH_KPMCORE4API
 #include <kpmcore/core/softwareraid.h>
-#endif
 #include <kpmcore/ops/deactivatevolumegroupoperation.h>
 #include <kpmcore/ops/removevolumegroupoperation.h>
 
-// Qt
 #include <QDir>
 #include <QFutureWatcher>
 #include <QHeaderView>
@@ -57,14 +54,17 @@
 #include <QPointer>
 #include <QtConcurrent/QtConcurrent>
 
-PartitionPage::PartitionPage( PartitionCoreModule* core, QWidget* parent )
+PartitionPage::PartitionPage( PartitionCoreModule* core, const Config & config, QWidget* parent )
     : QWidget( parent )
     , m_ui( new Ui_PartitionPage )
     , m_core( core )
     , m_lastSelectedBootLoaderIndex( -1 )
-    , m_isEfi( false )
+    , m_isEfi( PartUtils::isEfiSystem() )
 {
-    m_isEfi = PartUtils::isEfiSystem();
+    if ( config.installChoice() != Config::InstallChoice::Manual )
+    {
+        cWarning() << "Manual partitioning page created without user choosing manual-partitioning.";
+    }
 
     m_ui->setupUi( this );
     m_ui->partitionLabelsView->setVisible(
@@ -78,6 +78,8 @@ PartitionPage::PartitionPage( PartitionCoreModule* core, QWidget* parent )
         ? PartitionBarsView::DrawNestedPartitions
         : PartitionBarsView::NoNestedPartitions;
     m_ui->partitionBarsView->setNestedPartitionsMode( mode );
+    m_ui->lvmButtonPanel->setVisible( config.isLVMEnabled() );
+
     updateButtons();
     updateBootLoaderInstallPath();
 
@@ -117,7 +119,10 @@ PartitionPage::PartitionPage( PartitionCoreModule* core, QWidget* parent )
         m_ui->label_3->hide();
     }
 
-    CALAMARES_RETRANSLATE( m_ui->retranslateUi( this ); );
+    CALAMARES_RETRANSLATE(
+        m_ui->retranslateUi( this );
+        m_core->bootLoaderModel()->update(); // Need to re-translate entries in the combo-box
+    );
 }
 
 PartitionPage::~PartitionPage() {}
@@ -136,7 +141,7 @@ PartitionPage::updateButtons()
         Q_ASSERT( model );
         Partition* partition = model->partitionForIndex( index );
         Q_ASSERT( partition );
-        const bool isFree = CalamaresUtils::Partition::isPartitionFreeSpace( partition );
+        const bool isFree = Calamares::Partition::isPartitionFreeSpace( partition );
         const bool isExtended = partition->roles().has( PartitionRole::Extended );
 
         // An extended partition can have a "free space" child; that one does
@@ -146,7 +151,7 @@ PartitionPage::updateButtons()
         const bool hasChildren = isExtended
             && ( partition->children().length() > 1
                  || ( partition->children().length() == 1
-                      && !CalamaresUtils::Partition::isPartitionFreeSpace( partition->children().at( 0 ) ) ) );
+                      && !Calamares::Partition::isPartitionFreeSpace( partition->children().at( 0 ) ) ) );
 
         const bool isInVG = m_core->isInVG( partition );
 
@@ -179,14 +184,12 @@ PartitionPage::updateButtons()
         {
             allow_create_table = true;
 
-#ifdef WITH_KPMCORE4API
             if ( device->type() == Device::Type::SoftwareRAID_Device
                  && static_cast< SoftwareRAID* >( device )->status() == SoftwareRAID::Status::Inactive )
             {
                 allow_create_table = false;
                 allow_create = false;
             }
-#endif
         }
         else
         {
@@ -252,7 +255,7 @@ PartitionPage::checkCanCreate( Device* device )
 {
     auto table = device->partitionTable();
 
-    if ( table->type() == PartitionTable::msdos || table->type() == PartitionTable::msdos_sectorbased )
+    if ( KPMHelpers::isMSDOSPartition( table->type() ) )
     {
         cDebug() << "Checking MSDOS partition" << table->numPrimaries() << "primaries, max" << table->maxPrimaries();
 
@@ -288,10 +291,12 @@ PartitionPage::onNewVolumeGroupClicked()
     QVector< const Partition* > availablePVs;
 
     for ( const Partition* p : m_core->lvmPVs() )
+    {
         if ( !m_core->isInVG( p ) )
         {
             availablePVs << p;
         }
+    }
 
     QPointer< CreateVolumeGroupDialog > dlg
         = new CreateVolumeGroupDialog( vgName, selectedPVs, availablePVs, peSize, this );
@@ -346,10 +351,12 @@ PartitionPage::onResizeVolumeGroupClicked()
     QVector< const Partition* > selectedPVs;
 
     for ( const Partition* p : m_core->lvmPVs() )
+    {
         if ( !m_core->isInVG( p ) )
         {
             availablePVs << p;
         }
+    }
 
     QPointer< ResizeVolumeGroupDialog > dlg = new ResizeVolumeGroupDialog( device, availablePVs, selectedPVs, this );
 
@@ -404,7 +411,7 @@ PartitionPage::onCreateClicked()
     }
 
     QPointer< CreatePartitionDialog > dlg = new CreatePartitionDialog(
-        model->device(), CreatePartitionDialog::FreeSpace { partition }, getCurrentUsedMountpoints(), this );
+        m_core, model->device(), CreatePartitionDialog::FreeSpace { partition }, getCurrentUsedMountpoints(), this );
     if ( dlg->exec() == QDialog::Accepted )
     {
         Partition* newPart = dlg->getNewlyCreatedPartition();
@@ -423,7 +430,7 @@ PartitionPage::onEditClicked()
     Partition* partition = model->partitionForIndex( index );
     Q_ASSERT( partition );
 
-    if ( CalamaresUtils::Partition::isPartitionNew( partition ) )
+    if ( Calamares::Partition::isPartitionNew( partition ) )
     {
         updatePartitionToCreate( model->device(), partition );
     }
@@ -491,7 +498,7 @@ PartitionPage::onPartitionViewActivated()
     // but I don't expect there will be other occurences of triggering the same
     // action from multiple UI elements in this page, so it does not feel worth
     // the price.
-    if ( CalamaresUtils::Partition::isPartitionFreeSpace( partition ) )
+    if ( Calamares::Partition::isPartitionFreeSpace( partition ) )
     {
         m_ui->createButton->click();
     }
@@ -508,7 +515,7 @@ PartitionPage::updatePartitionToCreate( Device* device, Partition* partition )
     mountPoints.removeOne( PartitionInfo::mountPoint( partition ) );
 
     QPointer< CreatePartitionDialog > dlg
-        = new CreatePartitionDialog( device, CreatePartitionDialog::FreshPartition { partition }, mountPoints, this );
+        = new CreatePartitionDialog( m_core, device, CreatePartitionDialog::FreshPartition { partition }, mountPoints, this );
     if ( dlg->exec() == QDialog::Accepted )
     {
         Partition* newPartition = dlg->getNewlyCreatedPartition();
@@ -525,12 +532,14 @@ PartitionPage::editExistingPartition( Device* device, Partition* partition )
     mountPoints.removeOne( PartitionInfo::mountPoint( partition ) );
 
     QPointer< EditExistingPartitionDialog > dlg
-        = new EditExistingPartitionDialog( device, partition, mountPoints, this );
+        = new EditExistingPartitionDialog( m_core, device, partition, mountPoints, this );
     if ( dlg->exec() == QDialog::Accepted )
     {
         dlg->applyChanges( m_core );
     }
     delete dlg;
+
+    updateBootLoaderInstallPath();
 }
 
 void
@@ -563,6 +572,14 @@ PartitionPage::restoreSelectedBootLoader()
     Calamares::restoreSelectedBootLoader( *( m_ui->bootLoaderComboBox ), m_core->bootLoaderInstallPath() );
 }
 
+void
+PartitionPage::reconcileSelections()
+{
+    QModelIndex selectedIndex = m_ui->partitionBarsView->selectionModel()->currentIndex();
+    selectedIndex = selectedIndex.sibling( selectedIndex.row(), 0 );
+    m_ui->partitionBarsView->setCurrentIndex( selectedIndex );
+    m_ui->partitionLabelsView->setCurrentIndex( selectedIndex );
+}
 
 void
 PartitionPage::updateFromCurrentDevice()
@@ -605,18 +622,11 @@ PartitionPage::updateFromCurrentDevice()
     // This is necessary because even with the same selection model it might happen that
     // a !=0 column is selected in the tree view, which for some reason doesn't trigger a
     // timely repaint in the bars view.
-    connect(
-        m_ui->partitionBarsView->selectionModel(),
-        &QItemSelectionModel::currentChanged,
-        this,
-        [ = ]
-        {
-            QModelIndex selectedIndex = m_ui->partitionBarsView->selectionModel()->currentIndex();
-            selectedIndex = selectedIndex.sibling( selectedIndex.row(), 0 );
-            m_ui->partitionBarsView->setCurrentIndex( selectedIndex );
-            m_ui->partitionLabelsView->setCurrentIndex( selectedIndex );
-        },
-        Qt::UniqueConnection );
+    connect( m_ui->partitionBarsView->selectionModel(),
+             &QItemSelectionModel::currentChanged,
+             this,
+             &PartitionPage::reconcileSelections,
+             Qt::UniqueConnection );
 
     // Must be done here because we need to have a model set to define
     // individual column resize mode

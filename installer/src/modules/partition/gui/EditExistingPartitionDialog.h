@@ -37,7 +37,8 @@ public:
         Partition* p;
     };
 
-    EditExistingPartitionDialog( Device* device,
+    EditExistingPartitionDialog( PartitionCoreModule* core,
+                                 Device* device,
                                  Partition* partition,
                                  const QStringList& usedMountPoints,
                                  QWidget* parentWidget = nullptr );
@@ -50,6 +51,7 @@ private slots:
 
 private:
     QScopedPointer< Ui_EditExistingPartitionDialog > m_ui;
+    PartitionCoreModule* m_core;
     Device* m_device;
     Partition* m_partition;
     PartitionSizeController* m_partitionSizeController;

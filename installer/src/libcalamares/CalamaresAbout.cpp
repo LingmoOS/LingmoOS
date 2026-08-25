@@ -9,7 +9,7 @@
 
 #include "CalamaresAbout.h"
 
-#include "CalamaresVersion.h"
+#include "CalamaresVersionX.h"
 
 #include <QCoreApplication>
 
@@ -19,12 +19,8 @@ static const char s_header[]
 static const char s_footer[]
     = QT_TRANSLATE_NOOP( "AboutData",
                          "Thanks to <a href=\"https://calamares.io/team/\">the Calamares team</a> "
-                         "and the <a href=\"https://www.transifex.com/calamares/calamares/\">Calamares "
-                         "translators team</a>.<br/><br/>"
-                         "<a href=\"https://calamares.io/\">Calamares</a> "
-                         "development is sponsored by <br/>"
-                         "<a href=\"http://www.blue-systems.com/\">Blue Systems</a> - "
-                         "Liberating Software." );
+                         "and the <a href=\"https://app.transifex.com/calamares/calamares/\">Calamares "
+                         "translators team</a>." );
 
 struct Maintainer
 {
@@ -46,19 +42,18 @@ struct Maintainer
 static constexpr const Maintainer maintainers[] = {
     { 2014, 2017, "Teo Mrnjavac", "teo@kde.org" },
     { 2017, 2022, "Adriaan de Groot", "groot@kde.org" },
+    { 2022, 2024, "Adriaan de Groot (community)", "groot@kde.org" },
 };
 
 static QString
 aboutMaintainers()
 {
-    return std::accumulate( std::cbegin( maintainers ),
-                            std::cend( maintainers ),
-                            QString(),
-                            []( QString& s, const Maintainer& m )
-                            {
-                                s += m.text();
-                                return s;
-                            } );
+    QStringList s;
+    for ( const auto& m : maintainers )
+    {
+        s.append( m.text() );
+    }
+    return s.join( QString() );
 }
 
 static QString

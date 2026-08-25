@@ -25,6 +25,12 @@ Page {
     property string currentRegion
     property string currentZone
 
+    readonly property color backgroundColor: Kirigami.Theme.backgroundColor //"#F5F5F5"
+    readonly property color backgroundLighterColor: "#ffffff"
+    readonly property color highlightColor: Kirigami.Theme.highlightColor //"#3498DB"
+    readonly property color textColor: Kirigami.Theme.textColor
+    readonly property color highlightedTextColor: Kirigami.Theme.highlightedTextColor
+
      StackView {
         id: stack
         anchors.fill: parent
@@ -36,9 +42,9 @@ Page {
 
                 id: region
                 anchors.horizontalCenter: parent.horizontalCenter
-                color: Kirigami.Theme.textColor
+                color: textColor
                 horizontalAlignment: Text.AlignCenter
-                text: qsTr("Select your preferred Region, or use the default settings.")
+                text: qsTr("Select your preferred region, or use the default settings", "@label")
             }
 
             ListView {
@@ -61,18 +67,16 @@ Page {
 
                     z: parent.z - 1
                     anchors.fill: parent
-                    color: "#BDC3C7"
-                    radius: 5
-                    opacity: 0.7
+                    color: backgroundLighterColor
                 }
 
                 model: config.regionModel
-                currentIndex: -1
+                currentIndex: 1 // offline install, means locale from config
                 delegate: ItemDelegate {
 
                     hoverEnabled: true
                     width: parent.width
-                    height: 30
+                    height: 28
                     highlighted: ListView.isCurrentItem
 
                     Label {
@@ -81,13 +85,13 @@ Page {
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignVCenter
                         width: parent.width
-                        height: 30
-                        color: highlighted ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
+                        height: 28
+                        color: highlighted ? highlightedTextColor : textColor
 
                         background: Rectangle {
 
-                            color: highlighted || hovered ? Kirigami.Theme.highlightColor : "white" //Kirigami.Theme.backgroundColor
-                            opacity: highlighted || hovered ? 0.5 : 0.3
+                            color: highlighted || hovered ? highlightColor : backgroundLighterColor
+                            opacity: highlighted || hovered ? 0.5 : 1
                         }
                     }
 
@@ -96,7 +100,7 @@ Page {
                         list.currentIndex = index
                         control.currentRegion = model.name
                         config.regionalZonesModel.region = control.currentRegion
-                        tztext.text = qsTr("Timezone: %1").arg(config.currentTimezoneName)
+                        tztext.text = qsTr("Timezone: %1", "@label").arg(config.currentTimezoneName)
                         stack.push(zoneView)
                     }
                 }
@@ -112,8 +116,8 @@ Page {
 
                     id: zone
                     anchors.horizontalCenter: parent.horizontalCenter
-                    color: Kirigami.Theme.textColor
-                    text: qsTr("Select your preferred Zone within your Region.")
+                    color: textColor
+                    text: qsTr("Select your preferred zone within your region", "@label")
                 }
 
                 ListView {
@@ -136,18 +140,19 @@ Page {
 
                         z: parent.z - 1
                         anchors.fill: parent
-                        color: "#BDC3C7"
-                        radius: 5
-                        opacity: 0.7
+                        color: backgroundLighterColor
+                        //radius: 5
+                        //opacity: 0.7
                     }
 
                     model: config.regionalZonesModel
-                    currentIndex : -1
+                    currentIndex : 99 // index of New York
+                    Component.onCompleted: positionViewAtIndex(currentIndex, ListView.Center)
                     delegate: ItemDelegate {
 
                         hoverEnabled: true
                         width: parent.width
-                        height: 30
+                        height: 24
                         highlighted: ListView.isCurrentItem
 
                         Label {
@@ -156,13 +161,13 @@ Page {
                             horizontalAlignment: Text.AlignHCenter
                             verticalAlignment: Text.AlignVCenter
                             width: parent.width
-                            height: 30
-                            color: highlighted ? Kirigami.Theme.highlightedTextColor : Kirigami.Theme.textColor
+                            height: 24
+                            color: highlighted ? highlightedTextColor : textColor
 
                             background: Rectangle {
 
-                                color: highlighted || hovered ? Kirigami.Theme.highlightColor : "white" //Kirigami.Theme.backgroundColor
-                                opacity: highlighted || hovered ? 0.5 : 0.3
+                                color: highlighted || hovered ? highlightColor : backgroundLighterColor
+                                opacity: highlighted || hovered ? 0.5 : 1
                             }
                         }
 
@@ -172,7 +177,7 @@ Page {
                             list2.positionViewAtIndex(index, ListView.Center)
                             control.currentZone = model.name
                             config.setCurrentLocation(control.currentRegion, control.currentZone)
-                            tztext.text = qsTr("Timezone: %1").arg(config.currentTimezoneName)
+                            tztext.text = qsTr("Timezone: %1", "@label").arg(config.currentTimezoneName)
                         }
                     }
                 }
@@ -185,7 +190,7 @@ Page {
                     anchors.left: parent.left
                     anchors.leftMargin: parent.width / 15
                     icon.name: "go-previous"
-                    text: qsTr("Zones")
+                    text: qsTr("Zones", "@button")
                     onClicked: stack.pop()
                 }
             }
@@ -216,7 +221,7 @@ Page {
                 Text {
 
                     id: tztext
-                    text: qsTr("Timezone: %1").arg(config.currentTimezoneName)
+                    text: qsTr("Timezone: %1", "@label").arg(config.currentTimezoneName)
                     color: Kirigami.Theme.textColor
                     anchors.centerIn: parent
                 }
@@ -232,7 +237,7 @@ Page {
             wrapMode: Text.WordWrap
             horizontalAlignment: Text.AlignHCenter
             Kirigami.Theme.backgroundColor: Kirigami.Theme.backgroundColor
-            text: qsTr("You can fine-tune Language and Locale settings below.")
+            text: qsTr("You can fine-tune language and locale settings below", "@label")
         }
     }
 }

@@ -53,6 +53,10 @@ if test "x$1" = "x--no-tx" ; then
 	}
 else
 	# tx is the regular transifex command
+	tx() {
+		transifex-client "$@"
+	}
+
 	# txtag is used to tag in git to measure changes
 	txtag() {
 		git tag -f translation
@@ -82,6 +86,15 @@ do
 done
 # XMLLINT is optional
 
+if sed --version 2>&1 | grep -q GNU ; then
+	reinplace() {
+		sed -i'' "$@"
+	}
+else
+	reinplace() {
+		sed -i '' "$@"
+	}
+fi
 
 ### CREATE TRANSLATIONS
 #
@@ -92,6 +105,7 @@ done
 # those are done separately.
 _srcdirs="src/calamares src/libcalamares src/libcalamaresui src/modules src/qml"
 $LUPDATE -no-obsolete $_srcdirs -ts lang/calamares_en.ts
+grep '{1' lang/calamares_en.ts && { echo "lupdate has introduced weird markers." ; exit 1 ; }
 # Non-Transifex special-cases
 #
 # - timezone names can be translated, but that's 700+ strings I don't want
@@ -108,8 +122,8 @@ if test -n "$XMLLINT" ; then
 	$XMLLINT --c14n11 "$TS_FILE" | { echo "<!DOCTYPE TS>" ; cat - ; } | $XMLLINT --format --encode utf-8 -o "$TS_FILE".new - && mv "$TS_FILE".new "$TS_FILE"
 fi
 
-tx push --source --no-interactive -r calamares.calamares
-tx push --source --no-interactive -r calamares.fdo
+tx push --source -r calamares.calamares || exit 1
+tx push --source -r calamares.fdo || exit 1
 
 
 ### PYTHON MODULES
@@ -132,9 +146,8 @@ for MODULE_DIR in $(find src/modules -maxdepth 1 -mindepth 1 -type d | sort) ; d
 			${PYGETTEXT} -p ${MODULE_DIR}/lang -d ${MODULE_NAME} -o ${MODULE_NAME}.pot ${MODULE_DIR}/*.py
 			POTFILE="${MODULE_DIR}/lang/${MODULE_NAME}.pot"
 			if [ -f "$POTFILE" ]; then
-				sed -i'' '/^"Content-Type/s/CHARSET/UTF-8/' "$POTFILE"
-				tx set -r calamares.${MODULE_NAME} --source -l en "$POTFILE"
-				tx push --source --no-interactive -r calamares.${MODULE_NAME}
+				reinplace '/^"Content-Type/s/CHARSET/UTF-8/' "$POTFILE"
+				tx push --source -r calamares.${MODULE_NAME}
 			fi
 		else
 			SHARED_PYTHON="$SHARED_PYTHON $FILES"
@@ -145,9 +158,8 @@ done
 if test -n "$SHARED_PYTHON" ; then
 	${PYGETTEXT} -p lang -d python -o python.pot $SHARED_PYTHON
 	POTFILE="lang/python.pot"
-	sed -i'' '/^"Content-Type/s/CHARSET/UTF-8/' "$POTFILE"
-	tx set -r calamares.python --source -l en "$POTFILE"
-	tx push --source --no-interactive -r calamares.python
+	reinplace '/^"Content-Type/s/CHARSET/UTF-8/' "$POTFILE"
+	tx push --source -r calamares.python
 fi
 
 txtag

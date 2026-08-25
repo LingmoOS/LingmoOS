@@ -16,7 +16,7 @@
 #include "partition/PartitionQuery.h"
 #include "utils/Logger.h"
 
-#include "utils/CalamaresUtilsGui.h"
+#include "utils/Gui.h"
 
 #include <kpmcore/core/device.h>
 #include <kpmcore/core/partition.h>
@@ -27,13 +27,54 @@
 #include <QPainterPath>
 #include <QStyleOption>
 
-using CalamaresUtils::Partition::PartitionIterator;
+using Calamares::Partition::PartitionIterator;
 
-static const int VIEW_HEIGHT
-    = qMax( CalamaresUtils::defaultFontHeight() + 8,  // wins out with big fonts
-            int( CalamaresUtils::defaultFontHeight() * 0.6 ) + 22 );  // wins out with small fonts
+static const int VIEW_HEIGHT = qMax( Calamares::defaultFontHeight() + 8,  // wins out with big fonts
+                                     int( Calamares::defaultFontHeight() * 0.6 ) + 22 );  // wins out with small fonts
 static const int CORNER_RADIUS = 3;
 static const int EXTENDED_PARTITION_MARGIN = qMax( 4, VIEW_HEIGHT / 6 );
+
+/** @brief Applies @p operation to each item
+ *
+ * A PartitionSplitterItem can contain a tree of items (each item has its
+ * own list of children) so recurse over all the children. Returns a count
+ * of how many items were affected.
+ */
+static int
+countTransform( QVector< PartitionSplitterItem >& items,
+                const std::function< bool( PartitionSplitterItem& ) >& operation )
+{
+    int opCount = 0;
+    for ( auto it = items.begin(); it != items.end(); ++it )
+    {
+        if ( operation( *it ) )
+        {
+            opCount++;
+        }
+
+        opCount += countTransform( it->children, operation );
+    }
+    return opCount;
+}
+
+static PartitionSplitterItem
+findTransform( QVector< PartitionSplitterItem >& items, std::function< bool( PartitionSplitterItem& ) > condition )
+{
+    for ( auto it = items.begin(); it != items.end(); ++it )
+    {
+        if ( condition( *it ) )
+        {
+            return *it;
+        }
+
+        PartitionSplitterItem candidate = findTransform( it->children, condition );
+        if ( !candidate.isNull() )
+        {
+            return candidate;
+        }
+    }
+    return PartitionSplitterItem::null();
+}
 
 PartitionSplitterWidget::PartitionSplitterWidget( QWidget* parent )
     : QWidget( parent )
@@ -50,7 +91,6 @@ PartitionSplitterWidget::PartitionSplitterWidget( QWidget* parent )
     setMouseTracking( true );
 }
 
-
 void
 PartitionSplitterWidget::init( Device* dev, bool drawNestedPartitions )
 {
@@ -61,7 +101,7 @@ PartitionSplitterWidget::init( Device* dev, bool drawNestedPartitions )
     {
         PartitionSplitterItem newItem = { ( *it )->partitionPath(),
                                           ColorUtils::colorForPartition( *it ),
-                                          CalamaresUtils::Partition::isPartitionFreeSpace( *it ),
+                                          Calamares::Partition::isPartitionFreeSpace( *it ),
                                           ( *it )->capacity(),
                                           PartitionSplitterItem::Normal,
                                           {} };
@@ -111,7 +151,6 @@ PartitionSplitterWidget::setupItems( const QVector< PartitionSplitterItem >& ite
     }
 }
 
-
 void
 PartitionSplitterWidget::setSplitPartition( const QString& path, qint64 minSize, qint64 maxSize, qint64 preferredSize )
 {
@@ -159,16 +198,16 @@ PartitionSplitterWidget::setSplitPartition( const QString& path, qint64 minSize,
         m_itemToResizePath.clear();
     }
 
-    PartitionSplitterItem itemToResize = _findItem( m_items,
-                                                    [ path ]( PartitionSplitterItem& item ) -> bool
-                                                    {
-                                                        if ( path == item.itemPath )
+    PartitionSplitterItem itemToResize = findTransform( m_items,
+                                                        [ path ]( PartitionSplitterItem& item ) -> bool
                                                         {
-                                                            item.status = PartitionSplitterItem::Resizing;
-                                                            return true;
-                                                        }
-                                                        return false;
-                                                    } );
+                                                            if ( path == item.itemPath )
+                                                            {
+                                                                item.status = PartitionSplitterItem::Resizing;
+                                                                return true;
+                                                            }
+                                                            return false;
+                                                        } );
 
     if ( itemToResize.isNull() )
     {
@@ -186,16 +225,16 @@ PartitionSplitterWidget::setSplitPartition( const QString& path, qint64 minSize,
 
     qint64 newSize = m_itemToResize.size - preferredSize;
     m_itemToResize.size = preferredSize;
-    int opCount = _eachItem( m_items,
-                             [ preferredSize ]( PartitionSplitterItem& item ) -> bool
-                             {
-                                 if ( item.status == PartitionSplitterItem::Resizing )
-                                 {
-                                     item.size = preferredSize;
-                                     return true;
-                                 }
-                                 return false;
-                             } );
+    int opCount = countTransform( m_items,
+                                  [ preferredSize ]( PartitionSplitterItem& item ) -> bool
+                                  {
+                                      if ( item.status == PartitionSplitterItem::Resizing )
+                                      {
+                                          item.size = preferredSize;
+                                          return true;
+                                      }
+                                      return false;
+                                  } );
     cDebug() << "each splitter item opcount:" << opCount;
     m_itemMinSize = minSize;
     m_itemMaxSize = maxSize;
@@ -243,7 +282,6 @@ PartitionSplitterWidget::setSplitPartition( const QString& path, qint64 minSize,
     repaint();
 }
 
-
 qint64
 PartitionSplitterWidget::splitPartitionSize() const
 {
@@ -253,7 +291,6 @@ PartitionSplitterWidget::splitPartitionSize() const
     }
     return m_itemToResize.size;
 }
-
 
 qint64
 PartitionSplitterWidget::newPartitionSize() const
@@ -265,20 +302,17 @@ PartitionSplitterWidget::newPartitionSize() const
     return m_itemToResizeNext.size;
 }
 
-
 QSize
 PartitionSplitterWidget::sizeHint() const
 {
     return QSize( -1, VIEW_HEIGHT );
 }
 
-
 QSize
 PartitionSplitterWidget::minimumSizeHint() const
 {
     return sizeHint();
 }
-
 
 void
 PartitionSplitterWidget::paintEvent( QPaintEvent* event )
@@ -292,19 +326,21 @@ PartitionSplitterWidget::paintEvent( QPaintEvent* event )
     drawPartitions( &painter, rect(), m_items );
 }
 
-
 void
 PartitionSplitterWidget::mousePressEvent( QMouseEvent* event )
 {
     if ( m_itemToResize && m_itemToResizeNext && event->button() == Qt::LeftButton )
     {
+#if QT_VERSION < QT_VERSION_CHECK( 6, 0, 0 )
         if ( qAbs( event->x() - m_resizeHandleX ) < HANDLE_SNAP )
+#else
+        if ( qAbs( event->position().x() - m_resizeHandleX ) < HANDLE_SNAP )
+#endif
         {
             m_resizing = true;
         }
     }
 }
-
 
 void
 PartitionSplitterWidget::mouseMoveEvent( QMouseEvent* event )
@@ -351,7 +387,11 @@ PartitionSplitterWidget::mouseMoveEvent( QMouseEvent* event )
         int ew = rect().width();  //effective width
         qreal bpp = total / static_cast< qreal >( ew );  //bytes per pixel
 
+#if QT_VERSION < QT_VERSION_CHECK( 6, 0, 0 )
         qreal mx = event->x() * bpp - start;
+#else
+        qreal mx = event->position().x() * bpp - start;
+#endif
 
         // make sure we are within resize range
         mx = qBound( static_cast< qreal >( m_itemMinSize ), mx, static_cast< qreal >( m_itemMaxSize ) );
@@ -362,21 +402,21 @@ PartitionSplitterWidget::mouseMoveEvent( QMouseEvent* event )
 
         m_itemToResize.size = qRound64( span * percent );
         m_itemToResizeNext.size -= m_itemToResize.size - oldsize;
-        _eachItem( m_items,
-                   [ this ]( PartitionSplitterItem& item ) -> bool
-                   {
-                       if ( item.status == PartitionSplitterItem::Resizing )
-                       {
-                           item.size = m_itemToResize.size;
-                           return true;
-                       }
-                       else if ( item.status == PartitionSplitterItem::ResizingNext )
-                       {
-                           item.size = m_itemToResizeNext.size;
-                           return true;
-                       }
-                       return false;
-                   } );
+        countTransform( m_items,
+                        [ this ]( PartitionSplitterItem& item ) -> bool
+                        {
+                            if ( item.status == PartitionSplitterItem::Resizing )
+                            {
+                                item.size = m_itemToResize.size;
+                                return true;
+                            }
+                            else if ( item.status == PartitionSplitterItem::ResizingNext )
+                            {
+                                item.size = m_itemToResizeNext.size;
+                                return true;
+                            }
+                            return false;
+                        } );
 
         repaint();
 
@@ -386,7 +426,11 @@ PartitionSplitterWidget::mouseMoveEvent( QMouseEvent* event )
     {
         if ( m_itemToResize && m_itemToResizeNext )
         {
+#if QT_VERSION < QT_VERSION_CHECK( 6, 0, 0 )
             if ( qAbs( event->x() - m_resizeHandleX ) < HANDLE_SNAP )
+#else
+            if ( qAbs( event->position().x() - m_resizeHandleX ) < HANDLE_SNAP )
+#endif
             {
                 setCursor( Qt::SplitHCursor );
             }
@@ -398,7 +442,6 @@ PartitionSplitterWidget::mouseMoveEvent( QMouseEvent* event )
     }
 }
 
-
 void
 PartitionSplitterWidget::mouseReleaseEvent( QMouseEvent* event )
 {
@@ -406,7 +449,6 @@ PartitionSplitterWidget::mouseReleaseEvent( QMouseEvent* event )
 
     m_resizing = false;
 }
-
 
 void
 PartitionSplitterWidget::drawSection( QPainter* painter,
@@ -501,7 +543,6 @@ PartitionSplitterWidget::drawResizeHandle( QPainter* painter, const QRect& rect_
     painter->drawLine( x, 0, x, int( h ) - 1 );
 }
 
-
 void
 PartitionSplitterWidget::drawPartitions( QPainter* painter,
                                          const QRect& rect,
@@ -552,46 +593,6 @@ PartitionSplitterWidget::drawPartitions( QPainter* painter,
         x += width;
     }
 }
-
-
-PartitionSplitterItem
-PartitionSplitterWidget::_findItem( QVector< PartitionSplitterItem >& items,
-                                    std::function< bool( PartitionSplitterItem& ) > condition ) const
-{
-    for ( auto it = items.begin(); it != items.end(); ++it )
-    {
-        if ( condition( *it ) )
-        {
-            return *it;
-        }
-
-        PartitionSplitterItem candidate = _findItem( it->children, condition );
-        if ( !candidate.isNull() )
-        {
-            return candidate;
-        }
-    }
-    return PartitionSplitterItem::null();
-}
-
-
-int
-PartitionSplitterWidget::_eachItem( QVector< PartitionSplitterItem >& items,
-                                    std::function< bool( PartitionSplitterItem& ) > operation ) const
-{
-    int opCount = 0;
-    for ( auto it = items.begin(); it != items.end(); ++it )
-    {
-        if ( operation( *it ) )
-        {
-            opCount++;
-        }
-
-        opCount += _eachItem( it->children, operation );
-    }
-    return opCount;
-}
-
 
 QPair< QVector< PartitionSplitterItem >, qreal >
 PartitionSplitterWidget::computeItemsVector( const QVector< PartitionSplitterItem >& originalItems ) const

@@ -26,9 +26,7 @@ ShellProcessJob::ShellProcessJob( QObject* parent )
 {
 }
 
-
 ShellProcessJob::~ShellProcessJob() {}
-
 
 QString
 ShellProcessJob::prettyName() const
@@ -37,9 +35,8 @@ ShellProcessJob::prettyName() const
     {
         return m_name->get();
     }
-    return tr( "Shell Processes Job" );
+    return tr( "Running shell processes…", "@status" );
 }
-
 
 Calamares::JobResult
 ShellProcessJob::exec()
@@ -54,25 +51,26 @@ ShellProcessJob::exec()
     return m_commands->run();
 }
 
-
 void
 ShellProcessJob::setConfigurationMap( const QVariantMap& configurationMap )
 {
-    bool dontChroot = CalamaresUtils::getBool( configurationMap, "dontChroot", false );
-    qint64 timeout = CalamaresUtils::getInteger( configurationMap, "timeout", 30 );
+    bool dontChroot = Calamares::getBool( configurationMap, "dontChroot", false );
+    qint64 timeout = Calamares::getInteger( configurationMap, "timeout", 30 );
     if ( timeout < 1 )
     {
         timeout = 30;
     }
+    bool verbose = Calamares::getBool( configurationMap, "verbose", false );
 
     if ( configurationMap.contains( "script" ) )
     {
-        m_commands = std::make_unique< CalamaresUtils::CommandList >(
+        m_commands = std::make_unique< Calamares::CommandList >(
             configurationMap.value( "script" ), !dontChroot, std::chrono::seconds( timeout ) );
         if ( m_commands->isEmpty() )
         {
             cDebug() << "ShellProcessJob: \"script\" contains no commands for" << moduleInstanceKey();
         }
+        m_commands->updateVerbose( verbose );
     }
     else
     {
@@ -80,12 +78,12 @@ ShellProcessJob::setConfigurationMap( const QVariantMap& configurationMap )
     }
 
     bool labels_ok = false;
-    auto labels = CalamaresUtils::getSubMap( configurationMap, "i18n", labels_ok );
+    auto labels = Calamares::getSubMap( configurationMap, "i18n", labels_ok );
     if ( labels_ok )
     {
         if ( labels.contains( "name" ) )
         {
-            m_name = std::make_unique< CalamaresUtils::Locale::TranslatedString >( labels, "name" );
+            m_name = std::make_unique< Calamares::Locale::TranslatedString >( labels, "name" );
         }
     }
 }

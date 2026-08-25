@@ -7,25 +7,21 @@
  *
  */
 
-/** @brief Loading items from AppData XML files.
+/** @brief Loading items from AppStream database.
  *
- * Only used if QtXML is found, implements PackageItem::fromAppData().
+ * Only used if AppStreamQt is found, implements PackageItem::fromAppStream().
  */
-#include "PackageModel.h"
+#include "ItemAppStream.h"
 
 #include "locale/TranslationsModel.h"
 #include "utils/Logger.h"
 #include "utils/Variant.h"
 
-#include <AppStreamQt/image.h>
-#include <AppStreamQt/pool.h>
-#include <AppStreamQt/screenshot.h>
-
 /// @brief Return number of pixels in a size, for < ordering purposes
 static inline quint64
 sizeOrder( const QSize& size )
 {
-    return size.width() * size.height();
+    return static_cast< quint64 >( size.width() ) * static_cast< quint64 >( size.height() );
 }
 
 /// @brief Sets a screenshot in @p map from @p screenshot, if a usable one is found
@@ -56,8 +52,14 @@ setScreenshot( QVariantMap& map, const AppStream::Screenshot& screenshot )
 
 /// @brief Interpret an AppStream Component
 static PackageItem
-fromComponent( AppStream::Component& component )
+fromComponent( AppStream::Pool& pool, AppStream::Component& component )
 {
+#if HAVE_APPSTREAM_VERSION == 0
+    auto setActiveLocale = [ &component ]( const QString& locale ) { component.setActiveLocale( locale ); };
+#else
+    auto setActiveLocale = [ &pool ]( const QString& locale ) { pool.setLocale( locale ); };
+#endif
+
     QVariantMap map;
     map.insert( "id", component.id() );
     map.insert( "package", component.packageNames().join( "," ) );
@@ -66,15 +68,15 @@ fromComponent( AppStream::Component& component )
     // to any of them; get the en_US locale as "untranslated" and then
     // loop over Calamares locales (since there is no way to query for
     // available locales in the Component) to see if there's anything else.
-    component.setActiveLocale( QStringLiteral( "en_US" ) );
+    setActiveLocale( QStringLiteral( "en_US" ) );
     QString en_name = component.name();
     QString en_description = component.description();
     map.insert( "name", en_name );
     map.insert( "description", en_description );
 
-    for ( const QString& locale : CalamaresUtils::Locale::availableTranslations()->localeIds() )
+    for ( const QString& locale : Calamares::Locale::availableTranslations()->localeIds() )
     {
-        component.setActiveLocale( locale );
+        setActiveLocale( locale );
         QString name = component.name();
         if ( name != en_name )
         {
@@ -87,7 +89,11 @@ fromComponent( AppStream::Component& component )
         }
     }
 
+#if HAVE_APPSTREAM_VERSION == 0
     auto screenshots = component.screenshots();
+#else
+    auto screenshots = component.screenshotsAll();
+#endif
     if ( screenshots.count() > 0 )
     {
         bool done = false;
@@ -112,7 +118,7 @@ fromComponent( AppStream::Component& component )
 PackageItem
 fromAppStream( AppStream::Pool& pool, const QVariantMap& item_map )
 {
-    QString appstreamId = CalamaresUtils::getString( item_map, "appstream" );
+    QString appstreamId = Calamares::getString( item_map, "appstream" );
     if ( appstreamId.isEmpty() )
     {
         cWarning() << "Can't load AppStream without a suitable appstreamId.";
@@ -120,7 +126,11 @@ fromAppStream( AppStream::Pool& pool, const QVariantMap& item_map )
     }
     cDebug() << "Loading AppStream data for" << appstreamId;
 
+#if HAVE_APPSTREAM_VERSION == 0
     auto itemList = pool.componentsById( appstreamId );
+#else
+    auto itemList = pool.componentsById( appstreamId ).toList();
+#endif
     if ( itemList.count() < 1 )
     {
         cWarning() << "No AppStream data for" << appstreamId;
@@ -131,11 +141,11 @@ fromAppStream( AppStream::Pool& pool, const QVariantMap& item_map )
         cDebug() << "Multiple AppStream data for" << appstreamId << "using first.";
     }
 
-    auto r = fromComponent( itemList.first() );
+    auto r = fromComponent( pool, itemList.first() );
     if ( r.isValid() )
     {
-        QString id = CalamaresUtils::getString( item_map, "id" );
-        QString screenshotPath = CalamaresUtils::getString( item_map, "screenshot" );
+        QString id = Calamares::getString( item_map, "id" );
+        QString screenshotPath = Calamares::getString( item_map, "screenshot" );
         if ( !id.isEmpty() )
         {
             r.id = id;

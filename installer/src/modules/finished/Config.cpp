@@ -34,7 +34,6 @@ restartModes()
     return table;
 }
 
-
 Config::Config( QObject* parent )
     : QObject( parent )
 {
@@ -107,7 +106,6 @@ Config::onInstallationFailed( const QString& message, const QString& details )
     }
 }
 
-
 void
 Config::doRestart( bool restartAnyway )
 {
@@ -119,7 +117,6 @@ Config::doRestart( bool restartAnyway )
         QProcess::execute( "/bin/sh", { "-c", m_restartNowCommand } );
     }
 }
-
 
 void
 Config::doNotify( bool hasFailed, bool sendAnyway )
@@ -142,17 +139,19 @@ Config::doNotify( bool hasFailed, bool sendAnyway )
         QString message;
         if ( hasFailed )
         {
-            title = Calamares::Settings::instance()->isSetupMode() ? tr( "Setup Failed" ) : tr( "Installation Failed" );
+            title = Calamares::Settings::instance()->isSetupMode() ? tr( "Setup Failed", "@title" )
+                                                                   : tr( "Installation Failed", "@title" );
             message = Calamares::Settings::instance()->isSetupMode()
-                ? tr( "The setup of %1 did not complete successfully." )
-                : tr( "The installation of %1 did not complete successfully." );
+                ? tr( "The setup of %1 did not complete successfully.", "@info" )
+                : tr( "The installation of %1 did not complete successfully.", "@info" );
         }
         else
         {
-            title = Calamares::Settings::instance()->isSetupMode() ? tr( "Setup Complete" )
-                                                                   : tr( "Installation Complete" );
-            message = Calamares::Settings::instance()->isSetupMode() ? tr( "The setup of %1 is complete." )
-                                                                     : tr( "The installation of %1 is complete." );
+            title = Calamares::Settings::instance()->isSetupMode() ? tr( "Setup Complete", "@title" )
+                                                                   : tr( "Installation Complete", "@title" );
+            message = Calamares::Settings::instance()->isSetupMode()
+                ? tr( "The setup of %1 is complete.", "@info" )
+                : tr( "The installation of %1 is complete.", "@info" );
         }
 
         const auto* branding = Calamares::Branding::instance();
@@ -176,14 +175,13 @@ Config::doNotify( bool hasFailed, bool sendAnyway )
     }
 }
 
-
 void
 Config::setConfigurationMap( const QVariantMap& configurationMap )
 {
     RestartMode mode = RestartMode::Never;
 
     //TODO:3.3 remove deprecated restart settings
-    QString restartMode = CalamaresUtils::getString( configurationMap, "restartNowMode" );
+    QString restartMode = Calamares::getString( configurationMap, "restartNowMode" );
     if ( restartMode.isEmpty() )
     {
         if ( configurationMap.contains( "restartNowEnabled" ) )
@@ -191,8 +189,8 @@ Config::setConfigurationMap( const QVariantMap& configurationMap )
             cWarning() << "Configuring the finished module with deprecated restartNowEnabled settings";
         }
 
-        bool restartNowEnabled = CalamaresUtils::getBool( configurationMap, "restartNowEnabled", false );
-        bool restartNowChecked = CalamaresUtils::getBool( configurationMap, "restartNowChecked", false );
+        bool restartNowEnabled = Calamares::getBool( configurationMap, "restartNowEnabled", false );
+        bool restartNowChecked = Calamares::getBool( configurationMap, "restartNowChecked", false );
 
         if ( !restartNowEnabled )
         {
@@ -220,7 +218,7 @@ Config::setConfigurationMap( const QVariantMap& configurationMap )
 
     if ( mode != RestartMode::Never )
     {
-        QString restartNowCommand = CalamaresUtils::getString( configurationMap, "restartNowCommand" );
+        QString restartNowCommand = Calamares::getString( configurationMap, "restartNowCommand" );
         if ( restartNowCommand.isEmpty() )
         {
             restartNowCommand = QStringLiteral( "shutdown -r now" );
@@ -228,5 +226,5 @@ Config::setConfigurationMap( const QVariantMap& configurationMap )
         m_restartNowCommand = restartNowCommand;
     }
 
-    m_notifyOnFinished = CalamaresUtils::getBool( configurationMap, "notifyOnFinished", false );
+    m_notifyOnFinished = Calamares::getBool( configurationMap, "notifyOnFinished", false );
 }

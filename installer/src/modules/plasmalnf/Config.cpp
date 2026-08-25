@@ -12,8 +12,9 @@
 #include "PlasmaLnfJob.h"
 #include "ThemeInfo.h"
 
-#include "utils/CalamaresUtilsSystem.h"
+#include "compat/Variant.h"
 #include "utils/Logger.h"
+#include "utils/System.h"
 #include "utils/Variant.h"
 
 #ifdef WITH_KCONFIG
@@ -52,23 +53,24 @@ Config::Config( QObject* parent )
 void
 Config::setConfigurationMap( const QVariantMap& configurationMap )
 {
-    m_lnfPath = CalamaresUtils::getString( configurationMap, "lnftool" );
+    m_lnfPath = Calamares::getString( configurationMap, "lnftool" );
 
     if ( m_lnfPath.isEmpty() )
     {
         cWarning() << "no lnftool given for plasmalnf module.";
     }
 
-    m_liveUser = CalamaresUtils::getString( configurationMap, "liveuser" );
+    m_liveUser = Calamares::getString( configurationMap, "liveuser" );
 
-    QString preselect = CalamaresUtils::getString( configurationMap, "preselect" );
+    QString preselect = Calamares::getString( configurationMap, "preselect" );
     if ( preselect == QStringLiteral( "*" ) )
     {
         preselect = currentPlasmaTheme();
     }
     m_preselectThemeId = preselect;
 
-    if ( configurationMap.contains( "themes" ) && configurationMap.value( "themes" ).type() == QVariant::List )
+    if ( configurationMap.contains( "themes" )
+         && Calamares::typeOf( configurationMap.value( "themes" ) ) == Calamares::StringVariantType )
     {
         QMap< QString, QString > listedThemes;
         auto themeList = configurationMap.value( "themes" ).toList();
@@ -76,15 +78,17 @@ Config::setConfigurationMap( const QVariantMap& configurationMap )
         // about the themes from Plasma (e.g. human-readable name and description)
         // are filled in by update_names() in PlasmaLnfPage.
         for ( const auto& i : themeList )
-            if ( i.type() == QVariant::Map )
+        {
+            if ( Calamares::typeOf( i ) == Calamares::MapVariantType )
             {
                 auto iv = i.toMap();
                 listedThemes.insert( iv.value( "theme" ).toString(), iv.value( "image" ).toString() );
             }
-            else if ( i.type() == QVariant::String )
+            else if ( Calamares::typeOf( i ) == Calamares::StringVariantType )
             {
                 listedThemes.insert( i.toString(), QString() );
             }
+        }
 
         if ( listedThemes.count() == 1 )
         {
@@ -92,7 +96,7 @@ Config::setConfigurationMap( const QVariantMap& configurationMap )
         }
         m_themeModel->setThemeImage( listedThemes );
 
-        bool showAll = CalamaresUtils::getBool( configurationMap, "showAll", false );
+        bool showAll = Calamares::getBool( configurationMap, "showAll", false );
         if ( !listedThemes.isEmpty() && !showAll )
         {
             m_themeModel->showOnlyThemes( listedThemes );
@@ -122,7 +126,6 @@ Config::createJobs() const
     return l;
 }
 
-
 void
 Config::setTheme( const QString& id )
 {
@@ -148,7 +151,7 @@ Config::setTheme( const QString& id )
         }
         command << lnfToolPath() << "--resetLayout"
                 << "--apply" << id;
-        auto r = CalamaresUtils::System::instance()->runCommand( command, std::chrono::seconds( 10 ) );
+        auto r = Calamares::System::instance()->runCommand( command, std::chrono::seconds( 10 ) );
 
         if ( r.getExitCode() )
         {

@@ -11,33 +11,34 @@
 
 #include "GlobalStorage.h"
 
+#include "compat/Mutex.h"
+
 #include "utils/Logger.h"
 #include "utils/Units.h"
 #include "utils/Yaml.h"
 
 #include <QFile>
 #include <QJsonDocument>
-#include <QMutexLocker>
 
-using namespace CalamaresUtils::Units;
+using namespace Calamares::Units;
 
 namespace Calamares
 {
 
-class GlobalStorage::ReadLock : public QMutexLocker
+class GlobalStorage::ReadLock : public MutexLocker
 {
 public:
     ReadLock( const GlobalStorage* gs )
-        : QMutexLocker( &gs->m_mutex )
+        : MutexLocker( &gs->m_mutex )
     {
     }
 };
 
-class GlobalStorage::WriteLock : public QMutexLocker
+class GlobalStorage::WriteLock : public MutexLocker
 {
 public:
     WriteLock( GlobalStorage* gs )
-        : QMutexLocker( &gs->m_mutex )
+        : MutexLocker( &gs->m_mutex )
         , m_gs( gs )
     {
     }
@@ -51,14 +52,12 @@ GlobalStorage::GlobalStorage( QObject* parent )
 {
 }
 
-
 bool
 GlobalStorage::contains( const QString& key ) const
 {
     ReadLock l( this );
     return m.contains( key );
 }
-
 
 int
 GlobalStorage::count() const
@@ -67,7 +66,6 @@ GlobalStorage::count() const
     return m.count();
 }
 
-
 void
 GlobalStorage::insert( const QString& key, const QVariant& value )
 {
@@ -75,14 +73,12 @@ GlobalStorage::insert( const QString& key, const QVariant& value )
     m.insert( key, value );
 }
 
-
 QStringList
 GlobalStorage::keys() const
 {
     ReadLock l( this );
     return m.keys();
 }
-
 
 int
 GlobalStorage::remove( const QString& key )
@@ -92,6 +88,12 @@ GlobalStorage::remove( const QString& key )
     return nItems;
 }
 
+void
+GlobalStorage::clear()
+{
+    WriteLock l( this );
+    m.clear();
+}
 
 QVariant
 GlobalStorage::value( const QString& key ) const
@@ -165,14 +167,14 @@ bool
 GlobalStorage::saveYaml( const QString& filename ) const
 {
     ReadLock l( this );
-    return CalamaresUtils::saveYaml( filename, m );
+    return Calamares::YAML::save( filename, m );
 }
 
 bool
 GlobalStorage::loadYaml( const QString& filename )
 {
     bool ok = false;
-    auto map = CalamaresUtils::loadYaml( filename, &ok );
+    auto map = Calamares::YAML::load( filename, &ok );
     if ( ok )
     {
         WriteLock l( this );
@@ -188,5 +190,55 @@ GlobalStorage::loadYaml( const QString& filename )
     return false;
 }
 
+///@brief Implementation for recursively looking up dotted selector parts.
+static QVariant
+lookup( const QStringList& nestedKey, int index, const QVariant& v, bool& ok )
+{
+    if ( !v.canConvert< QVariantMap >() )
+    {
+        // Mismatch: we're still looking for keys, but v is not a submap
+        ok = false;
+        return {};
+    }
+    if ( index >= nestedKey.length() )
+    {
+        cError() << "Recursion error looking at index" << index << "of" << nestedKey;
+        ok = false;
+        return {};
+    }
+
+    const QVariantMap map = v.toMap();
+    const QString& key = nestedKey.at( index );
+    if ( index == nestedKey.length() - 1 )
+    {
+        ok = map.contains( key );
+        return ok ? map.value( key ) : QVariant();
+    }
+    else
+    {
+        return lookup( nestedKey, index + 1, map.value( key ), ok );
+    }
+}
+
+QVariant
+lookup( const GlobalStorage* storage, const QString& nestedKey, bool& ok )
+{
+    ok = false;
+    if ( !storage )
+    {
+        return {};
+    }
+
+    if ( nestedKey.contains( '.' ) )
+    {
+        QStringList steps = nestedKey.split( '.' );
+        return lookup( steps, 1, storage->value( steps.first() ), ok );
+    }
+    else
+    {
+        ok = storage->contains( nestedKey );
+        return ok ? storage->value( nestedKey ) : QVariant();
+    }
+}
 
 }  // namespace Calamares

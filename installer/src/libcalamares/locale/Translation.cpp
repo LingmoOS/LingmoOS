@@ -12,6 +12,10 @@
 #include "Translation.h"
 
 #include <memory>
+#include <set>
+
+namespace
+{
 
 struct TranslationSpecialCase
 {
@@ -84,6 +88,21 @@ static constexpr const TranslationSpecialCase special_cases[] = {
       QLocale::Script::AnyScript,
       QLocale::Country::AnyCountry,
       "Lenga d'òc" },
+    // Luri
+    { "bqi",
+      nullptr,
+      QLocale::Language::NorthernLuri,
+      QLocale::Script::AnyScript,
+      QLocale::Country::AnyCountry,
+      nullptr },
+    // Interlingue is mapped to interlingu*a* (up until Qt version ...) because
+    //   the real Language::Interlingue acts like C locale.
+    { "ie",
+      nullptr,
+      CALAMARES_QT_SUPPORT_INTERLINGUE ? QLocale::Language::Interlingue : QLocale::Language::Interlingua,
+      QLocale::Script::AnyScript,
+      QLocale::Country::AnyCountry,
+      "Interlingue" },
 };
 
 static inline bool
@@ -128,7 +147,46 @@ specialCaseSystemLanguage()
     return ( it != std::cend( special_cases ) ) ? QString::fromLatin1( it->id ) : QString();
 }
 
-namespace CalamaresUtils
+///@brief Country (territory) name for this locale
+QString
+territoryName( const QLocale& locale )
+{
+#if QT_VERSION < QT_VERSION_CHECK( 6, 6, 0 )
+    return QLocale::countryToString( locale.country() );
+#else
+    return QLocale::territoryToString( locale.territory() );
+#endif
+}
+
+QString
+nativeTerritoryName( const QLocale& locale )
+{
+#if QT_VERSION < QT_VERSION_CHECK( 6, 6, 0 )
+    return locale.nativeCountryName();
+#else
+    return locale.nativeTerritoryName();
+#endif
+}
+
+bool
+needsTerritorialDisambiguation( const QLocale& locale )
+{
+#if QT_VERSION < QT_VERSION_CHECK( 6, 6, 0 )
+    return QLocale::countriesForLanguage( locale.language() ).count() > 1;
+#else
+    std::set<QLocale::Territory> s;
+    for(const auto & l : QLocale::matchingLocales( locale.language(), QLocale::Script::AnyScript, QLocale::Territory::AnyTerritory ))
+    {
+        s.insert(l.territory());
+    }
+    return s.size() > 1;
+#endif
+}
+
+
+}  // namespace
+
+namespace Calamares
 {
 namespace Locale
 {
@@ -159,12 +217,10 @@ Translation::Translation( const Id& localeId, LabelFormat format, QObject* paren
     }
 
     bool needsCountryName = ( format == LabelFormat::AlwaysWithCountry )
-        || ( !name && localeId.name.contains( '_' )
-             && QLocale::countriesForLanguage( m_locale.language() ).count() > 1 );
-    QString countryName = needsCountryName ? m_locale.nativeCountryName() : QString();
+        || ( !name && localeId.name.contains( '_' ) && needsTerritorialDisambiguation( ( m_locale ) ) );
+    const QString countryName = needsCountryName ? nativeTerritoryName( m_locale ) : QString();
     m_label = needsCountryName ? longFormat.arg( languageName, countryName ) : languageName;
-    m_englishLabel = needsCountryName ? longFormat.arg( englishName, QLocale::countryToString( m_locale.country() ) )
-                                      : englishName;
+    m_englishLabel = needsCountryName ? longFormat.arg( englishName, territoryName( m_locale ) ) : englishName;
 }
 
 QLocale
@@ -187,4 +243,4 @@ Translation::getLocale( const Id& localeId )
 }
 
 }  // namespace Locale
-}  // namespace CalamaresUtils
+}  // namespace Calamares

@@ -11,7 +11,6 @@
  * This is a test-application that does one GeoIP parse.
  */
 
-
 #include "GeoIPFixed.h"
 #include "GeoIPJSON.h"
 #ifdef QT_XML_LIB
@@ -23,7 +22,7 @@
 #include <iostream>
 
 using std::cerr;
-using namespace CalamaresUtils::GeoIP;
+using namespace Calamares::GeoIP;
 
 int
 main( int argc, char** argv )
@@ -72,14 +71,14 @@ main( int argc, char** argv )
     }
 
     auto tz = handler->processReply( ba );
-    if ( tz.first.isEmpty() )
+    if ( tz.region().isEmpty() )
     {
         std::cout << "No TimeZone determined from input.\n";
     }
     else
     {
-        std::cout << "TimeZone Region=" << tz.first.toLatin1().constData()
-                  << "\nTimeZone Zone=" << tz.second.toLatin1().constData() << '\n';
+        std::cout << "TimeZone Region=" << tz.region().toLatin1().constData()
+                  << "\nTimeZone Zone=" << tz.zone().toLatin1().constData() << '\n';
     }
 
     return 0;

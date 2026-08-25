@@ -12,6 +12,7 @@
 #include "Branding.h"
 #include "ViewManager.h"
 
+#include "compat/Variant.h"
 #include "utils/Dirs.h"
 #include "utils/Logger.h"
 #include "utils/NamedEnum.h"
@@ -23,10 +24,14 @@
 #include <QQmlContext>
 #include <QQmlEngine>
 #include <QQuickItem>
+#if QT_VERSION < QT_VERSION_CHECK( 6, 0, 0 )
 #include <QQuickWidget>
+#else
+#include <QQuickWindow>
+#endif
+
 #include <QVBoxLayout>
 #include <QWidget>
-
 
 /// @brief State-change of the QML, for changeQMLState()
 enum class QMLAction
@@ -49,10 +54,11 @@ changeQMLState( QMLAction action, QQuickItem* item )
     static const char propertyName[] = "activatedInCalamares";
 
     bool activate = action == QMLAction::Start;
-    CalamaresUtils::callQmlFunction( item, activate ? "onActivate" : "onLeave" );
+    Calamares::callQmlFunction( item, activate ? "onActivate" : "onLeave" );
 
     auto property = item->property( propertyName );
-    if ( property.isValid() && ( property.type() == QVariant::Bool ) && ( property.toBool() != activate ) )
+    if ( property.isValid() && ( Calamares::typeOf( property ) == Calamares::BoolVariantType )
+         && ( property.toBool() != activate ) )
     {
         item->setProperty( propertyName, activate );
     }
@@ -64,17 +70,23 @@ namespace Calamares
 QmlViewStep::QmlViewStep( QObject* parent )
     : ViewStep( parent )
     , m_widget( new QWidget )
-    , m_spinner( new WaitingWidget( tr( "Loading ..." ) ) )
-    , m_qmlWidget( new QQuickWidget )
+    , m_spinner( new WaitingWidget( tr( "Loading…", "@status" ) ) )
 {
-    CalamaresUtils::registerQmlModels();
+    Calamares::registerQmlModels();
+
+#if QT_VERSION < QT_VERSION_CHECK( 6, 0, 0 )
+    m_qmlWidget = new QQuickWidget;
+    m_qmlWidget->setResizeMode( QQuickWidget::SizeRootObjectToView );
+    m_qmlWidget->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
+    m_qmlEngine = m_qmlWidget->engine();
+#else
+    m_qmlEngine = new QQmlEngine( this );
+#endif
 
     QVBoxLayout* layout = new QVBoxLayout( m_widget );
     layout->addWidget( m_spinner );
 
-    m_qmlWidget->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
-    m_qmlWidget->setResizeMode( QQuickWidget::SizeRootObjectToView );
-    m_qmlWidget->engine()->addImportPath( CalamaresUtils::qmlModulesDir().absolutePath() );
+    m_qmlEngine->addImportPath( Calamares::qmlModulesDir().absolutePath() );
 
     // QML Loading starts when the configuration for the module is set.
 }
@@ -85,9 +97,8 @@ QString
 QmlViewStep::prettyName() const
 {
     // TODO: query the QML itself
-    return tr( "QML Step <i>%1</i>." ).arg( moduleInstanceKey().module() );
+    return tr( "QML step <i>%1</i>.", "@label" ).arg( moduleInstanceKey().module() );
 }
-
 
 bool
 QmlViewStep::isAtBeginning() const
@@ -181,11 +192,20 @@ QmlViewStep::loadComplete()
         }
         else
         {
+#if QT_VERSION < QT_VERSION_CHECK( 6, 0, 0 )
             // setContent() is public API, but not documented publicly.
             // It is marked \internal in the Qt sources, but does exactly
             // what is needed: sets up visual parent by replacing the root
             // item, and handling resizes.
             m_qmlWidget->setContent( QUrl( m_qmlFileName ), m_qmlComponent, m_qmlObject );
+#else
+            auto* quick = new QQuickWindow;
+            auto* root = quick->contentItem();
+            m_qmlObject->setParentItem( root );
+            m_qmlObject->bindableWidth().setBinding( [ = ]() { return root->width(); } );
+            m_qmlObject->bindableHeight().setBinding( [ = ]() { return root->height(); } );
+            m_qmlWidget = QWidget::createWindowContainer( quick, m_widget );
+#endif
             showQml();
         }
     }
@@ -219,19 +239,17 @@ QmlViewStep::showQml()
     }
 }
 
-
 void
 QmlViewStep::setConfigurationMap( const QVariantMap& configurationMap )
 {
     bool ok = false;
-    m_searchMethod
-        = CalamaresUtils::qmlSearchNames().find( CalamaresUtils::getString( configurationMap, "qmlSearch" ), ok );
+    m_searchMethod = Calamares::qmlSearchNames().find( Calamares::getString( configurationMap, "qmlSearch" ), ok );
     if ( !ok )
     {
         cWarning() << "Bad QML search mode set for" << moduleInstanceKey();
     }
 
-    QString qmlFile = CalamaresUtils::getString( configurationMap, "qmlFilename" );
+    QString qmlFile = Calamares::getString( configurationMap, "qmlFilename" );
     if ( !m_qmlComponent )
     {
         m_qmlFileName = searchQmlFile( m_searchMethod, qmlFile, moduleInstanceKey() );
@@ -243,8 +261,8 @@ QmlViewStep::setConfigurationMap( const QVariantMap& configurationMap )
         }
 
         cDebug() << "QmlViewStep" << moduleInstanceKey() << "loading" << m_qmlFileName;
-        m_qmlComponent = new QQmlComponent(
-            m_qmlWidget->engine(), QUrl( m_qmlFileName ), QQmlComponent::CompilationMode::Asynchronous );
+        m_qmlComponent
+            = new QQmlComponent( m_qmlEngine, QUrl( m_qmlFileName ), QQmlComponent::CompilationMode::Asynchronous );
         connect( m_qmlComponent, &QQmlComponent::statusChanged, this, &QmlViewStep::loadComplete );
         if ( m_qmlComponent->status() == QQmlComponent::Error )
         {
@@ -265,7 +283,7 @@ QmlViewStep::showFailedQml()
     {
         cDebug() << Logger::SubEntry << "QML error:" << m_qmlComponent->errorString();
     }
-    m_spinner->setText( prettyName() + ' ' + tr( "Loading failed." ) );
+    m_spinner->setText( prettyName() + ' ' + tr( "Loading failed.", "@info" ) );
 }
 
 QObject*
@@ -277,7 +295,7 @@ QmlViewStep::getConfig()
 void
 QmlViewStep::setContextProperty( const char* name, QObject* property )
 {
-    m_qmlWidget->engine()->rootContext()->setContextProperty( name, property );
+    m_qmlEngine->rootContext()->setContextProperty( name, property );
 }
 
 }  // namespace Calamares

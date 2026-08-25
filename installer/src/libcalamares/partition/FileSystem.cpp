@@ -14,7 +14,7 @@
 
 #include <QObject>
 
-namespace CalamaresUtils
+namespace Calamares
 {
 namespace Partition
 {
@@ -22,21 +22,19 @@ namespace Partition
 QString
 prettyNameForFileSystemType( FileSystem::Type t )
 {
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wswitch-enum"
-#endif
+    QT_WARNING_PUSH
+    QT_WARNING_DISABLE_CLANG( "-Wswitch-enum" )
     // 13 enumeration values not handled
     switch ( t )
     {
     case FileSystem::Unknown:
-        return QObject::tr( "unknown" );
+        return QObject::tr( "unknown", "@partition info" );
     case FileSystem::Extended:
-        return QObject::tr( "extended" );
+        return QObject::tr( "extended", "@partition info" );
     case FileSystem::Unformatted:
-        return QObject::tr( "unformatted" );
+        return QObject::tr( "unformatted", "@partition info" );
     case FileSystem::LinuxSwap:
-        return QObject::tr( "swap" );
+        return QObject::tr( "swap", "@partition info" );
     case FileSystem::Fat16:
     case FileSystem::Fat32:
     case FileSystem::Ntfs:
@@ -46,6 +44,7 @@ prettyNameForFileSystemType( FileSystem::Type t )
     case FileSystem::Ufs:
     case FileSystem::Hpfs:
     case FileSystem::Luks:
+    case FileSystem::Luks2:
     case FileSystem::Ocfs2:
     case FileSystem::Zfs:
     case FileSystem::Nilfs2:
@@ -65,18 +64,14 @@ prettyNameForFileSystemType( FileSystem::Type t )
     default:
         return FileSystem::nameForType( t );
     }
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
+    QT_WARNING_POP
 }
 
 QString
 untranslatedFS( FileSystem::Type t )
 {
-#ifdef __clang__
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wswitch-enum"
-#endif
+    QT_WARNING_PUSH
+    QT_WARNING_DISABLE_CLANG( "-Wswitch-enum" )
     // 34 enumeration values not handled
     switch ( t )
     {
@@ -85,10 +80,8 @@ untranslatedFS( FileSystem::Type t )
     default:
         return FileSystem::nameForType( t, { QStringLiteral( "C" ) } );
     }
-#ifdef __clang__
-#pragma clang diagnostic pop
-#endif
+    QT_WARNING_POP
 }
 
 }  // namespace Partition
-}  // namespace CalamaresUtils
+}  // namespace Calamares

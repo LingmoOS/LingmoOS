@@ -24,9 +24,9 @@
 #include <QColor>
 #include <QMap>
 
-using CalamaresUtils::Partition::isPartitionFreeSpace;
-using CalamaresUtils::Partition::isPartitionNew;
-using CalamaresUtils::Partition::PartitionIterator;
+using Calamares::Partition::isPartitionFreeSpace;
+using Calamares::Partition::isPartitionNew;
+using Calamares::Partition::PartitionIterator;
 
 static const int NUM_PARTITION_COLORS = 5;
 static const int NUM_NEW_PARTITION_COLORS = 4;
@@ -98,7 +98,7 @@ colorForPartition( Partition* partition )
     if ( partition->fileSystem().supportGetUUID() != FileSystem::cmdSupportNone
          && !partition->fileSystem().uuid().isEmpty() )
     {
-        if ( partition->fileSystem().type() == FileSystem::Luks )
+        if ( partition->fileSystem().type() == FileSystem::Luks || partition->fileSystem().type() == FileSystem::Luks2 )
         {
             FS::luks& luksFs = dynamic_cast< FS::luks& >( partition->fileSystem() );
             if ( !luksFs.outerUuid().isEmpty() && s_partitionColorsCache.contains( luksFs.outerUuid() ) )
@@ -146,7 +146,7 @@ colorForPartition( Partition* partition )
     if ( partition->fileSystem().supportGetUUID() != FileSystem::cmdSupportNone
          && !partition->fileSystem().uuid().isEmpty() )
     {
-        if ( partition->fileSystem().type() == FileSystem::Luks )
+        if ( partition->fileSystem().type() == FileSystem::Luks || partition->fileSystem().type() == FileSystem::Luks2 )
         {
             FS::luks& luksFs = dynamic_cast< FS::luks& >( partition->fileSystem() );
             if ( !luksFs.outerUuid().isEmpty() )
@@ -156,8 +156,10 @@ colorForPartition( Partition* partition )
             }
         }
         else
+        {
             s_partitionColorsCache.insert( partition->fileSystem().uuid(),
                                            PARTITION_COLORS[ colorIdx % NUM_PARTITION_COLORS ] );
+        }
     }
     return PARTITION_COLORS[ colorIdx % NUM_PARTITION_COLORS ];
 }

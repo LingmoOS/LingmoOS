@@ -56,6 +56,8 @@ private Q_SLOTS:
 
     void testUserYAML_data();
     void testUserYAML();
+    void testUserUmask_data();
+    void testUserUmask();
 };
 
 UserTests::UserTests() {}
@@ -129,7 +131,6 @@ UserTests::testGetSet()
         QVERIFY( !c.loginNameStatus().isEmpty() );  // can't be root
     }
 }
-
 
 void
 UserTests::testDefaultGroups()
@@ -214,11 +215,11 @@ UserTests::testDefaultGroupsYAML()
     QFETCH( QString, group );
 
     // BUILD_AS_TEST is the source-directory path
-    QFile fi( QString( "%1/%2" ).arg( BUILD_AS_TEST, filename ) );
+    QFileInfo fi( QString( "%1/%2" ).arg( BUILD_AS_TEST, filename ) );
     QVERIFY( fi.exists() );
 
     bool ok = false;
-    const auto map = CalamaresUtils::loadYaml( fi, &ok );
+    const auto map = Calamares::YAML::load( fi, &ok );
     QVERIFY( ok );
     QVERIFY( map.count() > 0 );
 
@@ -228,7 +229,6 @@ UserTests::testDefaultGroupsYAML()
     QCOMPARE( c.defaultGroups().count(), count );
     QVERIFY( c.defaultGroups().contains( group ) );
 }
-
 
 void
 UserTests::testHostActions_data()
@@ -284,13 +284,14 @@ UserTests::testHostActions2()
     QCOMPARE( c.hostnameAction(), HostNameAction::EtcHostname );
     QCOMPARE( c.writeEtcHosts(), true );
 
-    legacy.insert( "writeHostsFile", false );
-    legacy.insert( "setHostname", "Hostnamed" );
+    QVariantMap hostSettings;
+    hostSettings.insert( "writeHostsFile", false );
+    hostSettings.insert( "location", "Hostnamed" );
+    legacy.insert( "hostname", hostSettings );
     c.setConfigurationMap( legacy );
     QCOMPARE( c.hostnameAction(), HostNameAction::SystemdHostname );
     QCOMPARE( c.writeEtcHosts(), false );
 }
-
 
 void
 UserTests::testHostSuggestions_data()
@@ -333,17 +334,16 @@ UserTests::testHostSuggestions()
     QCOMPARE( makeHostnameSuggestion( templateString, fullName, login ), result );
 }
 
-
 void
 UserTests::testPasswordChecks()
 {
     {
         PasswordCheckList l;
         QCOMPARE( l.length(), 0 );
-        QVERIFY( !addPasswordCheck( "nonempty", QVariant( false ), l ) );  // a silly setting
+        QVERIFY( !addPasswordCheck( "nonempty", QVariant( false ), l ) );  // legacy option, now ignored
         QCOMPARE( l.length(), 0 );
-        QVERIFY( addPasswordCheck( "nonempty", QVariant( true ), l ) );
-        QCOMPARE( l.length(), 1 );
+        QVERIFY( !addPasswordCheck( "nonempty", QVariant( true ), l ) );  // still ignored
+        QCOMPARE( l.length(), 0 );
     }
 }
 
@@ -448,11 +448,11 @@ UserTests::testAutoLogin()
     QFETCH( QString, autoLoginGroupName );
 
     // BUILD_AS_TEST is the source-directory path
-    QFile fi( QString( "%1/%2" ).arg( BUILD_AS_TEST, filename ) );
+    QFileInfo fi( QString( "%1/%2" ).arg( BUILD_AS_TEST, filename ) );
     QVERIFY( fi.exists() );
 
     bool ok = false;
-    const auto map = CalamaresUtils::loadYaml( fi, &ok );
+    const auto map = Calamares::YAML::load( fi, &ok );
     QVERIFY( ok );
     QVERIFY( map.count() > 0 );
 
@@ -469,16 +469,14 @@ UserTests::testUserYAML_data()
     QTest::addColumn< QString >( "filename" );
     QTest::addColumn< QString >( "shell" );
 
-    QTest::newRow( "old, unset   " ) << "tests/7ao-shell.conf"
-                                     << "/bin/bash";
-    QTest::newRow( "old, empty   " ) << "tests/7bo-shell.conf"
-                                     << "";
-    QTest::newRow( "old, relative" ) << "tests/7co-shell.conf"
-                                     << "/bin/ls";  // Setting is ignored
-    QTest::newRow( "old, invalid " ) << "tests/7do-shell.conf"
-                                     << "";
-    QTest::newRow( "old, absolute" ) << "tests/7eo-shell.conf"
-                                     << "/usr/bin/dash";
+    const QString bash = QStringLiteral( "/bin/bash" );
+
+    // All the old settings are ignored
+    QTest::newRow( "old, unset   " ) << "tests/7ao-shell.conf" << bash;
+    QTest::newRow( "old, empty   " ) << "tests/7bo-shell.conf" << bash;
+    QTest::newRow( "old, relative" ) << "tests/7co-shell.conf" << bash;
+    QTest::newRow( "old, invalid " ) << "tests/7do-shell.conf" << bash;
+    QTest::newRow( "old, absolute" ) << "tests/7eo-shell.conf" << bash;
 
     QTest::newRow( "new, unset   " ) << "tests/7an-shell.conf"
                                      << "/bin/bash";
@@ -502,17 +500,85 @@ UserTests::testUserYAML()
     QFETCH( QString, shell );
 
     // BUILD_AS_TEST is the source-directory path
-    QFile fi( QString( "%1/%2" ).arg( BUILD_AS_TEST, filename ) );
+    QFileInfo fi( QString( "%1/%2" ).arg( BUILD_AS_TEST, filename ) );
     QVERIFY( fi.exists() );
 
     bool ok = false;
-    const auto map = CalamaresUtils::loadYaml( fi, &ok );
+    const auto map = Calamares::YAML::load( fi, &ok );
     QVERIFY( ok );
     QVERIFY( map.count() > 0 );
 
     QCOMPARE( c.userShell(), QStringLiteral( "/bin/ls" ) );
     c.setConfigurationMap( map );
     QCOMPARE( c.userShell(), shell );
+}
+
+void
+UserTests::testUserUmask_data()
+{
+    QTest::addColumn< QString >( "filename" );
+    QTest::addColumn< int >( "permission" );
+    QTest::addColumn< int >( "umask" );
+    QTest::addColumn< QString >( "umask_string" );
+
+    QTest::newRow( "good " ) << "tests/8a-issue-2362.conf" << 0700 << 0077 << QStringLiteral( "077" );
+    QTest::newRow( "open " ) << "tests/8b-issue-2362.conf" << 0755 << 0022 << QStringLiteral( "022" );
+    QTest::newRow( "weird" ) << "tests/8c-issue-2362.conf" << 0126 << 0651 << QStringLiteral( "651" );
+    QTest::newRow( "rwxx " ) << "tests/8d-issue-2362.conf" << 0710 << 0067 << QStringLiteral( "067" );
+    QTest::newRow( "-wrd " ) << "tests/8e-issue-2362.conf" << 0214 << 0563 << QStringLiteral( "563" );
+    QTest::newRow( "bogus" ) << "tests/8f-issue-2362.conf" << -1 << -1
+                             << QStringLiteral( "-01" );  // Bogus 3-character representation
+    QTest::newRow( "good2" ) << "tests/8g-issue-2362.conf" << 0750 << 0027 << QStringLiteral( "027" );
+    QTest::newRow( "numrc" ) << "tests/8h-issue-2362.conf" << 0751 << 0026 << QStringLiteral( "026" );
+}
+
+void
+UserTests::testUserUmask()
+{
+    static constexpr int no_permissions = -1;
+    const QString old_shell = QStringLiteral( "/bin/ls" );
+    const QString new_shell = QStringLiteral( "/usr/bin/new" );
+    // nobody and root are always forbidden, even if not mentioned in the config, entries are alphabetical
+    const QStringList forbidden { QStringLiteral( "me" ),
+                                  QStringLiteral( "moi" ),
+                                  QStringLiteral( "myself" ),
+                                  QStringLiteral( "nobody" ),
+                                  QStringLiteral( "root" ) };
+    Config c;
+    c.setUserShell( old_shell );
+    QCOMPARE( c.homePermissions(), no_permissions );
+    QCOMPARE( c.homeUMask(), no_permissions );
+
+    QFETCH( QString, filename );
+    QFETCH( int, permission );
+    QFETCH( int, umask );
+    QFETCH( QString, umask_string );
+
+    // Checks that the test-data is valid
+    if ( permission != -1 )
+    {
+        QCOMPARE( permission & umask, 0 );
+        QCOMPARE( permission | umask, 0777 );
+    }
+
+    QFileInfo fi( QString( "%1/%2" ).arg( BUILD_AS_TEST, filename ) );
+    QVERIFY( fi.exists() );
+
+    bool ok = false;
+    const auto map = Calamares::YAML::load( fi, &ok );
+    QVERIFY( ok );
+    QVERIFY( map.count() > 0 );
+
+    QCOMPARE( c.userShell(), old_shell );
+    c.setConfigurationMap( map );
+    QCOMPARE( c.userShell(), new_shell );
+
+    QCOMPARE( c.homePermissions(), permission );
+    QCOMPARE( c.homeUMask(), umask );
+    // The QChar() is needed to disambiguate from the overload that takes a double
+    QCOMPARE( QStringLiteral( "%1" ).arg( umask, 3, 8, QChar( '0' ) ), umask_string );
+
+    QCOMPARE( c.forbiddenLoginNames(), forbidden );
 }
 
 

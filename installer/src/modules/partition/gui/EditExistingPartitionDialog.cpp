@@ -42,15 +42,29 @@
 #include <QProcess>
 #include <QPushButton>
 
-using CalamaresUtils::Partition::untranslatedFS;
-using CalamaresUtils::Partition::userVisibleFS;
+using Calamares::Partition::untranslatedFS;
+using Calamares::Partition::userVisibleFS;
 
-EditExistingPartitionDialog::EditExistingPartitionDialog( Device* device,
+static void
+updateLabel( PartitionCoreModule* core, Device* device, Partition* partition, const QString& fsLabel )
+{
+    // In this case, we are not formatting the partition, but we are setting the
+    // label on the current filesystem, if any. We only create the job if the
+    // label actually changed.
+    if ( partition->fileSystem().type() != FileSystem::Type::Unformatted && fsLabel != partition->fileSystem().label() )
+    {
+        core->setFilesystemLabel( device, partition, fsLabel );
+    }
+}
+
+EditExistingPartitionDialog::EditExistingPartitionDialog( PartitionCoreModule* core,
+                                                          Device* device,
                                                           Partition* partition,
                                                           const QStringList& usedMountPoints,
                                                           QWidget* parentWidget )
     : QDialog( parentWidget )
     , m_ui( new Ui_EditExistingPartitionDialog )
+    , m_core( core )
     , m_device( device )
     , m_partition( partition )
     , m_partitionSizeController( new PartitionSizeController( this ) )
@@ -69,9 +83,15 @@ EditExistingPartitionDialog::EditExistingPartitionDialog( Device* device,
              this,
              &EditExistingPartitionDialog::checkMountPointSelection );
 
-    // The filesystem label dialog is always enabled, because we may want to change
+    connect( m_ui->fileSystemComboBox,
+             &QComboBox::currentTextChanged,
+             this,
+             &EditExistingPartitionDialog::checkMountPointSelection );
+
+    // The filesystem label field is always enabled, because we may want to change
     // the label on the current filesystem without formatting.
-    m_ui->fileSystemLabelEdit->setText( m_partition->fileSystem().label() );
+    m_ui->fileSystemLabelEdit->setText( PartitionInfo::label( m_partition ) );
+    m_ui->fileSystemLabel->setEnabled( true );
 
     replacePartResizerWidget();
 
@@ -81,7 +101,6 @@ EditExistingPartitionDialog::EditExistingPartitionDialog( Device* device,
              {
                  replacePartResizerWidget();
 
-                 m_ui->fileSystemLabel->setEnabled( doFormat );
                  m_ui->fileSystemComboBox->setEnabled( doFormat );
 
                  if ( !doFormat )
@@ -126,14 +145,17 @@ EditExistingPartitionDialog::EditExistingPartitionDialog( Device* device,
         m_ui->fileSystemComboBox->setCurrentText( FileSystem::nameForType( defaultFSType ) );
     }
 
-    m_ui->fileSystemLabel->setEnabled( m_ui->formatRadioButton->isChecked() );
-    m_ui->fileSystemComboBox->setEnabled( m_ui->formatRadioButton->isChecked() );
+    // Force a format if the existing device is a zfs device since reusing a
+    // zpool isn't currently supported; disable the radio buttons then.
+    const bool partitionIsZFS = m_partition->fileSystem().type() == FileSystem::Type::Zfs;
+    m_ui->formatRadioButton->setEnabled( !partitionIsZFS );
+    m_ui->keepRadioButton->setEnabled( !partitionIsZFS );
 
-    // Force a format if the existing device is a zfs device since reusing a zpool isn't currently supported
-    m_ui->formatRadioButton->setChecked( m_partition->fileSystem().type() == FileSystem::Type::Zfs );
-    m_ui->formatRadioButton->setEnabled( !( m_partition->fileSystem().type() == FileSystem::Type::Zfs ) );
-    m_ui->keepRadioButton->setChecked( !( m_partition->fileSystem().type() == FileSystem::Type::Zfs ) );
-    m_ui->keepRadioButton->setEnabled( !( m_partition->fileSystem().type() == FileSystem::Type::Zfs ) );
+    const bool formatChecked = partitionIsZFS || PartitionInfo::format( m_partition );
+    m_ui->formatRadioButton->setChecked( formatChecked );
+    m_ui->keepRadioButton->setChecked( !formatChecked );
+
+    m_ui->fileSystemComboBox->setEnabled( m_ui->formatRadioButton->isChecked() );
 
     setFlagList( *( m_ui->m_listFlags ), m_partition->availableFlags(), PartitionInfo::flags( m_partition ) );
 }
@@ -149,15 +171,17 @@ EditExistingPartitionDialog::newFlags() const
 void
 EditExistingPartitionDialog::applyChanges( PartitionCoreModule* core )
 {
-    PartitionInfo::setMountPoint( m_partition, selectedMountPoint( m_ui->mountPointComboBox ) );
+    // Remove jobs that we might have created for this partition already,
+    // and also clear intentions so that we set the current ones unconditionally.
+    core->clearJobs( m_device, m_partition );
+    PartitionInfo::reset( m_partition );
+
+    const QString mountPoint = selectedMountPoint( m_ui->mountPointComboBox );
+    PartitionInfo::setMountPoint( m_partition, mountPoint );
 
     qint64 newFirstSector = m_partitionSizeController->firstSector();
     qint64 newLastSector = m_partitionSizeController->lastSector();
     bool partResizedMoved = newFirstSector != m_partition->firstSector() || newLastSector != m_partition->lastSector();
-
-    cDebug() << "old boundaries:" << m_partition->firstSector() << m_partition->lastSector() << m_partition->length();
-    cDebug() << Logger::SubEntry << "new boundaries:" << newFirstSector << newLastSector;
-    cDebug() << Logger::SubEntry << "dirty status:" << m_partitionSizeController->isDirty();
 
     FileSystem::Type fsType = FileSystem::Unknown;
     if ( m_ui->formatRadioButton->isChecked() )
@@ -171,8 +195,15 @@ EditExistingPartitionDialog::applyChanges( PartitionCoreModule* core )
     const auto resultFlags = newFlags();
     const auto currentFlags = PartitionInfo::flags( m_partition );
 
+    cDebug() << m_partition->partitionPath() << "format?" << m_ui->formatRadioButton->isChecked() << "label=" << fsLabel
+             << "mount=" << mountPoint;
+
     if ( partResizedMoved )
     {
+        cDebug() << "old boundaries:" << m_partition->firstSector() << m_partition->lastSector()
+                 << m_partition->length();
+        cDebug() << Logger::SubEntry << "new boundaries:" << newFirstSector << newLastSector;
+
         if ( m_ui->formatRadioButton->isChecked() )
         {
             Partition* newPartition = KPMHelpers::createNewPartition( m_partition->parent(),
@@ -197,6 +228,8 @@ EditExistingPartitionDialog::applyChanges( PartitionCoreModule* core )
             {
                 core->setPartitionFlags( m_device, m_partition, resultFlags );
             }
+            updateLabel( core, m_device, m_partition, fsLabel );
+            PartitionInfo::setFormat( m_partition, false );
         }
     }
     else
@@ -213,6 +246,7 @@ EditExistingPartitionDialog::applyChanges( PartitionCoreModule* core )
                     core->setPartitionFlags( m_device, m_partition, resultFlags );
                 }
                 core->setFilesystemLabel( m_device, m_partition, fsLabel );
+                PartitionInfo::setFormat( m_partition, true );
             }
             else  // otherwise, we delete and recreate the partition with new fs type
             {
@@ -238,14 +272,8 @@ EditExistingPartitionDialog::applyChanges( PartitionCoreModule* core )
             {
                 core->setPartitionFlags( m_device, m_partition, resultFlags );
             }
-            // In this case, we are not formatting the partition, but we are setting the
-            // label on the current filesystem, if any. We only create the job if the
-            // label actually changed.
-            if ( m_partition->fileSystem().type() != FileSystem::Type::Unformatted
-                 && fsLabel != m_partition->fileSystem().label() )
-            {
-                core->setFilesystemLabel( m_device, m_partition, fsLabel );
-            }
+            updateLabel( core, m_device, m_partition, fsLabel );
+            PartitionInfo::setFormat( m_partition, false );
 
             core->refreshPartition( m_device, m_partition );
         }
@@ -324,8 +352,10 @@ EditExistingPartitionDialog::updateMountPointPicker()
 void
 EditExistingPartitionDialog::checkMountPointSelection()
 {
-    if ( validateMountPoint( selectedMountPoint( m_ui->mountPointComboBox ),
+    if ( validateMountPoint( m_core,
+                             selectedMountPoint( m_ui->mountPointComboBox ),
                              m_usedMountPoints,
+                             m_ui->fileSystemComboBox->currentText(),
                              m_ui->mountPointExplanation,
                              m_ui->buttonBox->button( QDialogButtonBox::Ok ) ) )
     {

@@ -31,12 +31,17 @@ struct ReplacePartitionOptions
 {
     QString defaultPartitionTableType;  // e.g. "gpt" or "msdos"
     QString defaultFsType;  // e.g. "ext4" or "btrfs"
+    Config::LuksGeneration luksFsType = Config::LuksGeneration::Luks1;  // optional ("luks", "luks2")
     QString luksPassphrase;  // optional
 
-    ReplacePartitionOptions( const QString& pt, const QString& fs, const QString& luks )
+    ReplacePartitionOptions( const QString& pt,
+                             const QString& fs,
+                             Config::LuksGeneration luksFs,
+                             const QString& passphrase )
         : defaultPartitionTableType( pt )
         , defaultFsType( fs )
-        , luksPassphrase( luks )
+        , luksFsType( luksFs )
+        , luksPassphrase( passphrase )
     {
     }
 };
@@ -44,18 +49,19 @@ struct ReplacePartitionOptions
 struct AutoPartitionOptions : ReplacePartitionOptions
 {
     QString efiPartitionMountPoint;  // optional, e.g. "/boot"
-    qint64 requiredSpaceB;  // estimated required space for root partition
+    quint64 requiredSpaceB;  // estimated required space for root partition
     Config::SwapChoice swap;
 
     AutoPartitionOptions( const QString& pt,
                           const QString& fs,
-                          const QString& luks,
+                          Config::LuksGeneration luksFs,
+                          const QString& passphrase,
                           const QString& efi,
                           qint64 requiredBytes,
                           Config::SwapChoice s )
-        : ReplacePartitionOptions( pt, fs, luks )
+        : ReplacePartitionOptions( pt, fs, luksFs, passphrase )
         , efiPartitionMountPoint( efi )
-        , requiredSpaceB( requiredBytes > 0 ? requiredBytes : 0 )
+        , requiredSpaceB( requiredBytes > 0 ? quint64( requiredBytes ) : 0U )
         , swap( s )
     {
     }

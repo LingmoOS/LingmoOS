@@ -19,11 +19,13 @@
 #ifndef PARTITION_PARTITIONITERATOR_H
 #define PARTITION_PARTITIONITERATOR_H
 
+#include "DllMacro.h"
+
 class Device;
 class Partition;
 class PartitionTable;
 
-namespace CalamaresUtils
+namespace Calamares
 {
 namespace Partition
 {
@@ -39,7 +41,7 @@ namespace Partition
  *
  * A nullptr is valid, for an empty iterator.
  */
-class PartitionIterator
+class DLLEXPORT PartitionIterator
 {
 public:
     ::Partition* operator*() const;
@@ -62,6 +64,6 @@ private:
 };
 
 }  // namespace Partition
-}  // namespace CalamaresUtils
+}  // namespace Calamares
 
 #endif  // PARTITION_PARTITIONITERATOR_H

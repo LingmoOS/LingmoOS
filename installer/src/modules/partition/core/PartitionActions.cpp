@@ -18,9 +18,9 @@
 
 #include "GlobalStorage.h"
 #include "JobQueue.h"
-#include "utils/CalamaresUtilsSystem.h"
 #include "utils/Logger.h"
 #include "utils/NamedEnum.h"
+#include "utils/System.h"
 #include "utils/Units.h"
 
 #include <kpmcore/core/device.h>
@@ -28,13 +28,10 @@
 
 #include <QDir>
 
-using namespace CalamaresUtils::Units;
+using namespace Calamares::Units;
 
-namespace PartitionActions
-{
-
-qint64
-swapSuggestion( const qint64 availableSpaceB, Config::SwapChoice swap )
+static quint64
+swapSuggestion( const quint64 availableSpaceB, Config::SwapChoice swap )
 {
     if ( ( swap != Config::SwapChoice::SmallSwap ) && ( swap != Config::SwapChoice::FullSwap ) )
     {
@@ -42,10 +39,8 @@ swapSuggestion( const qint64 availableSpaceB, Config::SwapChoice swap )
     }
 
     // See partition.conf for explanation
-    qint64 suggestedSwapSizeB = 0;
-    auto memory = CalamaresUtils::System::instance()->getTotalMemoryB();
-    qint64 availableRamB = memory.first;
-    qreal overestimationFactor = memory.second;
+    quint64 suggestedSwapSizeB = 0;
+    auto [ availableRamB, overestimationFactor ] = Calamares::System::instance()->getTotalMemoryB();
 
     bool ensureSuspendToDisk = swap == Config::SwapChoice::FullSwap;
 
@@ -66,12 +61,12 @@ swapSuggestion( const qint64 availableSpaceB, Config::SwapChoice swap )
     // .. top out at 8GiB if we don't care about suspend
     if ( !ensureSuspendToDisk )
     {
-        suggestedSwapSizeB = qMin( 8_GiB, suggestedSwapSizeB );
+        // TODO: make the _GiB operator return unsigned
+        suggestedSwapSizeB = qMin( quint64( 8_GiB ), suggestedSwapSizeB );
     }
 
-
     // Allow for a fudge factor
-    suggestedSwapSizeB = qRound64( suggestedSwapSizeB * overestimationFactor );
+    suggestedSwapSizeB = quint64( qRound64( qreal( suggestedSwapSizeB ) * overestimationFactor ) );
 
     // don't use more than 10% of available space
     if ( !ensureSuspendToDisk )
@@ -79,34 +74,41 @@ swapSuggestion( const qint64 availableSpaceB, Config::SwapChoice swap )
         suggestedSwapSizeB = qMin( suggestedSwapSizeB, availableSpaceB / 10 /* 10% is 0.1 */ );
     }
 
-    cDebug() << "Suggested swap size:" << CalamaresUtils::BytesToGiB( suggestedSwapSizeB ) << "GiB";
+    // TODO: make Units functions work on unsigned
+    cDebug() << "Suggested swap size:" << Calamares::BytesToGiB( suggestedSwapSizeB ) << "GiB";
 
     return suggestedSwapSizeB;
 }
+
+namespace PartitionActions
+{
 
 void
 doAutopartition( PartitionCoreModule* core, Device* dev, Choices::AutoPartitionOptions o )
 {
     Calamares::GlobalStorage* gs = Calamares::JobQueue::instance()->globalStorage();
 
-    bool isEfi = PartUtils::isEfiSystem();
+    const bool isEfi = PartUtils::isEfiSystem();
 
     // Partition sizes are expressed in MiB, should be multiples of
     // the logical sector size (usually 512B). EFI starts with 2MiB
     // empty and a EFI boot partition, while BIOS starts at
     // the 1MiB boundary (usually sector 2048).
-    int empty_space_sizeB = isEfi ? 2_MiB : 1_MiB;
+    // ARM empty sectors are 16 MiB in size.
+    const int empty_space_sizeB = PartUtils::isArmSystem() ? 16_MiB : ( isEfi ? 2_MiB : 1_MiB );
 
     // Since sectors count from 0, if the space is 2048 sectors in size,
     // the first free sector has number 2048 (and there are 2048 sectors
     // before that one, numbered 0..2047).
-    qint64 firstFreeSector = CalamaresUtils::bytesToSectors( empty_space_sizeB, dev->logicalSize() );
+    qint64 firstFreeSector = Calamares::bytesToSectors( empty_space_sizeB, dev->logicalSize() );
 
     PartitionTable::TableType partType = PartitionTable::nameToTableType( o.defaultPartitionTableType );
     if ( partType == PartitionTable::unknownTableType )
     {
         partType = isEfi ? PartitionTable::gpt : PartitionTable::msdos;
     }
+    // last usable sector possibly allowing for secondary GPT using 66 sectors (256 entries)
+    const qint64 lastUsableSector = dev->totalLogical() - ( partType == PartitionTable::gpt ? 67 : 1 );
 
     // Looking up the defaultFsType (which should name a filesystem type)
     // will log an error and set the type to Unknown if there's something wrong.
@@ -118,8 +120,8 @@ doAutopartition( PartitionCoreModule* core, Device* dev, Choices::AutoPartitionO
 
     if ( isEfi )
     {
-        size_t uefisys_part_sizeB = PartUtils::efiFilesystemMinimumSize();
-        qint64 efiSectorCount = CalamaresUtils::bytesToSectors( uefisys_part_sizeB, dev->logicalSize() );
+        qint64 uefisys_part_sizeB = PartUtils::efiFilesystemRecommendedSize();
+        qint64 efiSectorCount = Calamares::bytesToSectors( uefisys_part_sizeB, dev->logicalSize() );
         Q_ASSERT( efiSectorCount > 0 );
 
         // Since sectors count from 0, and this partition is created starting
@@ -147,28 +149,29 @@ doAutopartition( PartitionCoreModule* core, Device* dev, Choices::AutoPartitionO
     const bool mayCreateSwap
         = ( o.swap == Config::SwapChoice::SmallSwap ) || ( o.swap == Config::SwapChoice::FullSwap );
     bool shouldCreateSwap = false;
-    qint64 suggestedSwapSizeB = 0;
+    quint64 suggestedSwapSizeB = 0;
 
+    const quint64 sectorSize = quint64( dev->logicalSize() );
     if ( mayCreateSwap )
     {
-        qint64 availableSpaceB = ( dev->totalLogical() - firstFreeSector ) * dev->logicalSize();
+        quint64 availableSpaceB = quint64( lastUsableSector - firstFreeSector + 1 ) * sectorSize;
         suggestedSwapSizeB = swapSuggestion( availableSpaceB, o.swap );
         // Space required by this installation is what the distro claims is needed
         // (via global configuration) plus the swap size plus a fudge factor of
         // 0.6GiB (this was 2.1GiB up to Calamares 3.2.2).
-        qint64 requiredSpaceB = o.requiredSpaceB + 600_MiB + suggestedSwapSizeB;
+        quint64 requiredSpaceB = o.requiredSpaceB + 600_MiB + suggestedSwapSizeB;
 
         // If there is enough room for ESP + root + swap, create swap, otherwise don't.
         shouldCreateSwap = availableSpaceB > requiredSpaceB;
     }
 
-    qint64 lastSectorForRoot = dev->totalLogical() - 1;  //last sector of the device
+    qint64 lastSectorForRoot = lastUsableSector;
     if ( shouldCreateSwap )
     {
-        lastSectorForRoot -= suggestedSwapSizeB / dev->logicalSize() + 1;
+        lastSectorForRoot -= suggestedSwapSizeB / sectorSize + 1;
     }
 
-    core->layoutApply( dev, firstFreeSector, lastSectorForRoot, o.luksPassphrase );
+    core->layoutApply( dev, firstFreeSector, lastSectorForRoot, o.luksFsType, o.luksPassphrase );
 
     if ( shouldCreateSwap )
     {
@@ -181,7 +184,7 @@ doAutopartition( PartitionCoreModule* core, Device* dev, Choices::AutoPartitionO
                                                             FileSystem::LinuxSwap,
                                                             QStringLiteral( "swap" ),
                                                             lastSectorForRoot + 1,
-                                                            dev->totalLogical() - 1,
+                                                            lastUsableSector,
                                                             KPM_PARTITION_FLAG( None ) );
         }
         else
@@ -192,7 +195,8 @@ doAutopartition( PartitionCoreModule* core, Device* dev, Choices::AutoPartitionO
                                                                      FileSystem::LinuxSwap,
                                                                      QStringLiteral( "swap" ),
                                                                      lastSectorForRoot + 1,
-                                                                     dev->totalLogical() - 1,
+                                                                     lastUsableSector,
+                                                                     o.luksFsType,
                                                                      o.luksPassphrase,
                                                                      KPM_PARTITION_FLAG( None ) );
         }
@@ -207,13 +211,18 @@ doAutopartition( PartitionCoreModule* core, Device* dev, Choices::AutoPartitionO
     core->dumpQueue();
 }
 
-
 void
 doReplacePartition( PartitionCoreModule* core, Device* dev, Partition* partition, Choices::ReplacePartitionOptions o )
 {
     qint64 firstSector, lastSector;
 
     cDebug() << "doReplacePartition for device" << partition->partitionPath();
+
+    // Looking up the defaultFsType (which should name a filesystem type)
+    // will log an error and set the type to Unknown if there's something wrong.
+    FileSystem::Type type = FileSystem::Unknown;
+    PartUtils::canonicalFilesystemName( o.defaultFsType, &type );
+    core->partitionLayout().setDefaultFsType( type == FileSystem::Unknown ? FileSystem::Ext4 : type );
 
     PartitionRole newRoles( partition->roles() );
     if ( partition->roles().has( PartitionRole::Extended ) )
@@ -243,7 +252,7 @@ doReplacePartition( PartitionCoreModule* core, Device* dev, Partition* partition
         core->deletePartition( dev, partition );
     }
 
-    core->layoutApply( dev, firstSector, lastSector, o.luksPassphrase );
+    core->layoutApply( dev, firstSector, lastSector, o.luksFsType, o.luksPassphrase );
 
     core->dumpQueue();
 }

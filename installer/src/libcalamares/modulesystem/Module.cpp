@@ -51,9 +51,9 @@ moduleConfigurationCandidates( bool assumeBuildDir, const QString& moduleName, c
 {
     QStringList paths;
 
-    if ( CalamaresUtils::isAppDataDirOverridden() )
+    if ( Calamares::isAppDataDirOverridden() )
     {
-        paths << CalamaresUtils::appDataDir().absoluteFilePath( QString( "modules/%1" ).arg( configFileName ) );
+        paths << Calamares::appDataDir().absoluteFilePath( QString( "modules/%1" ).arg( configFileName ) );
     }
     else
     {
@@ -73,14 +73,16 @@ moduleConfigurationCandidates( bool assumeBuildDir, const QString& moduleName, c
             paths << QDir().absoluteFilePath( configFileName );
         }
 
-        if ( CalamaresUtils::haveExtraDirs() )
-            for ( auto s : CalamaresUtils::extraConfigDirs() )
+        if ( Calamares::haveExtraDirs() )
+        {
+            for ( auto s : Calamares::extraConfigDirs() )
             {
                 paths << ( s + QString( "modules/%1" ).arg( configFileName ) );
             }
+        }
 
         paths << QString( "/etc/calamares/modules/%1" ).arg( configFileName );
-        paths << CalamaresUtils::appDataDir().absoluteFilePath( QString( "modules/%1" ).arg( configFileName ) );
+        paths << Calamares::appDataDir().absoluteFilePath( QString( "modules/%1" ).arg( configFileName ) );
     }
 
     return paths;
@@ -98,7 +100,7 @@ Module::loadConfigurationFile( const QString& configFileName )  //throws YAML::E
         {
             QByteArray ba = configFile.readAll();
 
-            YAML::Node doc = YAML::Load( ba.constData() );
+            auto doc = ::YAML::Load( ba.constData() );  // Throws on error
             if ( doc.IsNull() )
             {
                 cWarning() << "Found empty module configuration" << path;
@@ -112,7 +114,7 @@ Module::loadConfigurationFile( const QString& configFileName )  //throws YAML::E
                 return;
             }
 
-            m_configurationMap = CalamaresUtils::yamlMapToVariant( doc );
+            m_configurationMap = Calamares::YAML::mapToVariant( doc );
             m_emergency = m_maybe_emergency && m_configurationMap.contains( EMERGENCY )
                 && m_configurationMap[ EMERGENCY ].toBool();
             return;
@@ -120,7 +122,6 @@ Module::loadConfigurationFile( const QString& configFileName )  //throws YAML::E
     }
     cWarning() << "No config file for" << name() << "found anywhere at" << Logger::DebugList( configCandidates );
 }
-
 
 QString
 Module::typeString() const
@@ -130,7 +131,6 @@ Module::typeString() const
     return ok ? v : QString();
 }
 
-
 QString
 Module::interfaceString() const
 {
@@ -139,13 +139,11 @@ Module::interfaceString() const
     return ok ? v : QString();
 }
 
-
 QVariantMap
 Module::configurationMap()
 {
     return m_configurationMap;
 }
-
 
 RequirementsList
 Module::checkRequirements()

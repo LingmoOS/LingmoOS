@@ -13,7 +13,7 @@
 
 #include "core/KPMHelpers.h"
 
-#include "utils/CalamaresUtilsSystem.h"
+#include "utils/System.h"
 
 #include <kpmcore/core/device.h>
 #include <kpmcore/core/partition.h>
@@ -44,7 +44,7 @@ isZfs( Partition* partition )
 static Calamares::JobResult
 removePartition( Partition* partition )
 {
-    auto r = CalamaresUtils::System::instance()->runCommand(
+    auto r = Calamares::System::instance()->runCommand(
         { "sfdisk", "--delete", "--force", partition->devicePath(), QString::number( partition->number() ) },
         std::chrono::seconds( 5 ) );
     if ( r.getExitCode() != 0 || r.getOutput().contains( "failed" ) )
@@ -70,23 +70,20 @@ DeletePartitionJob::DeletePartitionJob( Device* device, Partition* partition )
 QString
 DeletePartitionJob::prettyName() const
 {
-    return tr( "Delete partition %1." ).arg( m_partition->partitionPath() );
+    return tr( "Deleting partition %1…", "@status" ).arg( m_partition->partitionPath() );
 }
-
 
 QString
 DeletePartitionJob::prettyDescription() const
 {
-    return tr( "Delete partition <strong>%1</strong>." ).arg( m_partition->partitionPath() );
+    return tr( "Deleting partition <strong>%1</strong>…", "@status" ).arg( m_partition->partitionPath() );
 }
-
 
 QString
 DeletePartitionJob::prettyStatusMessage() const
 {
-    return tr( "Deleting partition %1." ).arg( m_partition->partitionPath() );
+    return tr( "Deleting partition %1…", "@status" ).arg( m_partition->partitionPath() );
 }
-
 
 Calamares::JobResult
 DeletePartitionJob::exec()

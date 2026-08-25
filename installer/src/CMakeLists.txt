@@ -12,11 +12,9 @@ include(CalamaresAddTranslations)
 
 # library
 add_subdirectory(libcalamares)
-
 add_subdirectory(libcalamaresui)
 
-# all things qml
-add_subdirectory(qml/calamares)
+add_subdirectory(qml)
 
 # application
 add_subdirectory(calamares)

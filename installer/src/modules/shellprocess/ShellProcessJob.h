@@ -37,8 +37,8 @@ public:
     void setConfigurationMap( const QVariantMap& configurationMap ) override;
 
 private:
-    std::unique_ptr< CalamaresUtils::CommandList > m_commands;
-    std::unique_ptr< CalamaresUtils::Locale::TranslatedString > m_name;
+    std::unique_ptr< Calamares::CommandList > m_commands;
+    std::unique_ptr< Calamares::Locale::TranslatedString > m_name;
 };
 
 CALAMARES_PLUGIN_FACTORY_DECLARATION( ShellProcessJobFactory )

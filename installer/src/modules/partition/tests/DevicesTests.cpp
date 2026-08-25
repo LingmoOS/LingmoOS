@@ -34,12 +34,12 @@ private Q_SLOTS:
     void testPartUtilScanDevices();
 
 private:
-    std::unique_ptr< CalamaresUtils::Partition::KPMManager > m_d;
+    std::unique_ptr< Calamares::Partition::KPMManager > m_d;
     bool m_isRoot = false;
 };
 
 DevicesTests::DevicesTests()
-    : m_d( std::make_unique< CalamaresUtils::Partition::KPMManager >() )
+    : m_d( std::make_unique< Calamares::Partition::KPMManager >() )
     , m_isRoot( geteuid() == 0 )
 {
 }
@@ -51,13 +51,13 @@ DevicesTests::testKPMScanDevices()
 
     cDebug() << "Getting devices via KPMCore";
     CoreBackend* backend = CoreBackendManager::self()->backend();
+#ifdef Q_OS_FREEBSD
+    QEXPECT_FAIL( "", "Test backend not expected on FreeBSD", Continue );
     QVERIFY( backend );
-#if defined( WITH_KPMCORE4API )
-    auto flags = ScanFlag( ~0 );
-#else
-    auto flags = true;
+    return;
 #endif
-    auto devices = backend->scanDevices( flags );  // These flags try to get "all"
+    QVERIFY( backend );
+    auto devices = backend->scanDevices( ScanFlag( ~0 ) );  // These flags try to get "all"
     cDebug() << Logger::SubEntry << "Done getting devices.";
 
     if ( !m_isRoot )

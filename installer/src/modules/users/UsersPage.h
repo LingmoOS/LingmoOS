@@ -25,7 +25,7 @@ class QLabel;
 namespace Ui
 {
 class Page_UserSetup;
-}
+}  // namespace Ui
 
 class UsersPage : public QWidget
 {
@@ -43,6 +43,8 @@ protected slots:
     void onReuseUserPasswordChanged( const int );
     void reportUserPasswordStatus( int, const QString& );
     void reportRootPasswordStatus( int, const QString& );
+
+    void onActiveDirectoryToggled( bool checked );
 
 private:
     void retranslate();

@@ -10,13 +10,22 @@
 # least once, maybe twice (if it needs the base-version ABI information
 # and hasn't cached it).
 
+# The build settings can be influenced via environment variables:
+#   * QT_VERSION    set to nothing (uses default), 5 or 6
+
+case "$QT_VERSION" in
+	5) extra_cmake_args="-DWITH_QT6=OFF" ;;
+	6) extra_cmake_args="-DWITH_QT6=ON" ;;
+	"") extra_cmake_args="" ;;
+	*) echo "Invalid QT_VERSION environment '${QT_VERSION}'" ; exit 1 ; ;;
+esac
+
 # The base version can be a tag or git-hash; it will be checked-out
 # in a worktree.
 #
-# Note that the hash here now is 3.2.60, which is sort-of-the
-# start of LTS releases. We try to keep ABI compatibility from
-# there on out.
-BASE_VERSION=b11ee3abc583e571e588fd00afb99d1a528373e6
+# Note that the hash here corresponds to v3.3.3 . That was a release
+# with hidden visibility enabled and a first step towards more-stable ABI.
+BASE_VERSION=8741c7ec1a94ee5f27e98ef3663d1a8f4738d2c2
 
 ### Build a tree and cache the ABI info into ci/
 #
@@ -27,9 +36,15 @@ do_build() {
 
 	BUILD_DIR=build-abi-$LABEL
 	rm -rf $BUILD_DIR
-	mkdir $BUILD_DIR
+	rm -f $BUILD_DIR.log
 
-	if ( cd $BUILD_DIR && cmake $SOURCE_DIR -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-Og -g -gdwarf" -DCMAKE_C_FLAGS="-Og -g -gdwarf" && make -j12 ) > /dev/null 2>&1
+	echo "# Running CMake for $LABEL"
+	cmake -S $SOURCE_DIR -B $BUILD_DIR -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="-Og -g -gdwarf" -DCMAKE_C_FLAGS="-Og -g -gdwarf" $extra_cmake_args > /dev/null 2>&1
+	test -f $BUILD_DIR/Makefile || { echo "! failed to CMake $LABEL" ; exit 1 ; }
+
+	echo "# Running make for $LABEL"
+	# Two targets make knows about at top-level
+	if make -C $BUILD_DIR -j12 calamares calamaresui > $BUILD_DIR.log 2>&1
 	then
 		ls -1 $BUILD_DIR/libcalamares*.so.*
 		# Copy the un-versioned files; .so is a symlink to the just-built one
@@ -37,6 +52,8 @@ do_build() {
 		do
 			cp $lib ci/`basename $lib`.$LABEL
 		done
+		rm -rf $BUILD_DIR $BUILD_DIR.log
+		echo "# .. build successful for $LABEL"
 	else
 		echo "! failed to build $LABEL"
 		exit 1
@@ -46,7 +63,7 @@ do_build() {
 ### Build current tree and get ABI info
 #
 #
-do_build current `pwd -P`
+do_build current .
 
 ### Build ABI base version
 #
@@ -58,9 +75,10 @@ then
 	# The ABI version is cached, so we're good
 	:
 else
-	git worktree remove --force tree-abi-$BASE_VERSION
+	git worktree remove --force tree-abi-$BASE_VERSION > /dev/null 2>&1
 	git worktree add tree-abi-$BASE_VERSION $BASE_VERSION > /dev/null 2>&1 || { echo "! could not create worktree for $BASE_VERSION" ; exit 1 ; }
-	do_build $BASE_VERSION $( cd tree-abi-$BASE_VERSION && pwd -P )
+	do_build $BASE_VERSION tree-abi-$BASE_VERSION
+	git worktree remove --force tree-abi-$BASE_VERSION > /dev/null 2>&1
 fi
 
 ### Compare & Report

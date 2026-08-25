@@ -26,12 +26,11 @@ class Config : public QObject
 {
     Q_OBJECT
     Q_PROPERTY( const QStringList& supportedLocales READ supportedLocales CONSTANT FINAL )
-    Q_PROPERTY( CalamaresUtils::Locale::RegionsModel* regionModel READ regionModel CONSTANT FINAL )
-    Q_PROPERTY( CalamaresUtils::Locale::ZonesModel* zonesModel READ zonesModel CONSTANT FINAL )
+    Q_PROPERTY( Calamares::Locale::RegionsModel* regionModel READ regionModel CONSTANT FINAL )
+    Q_PROPERTY( Calamares::Locale::ZonesModel* zonesModel READ zonesModel CONSTANT FINAL )
     Q_PROPERTY( QAbstractItemModel* regionalZonesModel READ regionalZonesModel CONSTANT FINAL )
 
-    Q_PROPERTY(
-        CalamaresUtils::Locale::TimeZoneData* currentLocation READ currentLocation_c NOTIFY currentLocationChanged )
+    Q_PROPERTY( Calamares::Locale::TimeZoneData* currentLocation READ currentLocation_c NOTIFY currentLocationChanged )
 
     // Status are complete, human-readable, messages
     Q_PROPERTY( QString currentLocationStatus READ currentLocationStatus NOTIFY currentLanguageStatusChanged )
@@ -76,22 +75,24 @@ public:
     // A long list of locale codes (e.g. en_US.UTF-8)
     const QStringList& supportedLocales() const { return m_localeGenLines; }
     // All the regions (Africa, America, ...)
-    CalamaresUtils::Locale::RegionsModel* regionModel() const { return m_regionModel.get(); }
+    Calamares::Locale::RegionsModel* regionModel() const { return m_regionModel.get(); }
     // All of the timezones in the world, according to zone.tab
-    CalamaresUtils::Locale::ZonesModel* zonesModel() const { return m_zonesModel.get(); }
+    Calamares::Locale::ZonesModel* zonesModel() const { return m_zonesModel.get(); }
     // This model can be filtered by region
-    CalamaresUtils::Locale::RegionalZonesModel* regionalZonesModel() const { return m_regionalZonesModel.get(); }
+    Calamares::Locale::RegionalZonesModel* regionalZonesModel() const { return m_regionalZonesModel.get(); }
 
-    const CalamaresUtils::Locale::TimeZoneData* currentLocation() const { return m_currentLocation; }
-
+    const Calamares::Locale::TimeZoneData* currentLocation() const { return m_currentLocation; }
 
     /// Special case, set location from starting timezone if not already set
     void setCurrentLocation();
 
+    /// Restores original timezone, if any
+    void cancel();
+
 private:
-    CalamaresUtils::Locale::TimeZoneData* currentLocation_c() const
+    Calamares::Locale::TimeZoneData* currentLocation_c() const
     {
-        return const_cast< CalamaresUtils::Locale::TimeZoneData* >( m_currentLocation );
+        return const_cast< Calamares::Locale::TimeZoneData* >( m_currentLocation );
     }
 
 public Q_SLOTS:
@@ -109,6 +110,7 @@ public Q_SLOTS:
      * change the actual location.
      */
     void setCurrentLocation( const QString& regionzone );
+
     /** @brief Sets a location by split name
      *
      * @p region should be "America" or the like, while @p zone
@@ -116,10 +118,13 @@ public Q_SLOTS:
      */
     void setCurrentLocation( const QString& region, const QString& zone );
 
+    /** @brief Sets a location by strongly-typed region+zone name */
+    void setCurrentLocation( const Calamares::GeoIP::RegionZonePair& tz );
+
     /** @brief Sets a location by pointer to zone data.
      *
      */
-    void setCurrentLocation( const CalamaresUtils::Locale::TimeZoneData* tz );
+    void setCurrentLocation( const Calamares::Locale::TimeZoneData* tz );
 
     QString currentLanguageCode() const { return localeConfiguration().language(); }
     QString currentLCCode() const { return localeConfiguration().lc_numeric; }
@@ -127,7 +132,7 @@ public Q_SLOTS:
     QString currentTimezoneCode() const;
 
 signals:
-    void currentLocationChanged( const CalamaresUtils::Locale::TimeZoneData* location ) const;
+    void currentLocationChanged( const Calamares::Locale::TimeZoneData* location ) const;
     void currentLocationStatusChanged( const QString& ) const;
     void currentLanguageStatusChanged( const QString& ) const;
     void currentLCStatusChanged( const QString& ) const;
@@ -142,11 +147,11 @@ private:
     QStringList m_localeGenLines;
 
     /// The regions (America, Asia, Europe ..)
-    std::unique_ptr< CalamaresUtils::Locale::RegionsModel > m_regionModel;
-    std::unique_ptr< CalamaresUtils::Locale::ZonesModel > m_zonesModel;
-    std::unique_ptr< CalamaresUtils::Locale::RegionalZonesModel > m_regionalZonesModel;
+    std::unique_ptr< Calamares::Locale::RegionsModel > m_regionModel;
+    std::unique_ptr< Calamares::Locale::ZonesModel > m_zonesModel;
+    std::unique_ptr< Calamares::Locale::RegionalZonesModel > m_regionalZonesModel;
 
-    const CalamaresUtils::Locale::TimeZoneData* m_currentLocation = nullptr;
+    const Calamares::Locale::TimeZoneData* m_currentLocation = nullptr;
 
     /** @brief Specific locale configurations
      *
@@ -171,19 +176,22 @@ private:
      * This may be overridden by setting *useSystemTimezone* or by
      * GeoIP settings.
      */
-    CalamaresUtils::GeoIP::RegionZonePair m_startingTimezone;
+    Calamares::GeoIP::RegionZonePair m_startingTimezone;
+
+    /// @brief The timezone set in the system when Calamares started (not from config)
+    Calamares::GeoIP::RegionZonePair m_originalTimezone;
 
     /** @brief Handler for GeoIP lookup (if configured)
      *
      * The GeoIP lookup needs to be started at some suitable time,
      * by explicitly calling *TODO*
      */
-    std::unique_ptr< CalamaresUtils::GeoIP::Handler > m_geoip;
+    std::unique_ptr< Calamares::GeoIP::Handler > m_geoip;
 
     // Implementation details for doing GeoIP lookup
     void startGeoIP();
     void completeGeoIP();
-    std::unique_ptr< QFutureWatcher< CalamaresUtils::GeoIP::RegionZonePair > > m_geoipWatcher;
+    std::unique_ptr< QFutureWatcher< Calamares::GeoIP::RegionZonePair > > m_geoipWatcher;
 };
 
 

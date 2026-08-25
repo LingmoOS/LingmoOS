@@ -1,4 +1,5 @@
 # SPDX-FileCopyrightText: 2020 Adriaan de Groot <groot@kde.org>
+# SPDX-FileCopyrightText: 2023 Evan James <dalto@fastmail.com>
 # SPDX-License-Identifier: GPL-3.0-or-later
 ---
 $schema: https://json-schema.org/schema#
@@ -6,27 +7,49 @@ $id: https://calamares.io/schemas/partition
 additionalProperties: false
 type: object
 properties:
-    efiSystemPartition: { type: string }  # Mount point
-    efiSystemPartitionSize: { type: string }
-    efiSystemPartitionName: { type: string }
+    efiSystemPartition: { type: string }  # Deprecated alias of efi.mountPoint
+    efiSystemPartitionSize: { type: string } # Deprecated alias of efi.recommendedSize
+    efiSystemPartitionName: { type: string } # Deprecated alias of efi.label
+
+    efi:
+        type: object
+        properties:
+            recommendedSize: { type: string }
+            minimumSize: { type: string }
+            label: { type: string }
+            mountPoint: { type: string }
+        additionalProperties: false
+
+    lvm:
+        type: object
+        properties:
+            enable: { type: boolean, default: true }
+        additionalProperties: false
 
     userSwapChoices: { type: array, items: { type: string, enum: [ none, reuse, small, suspend, file ] } }
     # ensureSuspendToDisk: { type: boolean, default: true }  # Legacy
     # neverCreateSwap: { type: boolean, default: false }  # Legacy
+    armInstall: { type: boolean, default: false }
 
+    allowZfsEncryption: { type: boolean, default: true }
     drawNestedPartitions: { type: boolean, default: false }
     alwaysShowPartitionLabels: { type: boolean, default: true }
 
     defaultFileSystemType: { type: string }
     availableFileSystemTypes: { type: array, items: { type: string } }
+    mountpointFilesystemRestrictions: { type: array } # TODO: specify items
 
+    luksGeneration: { type: string, enum: [luks1, luks2] }  # Also allows "luks" as alias of "luks1"
     enableLuksAutomatedPartitioning: { type: boolean, default: false }
+    preCheckEncryption: { type: boolean, default: false }
+    essentialMounts: { type: array, items: { type: string } } # List of names under /dev/mapper not to close
+
     allowManualPartitioning: { type: boolean, default: true }
+    showNotEncryptedBootMessage: { type: boolean, default: true }
     partitionLayout: { type: array }  # TODO: specify items
     initialPartitioningChoice: { type: string, enum: [ none, erase, replace, alongside, manual ] }
     initialSwapChoice: { type: string, enum: [ none, small, suspend, reuse, file ] }
 
     requiredStorage: { type: number }
 required:
-    - efiSystemPartition
     - userSwapChoices

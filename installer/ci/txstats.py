@@ -32,12 +32,31 @@ class TransifexGetter(object):
             raise TXError("Could not get Transifex API token")
 
         import requests
-        r = requests.get("https://api.transifex.com/organizations/calamares/projects/calamares/resources/calamares/", auth=("api", token))
+        base_url = "https://rest.api.transifex.com/resource_language_stats"
+        project_filter = "filter[project]=o:calamares:p:calamares"
+        resource_filter = "filter[resource]=o:calamares:p:calamares:r:calamares"
+        url = base_url + "?" + project_filter.replace(":", "%3A") + "&" + resource_filter.replace(":", "%3A")
+        headers = {
+            "accept": "application/vnd.api+json",
+            "authorization": "Bearer " + token
+        }
+
+        r = requests.get(url, headers=headers)
         if r.status_code != 200:
             raise TXError("Could not get Transifex data from API")
 
         j = r.json()
-        self.languages = j["stats"]
+        data = j["data"]
+
+        self.languages = dict()
+
+        for d in data:
+            translated_count = d["attributes"]["translated_strings"]
+            total_count = d["attributes"]["total_strings"]
+            language_key = d["relationships"]["language"]["data"]["id"]
+            assert language_key.startswith("l:")
+            language_key = language_key[2:]
+            self.languages[language_key] = dict(translated=dict(stringcount=translated_count, percentage=(translated_count / total_count)))
 
 
     def get_tx_credentials(self):
@@ -53,7 +72,7 @@ class TransifexGetter(object):
                 parser = configparser.ConfigParser()
                 parser.read_file(f)
 
-                return parser.get("https://www.transifex.com", "password")
+                return parser.get("https://app.transifex.com", "password")
         except IOError as e:
             return None
 
@@ -97,10 +116,12 @@ class EditingOutputter(object):
             lines = f.readlines()
 
         mark = None
+        mark_text = None
         for l in lines:
             # Note that we didn't strip the lines, so need the \n here
             if l.startswith("# Total ") and l.endswith(" languages\n"):
                 mark = lines.index(l)
+                mark_text = l
                 break
         if mark is None:
             raise TXError("No CMakeLists.txt lines for TX stats found")
@@ -108,18 +129,17 @@ class EditingOutputter(object):
 
         nextmark = mark + 1
         for l in lines[mark+1:]:
-            if l.startswith("set( _tx_"):
-                nextmark += 1
-                continue
-            if l.startswith("    "):
-                nextmark += 1
-                continue
-            break
-        if nextmark > mark + 12 or nextmark > len(lines) - 4:
+            nextmark += 1
+            if l.startswith(mark_text):
+                break
+        if nextmark > mark + 150 or nextmark > len(lines) - 4:
             # Try to catch runaway nextmarks: we know there should
             # be four set-lines, which are unlikely to be 3 lines each;
             # similarly the CMakeLists.txt is supposed to end with
             # some boilerplate.
+            #
+            # However, gersemi will reformat to one-language-per-line,
+            # so we can get really long sections, that's why we use 150 as a limit.
             raise TXError("Could not find end of TX settings in CMakeLists.txt")
         self.post_lines = lines[nextmark:]
 
@@ -155,13 +175,13 @@ def output_langs(all_langs, outputter, label, filterfunc):
     out = " ".join(["set( _tx_%s" % label, " ".join(sorted(these_langs)), ")"])
     width = 68
     prefix = ""
-
+    trailer = f"  # {len(these_langs)} languages" # Comment at the end of the CMake line
     while len(out) > width - len(prefix):
         chunk = out[:out[:width].rfind(" ")]
         outputter.print("%s%s" % (prefix, chunk))
         out = out[len(chunk)+1:]
         prefix = "    "
-    outputter.print("%s%s" % (prefix, out))
+    outputter.print(f"{prefix}{out}{trailer}")
 
 
 def get_tx_stats(languages, outputter, verbose):
@@ -176,16 +196,15 @@ def get_tx_stats(languages, outputter, verbose):
     # Some languages go into the "incomplete" list by definition,
     # regardless of their completion status: this can have various reasons.
     #
-    # Note that Esperanto (eo) is special-cased in CMakeLists.txt
-    # during the build; recent Qt releases *do* support the language,
-    # and it's at-the-least ok.
+    # - (Esperanto wasn't supported until Qt 5.12.2)
+    # - Interlingue still is not supported by the minimum Qt version
     incomplete_languages = (
-        "eo",   # Not supported by QLocale < 5.12.1
         "ie",   # Not supported by Qt at least through 5.15.0
         )
 
     all_langs = []
-    outputter.print("# Total %d languages" % len(languages))
+    mark_text = "# Total %d languages" % len(languages)
+    outputter.print(mark_text)
     for lang_name in languages:
         stats = languages[lang_name]["translated"]["percentage"]
         # Make the by-definition-incomplete languages have a percentage
@@ -202,6 +221,7 @@ def get_tx_stats(languages, outputter, verbose):
     output_langs(all_langs, outputter, "good", lambda s : 1.0 > s >= 0.75)
     output_langs(all_langs, outputter, "ok", lambda s : 0.75 > s >= 0.05)
     output_langs(all_langs, outputter, "incomplete", lambda s : 0.05 > s)
+    outputter.print(mark_text)
 
     # Audit the languages that are in TX, mapped to git
     for lang_name in languages:

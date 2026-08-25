@@ -15,6 +15,8 @@
 
 #include <memory>
 
+class QLabel;
+
 namespace Calamares
 {
 class DebugWindowManager;
@@ -32,19 +34,19 @@ public:
     ~CalamaresWindow() override {}
 
 public Q_SLOTS:
-    /**
-     * This asks the main window to grow to accomodate @p size pixels, to accomodate
-     * larger-than-expected window contents. The enlargement may be silently
-     * ignored.
-     */
     void ensureSize( QSize size );
 
 protected:
     virtual void closeEvent( QCloseEvent* e ) override;
 
 private:
+    void setupBlurredBackground();
+    QWidget* createCardWidget( QWidget* content, QWidget* sidebar, QWidget* navigation );
+
     Calamares::DebugWindowManager* m_debugManager = nullptr;
     Calamares::ViewManager* m_viewManager = nullptr;
+    QLabel* m_backgroundLabel = nullptr;
+    QWidget* m_cardWidget = nullptr;
 };
 
 #endif  // CALAMARESWINDOW_H

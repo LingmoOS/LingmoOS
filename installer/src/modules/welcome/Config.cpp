@@ -14,6 +14,7 @@
 #include "GlobalStorage.h"
 #include "JobQueue.h"
 #include "Settings.h"
+#include "compat/Variant.h"
 #include "geoip/Handler.h"
 #include "locale/Global.h"
 #include "locale/Lookup.h"
@@ -26,7 +27,7 @@
 
 Config::Config( QObject* parent )
     : QObject( parent )
-    , m_languages( CalamaresUtils::Locale::availableTranslations() )
+    , m_languages( Calamares::Locale::availableTranslations() )
     , m_filtermodel( std::make_unique< QSortFilterProxyModel >() )
     , m_requirementsChecker( std::make_unique< GeneralRequirements >( this ) )
 {
@@ -55,12 +56,10 @@ Config::retranslate()
         {
             message = setup ? tr( "This computer does not satisfy the minimum "
                                   "requirements for setting up %1.<br/>"
-                                  "Setup cannot continue. "
-                                  "<a href=\"#details\">Details...</a>" )
+                                  "Setup cannot continue." )
                             : tr( "This computer does not satisfy the minimum "
                                   "requirements for installing %1.<br/>"
-                                  "Installation cannot continue. "
-                                  "<a href=\"#details\">Details...</a>" );
+                                  "Installation cannot continue." );
         }
         else
         {
@@ -86,7 +85,7 @@ Config::retranslate()
     emit warningMessageChanged( m_warningMessage );
 }
 
-CalamaresUtils::Locale::TranslationsModel*
+Calamares::Locale::TranslationsModel*
 Config::languagesModel() const
 {
     return m_languages;
@@ -111,18 +110,29 @@ Config::unsatisfiedRequirements() const
     return m_filtermodel.get();
 }
 
-
 QString
 Config::languageIcon() const
 {
     return m_languageIcon;
 }
 
+static bool
+languageAndTerritoryMatch( const QLocale& a, const QLocale& b )
+{
+    const bool languageMatch = a.language() == b.language();
+#if QT_VERSION < QT_VERSION_CHECK( 6, 6, 0 )
+    const bool placeMatch = a.country() == b.country();
+#else
+    const bool placeMatch = a.territory() == b.territory();
+#endif
+    return languageMatch && placeMatch;
+}
+
 void
 Config::initLanguages()
 {
     // Find the best initial translation
-    CalamaresUtils::Locale::Translation defaultTranslation;
+    Calamares::Locale::Translation defaultTranslation;
 
     cDebug() << "Trying to match locale" << defaultTranslation.id();
     int matchedLocaleIndex = m_languages->find( defaultTranslation.id() );
@@ -130,13 +140,11 @@ Config::initLanguages()
     // Need to match by some other means than the exact translation Id
     if ( matchedLocaleIndex < 0 )
     {
-
         QLocale defaultLocale = defaultTranslation.locale();
 
         cDebug() << "Trying to match locale" << defaultLocale;
-        matchedLocaleIndex = m_languages->find(
-            [ & ]( const QLocale& x )
-            { return x.language() == defaultLocale.language() && x.country() == defaultLocale.country(); } );
+        matchedLocaleIndex = m_languages->find( [ &defaultLocale ]( const QLocale& x )
+                                                { return languageAndTerritoryMatch(  defaultLocale, x  ); } );
 
         if ( matchedLocaleIndex < 0 )
         {
@@ -175,7 +183,7 @@ void
 Config::setCountryCode( const QString& countryCode )
 {
     m_countryCode = countryCode;
-    setLocaleIndex( CalamaresUtils::Locale::availableTranslations()->find( m_countryCode ) );
+    setLocaleIndex( Calamares::Locale::availableTranslations()->find( m_countryCode ) );
 
     emit countryCodeChanged( m_countryCode );
 }
@@ -189,7 +197,7 @@ Config::setLanguageIcon( const QString& languageIcon )
 void
 Config::setLocaleIndex( int index )
 {
-    if ( index == m_localeIndex || index > CalamaresUtils::Locale::availableTranslations()->rowCount( QModelIndex() )
+    if ( index == m_localeIndex || index > Calamares::Locale::availableTranslations()->rowCount( QModelIndex() )
          || index < 0 )
     {
         return;
@@ -202,13 +210,12 @@ Config::setLocaleIndex( int index )
 
     QLocale::setDefault( selectedTranslation.locale() );
     const auto* branding = Calamares::Branding::instance();
-    CalamaresUtils::installTranslator( selectedTranslation.id(),
-                                       branding ? branding->translationsDirectory() : QString() );
+    Calamares::installTranslator( selectedTranslation.id(), branding ? branding->translationsDirectory() : QString() );
     if ( Calamares::JobQueue::instance() && Calamares::JobQueue::instance()->globalStorage() )
     {
-        CalamaresUtils::Locale::insertGS( *Calamares::JobQueue::instance()->globalStorage(),
-                                          QStringLiteral( "LANG" ),
-                                          CalamaresUtils::translatorLocaleName().name );
+        Calamares::Locale::insertGS( *Calamares::JobQueue::instance()->globalStorage(),
+                                     QStringLiteral( "LANG" ),
+                                     Calamares::translatorLocaleName().name );
     }
     emit localeIndexChanged( m_localeIndex );
 }
@@ -253,7 +260,6 @@ Config::aboutMessage() const
 {
     return Calamares::aboutString();
 }
-
 
 QString
 Config::genericWelcomeMessage() const
@@ -304,11 +310,11 @@ jobOrBrandingSetting( Calamares::Branding::StringEntry e, const QVariantMap& map
         return QString();
     }
     auto v = map.value( key );
-    if ( v.type() == QVariant::Bool )
+    if ( Calamares::typeOf( v ) == Calamares::BoolVariantType )
     {
         return v.toBool() ? ( Calamares::Branding::instance()->string( e ) ) : QString();
     }
-    if ( v.type() == QVariant::String )
+    if ( Calamares::typeOf( v ) == Calamares::StringVariantType )
     {
         return v.toString();
     }
@@ -319,7 +325,7 @@ jobOrBrandingSetting( Calamares::Branding::StringEntry e, const QVariantMap& map
 static inline void
 setLanguageIcon( Config* c, const QVariantMap& configurationMap )
 {
-    QString language = CalamaresUtils::getString( configurationMap, "languageIcon" );
+    QString language = Calamares::getString( configurationMap, "languageIcon" );
     if ( !language.isEmpty() )
     {
         auto icon = Calamares::Branding::instance()->image( language, QSize( 48, 48 ) );
@@ -331,7 +337,7 @@ setLanguageIcon( Config* c, const QVariantMap& configurationMap )
 }
 
 static inline void
-logGeoIPHandler( CalamaresUtils::GeoIP::Handler* handler )
+logGeoIPHandler( Calamares::GeoIP::Handler* handler )
 {
     if ( handler )
     {
@@ -341,7 +347,7 @@ logGeoIPHandler( CalamaresUtils::GeoIP::Handler* handler )
 }
 
 static void
-setCountry( Config* config, const QString& countryCode, CalamaresUtils::GeoIP::Handler* handler )
+setCountry( Config* config, const QString& countryCode, Calamares::GeoIP::Handler* handler )
 {
     if ( countryCode.length() != 2 )
     {
@@ -350,7 +356,7 @@ setCountry( Config* config, const QString& countryCode, CalamaresUtils::GeoIP::H
         return;
     }
 
-    auto c_l = CalamaresUtils::Locale::countryData( countryCode );
+    auto c_l = Calamares::Locale::countryData( countryCode );
     if ( c_l.first == QLocale::Country::AnyCountry )
     {
         cDebug() << "Unusable country code" << countryCode;
@@ -359,7 +365,7 @@ setCountry( Config* config, const QString& countryCode, CalamaresUtils::GeoIP::H
     }
     else
     {
-        int r = CalamaresUtils::Locale::availableTranslations()->find( countryCode );
+        int r = Calamares::Locale::availableTranslations()->find( countryCode );
         if ( r < 0 )
         {
             cDebug() << "Unusable country code" << countryCode << "(no suitable translation)";
@@ -375,15 +381,15 @@ static inline void
 setGeoIP( Config* config, const QVariantMap& configurationMap )
 {
     bool ok = false;
-    QVariantMap geoip = CalamaresUtils::getSubMap( configurationMap, "geoip", ok );
+    QVariantMap geoip = Calamares::getSubMap( configurationMap, "geoip", ok );
     if ( ok )
     {
         using FWString = QFutureWatcher< QString >;
 
-        auto* handler = new CalamaresUtils::GeoIP::Handler( CalamaresUtils::getString( geoip, "style" ),
-                                                            CalamaresUtils::getString( geoip, "url" ),
-                                                            CalamaresUtils::getString( geoip, "selector" ) );
-        if ( handler->type() != CalamaresUtils::GeoIP::Handler::Type::None )
+        auto* handler = new Calamares::GeoIP::Handler( Calamares::getString( geoip, "style" ),
+                                                       Calamares::getString( geoip, "url" ),
+                                                       Calamares::getString( geoip, "selector" ) );
+        if ( handler->type() != Calamares::GeoIP::Handler::Type::None )
         {
             auto* future = new FWString();
             QObject::connect( future,
@@ -420,7 +426,7 @@ Config::setConfigurationMap( const QVariantMap& configurationMap )
     ::setGeoIP( this, configurationMap );
 
     if ( configurationMap.contains( "requirements" )
-         && configurationMap.value( "requirements" ).type() == QVariant::Map )
+         && Calamares::typeOf( configurationMap.value( "requirements" ) ) == Calamares::MapVariantType )
     {
         m_requirementsChecker->setConfigurationMap( configurationMap.value( "requirements" ).toMap() );
     }

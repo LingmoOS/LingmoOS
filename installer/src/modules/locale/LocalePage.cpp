@@ -14,7 +14,7 @@
 #include "LCLocaleDialog.h"
 #include "timezonewidget/timezonewidget.h"
 
-#include "utils/CalamaresUtilsGui.h"
+#include "utils/Gui.h"
 #include "utils/Logger.h"
 #include "utils/RAII.h"
 #include "utils/Retranslator.h"
@@ -109,7 +109,7 @@ LocalePage::LocalePage( Config* config, QWidget* parent )
     connect( m_tzWidget,
              &TimeZoneWidget::locationChanged,
              config,
-             QOverload< const CalamaresUtils::Locale::TimeZoneData* >::of( &Config::setCurrentLocation ) );
+             QOverload< const Calamares::Locale::TimeZoneData* >::of( &Config::setCurrentLocation ) );
 
     connect( m_regionCombo, QOverload< int >::of( &QComboBox::currentIndexChanged ), this, &LocalePage::regionChanged );
     connect( m_zoneCombo, QOverload< int >::of( &QComboBox::currentIndexChanged ), this, &LocalePage::zoneChanged );
@@ -127,10 +127,10 @@ LocalePage::~LocalePage() {}
 void
 LocalePage::updateLocaleLabels()
 {
-    m_regionLabel->setText( tr( "Region:" ) );
-    m_zoneLabel->setText( tr( "Zone:" ) );
-    m_localeChangeButton->setText( tr( "&Change..." ) );
-    m_formatsChangeButton->setText( tr( "&Change..." ) );
+    m_regionLabel->setText( tr( "Region:", "@label" ) );
+    m_zoneLabel->setText( tr( "Zone:", "@label" ) );
+    m_localeChangeButton->setText( tr( "&Change…", "@button" ) );
+    m_formatsChangeButton->setText( tr( "&Change…", "@button" ) );
     m_localeLabel->setText( m_config->currentLanguageStatus() );
     m_formatsLabel->setText( m_config->currentLCStatus() );
 }
@@ -147,7 +147,7 @@ LocalePage::onActivate()
 void
 LocalePage::regionChanged( int currentIndex )
 {
-    using namespace CalamaresUtils::Locale;
+    using namespace Calamares::Locale;
 
     QString selectedRegion = m_regionCombo->itemData( currentIndex ).toString();
     {
@@ -168,7 +168,7 @@ LocalePage::zoneChanged( int currentIndex )
 }
 
 void
-LocalePage::locationChanged( const CalamaresUtils::Locale::TimeZoneData* location )
+LocalePage::locationChanged( const Calamares::Locale::TimeZoneData* location )
 {
     if ( !location )
     {

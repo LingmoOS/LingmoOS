@@ -1,0 +1,639 @@
+<!-- SPDX-FileCopyrightText: no
+     SPDX-License-Identifier: CC0-1.0
+-->
+
+This is the changelog for Calamares. For each release, the major changes and
+contributors are listed. Note that Calamares does not have a historical
+changelog -- this log starts with version 3.3.0. See CHANGES-3.2 for
+the history of the 3.2 series (2018-05 - 2022-08).
+
+# 3.3.14 (2024-02-20)
+
+This release contains contributions from (alphabetically by given name):
+ - Adriaan de Groot
+ - Evan James
+ - TNE
+ - vincent PENVERN
+
+## Core ##
+ - The Python bindings have been re-organized (source) and made more
+   consistent. At least one valid Python program would work with
+   the Boost::Python bindings, but not the pybind11 bindings. A
+   memory-corruption problem in the Boost::Python bindings was resolved.
+ - Steps in the UI now have a hook to undo any changes they have made
+   to the live system, if the user cancels the installation.
+
+## Modules ##
+ - *keyboard* module undoes changes to the keyboard layout if the
+   user cancels the installation (returning the system to whatever
+   layout was in use when Calamares started). (#2377, #2431)
+ - *locale* module undoes changes to the timezone. (#2377, #2431)
+ - *partition* module stores a global storage value in luksPassphrase,
+   for later modules that need to manipulate the encrypted partition.
+   (thanks vincent, #2424)
+ - *partition* module no longer clear (unmounts) a Ventoy device.
+   (thanks TNE, #2427)
+ - *partition* module has configurable exceptions for the clear-mounts
+   (unmount) job, which always includes Ventoy.
+
+
+# 3.3.13 (2024-12-31)
+
+This release contains contributions from (alphabetically by given name):
+ - Aaron Rainbolt
+ - Adriaan de Groot
+ - Anke Boersma
+ - Ching Hsü
+ - Jakob Petsovits
+ - Masato TOYOSHIMA
+ - Simon Quigley
+ - Vladyslav Prudius
+
+## Core ##
+ - Fewer compile warnings with most-recent Qt versions.
+ - Support systemd and consolekit block-suspend, not just KDE Plasma
+   block-suspend, during installation. (thanks Jakob, #2404)
+
+## Modules ##
+ - *dracut* module has more freedom to specify program options. (thanks Simon, #2401)
+ - *partition* module improved some user-visible messages. (thanks Masato, #2412)
+ - *partition* module re-scans available devices when selecting
+   "manual" partitioning mode, avoiding a crash. (thanks Masato, #2414)
+ - *partition* module can hide the LVM buttons during manual partitioning,
+   if the distro does not want to support LVM. (#2413)
+ - *partition* module can restrict what filesystems a user applies where,
+   e.g. ensuring EFI is a FAT32 partition. (thanks Aaron, #2400)
+ - *unpackfs* module supports skipping installation media if it
+   is not present, e.g. depending on how the live media is booted.
+   (thanks Simon, #2410)
+
+## Translations ##
+
+Calamares translations are usually done through Transifex, but
+some users provide translation updates via patches, instead.
+ - *uk* thanks Vladyslav Prudius
+ - *zh_CN* thanks Ching Hsü
+
+
+# 3.3.12 (2024-11-21)
+
+This release contains contributions from (alphabetically by given name):
+ - Adriaan de Groot
+
+## Core ##
+ - This release repairs the Calamares configuration file which is
+   used by external Calamares modules -- calamares-extensions in particular.
+
+## Modules ##
+ - *users* module always uses a 3-digit UMASK if one is specified.
+
+
+# 3.3.11 (2024-11-05)
+
+This release contains contributions from (alphabetically by given name):
+ - Adriaan de Groot
+ - Jakob Petsovits
+ - Simon Quigley
+
+## Core ##
+ - Nothing yet
+
+## Modules ##
+ - *unpackfs* now supports a `condition` configuration option for
+   conditional installation / unsquash. (thanks Simon)
+ - *unpackfsc* module imported from Calamares-extensions, and extended
+   with the same `condition` configuration.
+ - *partition* crash fixed when swap was using the wrong end-sector
+   in some GPT configurations. (thanks Jakob, #2367)
+
+
+# 3.3.10 (2024-10-21)
+
+This release contains contributions from (alphabetically by given name):
+ - Aaron Rainbolt
+ - Adriaan de Groot
+ - Evan James
+ - Neal Gompa
+
+## Core ##
+ - Nothing yet
+
+## Modules ##
+ - *keyboard* Repaired summary messages with strange formatting. (#2364)
+ - *keyboard* Can update KDE Plasma configuration in Wayland. (thanks Neal, #2264)
+ - *locale* Repaired summary messages with strange formatting. (#2364)
+ - *partition* Module fixed unwanted behavior with the encryption checkbox. (thanks Aaron, #2376)
+ - *umount* Correctly unmounts the root filesystem of the target. (thanks Evan)
+ - *users* Supports a new `home_permissions` setting to override the
+   distro's `useradd` configuration of the umask. Supports octal and rwx-style
+   specifications of permissions. Other places that use permissions now also
+   support octal and rwx-style. (#2362)
+ - *welcome* Follows system styling colors (e.g. Dark Mode).
+
+
+# 3.3.9 (2024-08-12)
+
+Please note that if you are using the *luksbootkeyfile* module,
+it must be placed before the *fstab* module in settings.conf.  If it comes
+after, then the keyfile will be missing from crypttab and the user will be
+asked for their password multiple times.
+
+This release contains contributions from (alphabetically by given name):
+ - Adriaan de Groot
+ - Evan James
+ - Luca Matei Pintilie
+
+## Core ##
+ - Improved schemas for configuration files
+ - Support for Interlingue in Qt 6.7
+
+## Modules ##
+ - Placed *luksbootkeyfile* before *fstab* in the example `settings.conf` (#2356, Evan)
+ - *packages* module `xbcs` package manager now logs progress messages (#2359, Luca)
+ - *partition* module mentions creating a swap file in its summary (#2320, Adriaan)
+
+
+# 3.3.8 (2024-07-02)
+
+The *partition* bug described below was reported by jghodd, then carefully
+described and made reproducible by Joe Kamprad, examined by Evan James
+and repaired by Adriaan de Groot. Many thanks to all who participated.
+
+This release contains contributions from (alphabetically by first name):
+ - Adriaan de Groot
+ - Evan James
+ - Lorenzo Faletra
+ - Tj
+ - Victor Fuentes
+
+## Core ##
+ - nothing in particular
+
+## Modules ##
+ - *contextualprocess* see *shellprocess*.
+ - *mount* module now correctly mounts luks and luks2-encrypted swap. (thanks Victor)
+ - *partition* avoids a crash with specific checkbox-presets. (thanks Evan)
+ - *partition* had a bug where manual partitioning on MBR systems might
+   skip the installation of a bootloader, even though the visible bootloader
+   combo-box showed that it would be installed. (see #2318)
+ - *partition* could calculate an incorrect partition size when installing to
+   very specific partition sizes, and now leaves a few more sectors for secondary
+   GPT tables. (thanks Tj)
+ - *shellprocess* now supports a *verbose* key (globally and per-command) which logs
+   command output line-by-line.
+ - *users* module defaults password salt to *yescrypt*. (thanks Lorenzo)
+
+
+# 3.3.7 (2024-06-20)
+
+This release contains contributions from (alphabetically by first name):
+ - Adriaan de Groot
+ - Eugene San
+ - Evan James
+ - Ivan Borzenkov
+ - Sohrab Behdani
+ - Vincent Penvern
+ - Vladislav Nepogodin
+
+## Core ##
+ - Updated clang-formatting
+ - Some C++20 future-proofing (thanks Vladislav)
+ - CommandList (used by *contextualprocess* and *shellprocess*) now supports
+   globalstorage keys as substitutable variables.
+
+## Modules ##
+ - *contextualprocess* see *shellprocess*.
+ - *fstab* module does not add an encryption keyfile if it does
+   not exist. (thanks Eugene)
+ - *initcpiocfg* has some new configuration settings to more carefully
+   adjust hooks for initcpio.
+ - *keyboard* module handles Persian (fa) layout better. (thanks Sohrab)
+ - *keyboard* module handles other non-ascii layout better. (thanks Ivan)
+ - *partition* module did not filter out invalid fstab entries;
+   they were not written, either, so no net change.
+ - *partition* module now has a configurable default check-state
+   for the encryption checkbox. (thanks Vincent)
+ - *shellprocess* commands now support globalstorage variables, which
+   are written as `${gs[key]}`, where `key` is a dotted string that
+   selects the globalstorage key to use (like in *contextualprocess*
+   variable-selectors) and `${gs[` and `]}` are literal characters.
+
+
+# 3.3.6 (2024-04-16)
+
+This release contains contributions from (alphabetically by first name):
+ - Adriaan de Groot
+ - Anke Boersma
+ - Eugene San
+ - Evan James
+ - Harald Sitter
+ - Mike Stemle
+ - Peter Jung
+ - Simon Quigley
+
+## Core ##
+ - Various Qt6-related fixes.
+ - Calamares now prevents sleep and suspend while the installation is
+   running, so that unattended installs do not accidentally fall asleep.
+
+## Modules ##
+ - *bootloader* Adds "splash" to kernel parameters if plymouth is present.
+   (thanks Eugene)
+ - *locale* Now picks the correct timezone for Dubai, Muscat, Tehran.
+ - *plymouthcfg* Use plymouth-set-default-theme to avoid issues with
+   configuration. (thanks Peter)
+ - *users* module now supports enrolling in Active Directory, if enabled.
+   (thanks Simon)
+
+
+# 3.3.5 (2024-03-03)
+
+This release contains contributions from (alphabetically by first name):
+ - Adriaan de Groot
+ - Evan James
+ - Peter Jung
+
+## Core ##
+ - Calamares logs more information about how the executable was created
+   in the session log on startup. This will help in recreating the specific
+   configuration when bug reports are filed. (thanks Evan)
+ - The debug window now has better Qt6 compatibility.
+
+## Modules ##
+ - *displaymanager* module can configure an alternate SDDM configuration file.
+ - *networkcfg* a bug affecting NetPlan + NetworkManager was fixed.
+ - *initcpiocfg* Add microcode hook to initcpiocfg
+
+
+# 3.3.4 (2024-02-27)
+
+In this release, process jobmodules -- a particular kind of module
+recognizable by `type: job` and `interface: process` in the descriptor
+file -- undergo a large change to resemble *shellprocess* more.
+
+Users of process jobmodules are encouraged to double-check the Functionality
+of those modules in this release.
+
+This release contains contributions from (alphabetically by first name):
+ - Adriaan de Groot
+ - Victor Fuentes
+
+## Core ##
+ - Process jobs (a job type provided by Calamares core) now share more
+   code with *contextualprocess* and *shellprocess* jobs. The execution
+   mechanism is the same, and always invokes the shell, whether the command
+   runs in the host or in the target system. It is no longer necessary to
+   add `/bin/sh` in the *command* key -- this is always present.
+
+## Modules ##
+ - *contextualprocess* and *shellprocess* can now set environment variables
+   as part of the configuration. See *shellprocess* documentation for details.
+   This is optional, and does not do anything that could not already be done
+   by putting `export VAR=value ;` in front of the command before.
+ - *partition* fixed a bug with an uninitialized variable. (thanks Victor)
+ - *shellprocess* (and therefore also *contextualprocess* and process
+   jobmodules) now substitutes `${LANG}` in commands with the language
+   selected in the user-interface of Calamares.
+
+
+# 3.3.3 (2024-02-24)
+
+This release contains contributions from (alphabetically by first name):
+ - Adriaan de Groot
+ - Anke Boersma
+
+Translations have been updated (3.3.2 skipped that step).
+
+## Core ##
+ - Core libraries *libcalamares* and *libcalamaresui* now build with
+   hidden visibility by default, as a step towards ABI stability.
+ - A runtime crash caused by (mis?)use of Qt UniqueConnection which
+   shows up in Debug builds was resolved.
+
+## Modules ##
+ - *interactiveterminal* can use konsole in Qt6 too. (thanks Anke)
+ - *plasmalnf* module ported to Plasma 6. (thanks Anke)
+ - *welcomeq* example extended to include Markdown syntax. (thanks Anke)
+
+
+# 3.3.2 (2024-02-19)
+
+This release contains contributions from (alphabetically by first name):
+ - Aaron Rainbolt
+ - Adriaan de Groot
+ - Anke Boersma
+ - Evan James
+ - Jonathan Riddell
+ - Lukas Märdian
+ - Tj
+
+## Core ##
+ - Slideshow support code (QML) now ported to Qt6 and made available
+   as two separate directories of support-code. (thanks Jon)
+ - Compatibility with Qt versions prior to 5.15.5 has been removed.
+
+## Modules ##
+ - *fstab* bug fixed where BTRFS messes up the partition layout. (thanks Tj)
+ - *networkcfg* on NetPlan-enabled systems, configure NetworkManager
+   with the live-system's NetPlan settings. (thanks Lukas)
+ - *partition* module can now also define unencrypted partitions
+   when encryption is used. (thanks Aaron)
+
+
+# 3.3.1 (2024-01-15)
+
+This release sets `BUILD_APPDATA` and `BUILD_APSTREAM` to default to **OFF**,
+where previously they defaulted to **ON**. When enabled, the dependencies for
+both features are required -- previously they would silently switch off if
+the dependencies were not found. Distributions are strongly advised to check
+their package-building instructions.
+
+This release contains contributions from (alphabetically by first name):
+ - Adriaan de Groot
+ - Aleksey Samoilov
+ - Emir Sari
+ - Simon Quigley
+
+## Core ##
+ - There has been internal code re-organization (e.g. not using functions
+   named `tr()`) to help translation tools.
+ - Strings everywhere have been given more context. (thanks Emir)
+ - In CMake, "view" is no longer accepted as an alias of the module
+   type "viewmodule" in function `calamares_add_plugin()`.
+ - Plain Ubuntu builds have been added to the CI roster. (thanks Simon)
+ - Commands that run in the target system (in the chroot) no longer
+   use the TMP-related environment variables from the host. #2269
+
+## Modules ##
+ - The *displaymanager* module configuration for `greetd` has some more
+   options now. (thanks Aleksey)
+
+
+# 3.3.0 (2023-12-12)
+
+This release contains contributions from (alphabetically by first name):
+ - Adriaan de Groot
+ - Alberto Salvia Novella
+ - Christophe Marin
+ - Evan Maddock
+ - Frede Hundewadt
+
+Since this is the first non-alpha release of 3.3.0, we would like to thank
+all the contributors to a year and a half of alpha releases, six in all.
+Distributions are **strongly** advices to take the release notes of
+the alpha's into account as well.
+
+## Core ##
+ - No changes of note.
+
+## Modules ##
+ - *users* and *usersq* no longer support the password requirement 'nonempty'.
+   Use 'minLength: 1' instead. The example configuration allows the user to
+   choose any password at all, but also contains suggestions for other
+   password-requirements schemes. (thanks Alberto)
+ - *users* now can use stronger password hashes, if `crypt_gensalt()` is
+   available in the *crypt* library. (thanks Evan)
+ - *machineid* module supports several variations of writing /etc/machine-id .
+
+
+# 3.3.0-alpha6 (2023-11-16)
+
+This release contains contributions from (alphabetically by first name):
+ - Adriaan de Groot
+ - Anke Boersma
+
+ This is a hotfix release because -alpha5 didn't compile,
+ and Anke repaired the partition unit-tests when building with Qt6.
+
+
+# 3.3.0-alpha5 (2023-11-13)
+
+This release contains contributions from (alphabetically by first name):
+ - Adriaan de Groot
+ - Alejo Fernandez
+ - Anke Boersma
+ - Christophe Marin
+ - Emir Sari
+ - Evan James
+ - Gaël PORTAY
+ - Gecko Linux
+ - Jeremy Whiting
+ - Neal Gompa
+
+## Core ##
+ - Boost::Python is no longer a dependency, Calamares uses a bundled copy
+   of pybind11 instead. This speeds up compilation and reducese the
+   dependency tree a great deal. You can set `WITH_PYBIND11=OFF` in the
+   build to keep Boost::Python and all the binary-compatibility problems
+   it entails.
+ - Coding style now wants clang-format 15 or 16, but no longer needs astyle.
+   There is also a clang-tidy file for additional styling support.
+ - Ongoing translation improvements. (thanks Emir)
+ - Translations for bqi (Luri), es_AR (Castellano), eo (Esperanto),
+   ka (Georgian). In **non-release** builds (e.g. between releases,
+   so for developers building directly from git) all translations are
+   enabled, even the ones with no translations at all.
+ - The logging format in the `session.log` file and on-screen is now
+   more similar, although the file contains a lot more per-line information.
+ - The INSTALL_CONFIG option has been restored. It is still a terrible
+   idea to fork the repository to modify the config files, and you
+   probably should have a calamares-config package with those files
+   instead, there are packaging workflows that can usefully patch-and-
+   install configuration files. The option defaults to OFF.
+
+## Modules ##
+ - All QML modules now have a Qt6-compatible set of QML files as well. (thanks Anke)
+ - *packagechooser* supports AppStream 1.0 API.
+ - *unpackfs* now uses the `-S` option to rsync for sparse file support. (thanks Jeremy)
+
+
+# 3.3.0-alpha4 (2023-10-13)
+
+Another closing-in-on-3.3.0 release! One of the big changes is that
+Calamares -- the core and nearly all of the modules in this repository --
+are compatible with Qt6. That is, it compiles. Functionality has not
+been tested, but early-testing distributions are encouraged to submit
+pull requests to improve the code.
+
+This release contains contributions from (alphabetically by first name):
+ - Adriaan de Groot
+ - Anke Boersma
+ - Emir Sari
+ - Evan James
+ - Hector Martin
+ - Ivan Borzenkov
+ - Simon Quigley
+
+## Core ##
+ - Qt6 compatibility. You can choose Qt5 (with KDE Frameworks 5) as before,
+   or choose Qt6 (with KDE Frameworks 6). This means that a Qt6-based Linux
+   distribution can use Calamares without needing an extra version of Qt.
+   Note that some KDE Frameworks are required as well, and those need to be
+   Qt6-based also (and are not released as of September 2023).
+ - QML-based modules are also supported in Qt6, but the QML is likely to
+   be source-incompatible. The *welcomeq* module shipped with Calamares
+   now has two `.qrc` files and uses the `${QT_VERSION_SUFFIX}` variable
+   to pick one of the two depending on the Qt version being used.
+   Other modules are likely to follow the same pattern.
+ - C++ namespaces have been shuffled around and `CalamaresUtils` has been
+   retired. This has an effect on all C++ plugins, since this is neither
+   a binary- nor source-compatible change.
+
+## Modules ##
+ - *keyboard* module can now be explicitly configured to use X11 keyboard
+   settings or the FreeDesktop locale1 DBus service. The latter is most
+   useful for Calamares as an "initial setup" system, not an installer,
+   in a Wayland session. (thanks Hector)
+ - *keyboard* module now writes X11 layout configuration with variants
+   for all non-ASCII (e.g. us) layouts. (thanks Ivan)
+ - *keyboard* module now can configure keyboard switch. (thanks Ivan)
+
+
+# 3.3.0-alpha3 (2023-08-28)
+
+This release contains contributions from (alphabetically by first name):
+ - Adriaan de Groot
+ - Aleksey Samoilov
+ - Anke Boersma
+ - Arjen Balfoort
+ - Boria138
+ - Brian Morison
+ - Emir Sari
+ - Evan Goode
+ - Evan James
+ - Ficelloo
+ - Hector Martin
+ - Jeremy Attall
+ - Johannes Kamprad
+ - Kasta Hashemi
+ - Kevin Kofler
+ - Mario Haustein
+ - Masato TOYOSHIMA
+ - Panda
+ - Paolo Dongilli
+ - Peter Jung
+ - Philip Müller
+ - Shivanand
+ - Sławomir Lach
+ - Sunderland93
+ - wiz64
+
+## Core ##
+ - Incompatible module-configuration changes, see #1438.
+ - Branding entries use ${var} instead of @{var} for substitutions,
+   in line with all the other substitution mechanisms used from C++
+   core. See documentation in `branding.desc`.
+ - Boost::Python requires at least version 1.72.
+ - KDE Frameworks must be version 5.58 or later.
+ - The `INSTALL_CONFIG` option has been removed. If you are installing
+   the example configuration files from the Calamares repository, just
+   stop. That was never a good idea, and you should keep your configs elsewhere.
+ - Progress percentage during install can now be localized. (thanks Emir)
+
+## Modules ##
+ - *dracut* added a configurable kernel name. (thanks Anke)
+ - *initcpiocfg* orders hookds slightly differently. (thanks Peter)
+ - *localeq* moved to using Drawer instead of ComboBox in UI. (thanks Anke)
+ - *keyboardq* moved to using Drawer instead of ComboBox in UI. (thanks Anke)
+ - *netinstall* now has a new *noncheckable* option for groups, which prevent
+   it a group from being checked/uncheckd as a whole. You can still check
+   individual items **in** the group though. (thanks Shivanand)
+ - *partition* can now pick LUKS or LUKS2. (thanks Jeremy)
+ - *zfs* creates a hostid through zgenhostid.
+ - *zfshostid* new module to copy zfs generated /etc/hostid
+
+
+# 3.3.0-alpha2 (2022-08-23)
+
+Second alpha release, with updated ABI compatibility checking,
+some 3.3.0 release goals, new features in modules and important bugfixes.
+
+This release contains contributions from (alphabetically by first name):
+ - Adriaan de Groot
+ - Anke Boersma
+ - Evan James
+ - Shivanand
+ - Vitor Lopes
+
+## Core ##
+
+A core **TODO** is moving all library code into the `Calamares` namespace,
+dropping the `CalamaresUtils` namespace. Modern C++ supports nested namespaces,
+so in some cases we can use those. This has a drastic effect on ABI compatibility,
+though, as functions move from one namespace to another. This needs to be
+completed before a 3.3.0 with ABI stability is released.
+
+## Modules ##
+
+Module schemas have been updated to reflect all the incompatible changes.
+
+
+# 3.3.0-alpha1 (2022-06-27)
+
+Initial 3.3.0 alpha release to check the release scripts &c.
+
+This release contains contributions from (alphabetically by first name):
+ - Adriaan de Groot
+ - Aleksey Samoilov
+ - Anke Boersma
+ - Dan Simmons
+ - Evan James
+ - Peter Jung
+
+
+# 3.3.0-pre-alpha (unreleased) #
+
+This release contains contributions from (alphabetically by first name):
+ - Anke Boersma
+ - Anubhav Choudhary
+ - Evan James
+ - Vitor Lopes
+
+This is a "minor" version change, but the size of the changes is very
+large. Configuration files from previous versions of Calamares will
+**certainly** need to be re-validated. Take heed of the many changes
+in the *Modules* heading, below.
+
+Users (distributions) are **strongly** advised to use the tools
+for configuration validation (`ci/configvalidator.py`) to check
+that the distribution configuration files follow the current schema.
+
+## Project ##
+ - The C++ code in the project is now formatted with clang-format 12 or 13,
+   with the coding-style as found in `.clang-format`; there are minor
+   differences from the tool, compared to the clang-format 9 usually applied
+   to Calamares 3.2.
+ - The CMake code in the project is now formatted with gersemi 0.7.5.
+
+## Core ##
+ - CMake 3.16, Qt 5.15 are now required; the newer CMake is to support
+   new features (also for KDE Frameworks), Qt is the current LTS version.
+ - Running `calamares -d` no longer enforces a single-application
+   (it is for debugging purposes, after all).
+ - Python 3.6 or later is now required, to allow for F-strings in
+   Python code and allow other tidy-ups in the Python modules.
+   Boost::Python now requires 1.67 or later (for CMake support).
+ - The log file now **always** contains a debug-log, and the `-D` flag
+   primarily controls what is printed to stdout. By default, stdout
+   only gets errors; use `-D6` to match stdout with the file. Use `-D8`
+   to get an extra-verbose log file **and** verbose stdout.
+
+## Modules ##
+ - *bootloader* now supports more options when building the kernel
+   command-line. (Thanks Evan)
+ - *bootloader* no longer supports `@@`-style suffixes for unique-EFI-id
+   generation. Use `${}` instead.
+ - *displaymanager* no longer supports the discontinued *kdm* display manager.
+ - *fstab* configuration has been completely re-done. Many configuration
+   options have moved to the *mount* module. See #1993
+ - *grubcfg* changed the key *keepDistributor* to *keep_distributor*.
+   Please update configurations.
+ - *mount* now does most of the mounting; options that were in *fstab*
+   have moved here. See #1993
+ - *oemid* now uses consistent variable replacement (e.g. KMacroExpander)
+   and does not support `@@DATE@@` anymore (use `${DATE}`).
+ - *partition* requires KPMCore 21.12 (e.g. KPMCore 4.2 API, or later).
+ - *partition* can now skip installing the bootloader in more scenarios.
+   #1632 (Thanks Anubhav)
+ - *preservefiles* follows `${}` variable syntax instead of `@@`.
+

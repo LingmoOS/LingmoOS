@@ -31,7 +31,7 @@
 #include <QSortFilterProxyModel>
 #include <QVariant>
 
-namespace CalamaresUtils
+namespace Calamares
 {
 namespace Locale
 {
@@ -39,7 +39,7 @@ class Private;
 class RegionalZonesModel;
 class ZonesModel;
 
-class TimeZoneData : public QObject, TranslatableString
+class DLLEXPORT TimeZoneData : public QObject, TranslatableString
 {
     friend class RegionalZonesModel;
     friend class ZonesModel;
@@ -48,7 +48,7 @@ class TimeZoneData : public QObject, TranslatableString
 
     Q_PROPERTY( QString region READ region CONSTANT )
     Q_PROPERTY( QString zone READ zone CONSTANT )
-    Q_PROPERTY( QString name READ tr CONSTANT )
+    Q_PROPERTY( QString name READ translated CONSTANT )
     Q_PROPERTY( QString countryCode READ country CONSTANT )
 
 public:
@@ -60,9 +60,12 @@ public:
     TimeZoneData( const TimeZoneData& ) = delete;
     TimeZoneData( TimeZoneData&& ) = delete;
 
-    QString tr() const override;
+    ///@brief Returns a translated, human-readable form of region/zone (e.g. "America/New York")
+    QString translated() const override;
 
+    ///@brief Returns the region key (e.g. "Europe") with no translation and no human-readable tweaks
     QString region() const { return m_region; }
+    ///@brief Returns the zone key (e.g. "New_York") with no translation and no human-readable tweaks
     QString zone() const { return key(); }
 
     QString country() const { return m_country; }
@@ -75,7 +78,6 @@ private:
     double m_latitude;
     double m_longitude;
 };
-
 
 /** @brief The list of timezone regions
  *
@@ -107,7 +109,7 @@ public Q_SLOTS:
      * Returns @p region unchanged if there is no such region
      * or no translation for the region's name.
      */
-    QString tr( const QString& region ) const;
+    QString translated( const QString& region ) const;
 
 private:
     Private* m_private;
@@ -229,8 +231,7 @@ private:
     QString m_region;
 };
 
-
 }  // namespace Locale
-}  // namespace CalamaresUtils
+}  // namespace Calamares
 
 #endif  // LOCALE_TIMEZONE_H

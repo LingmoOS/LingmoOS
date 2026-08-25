@@ -10,9 +10,9 @@
 #include "Item.h"
 
 #include "Settings.h"
-#include "utils/CalamaresUtilsSystem.h"
 #include "utils/Logger.h"
 #include "utils/NamedEnum.h"
+#include "utils/System.h"
 #include "utils/Yaml.h"
 
 #include <QtTest/QtTest>
@@ -40,7 +40,7 @@ PreserveFilesTests::initTestCase()
     cDebug() << "PreserveFiles test started.";
 
     // Ensure we have a system object, expect it to be a "bogus" one
-    CalamaresUtils::System* system = CalamaresUtils::System::instance();
+    Calamares::System* system = Calamares::System::instance();
     QVERIFY( system );
     cDebug() << Logger::SubEntry << "System @" << Logger::Pointer( system );
 
@@ -73,14 +73,14 @@ PreserveFilesTests::testItems()
     QFETCH( bool, ok );
     QFETCH( int, type_i );
 
-    QFile fi( QString( "%1/tests/%2" ).arg( BUILD_AS_TEST, filename ) );
+    QFileInfo fi( QString( "%1/tests/%2" ).arg( BUILD_AS_TEST, filename ) );
     QVERIFY( fi.exists() );
 
     bool config_file_ok = false;
-    const auto map = CalamaresUtils::loadYaml( fi, &config_file_ok );
+    const auto map = Calamares::YAML::load( fi, &config_file_ok );
     QVERIFY( config_file_ok );
 
-    CalamaresUtils::Permissions perm( QStringLiteral( "adridg:adridg:0750" ) );
+    Calamares::Permissions perm( QStringLiteral( "adridg:adridg:0750" ) );
     auto i = Item::fromVariant( map[ "item" ], perm );
     QCOMPARE( bool( i ), ok );
     QCOMPARE( smash( i.type() ), type_i );

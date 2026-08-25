@@ -16,6 +16,7 @@
 #include <QScopedPointer>
 #include <QWidget>
 
+class Config;
 class PartitionCoreModule;
 class Ui_PartitionPage;
 
@@ -32,7 +33,7 @@ class PartitionPage : public QWidget
 {
     Q_OBJECT
 public:
-    explicit PartitionPage( PartitionCoreModule* core, QWidget* parent = nullptr );
+    explicit PartitionPage( PartitionCoreModule* core, const Config & config, QWidget* parent = nullptr );
     ~PartitionPage() override;
 
     void onRevertClicked();
@@ -40,7 +41,7 @@ public:
     int selectedDeviceIndex();
     void selectDeviceByIndex( int index );
 
-private slots:
+private Q_SLOTS:
     /// @brief Update everything when the base device changes
     void updateFromCurrentDevice();
     /// @brief Update when the selected device for boot loader changes
@@ -49,6 +50,8 @@ private slots:
     void updateSelectedBootLoaderIndex();
     /// @brief After boot loader model changes, try to preserve previously set value
     void restoreSelectedBootLoader();
+    /// @brief Make the selections in each widget match
+    void reconcileSelections();
 
 private:
     QScopedPointer< Ui_PartitionPage > m_ui;

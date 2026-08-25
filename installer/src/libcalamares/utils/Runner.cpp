@@ -41,7 +41,6 @@ relativeChangeDirectory( QDir& directory, const QString& subdir )
     return directory.cd( relPath );
 }
 
-
 STATICTEST std::pair< bool, QDir >
 calculateWorkingDirectory( Calamares::Utils::RunLocation location, const QString& directory )
 {
@@ -98,10 +97,8 @@ namespace Utils
 
 Runner::Runner() {}
 
-
 }  // namespace Utils
 }  // namespace Calamares
-
 
 Calamares::Utils::Runner::Runner( const QStringList& command )
 {
@@ -131,6 +128,14 @@ Calamares::Utils::Runner::run()
     {
         auto env = QProcessEnvironment::systemEnvironment();
         env.insert( "LC_ALL", "C" );
+        // No guarantees that host settings for /tmp/ make sense in target
+        if ( m_location == RunLocation::RunInTarget )
+        {
+            env.remove( "TEMP" );
+            env.remove( "TEMPDIR" );
+            env.remove( "TMP" );
+            env.remove( "TMPDIR" );
+        }
         process.setProcessEnvironment( env );
     }
     process.setProcessChannelMode( QProcess::MergedChannels );
@@ -184,8 +189,9 @@ Calamares::Utils::Runner::run()
                                        ? ( static_cast< int >( std::chrono::milliseconds( m_timeout ).count() ) )
                                        : -1 ) )
     {
-        cWarning() << "Process" << m_command.first() << "timed out after" << m_timeout.count() << "ms. Output so far:\n"
-                   << Logger::NoQuote << process.readAllStandardOutput();
+        cWarning() << "Process" << m_command.first() << "timed out after" << m_timeout.count() << "ms."
+                   << Logger::NoQuote << "Output so far:\n"
+                   << process.readAllStandardOutput();
         return ProcessResult::Code::TimedOut;
     }
 
@@ -211,7 +217,7 @@ Calamares::Utils::Runner::run()
 
     if ( process.exitStatus() == QProcess::CrashExit )
     {
-        cWarning() << "Process" << m_command.first() << "crashed. Output so far:\n" << Logger::NoQuote << output;
+        cWarning() << "Process" << m_command.first() << "crashed." << Logger::NoQuote << "Output so far:\n" << output;
         return ProcessResult::Code::Crashed;
     }
 
@@ -221,7 +227,7 @@ Calamares::Utils::Runner::run()
     {
         if ( showDebug && !output.isEmpty() )
         {
-            cDebug() << Logger::SubEntry << "Finished. Exit code:" << r << "output:\n" << Logger::NoQuote << output;
+            cDebug() << Logger::SubEntry << "Finished. Exit code:" << r << Logger::NoQuote << "output:\n" << output;
         }
     }
     else  // if ( r != 0 )
@@ -229,8 +235,8 @@ Calamares::Utils::Runner::run()
         if ( !output.isEmpty() )
         {
             cDebug() << Logger::SubEntry << "Target cmd:" << Logger::RedactedCommand( m_command ) << "Exit code:" << r
-                     << "output:\n"
-                     << Logger::NoQuote << output;
+                     << Logger::NoQuote << "output:\n"
+                     << output;
         }
         else
         {

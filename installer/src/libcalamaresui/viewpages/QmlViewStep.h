@@ -10,10 +10,12 @@
 #ifndef QMLVIEWSTEP_H
 #define QMLVIEWSTEP_H
 
+#include "DllMacro.h"
 #include "utils/Qml.h"
 #include "viewpages/ViewStep.h"
 
 class QQmlComponent;
+class QQmlEngine;
 class QQuickItem;
 class QQuickWidget;
 class WaitingWidget;
@@ -36,7 +38,7 @@ namespace Calamares
  * the QML in the module, see the module documentation:
  *      src/modules/README.md
  */
-class QmlViewStep : public Calamares::ViewStep
+class UIDLLEXPORT QmlViewStep : public Calamares::ViewStep
 {
     Q_OBJECT
 public:
@@ -102,14 +104,21 @@ private:
     void showFailedQml();
 
     /// @brief Controls where m_name is searched
-    CalamaresUtils::QmlSearch m_searchMethod;
+    Calamares::QmlSearch m_searchMethod;
 
     QString m_name;
     QString m_qmlFileName;
 
     QWidget* m_widget = nullptr;
     WaitingWidget* m_spinner = nullptr;
+
+#if QT_VERSION < QT_VERSION_CHECK( 6, 0, 0 )
     QQuickWidget* m_qmlWidget = nullptr;
+#else
+    QWidget* m_qmlWidget = nullptr;  // Qt6: container for QQuickWindow
+#endif
+
+    QQmlEngine* m_qmlEngine = nullptr;  // Qt5: points to QuickWidget engine, Qt6: separate engine
     QQmlComponent* m_qmlComponent = nullptr;
     QQuickItem* m_qmlObject = nullptr;
 };

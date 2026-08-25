@@ -23,13 +23,13 @@ class QEvent;
 class QLocale;
 class QTranslator;
 
-namespace CalamaresUtils
+namespace Calamares
 {
 /** @brief changes the application language.
  * @param locale the new locale (names as defined by Calamares).
  * @param brandingTranslationsPrefix the branding path prefix, from Calamares::Branding.
  */
-DLLEXPORT void installTranslator( const CalamaresUtils::Locale::Translation::Id& locale,
+DLLEXPORT void installTranslator( const Calamares::Locale::Translation::Id& locale,
                                   const QString& brandingTranslationsPrefix );
 
 /** @brief Initializes the translations with the current system settings
@@ -42,7 +42,7 @@ DLLEXPORT void installTranslator();
  * QLocale passed in, because Calamares will munge some names and
  * may remap translations.
  */
-DLLEXPORT CalamaresUtils::Locale::Translation::Id translatorLocaleName();
+DLLEXPORT Calamares::Locale::Translation::Id translatorLocaleName();
 
 /** @brief Loads <prefix><locale> translations into the given @p translator
  *
@@ -58,7 +58,7 @@ DLLEXPORT CalamaresUtils::Locale::Translation::Id translatorLocaleName();
  * @returns @c true on success
  */
 DLLEXPORT bool
-loadTranslator( const CalamaresUtils::Locale::Translation::Id& locale, const QString& prefix, QTranslator* translator );
+loadTranslator( const Calamares::Locale::Translation::Id& locale, const QString& prefix, QTranslator* translator );
 
 /** @brief Set @p allow to true to load translations from current dir.
  *
@@ -68,7 +68,6 @@ loadTranslator( const CalamaresUtils::Locale::Translation::Id& locale, const QSt
  * current directory.
  */
 DLLEXPORT void setAllowLocalTranslation( bool allow );
-
 
 /** @brief Handles change-of-language events
  *
@@ -82,7 +81,7 @@ DLLEXPORT void setAllowLocalTranslation( bool allow );
  * but use the macros `CALAMARES_RETRANSLATE*` to set things up
  * in code -- the macros will connect to the Retranslator's signals.
  */
-class Retranslator : public QObject
+class DLLEXPORT Retranslator : public QObject
 {
     Q_OBJECT
 public:
@@ -102,8 +101,7 @@ private:
     explicit Retranslator( QObject* parent );
 };
 
-
-}  // namespace CalamaresUtils
+}  // namespace Calamares
 
 /** @brief Call code for this object when language changes
  *
@@ -116,7 +114,7 @@ private:
  *       immediately after setting up the connection. This allows
  *       setup and translation code to be mixed together.
  */
-#define CALAMARES_RETRANSLATE( body ) CalamaresUtils::Retranslator::attach( this, [ = ] { body } )
+#define CALAMARES_RETRANSLATE( body ) Calamares::Retranslator::attach( this, [ = ] { body } )
 /** @brief Call code for the given object (widget) when language changes
  *
  * This is identical to CALAMARES_RETRANSLATE, except the @p body is called
@@ -126,7 +124,7 @@ private:
  *       immediately after setting up the connection. This allows
  *       setup and translation code to be mixed together.
  */
-#define CALAMARES_RETRANSLATE_FOR( object, body ) CalamaresUtils::Retranslator::attach( object, [ = ] { body } )
+#define CALAMARES_RETRANSLATE_FOR( object, body ) Calamares::Retranslator::attach( object, [ = ] { body } )
 /** @brief Call a slot in this object when language changes
  *
  * Given a slot (in method-function-pointer notation), call that slot when the
@@ -140,10 +138,7 @@ private:
 #define CALAMARES_RETRANSLATE_SLOT( slotfunc ) \
     do \
     { \
-        connect( CalamaresUtils::Retranslator::instance(), \
-                 &CalamaresUtils::Retranslator::languageChanged, \
-                 this, \
-                 slotfunc ); \
+        connect( Calamares::Retranslator::instance(), &Calamares::Retranslator::languageChanged, this, slotfunc ); \
         ( this->*slotfunc )(); \
     } while ( false )
 

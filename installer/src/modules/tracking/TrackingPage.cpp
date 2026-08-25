@@ -16,7 +16,8 @@
 #include "GlobalStorage.h"
 #include "JobQueue.h"
 #include "ViewManager.h"
-#include "utils/CalamaresUtilsGui.h"
+#include "compat/CheckBox.h"
+#include "utils/Gui.h"
 #include "utils/Logger.h"
 #include "utils/Retranslator.h"
 
@@ -32,7 +33,7 @@ TrackingPage::TrackingPage( Config* config, QWidget* parent )
 
     ui->noneCheckBox->setChecked( true );
     ui->noneCheckBox->setEnabled( false );
-    connect( ui->noneCheckBox, &QCheckBox::stateChanged, this, &TrackingPage::buttonNoneChecked );
+    connect( ui->noneCheckBox, Calamares::checkBoxStateChangedSignal, this, &TrackingPage::buttonNoneChecked );
 
     // Each "panel" of configuration has the same kind of setup,
     // where the xButton and xCheckBox is connected to the xTracking
@@ -40,9 +41,9 @@ TrackingPage::TrackingPage( Config* config, QWidget* parent )
 #define trackingSetup( x ) \
     do \
     { \
-        connect( ui->x##CheckBox, &QCheckBox::stateChanged, this, &TrackingPage::buttonChecked ); \
+        connect( ui->x##CheckBox, Calamares::checkBoxStateChangedSignal, this, &TrackingPage::buttonChecked ); \
         connect( ui->x##CheckBox, \
-                 &QCheckBox::stateChanged, \
+                 Calamares::checkBoxStateChangedSignal, \
                  config->x##Tracking(), \
                  QOverload< bool >::of( &TrackingStyleConfig::setTracking ) ); \
         connect( config->x##Tracking(), \

@@ -9,7 +9,7 @@
 #include "ThemeInfo.h"
 
 #include "Branding.h"
-#include "utils/CalamaresUtilsGui.h"
+#include "utils/Gui.h"
 #include "utils/Logger.h"
 
 #include <KPackage/Package>
@@ -79,7 +79,6 @@ public:
         auto [ i, p ] = const_cast< const ThemeInfoList* >( this )->indexById( id );
         return { i, const_cast< ThemeInfo* >( p ) };
     }
-
 
     /** @brief Looks for a given @p id in the list of themes, returns nullptr if not found. */
     ThemeInfo* findById( const QString& id )
@@ -222,8 +221,7 @@ ThemesModel::showOnlyThemes( const QMap< QString, QString >& onlyThese )
 QSize
 ThemesModel::imageSize()
 {
-    return { qMax( 12 * CalamaresUtils::defaultFontHeight(), 120 ),
-             qMax( 8 * CalamaresUtils::defaultFontHeight(), 80 ) };
+    return { qMax( 12 * Calamares::defaultFontHeight(), 120 ), qMax( 8 * Calamares::defaultFontHeight(), 80 ) };
 }
 
 void
@@ -245,7 +243,6 @@ ThemesModel::select( const QString& themeId )
         ++i;
     }
 }
-
 
 /**
  * Massage the given @p path to the most-likely

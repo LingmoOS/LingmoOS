@@ -86,6 +86,7 @@ public:
 
     /// @brief Set the index back to PC105 (the default physical model)
     void setCurrentIndex() { XKBListModel::setCurrentIndex( m_defaultPC105 ); }
+    using XKBListModel::setCurrentIndex;
 
 private:
     int m_defaultPC105 = -1;  ///< The index of pc105, if there is one
@@ -151,6 +152,20 @@ public:
     explicit KeyboardVariantsModel( QObject* parent = nullptr );
 
     void setVariants( QMap< QString, QString > variants );
+};
+
+/** @brief A list of groupsSwitcher (xkb id and human-readable)
+ *
+ * The list of group switching combinations `getKeyboardGroups()`
+ * function can be used to update the switching when the two models
+ * are related.
+ */
+class KeyboardGroupsSwitchersModel : public XKBListModel
+{
+    Q_OBJECT
+
+public:
+    explicit KeyboardGroupsSwitchersModel( QObject* parent = nullptr );
 };
 
 /** @brief Adjust to changes in application language.

@@ -11,6 +11,7 @@
 #ifndef MODULESYSTEM_DESCRIPTOR_H
 #define MODULESYSTEM_DESCRIPTOR_H
 
+#include "DllMacro.h"
 #include "utils/NamedEnum.h"
 
 #include <QVariantMap>
@@ -30,7 +31,7 @@ enum class Type
     Job,
     View
 };
-const NamedEnumTable< Type >& typeNames();
+DLLEXPORT const NamedEnumTable< Type >& typeNames();
 
 /**
  * @brief The Interface enum represents the interface through which the module
@@ -42,16 +43,17 @@ enum class Interface
     QtPlugin,  // Jobs or Views
     Python,  // Jobs only
     Process,  // Deprecated interface
-    PythonQt  // Views only, available as enum even if PythonQt isn't used
 };
-const NamedEnumTable< Interface >& interfaceNames();
+DLLEXPORT const NamedEnumTable< Interface >& interfaceNames();
 
-
-/* While this isn't a useful *using* right now, the intention is
- * to create a more strongly-typed Module Descriptor that carries
- * only the necessary information and no variants.
+/**
+ * @brief Description of a module (obtained from module.desc)
+ *
+ * Provides access to the fields of a descriptor, use type() to
+ * determine which specialized fields make sense for a given
+ * descriptor (e.g. a Python module has no shared-library path).
  */
-class Descriptor
+class DLLEXPORT Descriptor
 {
 public:
     ///@brief an invalid, and empty, descriptor
@@ -72,7 +74,7 @@ public:
     Interface interface() const { return m_interface; }
 
     bool isEmergency() const { return m_isEmergeny; }
-    bool hasConfig() const { return m_hasConfig; }
+    bool hasConfig() const { return m_hasConfig; }  // TODO: 3.5 rename to noConfig() to match descriptor key
     int weight() const { return m_weight < 1 ? 1 : m_weight; }
     bool explicitWeight() const { return m_weight > 0; }
 
@@ -112,10 +114,7 @@ public:
      *
      * Python job modules have one specific script to load and run.
      */
-    QString script() const
-    {
-        return ( m_interface == Interface::Python || m_interface == Interface::PythonQt ) ? m_script : QString();
-    }
+    QString script() const { return m_interface == Interface::Python ? m_script : QString(); }
 
 private:
     QString m_name;

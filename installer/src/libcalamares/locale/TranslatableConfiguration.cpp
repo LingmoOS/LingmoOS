@@ -19,7 +19,7 @@
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 
-namespace CalamaresUtils
+namespace Calamares
 {
 namespace Locale
 {
@@ -38,7 +38,7 @@ TranslatedString::TranslatedString( const QVariantMap& map, const QString& key, 
     : m_context( context )
 {
     // Get the un-decorated value for the key
-    QString value = CalamaresUtils::getString( map, key );
+    QString value = Calamares::getString( map, key );
     m_strings[ QString() ] = value;
 
     for ( auto it = map.constBegin(); it != map.constEnd(); ++it )
@@ -114,6 +114,5 @@ TranslatedString::get( const QLocale& locale ) const
     }
 }
 
-
 }  // namespace Locale
-}  // namespace CalamaresUtils
+}  // namespace Calamares

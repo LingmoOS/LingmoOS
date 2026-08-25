@@ -14,15 +14,12 @@
 
 #include <kpmcore/backend/corebackend.h>
 #include <kpmcore/backend/corebackendmanager.h>
-#if defined( WITH_KPMCORE4API )
 #include <kpmcore/util/externalcommand.h>
-#endif
-
 
 #include <QObject>
 
 
-namespace CalamaresUtils
+namespace Calamares
 {
 namespace Partition
 {
@@ -30,7 +27,6 @@ class InternalManager
 {
 public:
     InternalManager();
-    ~InternalManager();
 };
 
 static bool s_kpm_loaded = false;
@@ -69,22 +65,6 @@ InternalManager::InternalManager()
     }
 }
 
-InternalManager::~InternalManager()
-{
-#if defined( WITH_KPMCORE4API ) && !defined( WITH_KPMCORE42API )
-    cDebug() << "Cleaning up KPMCore backend ..";
-
-    // From KPMcore 4.0 until KPMcore 4.2 we needed to stop
-    // the helper by hand. KPMcore 4.2 ported to polkit directly,
-    // which doesn't need a helper.
-    auto backend_p = CoreBackendManager::self()->backend();
-    if ( backend_p )
-    {
-        ExternalCommand::stopHelper();
-    }
-#endif
-}
-
 std::shared_ptr< InternalManager >
 getInternal()
 {
@@ -117,4 +97,4 @@ KPMManager::backend() const
 
 
 }  // namespace Partition
-}  // namespace CalamaresUtils
+}  // namespace Calamares

@@ -9,8 +9,8 @@
 
 #include "ZfsJob.h"
 
-#include "utils/CalamaresUtilsSystem.h"
 #include "utils/Logger.h"
+#include "utils/System.h"
 #include "utils/Variant.h"
 
 #include "GlobalStorage.h"
@@ -18,6 +18,7 @@
 #include "Settings.h"
 
 #include <QProcess>
+#include <QRegularExpression>
 
 #include <unistd.h>
 
@@ -29,7 +30,7 @@
 static QString
 alphaNumeric( QString input )
 {
-    return input.remove( QRegExp( "[^a-zA-Z\\d\\s]" ) );
+    return input.remove( QRegularExpression( "[^a-zA-Z\\d\\s]" ) );
 }
 
 /** @brief Returns the best available device for zpool creation
@@ -98,7 +99,7 @@ ZfsJob::~ZfsJob() {}
 QString
 ZfsJob::prettyName() const
 {
-    return tr( "Create ZFS pools and datasets" );
+    return tr( "Creating ZFS pools and datasets…", "@status" );
 }
 
 void
@@ -107,7 +108,7 @@ ZfsJob::collectMountpoints( const QVariantList& partitions )
     m_mountpoints.empty();
     for ( const QVariant& partition : partitions )
     {
-        if ( partition.canConvert( QVariant::Map ) )
+        if ( partition.canConvert< QVariantMap >() )
         {
             QString mountpoint = partition.toMap().value( "mountPoint" ).toString();
             if ( !mountpoint.isEmpty() )
@@ -131,7 +132,6 @@ ZfsJob::isMountpointOverlapping( const QString& targetMountpoint ) const
     return false;
 }
 
-
 ZfsResult
 ZfsJob::createZpool( QString deviceName, QString poolName, QString poolOptions, bool encrypt, QString passphrase ) const
 {
@@ -153,8 +153,8 @@ ZfsJob::createZpool( QString deviceName, QString poolName, QString poolOptions, 
                                 << "create" << poolOptions.split( ' ' ) << poolName << deviceName;
     }
 
-    auto r = CalamaresUtils::System::instance()->runCommand(
-        CalamaresUtils::System::RunLocation::RunInHost, command, QString(), passphrase, std::chrono::seconds( 10 ) );
+    auto r = Calamares::System::instance()->runCommand(
+        Calamares::System::RunLocation::RunInHost, command, QString(), passphrase, std::chrono::seconds( 10 ) );
 
     if ( r.getExitCode() != 0 )
     {
@@ -170,7 +170,7 @@ ZfsJob::exec()
 {
     QVariantList partitions;
     Calamares::GlobalStorage* gs = Calamares::JobQueue::instance()->globalStorage();
-    if ( gs && gs->contains( "partitions" ) && gs->value( "partitions" ).canConvert( QVariant::List ) )
+    if ( gs && gs->contains( "partitions" ) && gs->value( "partitions" ).canConvert< QVariantList >() )
     {
         partitions = gs->value( "partitions" ).toList();
     }
@@ -182,21 +182,21 @@ ZfsJob::exec()
                                                     Calamares::JobResult::InvalidConfiguration );
     }
 
-    const CalamaresUtils::System* system = CalamaresUtils::System::instance();
+    const Calamares::System* system = Calamares::System::instance();
 
     QVariantList poolNames;
 
     // Check to ensure the list of zfs info from the partition module is available and convert it to a list
-    if ( !gs->contains( "zfsInfo" ) && gs->value( "zfsInfo" ).canConvert( QVariant::List ) )
+    if ( !gs->contains( "zfsInfo" ) && gs->value( "zfsInfo" ).canConvert< QVariantList >() )
     {
         return Calamares::JobResult::error( tr( "Internal data missing" ), tr( "Failed to create zpool" ) );
     }
     QVariantList zfsInfoList = gs->value( "zfsInfo" ).toList();
 
-    for ( auto& partition : qAsConst( partitions ) )
+    for ( auto& partition : std::as_const( partitions ) )
     {
         QVariantMap pMap;
-        if ( partition.canConvert( QVariant::Map ) )
+        if ( partition.canConvert< QVariantMap >() )
         {
             pMap = partition.toMap();
         }
@@ -231,14 +231,21 @@ ZfsJob::exec()
         // Look in the zfs info list to see if this partition should be encrypted
         bool encrypt = false;
         QString passphrase;
-        for ( const QVariant& zfsInfo : qAsConst( zfsInfoList ) )
+        for ( const QVariant& zfsInfo : std::as_const( zfsInfoList ) )
         {
-            if ( zfsInfo.canConvert( QVariant::Map ) && zfsInfo.toMap().value( "encrypted" ).toBool()
+            if ( zfsInfo.canConvert< QVariantMap >() && zfsInfo.toMap().value( "encrypted" ).toBool()
                  && mountpoint == zfsInfo.toMap().value( "mountpoint" ) )
             {
                 encrypt = true;
                 passphrase = zfsInfo.toMap().value( "passphrase" ).toString();
             }
+        }
+
+        // Generate the zfs hostid file
+        auto i = system->runCommand( { "zgenhostid" }, std::chrono::seconds( 3 ) );
+        if ( i.getExitCode() != 0 )
+        {
+            cWarning() << "Failed to create /etc/hostid";
         }
 
         // Create the zpool
@@ -269,7 +276,7 @@ ZfsJob::exec()
         {
             collectMountpoints( partitions );
             QVariantList datasetList;
-            for ( const auto& dataset : qAsConst( m_datasets ) )
+            for ( const auto& dataset : std::as_const( m_datasets ) )
             {
                 QVariantMap datasetMap = dataset.toMap();
 
@@ -351,15 +358,14 @@ ZfsJob::exec()
     return Calamares::JobResult::ok();
 }
 
-
 void
 ZfsJob::setConfigurationMap( const QVariantMap& map )
 {
-    m_poolName = CalamaresUtils::getString( map, "poolName" );
-    m_poolOptions = CalamaresUtils::getString( map, "poolOptions" );
-    m_datasetOptions = CalamaresUtils::getString( map, "datasetOptions" );
+    m_poolName = Calamares::getString( map, "poolName" );
+    m_poolOptions = Calamares::getString( map, "poolOptions" );
+    m_datasetOptions = Calamares::getString( map, "datasetOptions" );
 
-    m_datasets = CalamaresUtils::getList( map, "datasets" );
+    m_datasets = Calamares::getList( map, "datasets" );
 }
 
 CALAMARES_PLUGIN_FACTORY_DEFINITION( ZfsJobFactory, registerPlugin< ZfsJob >(); )

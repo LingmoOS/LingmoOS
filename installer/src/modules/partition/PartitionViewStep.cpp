@@ -21,11 +21,12 @@
 #include "gui/PartitionBarsView.h"
 #include "gui/PartitionLabelsView.h"
 #include "gui/PartitionPage.h"
+#include "partition/FileSystem.h"
 
 #include "Branding.h"
 #include "GlobalStorage.h"
 #include "JobQueue.h"
-#include "utils/CalamaresUtilsGui.h"
+#include "utils/Gui.h"
 #include "utils/Logger.h"
 #include "utils/QtCompat.h"
 #include "utils/Retranslator.h"
@@ -33,6 +34,7 @@
 #include "widgets/TranslationFix.h"
 #include "widgets/WaitingWidget.h"
 
+#include <kpmcore/core/device.h>
 #include <kpmcore/core/partition.h>
 
 #include <QFormLayout>
@@ -53,12 +55,23 @@ PartitionViewStep::PartitionViewStep( QObject* parent )
     m_waitingWidget = new WaitingWidget( QString() );
     m_widget->addWidget( m_waitingWidget );
     CALAMARES_RETRANSLATE(
-        if ( m_waitingWidget ) { m_waitingWidget->setText( tr( "Gathering system information..." ) ); } );
+        if ( m_waitingWidget ) { m_waitingWidget->setText( tr( "Gathering system information…", "@status" ) ); } );
 
     m_core = new PartitionCoreModule( this );  // Unusable before init is complete!
     // We're not done loading, but we need the configuration map first.
 }
 
+PartitionViewStep::FSConflictEntry::FSConflictEntry() {}
+
+PartitionViewStep::FSConflictEntry::FSConflictEntry( const QString& conflictingPathArg,
+                                                     const QString& conflictingFilesystemArg,
+                                                     const QString& conflictedPathArg,
+                                                     QStringList allowableFilesystemsArg )
+    : conflictingPath( conflictingPathArg )
+    , conflictingFilesystem( conflictingFilesystemArg )
+    , conflictedPath( conflictedPathArg )
+    , allowableFilesystems( allowableFilesystemsArg )
+{}
 
 void
 PartitionViewStep::initPartitionCoreModule()
@@ -66,7 +79,6 @@ PartitionViewStep::initPartitionCoreModule()
     Q_ASSERT( m_core );
     m_core->init();
 }
-
 
 void
 PartitionViewStep::continueLoading()
@@ -90,7 +102,6 @@ PartitionViewStep::continueLoading()
     connect( m_choicePage, &ChoicePage::nextStatusChanged, this, &PartitionViewStep::nextPossiblyChanged );
 }
 
-
 PartitionViewStep::~PartitionViewStep()
 {
     if ( m_choicePage && m_choicePage->parent() == nullptr )
@@ -104,28 +115,28 @@ PartitionViewStep::~PartitionViewStep()
     delete m_core;
 }
 
-
 QString
 PartitionViewStep::prettyName() const
 {
-    return tr( "Partitions" );
+    return tr( "Partitions", "@label" );
 }
 
 /** @brief Gather the pretty descriptions of all the partitioning jobs
  *
  * Returns a QStringList of each job's pretty description, including
- * empty strings and duplicates. The list is in-order of how the
- * jobs will be run.
+ * duplicates (but no empty lines). The list is in-order of how the
+ * jobs will be run. If no job has a non-empty description, the list is empty.
  */
 static QStringList
 jobDescriptions( const Calamares::JobList& jobs )
 {
     QStringList jobsLines;
-    for ( const Calamares::job_ptr& job : qAsConst( jobs ) )
+    for ( const Calamares::job_ptr& job : std::as_const( jobs ) )
     {
-        if ( !job->prettyDescription().isEmpty() )
+        const auto description = job->prettyDescription();
+        if ( !description.isEmpty() )
         {
-            jobsLines.append( job->prettyDescription() );
+            jobsLines.append( description );
         }
     }
     return jobsLines;
@@ -133,35 +144,38 @@ jobDescriptions( const Calamares::JobList& jobs )
 
 /** @brief A top-level description of what @p choice does
  *
- * Returns a (branded) string describing what @p choice will do.
+ * Returns a translated string describing what @p choice will do.
+ * Includes branding information.
  */
 static QString
 modeDescription( Config::InstallChoice choice )
 {
     const auto* branding = Calamares::Branding::instance();
-    static const char context[] = "PartitionViewStep";
 
     switch ( choice )
     {
     case Config::InstallChoice::Alongside:
-        return QCoreApplication::translate( context, "Install %1 <strong>alongside</strong> another operating system." )
+        return QCoreApplication::translate(
+                   "PartitionViewStep", "Install %1 <strong>alongside</strong> another operating system", "@label" )
             .arg( branding->shortVersionedName() );
     case Config::InstallChoice::Erase:
-        return QCoreApplication::translate( context, "<strong>Erase</strong> disk and install %1." )
+        return QCoreApplication::translate(
+                   "PartitionViewStep", "<strong>Erase</strong> disk and install %1", "@label" )
             .arg( branding->shortVersionedName() );
     case Config::InstallChoice::Replace:
-        return QCoreApplication::translate( context, "<strong>Replace</strong> a partition with %1." )
+        return QCoreApplication::translate(
+                   "PartitionViewStep", "<strong>Replace</strong> a partition with %1", "@label" )
             .arg( branding->shortVersionedName() );
     case Config::InstallChoice::NoChoice:
     case Config::InstallChoice::Manual:
-        return QCoreApplication::translate( context, "<strong>Manual</strong> partitioning." );
+        return QCoreApplication::translate( "PartitionViewStep", "<strong>Manual</strong> partitioning", "@label" );
     }
     return QString();
 }
 
 /** @brief A top-level description of what @p choice does to disk @p info
  *
- * Returns a (branded, and device-specific) string describing what
+ * Returns a translated string, with branding and device information, describing what
  * will be done to device @p info when @p choice is made. The @p listLength
  * is used to provide context; when more than one disk is in use, the description
  * works differently.
@@ -170,7 +184,6 @@ static QString
 diskDescription( int listLength, const PartitionCoreModule::SummaryInfo& info, Config::InstallChoice choice )
 {
     const auto* branding = Calamares::Branding::instance();
-    static const char context[] = "PartitionViewStep";
 
     if ( listLength == 1 )  // this is the only disk preview
     {
@@ -178,28 +191,33 @@ diskDescription( int listLength, const PartitionCoreModule::SummaryInfo& info, C
         {
         case Config::Alongside:
             return QCoreApplication::translate(
-                       context,
+                       "PartitionViewStep",
                        "Install %1 <strong>alongside</strong> another operating system on disk "
-                       "<strong>%2</strong> (%3)." )
+                       "<strong>%2</strong> (%3)",
+                       "@info" )
                 .arg( branding->shortVersionedName() )
                 .arg( info.deviceNode )
                 .arg( info.deviceName );
         case Config::Erase:
-            return QCoreApplication::translate( context,
-                                                "<strong>Erase</strong> disk <strong>%2</strong> (%3) and install %1." )
+            return QCoreApplication::translate( "PartitionViewStep",
+                                                "<strong>Erase</strong> disk <strong>%2</strong> (%3) and install %1",
+                                                "@info" )
                 .arg( branding->shortVersionedName() )
                 .arg( info.deviceNode )
                 .arg( info.deviceName );
         case Config::Replace:
             return QCoreApplication::translate(
-                       context, "<strong>Replace</strong> a partition on disk <strong>%2</strong> (%3) with %1." )
+                       "PartitionViewStep",
+                       "<strong>Replace</strong> a partition on disk <strong>%2</strong> (%3) with %1",
+                       "@info" )
                 .arg( branding->shortVersionedName() )
                 .arg( info.deviceNode )
                 .arg( info.deviceName );
         case Config::NoChoice:
         case Config::Manual:
-            return QCoreApplication::translate(
-                       context, "<strong>Manual</strong> partitioning on disk <strong>%1</strong> (%2)." )
+            return QCoreApplication::translate( "PartitionViewStep",
+                                                "<strong>Manual</strong> partitioning on disk <strong>%1</strong> (%2)",
+                                                "@info" )
                 .arg( info.deviceNode )
                 .arg( info.deviceName );
         }
@@ -207,7 +225,7 @@ diskDescription( int listLength, const PartitionCoreModule::SummaryInfo& info, C
     }
     else  // multiple disk previews!
     {
-        return QCoreApplication::translate( context, "Disk <strong>%1</strong> (%2)" )
+        return QCoreApplication::translate( "PartitionViewStep", "Disk <strong>%1</strong> (%2)", "@info" )
             .arg( info.deviceNode )
             .arg( info.deviceName );
     }
@@ -220,11 +238,21 @@ PartitionViewStep::prettyStatus() const
     const QList< PartitionCoreModule::SummaryInfo > list = m_core->createSummaryInfo();
 
     cDebug() << "Summary for Partition" << list.length() << choice;
-    auto joinDiskInfo = [ choice = choice ]( QString& s, const PartitionCoreModule::SummaryInfo& i )
-    { return s + diskDescription( 1, i, choice ); };
-    const QString diskInfoLabel = std::accumulate( list.begin(), list.end(), QString(), joinDiskInfo );
-    const QString jobsLabel = jobDescriptions( jobs() ).join( QStringLiteral( "<br/>" ) );
-    return diskInfoLabel + "<br/>" + jobsLabel;
+    const QString diskInfoLabel = [ &choice, &list ]()
+    {
+        QStringList s;
+        for ( const auto& i : list )
+        {
+            s.append( diskDescription( 1, i, choice ) );
+        }
+        return s.join( QString() );
+    }();
+    QStringList jobsLabels = jobDescriptions( jobs() );
+    if ( m_config->swapChoice() == Config::SwapChoice::SwapFile )
+    {
+        jobsLabels.append( tr( "Create a swap file." ) );
+    }
+    return diskInfoLabel + "<br/>" + jobsLabels.join( QStringLiteral( "<br/>" ) );
 }
 
 QWidget*
@@ -233,31 +261,31 @@ PartitionViewStep::createSummaryWidget() const
     QWidget* widget = new QWidget;
     QVBoxLayout* mainLayout = new QVBoxLayout;
     widget->setLayout( mainLayout );
-    mainLayout->setMargin( 0 );
+    Calamares::unmarginLayout( mainLayout );
 
     Config::InstallChoice choice = m_config->installChoice();
 
     QFormLayout* formLayout = new QFormLayout( widget );
-    const int MARGIN = CalamaresUtils::defaultFontHeight() / 2;
+    const int MARGIN = Calamares::defaultFontHeight() / 2;
     formLayout->setContentsMargins( MARGIN, 0, MARGIN, MARGIN );
     mainLayout->addLayout( formLayout );
 
 #if defined( DEBUG_PARTITION_UNSAFE ) || defined( DEBUG_PARTITION_BAIL_OUT ) || defined( DEBUG_PARTITION_SKIP )
-    auto specialRow = [ = ]( CalamaresUtils::ImageType t, const QString& s )
+    auto specialRow = [ = ]( Calamares::ImageType t, const QString& s )
     {
         QLabel* icon = new QLabel;
-        icon->setPixmap( CalamaresUtils::defaultPixmap( t ) );
+        icon->setPixmap( Calamares::defaultPixmap( t ) );
         formLayout->addRow( icon, new QLabel( s ) );
     };
 #endif
 #if defined( DEBUG_PARTITION_UNSAFE )
-    specialRow( CalamaresUtils::ImageType::StatusWarning, tr( "Unsafe partition actions are enabled." ) );
+    specialRow( Calamares::ImageType::StatusWarning, tr( "Unsafe partition actions are enabled." ) );
 #endif
 #if defined( DEBUG_PARTITION_BAIL_OUT )
-    specialRow( CalamaresUtils::ImageType::Information, tr( "Partitioning is configured to <b>always</b> fail." ) );
+    specialRow( Calamares::ImageType::Information, tr( "Partitioning is configured to <b>always</b> fail." ) );
 #endif
 #if defined( DEBUG_PARTITION_SKIP )
-    specialRow( CalamaresUtils::ImageType::Information, tr( "No partitions will be changed." ) );
+    specialRow( Calamares::ImageType::Information, tr( "No partitions will be changed." ) );
 #endif
 
     const QList< PartitionCoreModule::SummaryInfo > list = m_core->createSummaryInfo();
@@ -293,11 +321,11 @@ PartitionViewStep::createSummaryWidget() const
         previewLabels->setSelectionMode( QAbstractItemView::NoSelection );
         info.partitionModelBefore->setParent( widget );
         field = new QVBoxLayout;
-        CalamaresUtils::unmarginLayout( field );
+        Calamares::unmarginLayout( field );
         field->setSpacing( 6 );
         field->addWidget( preview );
         field->addWidget( previewLabels );
-        formLayout->addRow( tr( "Current:" ), field );
+        formLayout->addRow( tr( "Current:", "@label" ), field );
 
         preview = new PartitionBarsView;
         preview->setNestedPartitionsMode( mode );
@@ -311,11 +339,11 @@ PartitionViewStep::createSummaryWidget() const
             Calamares::Branding::instance()->string( Calamares::Branding::BootloaderEntryName ) );
         info.partitionModelAfter->setParent( widget );
         field = new QVBoxLayout;
-        CalamaresUtils::unmarginLayout( field );
+        Calamares::unmarginLayout( field );
         field->setSpacing( 6 );
         field->addWidget( preview );
         field->addWidget( previewLabels );
-        formLayout->addRow( tr( "After:" ), field );
+        formLayout->addRow( tr( "After:", "@label" ), field );
     }
     const QStringList jobsLines = jobDescriptions( jobs() );
     if ( !jobsLines.isEmpty() )
@@ -323,7 +351,7 @@ PartitionViewStep::createSummaryWidget() const
         QLabel* jobsLabel = new QLabel( widget );
         mainLayout->addWidget( jobsLabel );
         jobsLabel->setText( jobsLines.join( "<br/>" ) );
-        jobsLabel->setMargin( CalamaresUtils::defaultFontHeight() / 2 );
+        jobsLabel->setMargin( Calamares::defaultFontHeight() / 2 );
         QPalette pal;
         pal.setColor( WindowBackground, pal.window().color().lighter( 108 ) );
         jobsLabel->setAutoFillBackground( true );
@@ -347,7 +375,7 @@ PartitionViewStep::next()
         {
             if ( !m_manualPartitionPage )
             {
-                m_manualPartitionPage = new PartitionPage( m_core );
+                m_manualPartitionPage = new PartitionPage( m_core, *m_config );
                 m_widget->addWidget( m_manualPartitionPage );
             }
 
@@ -361,7 +389,6 @@ PartitionViewStep::next()
         cDebug() << "Choice applied: " << m_config->installChoice();
     }
 }
-
 
 void
 PartitionViewStep::back()
@@ -378,7 +405,6 @@ PartitionViewStep::back()
         }
     }
 }
-
 
 bool
 PartitionViewStep::isNextEnabled() const
@@ -408,7 +434,6 @@ PartitionViewStep::isBackEnabled() const
     return true;
 }
 
-
 bool
 PartitionViewStep::isAtBeginning() const
 {
@@ -418,7 +443,6 @@ PartitionViewStep::isAtBeginning() const
     }
     return true;
 }
-
 
 bool
 PartitionViewStep::isAtEnd() const
@@ -436,7 +460,6 @@ PartitionViewStep::isAtEnd() const
     return true;
 }
 
-
 void
 PartitionViewStep::onActivate()
 {
@@ -447,8 +470,13 @@ PartitionViewStep::onActivate()
     {
         m_choicePage->applyActionChoice( Config::InstallChoice::Alongside );
         //        m_choicePage->reset();
-        //FIXME: ReplaceWidget should be reset maybe?
     }
+}
+
+static QString
+listItem( QString s )
+{
+    return s.prepend( QStringLiteral( "<li>" ) ).append( QStringLiteral( "</li>" ) );
 }
 
 static bool
@@ -470,9 +498,9 @@ shouldWarnForGPTOnBIOS( const PartitionCoreModule* core )
         if ( table && table->type() == PartitionTable::TableType::gpt )
         {
             // So this is a BIOS system, and the bootloader will be installed on a GPT system
-            for ( const auto& partition : qAsConst( table->children() ) )
+            for ( const auto& partition : std::as_const( table->children() ) )
             {
-                using CalamaresUtils::Units::operator""_MiB;
+                using Calamares::Units::operator""_MiB;
                 if ( ( partition->activeFlags() & KPM_PARTITION_FLAG( BiosGrub ) )
                      && ( partition->fileSystem().type() == FileSystem::Unformatted )
                      && ( partition->capacity() >= 8_MiB ) )
@@ -492,6 +520,165 @@ shouldWarnForGPTOnBIOS( const PartitionCoreModule* core )
     return true;
 }
 
+static bool
+shouldWarnForNotEncryptedBoot( const Config* config, const PartitionCoreModule* core )
+{
+    if ( config->showNotEncryptedBootMessage() )
+    {
+        Partition* root_p = core->findPartitionByMountPoint( "/" );
+        Partition* boot_p = core->findPartitionByMountPoint( "/boot" );
+
+        if ( root_p && boot_p )
+        {
+            const auto encryptionMismatch
+                = [ root_t = root_p->fileSystem().type(), boot_t = boot_p->fileSystem().type() ]( FileSystem::Type t )
+            { return root_t == t && boot_t != t; };
+            if ( encryptionMismatch( FileSystem::Luks ) || encryptionMismatch( FileSystem::Luks2 ) )
+            {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+static PartitionViewStep::FSConflictEntry
+calcFSConflictEntry( PartitionCoreModule* core, PartitionModel* partModel, QModelIndex partFsIdx, QModelIndex partMountPointIdx, QStringList mountPointList )
+{
+    PartitionViewStep::FSConflictEntry result;
+
+    QString partFs = partModel->data( partFsIdx ).toString().toLower();
+    QString partMountPoint = partModel->data( partMountPointIdx ).toString();
+    FileSystem::Type fsType;
+    PartUtils::canonicalFilesystemName( partFs, &fsType );
+    bool fsTypeIsAllowed = false;
+    if ( fsType == FileSystem::Type::Unknown )
+    {
+        fsTypeIsAllowed = true;
+    }
+    else
+    {
+        QList< FileSystem::Type > allowedFsTypes = core->dirFSRestrictLayout().allowedFSTypes( partMountPoint, mountPointList, true );
+        for ( const auto& allowedFsType : allowedFsTypes )
+        {
+            if ( fsType == allowedFsType )
+            {
+                fsTypeIsAllowed = true;
+                break;
+            }
+        }
+    }
+
+    if ( !fsTypeIsAllowed )
+    {
+        QString conflictedPath = core->dirFSRestrictLayout().diagnoseFSConflict( partMountPoint, fsType, mountPointList );
+        QList< FileSystem::Type > nonConflictingFilesystemTypes = core->dirFSRestrictLayout().allowedFSTypes( conflictedPath, mountPointList, true );
+        QStringList nonConflictingFilesystems;
+        for ( const auto& fsType : nonConflictingFilesystemTypes )
+        {
+            nonConflictingFilesystems.append( Calamares::Partition::prettyNameForFileSystemType( fsType ) );
+        }
+        result = PartitionViewStep::FSConflictEntry( partMountPoint, partFs, conflictedPath, nonConflictingFilesystems );
+    }
+
+    return result;
+}
+
+static QList< PartitionViewStep::FSConflictEntry >
+checkForFilesystemConflicts( PartitionCoreModule* core )
+{
+    QList< PartitionViewStep::FSConflictEntry > result;
+
+    DeviceModel* dm = core->deviceModel();
+    QStringList mountPointList;
+
+    // Walk the device and partition tree, extracting mountpoints from it
+    for ( int i = 0; i < dm->rowCount(); i++ )
+    {
+        Device* dev = dm->deviceForIndex( dm->index( i ) );
+        PartitionModel* pm = core->partitionModelForDevice( dev );
+
+        QModelIndex extPartMountPointIdx = QModelIndex();
+        bool extPartFound = false;
+        for ( int j = 0; j < pm->rowCount(); j++ )
+        {
+            QModelIndex partFsIdx = pm->index( j, PartitionModel::FileSystemColumn );
+            QModelIndex partMountPointIdx = pm->index( j, PartitionModel::MountPointColumn );
+
+            if ( pm->data( partFsIdx ).toString().toLower() == "extended" )
+            {
+                extPartFound = true;
+                extPartMountPointIdx = partMountPointIdx;
+                break;
+            }
+
+            QString mountPoint = pm->data( partMountPointIdx ).toString();
+            if ( !mountPoint.isEmpty() )
+            {
+                mountPointList.append( mountPoint );
+            }
+        }
+        if ( extPartFound )
+        {
+            for ( int j = 0; j < pm->rowCount( extPartMountPointIdx ); j++ )
+            {
+                QModelIndex partMountPointIdx = pm->index( j, PartitionModel::MountPointColumn, extPartMountPointIdx );
+                QString mountPoint = pm->data( partMountPointIdx ).toString();
+                if ( !mountPoint.isEmpty() )
+                {
+                    mountPointList.append( mountPoint );
+                }
+            }
+        }
+    }
+
+    // Walk the device and partition tree again, validating it this time
+    for ( int i = 0; i < dm->rowCount(); i++ )
+    {
+        Device* dev = dm->deviceForIndex( dm->index( i ) );
+        PartitionModel* pm = core->partitionModelForDevice( dev );
+
+        QModelIndex extPartFsIdx = QModelIndex();
+        QModelIndex extPartMountPointIdx = QModelIndex();
+        bool extPartFound = false;
+
+        for ( int j = 0; j < pm->rowCount(); j++ )
+        {
+            QModelIndex partFsIdx = pm->index( j, PartitionModel::FileSystemColumn );
+            QModelIndex partMountPointIdx = pm->index( j, PartitionModel::MountPointColumn );
+
+            if ( pm->data( partFsIdx ).toString().toLower() == "extended" )
+            {
+                extPartFound = true;
+                extPartFsIdx = partFsIdx;
+                extPartMountPointIdx = partMountPointIdx;
+                break;
+            }
+
+            PartitionViewStep::FSConflictEntry conflictEntry = calcFSConflictEntry( core, pm, partFsIdx, partMountPointIdx, mountPointList );
+            if ( !conflictEntry.conflictedPath.isEmpty() )
+            {
+                result.append( conflictEntry );
+            }
+        }
+        if ( extPartFound )
+        {
+            for ( int j = 0; j < pm->rowCount( extPartFsIdx ); j++ )
+            {
+                QModelIndex partFsIdx = pm->index( j, PartitionModel::FileSystemColumn, extPartFsIdx );
+                QModelIndex partMountPointIdx = pm->index( j, PartitionModel::MountPointColumn, extPartMountPointIdx );
+                PartitionViewStep::FSConflictEntry conflictEntry = calcFSConflictEntry( core, pm, partFsIdx, partMountPointIdx, mountPointList );
+                if ( !conflictEntry.conflictedPath.isEmpty() )
+                {
+                    result.append( conflictEntry );
+                }
+            }
+        }
+    }
+
+    return result;
+}
+
 void
 PartitionViewStep::onLeave()
 {
@@ -502,17 +689,16 @@ PartitionViewStep::onLeave()
     }
 
     const auto* branding = Calamares::Branding::instance();
+
+    const QString startList = QStringLiteral( "<br/><br/><ul>" );
+    const QString endList = QStringLiteral( "</ul><br/><br/>" );
+
     if ( m_widget->currentWidget() == m_manualPartitionPage )
     {
         if ( PartUtils::isEfiSystem() )
         {
             const QString espMountPoint
                 = Calamares::JobQueue::instance()->globalStorage()->value( "efiSystemPartition" ).toString();
-#ifdef WITH_KPMCORE4API
-            const auto espFlag = PartitionTable::Flag::Boot;
-#else
-            const auto espFlag = PartitionTable::FlagEsp;
-#endif
             Partition* esp = m_core->findPartitionByMountPoint( espMountPoint );
 
             QString message;
@@ -521,60 +707,82 @@ PartitionViewStep::onLeave()
             Logger::Once o;
 
             const bool okType = esp && PartUtils::isEfiFilesystemSuitableType( esp );
-            const bool okSize = esp && PartUtils::isEfiFilesystemSuitableSize( esp );
+            const bool okRecommendedSize = esp && PartUtils::isEfiFilesystemRecommendedSize( esp );
+            const bool okMinimumSize = esp && PartUtils::isEfiFilesystemMinimumSize( esp );
             const bool okFlag = esp && PartUtils::isEfiBootable( esp );
 
-            if ( !esp )
-            {
-                message = tr( "No EFI system partition configured" );
-            }
-            else if ( !( okType && okSize && okFlag ) )
-            {
-                message = tr( "EFI system partition configured incorrectly" );
-            }
+            const bool espExistsButIsWrong = esp && !( okType && okMinimumSize && okFlag );
 
-            if ( !esp || !( okType && okSize && okFlag ) )
-            {
-                description = tr( "An EFI system partition is necessary to start %1."
-                                  "<br/><br/>"
-                                  "To configure an EFI system partition, go back and "
-                                  "select or create a suitable filesystem." )
-                                  .arg( branding->shortProductName() );
-            }
+            const QString genericWrongnessMessage = tr( "An EFI system partition is necessary to start %1."
+                                                        "<br/><br/>"
+                                                        "To configure an EFI system partition, go back and "
+                                                        "select or create a suitable filesystem." )
+                                                        .arg( branding->shortProductName() );
+            const QString genericRecommendationMessage
+                = tr( "An EFI system partition is necessary to start %1."
+                      "<br/><br/>"
+                      "The EFI system partition does not meet recommendations. It is "
+                      "recommended to go back and "
+                      "select or create a suitable filesystem." )
+                      .arg( branding->shortProductName() );
+
+            const QString wrongMountPointMessage
+                = tr( "The filesystem must be mounted on <strong>%1</strong>." ).arg( espMountPoint );
+            const QString wrongTypeMessage = tr( "The filesystem must have type FAT32." );
+            const QString wrongFlagMessage = tr( "The filesystem must have flag <strong>%1</strong> set." )
+                                                 .arg( PartitionTable::flagName( PartitionTable::Flag::Boot ) );
+
+            const auto recommendedMiB = Calamares::BytesToMiB( PartUtils::efiFilesystemRecommendedSize() );
+            const auto minimumMiB = Calamares::BytesToMiB( PartUtils::efiFilesystemMinimumSize() );
+
+            // Three flavors of size-is-wrong
+            const QString requireConfiguredSize
+                = tr( "The filesystem must be at least %1 MiB in size." ).arg( recommendedMiB );
+            const QString requiredMinimumSize
+                = tr( "The filesystem must be at least %1 MiB in size." ).arg( minimumMiB );
+            const QString suggestConfiguredSize
+                = tr( "The minimum recommended size for the filesystem is %1 MiB." ).arg( recommendedMiB );
+
+            const QString mayFail = tr( "You can continue without setting up an EFI system "
+                                        "partition but your system may fail to start." );
+            const QString possibleFail = tr( "You can continue with this EFI system "
+                                             "partition configuration but your system may fail to start." );
+
             if ( !esp )
             {
                 cDebug() << o << "No ESP mounted";
-                description.append( ' ' );
-                description.append(
-                    tr( "The filesystem must be mounted on <strong>%1</strong>." ).arg( espMountPoint ) );
+                message = tr( "No EFI system partition configured" );
+
+                description = genericWrongnessMessage + startList + listItem( wrongMountPointMessage )
+                    + listItem( requireConfiguredSize ) + listItem( wrongTypeMessage ) + listItem( wrongFlagMessage )
+                    + endList + mayFail;
             }
-            if ( !okType )
+            else if ( espExistsButIsWrong )
             {
-                cDebug() << o << "ESP wrong type";
-                description.append( ' ' );
-                description.append( tr( "The filesystem must have type FAT32." ) );
+                message = tr( "EFI system partition configured incorrectly" );
+
+                description = genericWrongnessMessage + startList;
+                if ( !okMinimumSize )
+                {
+                    description.append( listItem( requiredMinimumSize ) );
+                }
+                if ( !okType )
+                {
+                    description.append( listItem( wrongTypeMessage ) );
+                }
+                if ( !okFlag )
+                {
+                    description.append( listItem( wrongFlagMessage ) );
+                }
+                description.append( endList );
+                description.append( mayFail );
             }
-            if ( !okSize )
+            else if ( !okRecommendedSize )
             {
-                cDebug() << o << "ESP too small";
-                const qint64 atLeastBytes = static_cast< qint64 >( PartUtils::efiFilesystemMinimumSize() );
-                const auto atLeastMiB = CalamaresUtils::BytesToMiB( atLeastBytes );
-                description.append( ' ' );
-                description.append( tr( "The filesystem must be at least %1 MiB in size." ).arg( atLeastMiB ) );
+                message = tr( "EFI system partition recommendation" );
+                description = genericRecommendationMessage + suggestConfiguredSize + possibleFail;
             }
-            if ( !okFlag )
-            {
-                cDebug() << o << "ESP missing flag";
-                description.append( ' ' );
-                description.append( tr( "The filesystem must have flag <strong>%1</strong> set." )
-                                        .arg( PartitionTable::flagName( espFlag ) ) );
-            }
-            if ( !description.isEmpty() )
-            {
-                description.append( "<br/><br/>" );
-                description.append( tr( "You can continue without setting up an EFI system "
-                                        "partition but your system may fail to start." ) );
-            }
+
             if ( !message.isEmpty() )
             {
                 QMessageBox mb( QMessageBox::Warning, message, description, QMessageBox::Ok, m_manualPartitionPage );
@@ -611,40 +819,74 @@ PartitionViewStep::onLeave()
             }
         }
 
-        Partition* root_p = m_core->findPartitionByMountPoint( "/" );
-        Partition* boot_p = m_core->findPartitionByMountPoint( "/boot" );
-
-        if ( root_p and boot_p )
+        if ( shouldWarnForNotEncryptedBoot( m_config, m_core ) )
         {
-            QString message;
-            QString description;
+            QString message = tr( "Boot partition not encrypted" );
+            QString description = tr( "A separate boot partition was set up together with "
+                                      "an encrypted root partition, but the boot partition "
+                                      "is not encrypted."
+                                      "<br/><br/>"
+                                      "There are security concerns with this kind of "
+                                      "setup, because important system files are kept "
+                                      "on an unencrypted partition.<br/>"
+                                      "You may continue if you wish, but filesystem "
+                                      "unlocking will happen later during system startup."
+                                      "<br/>To encrypt the boot partition, go back and "
+                                      "recreate it, selecting <strong>Encrypt</strong> "
+                                      "in the partition creation window." );
 
-            // If the root partition is encrypted, and there's a separate boot
-            // partition which is not encrypted
-            if ( root_p->fileSystem().type() == FileSystem::Luks && boot_p->fileSystem().type() != FileSystem::Luks )
+            QMessageBox mb( QMessageBox::Warning, message, description, QMessageBox::Ok, m_manualPartitionPage );
+            Calamares::fixButtonLabels( &mb );
+            mb.exec();
+        }
+
+        QList< FSConflictEntry > conflictMap = checkForFilesystemConflicts( m_core );
+        if ( !conflictMap.isEmpty() )
+        {
+            QString message = tr( "Filesystem conflicts found" );
+            const QString descHeader = tr( "The chosen manual partitioning layout does not "
+                                           "comply with the filesystem restrictions set by the "
+                                           "distro. The following issues were found:");
+
+            QStringList issueList;
+            for ( const auto& entry : conflictMap )
             {
-                message = tr( "Boot partition not encrypted" );
-                description = tr( "A separate boot partition was set up together with "
-                                  "an encrypted root partition, but the boot partition "
-                                  "is not encrypted."
-                                  "<br/><br/>"
-                                  "There are security concerns with this kind of "
-                                  "setup, because important system files are kept "
-                                  "on an unencrypted partition.<br/>"
-                                  "You may continue if you wish, but filesystem "
-                                  "unlocking will happen later during system startup."
-                                  "<br/>To encrypt the boot partition, go back and "
-                                  "recreate it, selecting <strong>Encrypt</strong> "
-                                  "in the partition creation window." );
-
-                QMessageBox mb( QMessageBox::Warning, message, description, QMessageBox::Ok, m_manualPartitionPage );
-                Calamares::fixButtonLabels( &mb );
-                mb.exec();
+                QString buildString;
+                if ( entry.conflictedPath == "any" )
+                {
+                    buildString = tr( "The %1 directory uses filesystem %2, but this distro only allows the following filesystems: %3." )
+                                      .arg( entry.conflictingPath )
+                                      .arg( entry.conflictingFilesystem )
+                                      .arg( entry.allowableFilesystems.join( ", " ) );
+                    issueList.append( buildString );
+                }
+                else
+                {
+                    buildString = tr( "The %1 directory uses filesystem %2, but the %3 directory must use one of the following filesystems: %4." )
+                                      .arg( entry.conflictingPath )
+                                      .arg( entry.conflictingFilesystem )
+                                      .arg( entry.conflictedPath )
+                                      .arg( entry.allowableFilesystems.join( ", " ) );
+                    issueList.append( buildString );
+                }
             }
+
+            const QString descFooter = tr( "You can continue without setting up filesystems "
+                                           "properly, but your system may fail to start." );
+
+            QString description = descHeader + startList;
+            for ( const auto& item : issueList )
+            {
+                description += listItem( item );
+            }
+            description += endList + descFooter;
+
+            QMessageBox mb( QMessageBox::Warning, message, description, QMessageBox::Ok, m_manualPartitionPage );
+            Calamares::fixButtonLabels( &mb );
+            mb.exec();
         }
     }
 }
-
 
 void
 PartitionViewStep::setConfigurationMap( const QVariantMap& configurationMap )
@@ -658,18 +900,18 @@ PartitionViewStep::setConfigurationMap( const QVariantMap& configurationMap )
     // Read and parse key swapPartitionName
     if ( configurationMap.contains( "swapPartitionName" ) )
     {
-        gs->insert( "swapPartitionName", CalamaresUtils::getString( configurationMap, "swapPartitionName" ) );
+        gs->insert( "swapPartitionName", Calamares::getString( configurationMap, "swapPartitionName" ) );
     }
 
     // OTHER SETTINGS
     //
-    gs->insert( "drawNestedPartitions", CalamaresUtils::getBool( configurationMap, "drawNestedPartitions", false ) );
+    gs->insert( "drawNestedPartitions", Calamares::getBool( configurationMap, "drawNestedPartitions", false ) );
     gs->insert( "alwaysShowPartitionLabels",
-                CalamaresUtils::getBool( configurationMap, "alwaysShowPartitionLabels", true ) );
+                Calamares::getBool( configurationMap, "alwaysShowPartitionLabels", true ) );
     gs->insert( "enableLuksAutomatedPartitioning",
-                CalamaresUtils::getBool( configurationMap, "enableLuksAutomatedPartitioning", true ) );
+                Calamares::getBool( configurationMap, "enableLuksAutomatedPartitioning", true ) );
 
-    QString partitionTableName = CalamaresUtils::getString( configurationMap, "defaultPartitionTableType" );
+    QString partitionTableName = Calamares::getString( configurationMap, "defaultPartitionTableType" );
     if ( partitionTableName.isEmpty() )
     {
         cWarning() << "Partition-module setting *defaultPartitionTableType* is unset, "
@@ -691,12 +933,16 @@ PartitionViewStep::setConfigurationMap( const QVariantMap& configurationMap )
                  this->m_future = nullptr;
              } );
 
+#if QT_VERSION < QT_VERSION_CHECK( 6, 0, 0 )
     QFuture< void > future = QtConcurrent::run( this, &PartitionViewStep::initPartitionCoreModule );
+#else
+    QFuture< void > future = QtConcurrent::run( &PartitionViewStep::initPartitionCoreModule, this );
+#endif
     m_future->setFuture( future );
 
     m_core->partitionLayout().init( m_config->defaultFsType(), configurationMap.value( "partitionLayout" ).toList() );
+    m_core->dirFSRestrictLayout().init( configurationMap.value( "directoryFilesystemRestrictions" ).toList() );
 }
-
 
 Calamares::JobList
 PartitionViewStep::jobs() const
@@ -727,6 +973,5 @@ PartitionViewStep::checkRequirements()
 
     return l;
 }
-
 
 CALAMARES_PLUGIN_FACTORY_DEFINITION( PartitionViewStepFactory, registerPlugin< PartitionViewStep >(); )

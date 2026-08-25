@@ -29,8 +29,7 @@ namespace Calamares
  * A view module is a Calamares module which has at least one UI page (exposed as
  * ViewStep::widget), and can optionally create Calamares jobs at runtime.
  * As of early 2020, a view module can be implemented by deriving from ViewStep
- * in C++ (as a Qt Plugin or a Qml ViewStep) or in Python with the PythonQt interface
- * (which also mimics the ViewStep class).
+ * in C++ (as a Qt Plugin or a Qml ViewStep).
  *
  * A ViewStep can describe itself in human-readable format for the SummaryPage
  * (which shows all of the things which have been collected to be done in the
@@ -168,6 +167,15 @@ public:
      * See Calamares::RequirementEntry for details.
      */
     virtual RequirementsList checkRequirements();
+
+    /**
+     * @brief Called when the user cancels the installation
+     *
+     * View steps are expected to leave the system unchanged when
+     * the installation is cancelled. The default implementation
+     * does nothing.
+     */
+    virtual void onCancel();
 
 signals:
     /// @brief Tells the viewmanager to enable the *next* button according to @p status

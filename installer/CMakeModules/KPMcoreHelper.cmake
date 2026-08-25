@@ -7,33 +7,58 @@
 #
 # Finds KPMcore and consistently sets API flags based on the version.
 #
-if ( NOT KPMcore_searched_for )
-    set( KPMcore_searched_for TRUE )
+# If KPMcore is not found, still create calamares::kpmcore interface
+# library, which will add definition WITHOUT_KPMcore.
+#
+if(NOT TARGET calapmcore)
+    find_package(${kfname}Config CONFIG)
+    find_package(${kfname}I18n CONFIG)
+    find_package(${kfname}WidgetsAddons CONFIG)
 
-    find_package( KPMcore 3.3 )
+    if(WITH_QT6)
+        find_package(KPMcore 24.01.75)
+    else()
+        find_package(KPMcore 20.04.0)
+    endif()
     set_package_properties(
-        KPMcore PROPERTIES
+        KPMcore
+        PROPERTIES
         URL "https://invent.kde.org/kde/kpmcore"
         DESCRIPTION "KDE Partitioning library"
         TYPE RECOMMENDED
         PURPOSE "For disk partitioning support"
     )
 
-    if( KPMcore_FOUND )
-        set( KPMcore_API_DEFINITIONS "" )
-        if( KPMcore_VERSION VERSION_GREATER "3.3.70" AND KPMcore_VERSION VERSION_LESS "4.0" )
-            message( FATAL_ERROR "KPMCore beta versions ${KPMcore_VERSION} not supported" )
-        endif()
-        if ( KPMcore_VERSION VERSION_GREATER "3.3.0")
-            list( APPEND KPMcore_API_DEFINITIONS WITH_KPMCORE331API) # kpmcore > 3.3.0 with deprecations
-        endif()
-        if ( KPMcore_VERSION VERSION_GREATER_EQUAL "4.0")
-            list( APPEND KPMcore_API_DEFINITIONS WITH_KPMCORE4API) # kpmcore 4 with new API
-        endif()
-        if( KPMcore_VERSION VERSION_GREATER_EQUAL "4.2" )
-            list( APPEND KPMcore_API_DEFINITIONS WITH_KPMCORE42API) # kpmcore 4.2 with new API
-        endif()
+    # Create an internal Calamares interface to KPMcore
+    # and give it a nice alias name. If kpmcore is not found,
+    # then make a "no KPMcore" library.
+    add_library(calapmcore INTERFACE)
+
+    if(KPMcore_FOUND)
+        find_package(${qtname} REQUIRED DBus) # Needed for KPMCore
+        find_package(${kfname}I18n REQUIRED) # Needed for KPMCore
+        find_package(${kfname}WidgetsAddons REQUIRED) # Needed for KPMCore
+
+        target_link_libraries(calapmcore INTERFACE kpmcore ${qtname}::DBus ${kfname}::I18n ${kfname}::WidgetsAddons)
+        target_include_directories(calapmcore INTERFACE ${KPMCORE_INCLUDE_DIR})
+        math(EXPR _kpm_version_number "(0x${KPMcore_VERSION_MAJOR} * 0x10000)+(0x${KPMcore_VERSION_MINOR} * 0x100)+(0x${KPMcore_VERSION_PATCH})" OUTPUT_FORMAT HEXADECIMAL)
+        target_compile_definitions(calapmcore INTERFACE WITH_KPMcore=${_kpm_version_number})
+
+        # Flag that this library has KPMcore support. A variable
+        # set here has the wrong scope. ENV{} would be visible
+        # everywhere but seems the wrong thing to do. Setting
+        # properties on calapmcore requires a newer CMake than
+        # Debian 11 has, so runs into support issues.
+        add_library(calamares::kpmcore ALIAS calapmcore)
     else()
-        set( KPMcore_API_DEFINITIONS WITHOUT_KPMcore )
+        target_compile_definitions(calapmcore INTERFACE WITHOUT_KPMcore)
+    endif()
+else()
+    if(TARGET calamares::kpmcore)
+        message(STATUS "KPMcore has already been found")
+        set(KPMcore_FOUND TRUE)
+    else()
+        message(STATUS "KPMcore has been searched-for and not found")
+        set(KPMcore_FOUND FALSE)
     endif()
 endif()

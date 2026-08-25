@@ -18,18 +18,18 @@
 #include "JobQueue.h"
 #include "Settings.h"
 #include "ViewManager.h"
+#include "locale/TranslationsModel.h"
 #include "modulesystem/ModuleManager.h"
-#include "utils/CalamaresUtilsGui.h"
-#include "utils/CalamaresUtilsSystem.h"
 #include "utils/Dirs.h"
+#include "utils/Gui.h"
 #include "utils/Logger.h"
+#include "utils/System.h"
 #ifdef WITH_QML
 #include "utils/Qml.h"
 #endif
 #include "utils/Retranslator.h"
 #include "viewpages/ViewStep.h"
 
-#include <QDesktopWidget>
 #include <QDir>
 #include <QFileInfo>
 #include <QScreen>
@@ -58,16 +58,25 @@ CalamaresApplication::CalamaresApplication( int& argc, char* argv[] )
     setApplicationVersion( QStringLiteral( CALAMARES_VERSION ) );
 
     QFont f = font();
-    CalamaresUtils::setDefaultFontSize( f.pointSize() );
+    Calamares::setDefaultFontSize( f.pointSize() );
 }
-
 
 void
 CalamaresApplication::init()
 {
     Logger::setupLogfile();
     cDebug() << "Calamares version:" << CALAMARES_VERSION;
-    cDebug() << Logger::SubEntry << "languages:" << QString( CALAMARES_TRANSLATION_LANGUAGES ).replace( ";", ", " );
+    cDebug() << Logger::SubEntry << "Using Qt version:" << qVersion();
+    cDebug() << Logger::SubEntry << "Build type:" << CMAKE_BUILD_TYPE;
+#ifdef WITH_PYBIND11
+    cDebug() << Logger::SubEntry << "Using PyBind11";
+#endif
+#ifdef WITH_BOOST_PYTHON
+    cDebug() << Logger::SubEntry << "Using Boost Python";
+#endif
+    cDebug() << Logger::SubEntry << "Using settings:" << Calamares::Settings::instance()->path();
+    cDebug() << Logger::SubEntry << "Using log file:" << Logger::logFile();
+    cDebug() << Logger::SubEntry << "Languages:" << Calamares::Locale::availableLanguages();
 
     if ( !Calamares::Settings::instance() )
     {
@@ -77,7 +86,7 @@ CalamaresApplication::init()
     initQmlPath();
     initBranding();
 
-    CalamaresUtils::installTranslator();
+    Calamares::installTranslator();
 
     setQuitOnLastWindowClosed( false );
     setWindowIcon( QIcon( Calamares::Branding::instance()->imagePath( Calamares::Branding::ProductIcon ) ) );
@@ -89,13 +98,11 @@ CalamaresApplication::init()
     cDebug() << Logger::SubEntry << "STARTUP: initModuleManager: module init started";
 }
 
-
 CalamaresApplication::~CalamaresApplication()
 {
     Logger::CDebug( Logger::LOGVERBOSE ) << "Shutting down Calamares...";
     Logger::CDebug( Logger::LOGVERBOSE ) << Logger::SubEntry << "Finished shutdown.";
 }
-
 
 CalamaresApplication*
 CalamaresApplication::instance()
@@ -103,21 +110,19 @@ CalamaresApplication::instance()
     return qobject_cast< CalamaresApplication* >( QApplication::instance() );
 }
 
-
 CalamaresWindow*
 CalamaresApplication::mainWindow()
 {
     return m_mainwindow;
 }
 
-
 static QStringList
 brandingFileCandidates( bool assumeBuilddir, const QString& brandingFilename )
 {
     QStringList brandingPaths;
-    if ( CalamaresUtils::isAppDataDirOverridden() )
+    if ( Calamares::isAppDataDirOverridden() )
     {
-        brandingPaths << CalamaresUtils::appDataDir().absoluteFilePath( brandingFilename );
+        brandingPaths << Calamares::appDataDir().absoluteFilePath( brandingFilename );
     }
     else
     {
@@ -125,30 +130,30 @@ brandingFileCandidates( bool assumeBuilddir, const QString& brandingFilename )
         {
             brandingPaths << ( QDir::currentPath() + QStringLiteral( "/src/" ) + brandingFilename );
         }
-        if ( CalamaresUtils::haveExtraDirs() )
-            for ( auto s : CalamaresUtils::extraDataDirs() )
+        if ( Calamares::haveExtraDirs() )
+        {
+            for ( auto s : Calamares::extraDataDirs() )
             {
                 brandingPaths << ( s + brandingFilename );
             }
+        }
         brandingPaths << QDir( CMAKE_INSTALL_FULL_SYSCONFDIR "/calamares/" ).absoluteFilePath( brandingFilename );
-        brandingPaths << CalamaresUtils::appDataDir().absoluteFilePath( brandingFilename );
+        brandingPaths << Calamares::appDataDir().absoluteFilePath( brandingFilename );
     }
 
     return brandingPaths;
 }
 
-
 void
 CalamaresApplication::initQmlPath()
 {
 #ifdef WITH_QML
-    if ( !CalamaresUtils::initQmlModulesDir() )
+    if ( !Calamares::initQmlModulesDir() )
     {
         ::exit( EXIT_FAILURE );
     }
 #endif
 }
-
 
 void
 CalamaresApplication::initBranding()
@@ -181,7 +186,7 @@ CalamaresApplication::initBranding()
     {
         cError() << "Cowardly refusing to continue startup without branding."
                  << Logger::DebugList( brandingFileCandidatesByPriority );
-        if ( CalamaresUtils::isAppDataDirOverridden() )
+        if ( Calamares::isAppDataDirOverridden() )
         {
             cError() << "FATAL: explicitly configured application data directory is missing" << brandingComponentName;
         }
@@ -192,9 +197,8 @@ CalamaresApplication::initBranding()
         ::exit( EXIT_FAILURE );
     }
 
-    new Calamares::Branding( brandingFile.absoluteFilePath(), this );
+    new Calamares::Branding( brandingFile.absoluteFilePath(), this, devicePixelRatio() );
 }
-
 
 void
 CalamaresApplication::initModuleManager()
@@ -262,21 +266,12 @@ CalamaresApplication::initView()
     cDebug() << "STARTUP: CalamaresWindow created; loadModules started";
 }
 
-
 void
 CalamaresApplication::initViewSteps()
 {
     cDebug() << "STARTUP: loadModules for all modules done";
     m_moduleManager->checkRequirements();
-    if ( Calamares::Branding::instance()->windowMaximize() )
-    {
-        m_mainwindow->setWindowFlag( Qt::FramelessWindowHint );
-        m_mainwindow->showMaximized();
-    }
-    else
-    {
-        m_mainwindow->show();
-    }
+    m_mainwindow->showFullScreen();
 
     cDebug() << "STARTUP: Window now visible and ProgressTreeView populated";
     cDebug() << Logger::SubEntry << Calamares::ViewManager::instance()->viewSteps().count() << "view steps loaded.";
@@ -294,6 +289,6 @@ void
 CalamaresApplication::initJobQueue()
 {
     Calamares::JobQueue* jobQueue = new Calamares::JobQueue( this );
-    new CalamaresUtils::System( Calamares::Settings::instance()->doChroot(), this );
+    new Calamares::System( Calamares::Settings::instance()->doChroot(), this );
     Calamares::Branding::instance()->setGlobals( jobQueue->globalStorage() );
 }

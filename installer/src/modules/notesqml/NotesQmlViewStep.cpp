@@ -27,11 +27,11 @@ void
 NotesQmlViewStep::setConfigurationMap( const QVariantMap& configurationMap )
 {
     bool qmlLabel_ok = false;
-    auto qmlLabel = CalamaresUtils::getSubMap( configurationMap, "qmlLabel", qmlLabel_ok );
+    auto qmlLabel = Calamares::getSubMap( configurationMap, "qmlLabel", qmlLabel_ok );
 
     if ( qmlLabel.contains( "notes" ) )
     {
-        m_notesName = new CalamaresUtils::Locale::TranslatedString( qmlLabel, "notes" );
+        m_notesName = new Calamares::Locale::TranslatedString( qmlLabel, "notes" );
     }
 
     Calamares::QmlViewStep::setConfigurationMap( configurationMap );  // call parent implementation last

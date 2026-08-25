@@ -28,7 +28,7 @@
 #include <QProcess>
 #include <QStringList>
 
-using CalamaresUtils::Partition::PartitionIterator;
+using Calamares::Partition::PartitionIterator;
 
 
 /** @brief Returns list of partitions on a given @p deviceName
@@ -105,18 +105,39 @@ getSwapsForDevice( const QString& deviceName )
 }
 
 static inline bool
-isControl( const QString& baseName )
-{
-    return baseName == "control";
-}
-
-static inline bool
-isFedoraSpecial( const QString& baseName )
+isSpecial( const QString& baseName )
 {
     // Fedora live images use /dev/mapper/live-* internally. We must not
     // unmount those devices, because they are used by the live image and
     // because we need /dev/mapper/live-base in the unpackfs module.
-    return baseName.startsWith( "live-" );
+    const bool specialForFedora = baseName.startsWith( "live-" );
+
+    // Exclude /dev/mapper/control
+    const bool specialMapperControl = baseName == "control";
+
+    // When ventoy is used, ventoy uses the /dev/mapper/ventoy device. We
+    // must not unmount this device, because it is used by the live image
+    // and because we need /dev/mapper/ventoy in the unpackfs module.
+    const bool specialVentoy = baseName == "ventoy";
+
+    return specialForFedora || specialMapperControl || specialVentoy;
+}
+
+static inline bool
+matchesExceptions( const QStringList& mapperExceptions, const QString& basename )
+{
+    for ( const auto& e : mapperExceptions )
+    {
+        if ( basename == e )
+        {
+            return true;
+        }
+        if ( e.endsWith( '*' ) && basename.startsWith( e.left( e.length() - 1 ) ) )
+        {
+            return true;
+        }
+    }
+    return false;
 }
 
 /** @brief Returns a list of unneeded crypto devices
@@ -135,7 +156,7 @@ getCryptoDevices( const QStringList& mapperExceptions )
     for ( const QFileInfo& fi : fiList )
     {
         QString baseName = fi.baseName();
-        if ( isControl( baseName ) || isFedoraSpecial( baseName ) || mapperExceptions.contains( baseName ) )
+        if ( isSpecial( baseName ) || matchesExceptions( mapperExceptions, baseName ) )
         {
             continue;
         }
@@ -196,12 +217,7 @@ getPVGroups( const QString& deviceName )
 
                 vgSet.insert( vgName );
             }
-// toList() was deprecated, but old-old versions don't support QStringList construction like this
-#if QT_VERSION < QT_VERSION_CHECK( 5, 15, 0 )
-            return vgSet.toList();
-#else
             return QStringList { vgSet.cbegin(), vgSet.cend() };
-#endif
         }
     }
     else
@@ -338,7 +354,7 @@ template < typename F >
 void
 apply( const QStringList& paths, F f, QList< MessageAndPath >& news )
 {
-    for ( const QString& p : qAsConst( paths ) )
+    for ( const QString& p : std::as_const( paths ) )
     {
         auto n = f( p );
         if ( !n.isEmpty() )
@@ -352,7 +368,7 @@ STATICTEST QStringList
 stringify( const QList< MessageAndPath >& news )
 {
     QStringList l;
-    for ( const auto& m : qAsConst( news ) )
+    for ( const auto& m : std::as_const( news ) )
     {
         l << QString( m );
     }
@@ -368,20 +384,20 @@ ClearMountsJob::ClearMountsJob( Device* device )
 QString
 ClearMountsJob::prettyName() const
 {
-    return tr( "Clear mounts for partitioning operations on %1" ).arg( m_deviceNode );
+    return tr( "Clear mounts for partitioning operations on %1", "@title" ).arg( m_deviceNode );
 }
 
 QString
 ClearMountsJob::prettyStatusMessage() const
 {
-    return tr( "Clearing mounts for partitioning operations on %1." ).arg( m_deviceNode );
+    return tr( "Clearing mounts for partitioning operations on %1…", "@status" ).arg( m_deviceNode );
 }
 
 Calamares::JobResult
 ClearMountsJob::exec()
 {
     const QString deviceName = m_deviceNode.split( '/' ).last();
-    CalamaresUtils::Partition::Syncer s;
+    Calamares::Partition::Syncer s;
     QList< MessageAndPath > goodNews;
 
     apply( getCryptoDevices( m_mapperExceptions ), tryCryptoClose, goodNews );
