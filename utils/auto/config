@@ -14,20 +14,23 @@ country_code=$(echo "$response" | jq -r '.location.countryCode')
 if [ -e .mirror ]; then
     lingmo_mirror=$(cat .mirror)
 else
-	if [ "$country_code" == "CN" ]; then
-		lingmo_mirror=http://mirrors.tuna.tsinghua.edu.cn/debian
-	else
-	    lingmo_mirror=http://ftp.debian.org/debian
-	fi
+	# if [ "$country_code" == "CN" ]; then
+	# 	lingmo_mirror=http://mirrors.tuna.tsinghua.edu.cn/debian
+	# else
+	#     lingmo_mirror=http://ftp.debian.org/debian
+	# fi
+    lingmo_mirror=http://ftp.debian.org/debian
+
+	public_lingmo_mirror="$lingmo_mirror"
 fi
 
 ### DO NOT EDIT THE REST OF THIS FILE ###
 
-if [ "$country_code" == "CN" ]; then
-	public_lingmo_mirror=http://mirrors.tuna.tsinghua.edu.cn
-else
-	public_lingmo_mirror=http://ftp.debian.org/debian
-fi
+# if [ "$country_code" == "CN" ]; then
+# 	public_lingmo_mirror=http://mirrors.tuna.tsinghua.edu.cn
+# else
+# 	public_lingmo_mirror=http://ftp.debian.org/debian
+# fi
 
 # Detect target architecture and filter args
 temp=""
