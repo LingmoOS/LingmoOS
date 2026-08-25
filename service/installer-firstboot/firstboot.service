@@ -1,0 +1,15 @@
+[Unit]
+Description=Lingmo OS First Boot Setup
+ConditionPathExists=!/etc/.firstboot-complete
+DefaultDependencies=no
+Before=display-manager.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/lib/lingmo-oobe/oobe.sh setup
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=basic.target
