@@ -1,0 +1,13 @@
+#!/bin/sh
+# Display Lingmo OS MOTD with color support
+
+# Only show for interactive terminals
+if [ -t 0 ] && [ -t 1 ]; then
+    # Read the static motd and process escape sequences
+    if [ -f /usr/share/base-files/motd ]; then
+        # Use printf to interpret \033 escape sequences
+        while IFS= read -r line; do
+            printf '%b\n' "$line"
+        done < /usr/share/base-files/motd
+    fi
+fi

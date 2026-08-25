@@ -1,0 +1,55 @@
+#!/bin/sh
+set -e
+
+if [ "$1" = "install" ] || [ "$1" = "upgrade" ]; then
+  msg=
+  for d in bin lib lib32 lib64 libo32 libx32 sbin; do
+    if [ -L "$DPKG_ROOT/$d" ]; then
+      target=$(readlink "$DPKG_ROOT/$d")
+      if [ "$target" != "usr/$d" ]; then
+        if [ "$d" = lib64 ] && [ "$target" = "usr/lib/#DEB_HOST_MULTIARCH#" ]; then
+          # Work around https://github.com/systemd/systemd/issues/33919
+          echo "Fixing bad /$d symbolic link created by systemd-nspawn."
+          if [ -d "$DPKG_ROOT/usr/$d" ]; then
+            ln -sf "usr/$d" "$DPKG_ROOT/$d"
+          else
+            rm "$DPKG_ROOT/$d"
+          fi
+        else
+          msg="/$d is a symbolic link and not pointing at usr/$d exactly"
+        fi
+      elif [ ! -d "$DPKG_ROOT/usr/$d" ]; then
+        msg="/$d is a dangling symbolic link"
+      fi
+      msg2="This is an unexpected situation. Cannot proceed with the upgrade"
+    elif [ -d "$DPKG_ROOT/$d" ]; then
+      msg="/$d is a directory, but should be a symbolic link"
+      msg2="Please install the usrmerge package to convert this system to merged-/usr"
+    fi
+    if [ -n "$msg" ]; then
+      cat <<EOF
+
+
+******************************************************************************
+*
+* The base-files package cannot be installed because
+* $msg.
+*
+* $msg2.
+*
+* For more information please read https://wiki.debian.org/UsrMerge.
+*
+******************************************************************************
+
+
+EOF
+      exit 1
+    fi
+  done
+  for d in #USR_MERGE_MULTILIB#; do
+    # Install DEP17 M4 protective diversions
+    dpkg-divert --quiet --package base-files --add --no-rename --divert "/.$d.usr-is-merged" "/$d"
+  done
+fi
+
+#DEBHELPER#

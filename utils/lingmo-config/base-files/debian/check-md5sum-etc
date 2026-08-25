@@ -1,0 +1,8 @@
+#!/bin/sh
+file=$1
+md5=$(md5sum share/${file} | cut -f 1 -d " ")
+if ! grep -q "$md5" share/${file}.md5sums; then
+  echo Error: share/${file}.md5sums is incomplete.
+  echo Need to add "$md5" with current version.
+  exit 1
+fi

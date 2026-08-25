@@ -1,0 +1,71 @@
+# Builds the base-files source package from this LingmoOS aggregate repository.
+# The independent component repository has its own copy under .github/workflows/.
+name: Build and upload base-files
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'utils/lingmo-config/base-files/**'
+      - '.github/workflows/base-files.yml'
+    tags:
+      - 'base-files-v*'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'utils/lingmo-config/base-files/**'
+      - '.github/workflows/base-files.yml'
+  workflow_dispatch:
+
+jobs:
+  source-package:
+    name: Debian Testing source package
+    runs-on: ubuntu-latest
+    container: docker.io/library/debian:bookworm
+    steps:
+      - name: Install packaging tools
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            ca-certificates \
+            curl \
+            debhelper \
+            devscripts \
+            dpkg-dev \
+            pkg-kde-tools \
+            git
+
+      - name: Checkout source
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            utils/lingmo-config/base-files
+            .github/workflows/base-files.yml
+
+      - name: Build Debian source package
+        working-directory: 'utils/lingmo-config/base-files'
+        run: dpkg-buildpackage -S -us -uc -d
+
+      - name: Collect source package files
+        working-directory: 'utils/lingmo-config/base-files'
+        run: |
+          mkdir -p source-package
+          find .. -maxdepth 1 -type f \
+            \( -name '*.dsc' -o -name '*.tar.*' \) \
+            -exec mv -t source-package {} +
+          test -n "$(find source-package -maxdepth 1 -type f -name '*.dsc' -print -quit)"
+
+      - name: Upload source package to OBS
+        if: github.event_name != 'pull_request'
+        uses: LingmoOS/action-upload-to-obs@0.0.4
+        with:
+          remove-old-sources: true
+          obs-package-name: 'base-files'
+          obs-project-name: 'home:LingmoOS:3.0-LTS'
+          obs-user-name: ${{ secrets.OBS_USERNAME }}
+          obs-password: ${{ secrets.OBS_TOKEN }}
+          obs-instance-url: 'https://api.opensuse.org'
+          local-package-dir: 'utils/lingmo-config/base-files/source-package'

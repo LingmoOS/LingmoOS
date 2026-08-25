@@ -1,0 +1,1713 @@
+base-files (1:13.9+lingmo5u2) trixie; urgency=medium
+
+  * new release for Lingmo OS.
+
+ -- Lingmo OS Team <team@lingmo.org>  Mon, 22 Jun 2026 00:29:00 +0800
+
+base-files (1:13.9+lingmo5u1) trixie; urgency=medium
+
+  * Fix MOTD ANSI color display:
+    - Replace non-standard \e escape sequences with \033 (octal) for
+      broad shell compatibility (dash/sh/bash/zsh).
+    - Add update-motd.d/00-lingmo-motd script that uses printf '%b\n'
+      to properly interpret ANSI escape sequences on login.
+    - Add Lingmo OS ASCII art logo to motd header.
+  * Fix build: use cp -r instead of install for system/vendor directories
+    (install cannot handle directory recursion).
+  * Fix sed syntax error: remove stray quotes from DISTRO_NAME variable.
+
+ -- Lingmo OS Team <team@lingmo.org>  Thu, 18 Jun 2026 11:27:00 +0800
+
+base-files (1:13.8+lingmo5u1) trixie; urgency=medium
+
+  * Rebrand to Lingmo OS:
+    - Update os-release with Lingmo OS branding (NAME, PRETTY_NAME, ID, LOGO,
+      ANSI_COLOR, CPE_NAME, VARIANT, VARIANT_ID, HOME_URL, SUPPORT_URL).
+    - Add BUILD_VERSION, VERSION_TYPE, BUILD_ID fields to os-release.
+    - Replace Debian branding in /etc/issue, /etc/issue.net, /etc/debian_version.
+    - Rewrite /usr/share/base-files/motd with Lingmo OS welcome message,
+      colored prompt info, and 256-color terminal palette.
+    - Customize default ~/.bashrc skeleton: colored PS1 prompt
+      (user@host[dir]$ format), enable ls colors and safe aliases by default.
+
+ -- Lingmo OS Team <team@lingmo.org>  Wed, 17 Jun 2026 21:49:00 +0800
+
+base-files (13.8+deb13u5) trixie; urgency=medium
+
+  * Update debian_version and os-release for Debian 13.5 point release.
+
+ -- Santiago Vila <sanvila@debian.org>  Fri, 08 May 2026 18:10:00 +0200
+
+base-files (13.8+deb13u4) trixie; urgency=medium
+
+  * Update debian_version and os-release for Debian 13.4 point release.
+
+ -- Santiago Vila <sanvila@debian.org>  Mon, 02 Mar 2026 22:50:00 +0100
+
+base-files (13.8+deb13u3) trixie; urgency=medium
+
+  * Update debian_version and os-release for Debian 13.3 point release.
+
+ -- Santiago Vila <sanvila@debian.org>  Fri, 02 Jan 2026 13:35:00 +0100
+
+base-files (13.8+deb13u2) trixie; urgency=medium
+
+  * Update debian_version and os-release for Debian 13.2 point release.
+
+ -- Santiago Vila <sanvila@debian.org>  Fri, 07 Nov 2025 18:40:00 +0100
+
+base-files (13.8+deb13u1) trixie; urgency=medium
+
+  * Update debian_version and os-release for Debian 13.1 point release.
+
+ -- Santiago Vila <sanvila@debian.org>  Sun, 24 Aug 2025 18:20:00 +0200
+
+base-files (13.8) unstable; urgency=medium
+
+  * Changes for trixie as stable:
+  - Use 13 as version in /etc/issue and /etc/issue.net.
+  - Use 13.0 as version in /etc/debian_version.
+  - Update PRETTY_NAME in os-release, now 13 (trixie).
+  - Add VERSION_ID and VERSION.
+  - Add DEBIAN_VERSION_FULL with the same contents as /etc/debian_version.
+    This is only expected to exist on stable releases. Closes: #931197.
+    Note that this does not change the fundamental fact that "all point
+    releases of trixie are Debian 13". This is just a convenience for
+    tools like ansible who already parse both debian_version and os-release
+    so that in the long term they can parse os-release only.
+  - Update README (trixie -> forky and use 13.x for example version).
+  * Refresh some licenses from ftp.gnu.org. Closes: #1103289.
+  * Set Rules-Requires-Root to no.
+  * Drop obsolete debian/2775-dirs.
+  * Add Vcs-Git and Vcs-Browser fields.
+
+ -- Santiago Vila <sanvila@debian.org>  Mon, 12 May 2025 21:25:00 +0200
+
+base-files (13.7) unstable; urgency=medium
+
+  * Make /var/local to be root:root and 755 by default on new installs.
+    On upgrades from Debian 12, the permissions of /var/local are kept,
+    which is what we want for backwards compatibility. Closes: #1039973.
+  * Raise Standards-Version to 4.7.2.
+  * Add debian/salsa-ci.yml.
+
+ -- Santiago Vila <sanvila@debian.org>  Tue, 04 Mar 2025 12:20:00 +0100
+
+base-files (13.6) unstable; urgency=medium
+
+  * Change default dot.profile to not use mesg anymore. Closes: #1088011.
+
+ -- Santiago Vila <sanvila@debian.org>  Fri, 22 Nov 2024 15:40:00 +0100
+
+base-files (13.5) unstable; urgency=medium
+
+  [ Chris Hofstaedtler ]
+  * Fix typo in preinst: lib64 -> libx32. Closes: #1077863.
+  [ Helmut Grohne ]
+  * Work around /lib64 link created by systemd-nspawn. Closes: #1077866.
+  [ Santiago Vila ]
+  * Add lintian overrides for the directories that have become symlinks.
+
+ -- Santiago Vila <sanvila@debian.org>  Sun, 04 Aug 2024 23:30:00 +0200
+
+base-files (13.4) unstable; urgency=medium
+
+  [ Helmut Grohne ]
+  * Tighten the merged-/usr preinst check. Closes: #1076491.
+  [ Santiago Vila ]
+  * Raise Standards-Version to 4.7.0.
+
+ -- Santiago Vila <sanvila@debian.org>  Thu, 01 Aug 2024 12:30:00 +0200
+
+base-files (13.3) unstable; urgency=medium
+
+  [ Helmut Grohne ]
+  * DEP17: Install /usr-merge aliasing symlinks. Closes: #1064459.
+
+ -- Santiago Vila <sanvila@debian.org>  Thu, 06 Jun 2024 00:35:00 +0200
+
+base-files (13.2) unstable; urgency=medium
+
+  * Document that /etc/profile is not a conffile anymore. Closes: #868095.
+  * Use a regexp to source files in /etc/profile.d. The behaviour should now be
+    well defined and consistent. Closes: #885414, #1069279.
+  * Add NEWS.Debian entry for the above.
+  * Document that the default umask is defined in /etc/login.defs. Closes: #983606.
+  * Add #DEBHELPER# token to postinst to make lintian happy.
+  * Make binary package to be git-reproducible.
+
+ -- Santiago Vila <sanvila@debian.org>  Fri, 03 May 2024 18:15:00 +0200
+
+base-files (13.1) unstable; urgency=medium
+
+  * Rename postinst.in to postinst. Use dh_installdeb token feature instead.
+  * Add /usr/local/libexec. Closes: #994220.
+  * Machine-readable copyright file. Closes: #1020828.
+  * Add a debian/gbp.conf file.
+
+ -- Santiago Vila <sanvila@debian.org>  Wed, 17 Apr 2024 12:45:00 +0200
+
+base-files (13) unstable; urgency=medium
+
+  * Change issue, issue.net, debian_version and os-release
+    to read "trixie/sid".
+  * Change VERSION_CODENAME in os-release to read "trixie".
+  * Drop VERSION and VERSION_ID from os-release.
+
+ -- Santiago Vila <sanvila@debian.org>  Sun, 11 Jun 2023 17:00:00 +0200
+
+base-files (12.4) unstable; urgency=medium
+
+  * Release candidate for bookworm as stable:
+  - Use "12" as version in /etc/issue and /etc/issue.net.
+    (never expected to change after release)
+  - Use 12.0 as version in /etc/debian_version.
+    (expected to change at every point release)
+  - Change PRETTY_NAME in /usr/lib/os-release, adding 12 as version number
+    and "(bookworm)" as codename. Add also VERSION_ID and VERSION.
+    (never expected to change)
+  - Variable VERSION_CODENAME was already defined as "bookworm".
+  - Update README (bookworm -> trixie).
+  * Refresh GFDL-1.2, GFDL-1.3, GPL-3, LGPL-2 and LGPL-3 from their
+    canonical place at https://ftp.gnu.org/gnu/Licenses/ as they have
+    minor editorial changes like trimming spaces, https, etc.
+  * Drop debian/current-md5sums-obsolete. Closes: #1009358.
+  * Ship a real debian/copyright file in source package instead of
+    generating it at build time.
+  * Call dh_installchangelogs using --no-trim option.
+    Add versioned build-dependency on debhelper for the above.
+  * Update lintian-overrides to new format.
+  * Rules-Requires-Root: binary-targets.
+  * Update standards version to 4.6.2.
+
+ -- Santiago Vila <sanvila@debian.org>  Thu, 02 Mar 2023 14:55:00 +0100
+
+base-files (12.3) unstable; urgency=high
+
+  * Add VERSION_CODENAME to /etc/os-release. Closes: #1008735.
+    This still respects the fact that Debian distributions do not have
+    a version number until they are actually released as stable, but makes
+    /etc/os-release a little bit more useful for those who use testing as
+    a pre-release for the next stable. Those users are also the reason why
+    in this case we are simply using the string "bookworm".
+
+ -- Santiago Vila <sanvila@debian.org>  Mon, 03 Oct 2022 23:30:00 +0200
+
+base-files (12.2) unstable; urgency=medium
+
+  * A simplified version of the patch for DPKG_ROOT was applied, but the
+    simplification went too far and was incorrect. Closes: #824594.
+  * Use $() instead of `` when calling md5sum.
+
+ -- Santiago Vila <sanvila@debian.org>  Wed, 19 Jan 2022 23:35:00 +0100
+
+base-files (12.1) unstable; urgency=medium
+
+  * Add support for DPKG_ROOT to postinst. Closes: #824594
+
+ -- Santiago Vila <sanvila@debian.org>  Wed, 19 Jan 2022 22:40:00 +0100
+
+base-files (12) unstable; urgency=medium
+
+  * Do not create /var/run/utmp in postinst, as /var/run is
+    ephemeral and it does not make sense. Closes: #989725.
+  * Do not create /var/lib/dpkg/status if missing anymore,
+    as dpkg already does that. Closes: #989726.
+  * Change issue, issue.net, debian_version and os-release to read
+    "bookworm/sid". Closes: #992369.
+  * Drop VERSION, VERSION_ID and CODENAME from os-release.
+
+ -- Santiago Vila <sanvila@debian.org>  Sun, 22 Aug 2021 19:00:00 +0200
+
+base-files (11.1) unstable; urgency=medium
+
+  * Use https where appropriate, namely, origins/debian (currently used)
+    and share/staff-group-for-usr-local (not anymore). Closes: #959470.
+  * Gracefully handle /usr/share/info not existing. Closes: #977113.
+  * Use $() instead of `` where appropriate, namely, the default files
+    for /etc/profile and /root/.bashrc. Closes: #982687.
+  * Update share/profile.md5sums as the default file has changed.
+  * Update build-dependency on debhelper.
+  * Release candidate for bullseye as stable:
+  - Use "11" as version in /etc/issue and /etc/issue.net.
+    (never expected to change after buster is released)
+  - Use 11.0 as version in /etc/debian_version.
+    (expected to change at every point release)
+  - Change PRETTY_NAME in /usr/lib/os-release, adding 11 as version number
+    and "(bullseye)" as codename. Add also VERSION_ID and VERSION.
+    (never expected to change)
+  - Add VERSION_CODENAME to os-release.
+    (only expected on stable releases)
+  - Update README (bullseye -> bookworm).
+
+ -- Santiago Vila <sanvila@debian.org>  Sat, 10 Apr 2021 22:15:00 +0200
+
+base-files (11) unstable; urgency=medium
+
+  * Change issue, issue.net, debian_version and os-release to read
+    "bullseye/sid".
+  * Drop VERSION, VERSION_ID and CODENAME from os-release.
+  * Make "mesg n" silent in default /root/.profile. Closes: #930654.
+
+ -- Santiago Vila <sanvila@debian.org>  Tue, 09 Jul 2019 12:05:50 +0200
+
+base-files (10.3) unstable; urgency=medium
+
+  * Add Breaks: debian-security-support (<< 2019.04.25). Closes: #928172.
+    This is the first version of debian-security-support which does not break
+    when /etc/debian_version contains a string in the form "10.x".
+
+ -- Santiago Vila <sanvila@debian.org>  Mon, 13 May 2019 22:25:32 +0200
+
+base-files (10.2) unstable; urgency=medium
+
+  * Release candidate for buster as stable:
+  - Use "10" as version in /etc/issue and /etc/issue.net.
+    (never expected to change after buster is released)
+  - Use 10.0 as version in /etc/debian_version.
+    (expected to change at every point release)
+  - Change PRETTY_NAME in /usr/lib/os-release, adding 10 as version number
+    and "(buster)" as codename. Add also VERSION_ID and VERSION.
+    (never expected to change)
+  - Add VERSION_CODENAME to os-release. Closes: #829245. This is optional
+    according to the specs but some people find it useful. Please note that
+    for now this is only expected to be present on stable releases.
+  - Update README (buster -> bullseye).
+
+ -- Santiago Vila <sanvila@debian.org>  Fri, 19 Apr 2019 13:05:00 +0200
+
+base-files (10.1) unstable; urgency=medium
+
+  * Add CC0-1.0 to common-licenses. Closes: #859649, #882628.
+    Source: https://creativecommons.org/publicdomain/zero/1.0/legalcode.txt.
+  * Simplify debian/rules a little bit by dropping install target
+    and using override_dh_auto_install instead. Closes: #886901.
+    Package should now build from source again in every supported way.
+    Thanks to Daniel Schepler for the report and to Niels Thykier for
+    clarifying the true nature of this bug.
+  * Do not create /etc/staff-group-for-usr-local on new installs anymore.
+    Do not create it on upgrades either, as we don't support upgrades
+    skipping stable releases, and even less skipping several releases.
+  * Standards-Version: 4.1.3.
+
+ -- Santiago Vila <sanvila@debian.org>  Sun, 14 Jan 2018 00:36:34 +0100
+
+base-files (10) unstable; urgency=medium
+
+  * Change issue, issue.net, debian_version and os-release to read
+    "buster/sid", and drop VERSION and VERSION_ID from os-release.
+  * Fix typo in changelog for version 9.
+
+ -- Santiago Vila <sanvila@debian.org>  Mon, 26 Jun 2017 00:19:42 +0200
+
+base-files (9.9) unstable; urgency=medium
+
+  * Add MPL-1.1 and MPL-2.0 to common-licenses. Closes: #849835.
+    License texts taken from https://www.mozilla.org/en-US/MPL/.
+  * Add a default /etc/update-motd.d/10-uname script to
+    recover the traditional motd behaviour. Closes: #859124.
+
+ -- Santiago Vila <sanvila@debian.org>  Tue, 04 Apr 2017 18:00:30 +0200
+
+base-files (9.8) unstable; urgency=medium
+
+  * Release candidate for stretch as stable:
+  - Use "9" as version in /etc/issue and /etc/issue.net.
+    (never expected to change after stretch is released)
+  - Use 9.0 as version in /etc/debian_version.
+    (expected to change at every point release)
+  - Change PRETTY_NAME in /usr/lib/os-release, adding 9 as version number
+    and "(stretch)" as codename. Add also VERSION_ID and VERSION.
+    (never expected to change)
+  - Update README (stretch -> buster).
+  * Standards-Version: 3.9.8 (no special changes for this).
+
+ -- Santiago Vila <sanvila@debian.org>  Sun, 15 Jan 2017 23:00:02 +0100
+
+base-files (9.7) unstable; urgency=medium
+
+  * Do not care about /etc/nsswitch.conf anymore, as the file has been
+    moved to libc-bin. Closes: #827095.
+  [ Guillem Jover ]
+  * Do not use gzip compression anymore to build .deb and use the default.
+
+ -- Santiago Vila <sanvila@debian.org>  Sun, 27 Nov 2016 19:29:38 +0100
+
+base-files (9.6) unstable; urgency=low
+
+  * Add lintian override for /etc/os-release.
+  * Add lintian overrides for /usr/share/common-licenses.
+  * Standards-Version: 3.9.7 (no special changes for this).
+  * Switch to dh. Hopefully this should make the package easier
+    to fork. Closes: #693423.
+  * Change default /etc/profile to not warn about possibly undefined
+    variables PS1 and BASH. Closes: #776154.
+
+ -- Santiago Vila <sanvila@debian.org>  Fri, 04 Mar 2016 17:33:40 +0100
+
+base-files (9.5) unstable; urgency=medium
+
+  * os-release: Drop trailing slash in SUPPORT_URL variable, as the URL
+    is not supposed to have it. Closes: #781809, #800791.
+
+ -- Santiago Vila <sanvila@debian.org>  Wed, 28 Oct 2015 23:29:08 +0100
+
+base-files (9.4) unstable; urgency=medium
+
+  * Fix two install_from_default() calls in postinst that were still
+    using the old calling convention, making debootstrap to fail.
+    Thanks to Steven Shiau for the report. Closes: #795952
+
+ -- Santiago Vila <sanvila@debian.org>  Tue, 18 Aug 2015 12:06:00 +0200
+
+base-files (9.3) unstable; urgency=medium
+
+  * Change /usr/share/base-files/dot.profile (the default /root/.profile)
+    to not fail with new mesg behaviour in stretch. Closes: #794727.
+  * Add extra code in postinst so that people who never modified
+    their /root/.profile from jessie get the fixed version. This is
+    done by the update_to_current_default() function, which is now
+    more general and allows updating files not in /etc.
+  * While we are at it, modify install_from_default() function so that
+    it's called in the same simplified way as update_to_current_default().
+
+ -- Santiago Vila <sanvila@debian.org>  Mon, 17 Aug 2015 17:50:38 +0200
+
+base-files (9.2) unstable; urgency=medium
+
+  * Create md5sums in a reproducible way.
+  * Use "dpkg-parsechangelog -S Date" to get the date.
+  * Allow building with umasks other than 022, as far as
+    they make a minimum of sense. Closes: #774498.
+
+ -- Santiago Vila <sanvila@debian.org>  Sun, 17 May 2015 14:44:10 +0200
+
+base-files (9.1) unstable; urgency=low
+
+  * Use gzip -n to stop recording current time in gzip headers.
+  * Fix mtimes before building the binary package.
+  * The package should now build reproducibly. Closes: #774498.
+    Thanks to Jérémy Bobbio <lunar@debian.org>.
+
+ -- Santiago Vila <sanvila@debian.org>  Fri, 15 May 2015 12:45:34 +0200
+
+base-files (9) unstable; urgency=medium
+
+  * Changed issue, issue.net, debian_version and os-release to read
+    "stretch/sid", and dropped VERSION and VERSION_ID from os-release.
+  * Changed HOME_URL and SUPPORT_URL in os-release from http to https,
+    as those are the preferred URLs now.
+
+ -- Santiago Vila <sanvila@debian.org>  Thu, 30 Apr 2015 12:00:50 +0200
+
+base-files (8) unstable; urgency=low
+
+  * Release for jessie as stable:
+  - Use "8" as version in /etc/issue and /etc/issue.net. As usual, this
+    is never expected to change once that jessie is released as Debian 8.
+  - Use 8.0 as version in /etc/debian_version. As usual, this is expected
+    to change at every point release.
+  - Changed PRETTY_NAME in /usr/lib/os-release, adding 8 as version number
+    and "(jessie)" as codename. Added also VERSION_ID and VERSION.
+    This file, /usr/lib/os-release, is not expected to change either.
+  - Updated README (jessie -> stretch).
+  * Packages are not expected to rely on the contents of any of these
+    files, but if they do, they might better break now while we can still
+    fix them.
+
+ -- Santiago Vila <sanvila@debian.org>  Sun, 30 Nov 2014 13:36:12 +0100
+
+base-files (7.10) unstable; urgency=low
+
+  * Dropped "chown root:root" lines in postinst, as they are
+    completely redundant. The postinst script is run by root.
+    This might also help as a workaround for Bug#766459.
+
+ -- Santiago Vila <sanvila@debian.org>  Mon, 27 Oct 2014 13:35:32 +0100
+
+base-files (7.9) unstable; urgency=low
+
+  * The change introduced in version 7.7 regarding /mnt seems to break
+    the ability of debootstrap currently in wheezy to create a sid chroot.
+    The case of initial install of /mnt is already handled by postinst line
+    "install_directory mnt 755 root" inside the big "if" block that
+    creates a bunch of other things, so we can restrict re-creating the /mnt
+    directory on upgrades to the case when we are really upgrading.
+    Therefore, the code is moved to the same "if" block where /etc/profile
+    and /etc/nsswitch.conf are upgraded to their new defaults when unchanged.
+    This might help as a workaround for Bug#766459.
+
+ -- Santiago Vila <sanvila@debian.org>  Mon, 27 Oct 2014 12:33:22 +0100
+
+base-files (7.8) unstable; urgency=low
+
+  * The /etc/profile.d mechanism may be used to override PS1 setting
+    in /etc/bash.bashrc, which is particularly nice because there is
+    no need to modify /etc/profile or /etc/bash.bashrc for that,
+    but this is no longer possible if /etc/profile.d is sourced
+    before /etc/bash.bashrc. Therefore, /etc/profile.d is sourced
+    after /etc/bash.bashrc again. Closes: #766351.
+
+ -- Santiago Vila <sanvila@debian.org>  Wed, 22 Oct 2014 16:10:30 +0200
+
+base-files (7.7) unstable; urgency=low
+
+  * Updated FAQ to explain that only /etc/debian_version is updated at
+    every point release, using Debian 8.x as an example, to be read by
+    users of jessie during its lifetime as stable. Closes: #621757.
+  * Changed default /etc/profile to source /etc/bash.bashrc after
+    processing profile.d stuff, not before. Closes: #698479.
+  * Drop comment lines about umask in /etc/profile, as it has been
+    there for enough time for everybody to take note.
+  * The directory /mnt is not included inside base-files.deb anymore.
+    Instead, it is created by postinst the very first time base-files
+    is installed (by debootstrap), or when upgrading from an earlier
+    base-files version. This should make the usual upgrade at every point
+    release to work even if /mnt is a stale mount point. Closes: #763405.
+
+ -- Santiago Vila <sanvila@debian.org>  Tue, 21 Oct 2014 21:20:14 +0200
+
+base-files (7.6) unstable; urgency=low
+
+  * By default, when the computer is booting, green and red colors are used
+    to signal that a service started successfully, or that it did not.
+    In this context, trying to use colors for something else might be
+    misleading or even confusing. For this reason, I'm dropping
+    ANSI_COLOR from /usr/lib/os-release. Closes: #758246.
+  * Clarified in the copyright file that the Artistic License currently
+    in common-licenses is actually the one coming from Perl. Closes: #764553.
+
+ -- Santiago Vila <sanvila@debian.org>  Thu, 09 Oct 2014 20:27:00 +0200
+
+base-files (7.5) unstable; urgency=medium
+
+  * Made /etc/os-release symlink to be relative, as an absolute symlink
+    seems to break boot when using a dracut initrd. Thanks to Daniel Schaal
+    for the report. Closes: #755394.
+
+ -- Santiago Vila <sanvila@debian.org>  Sun, 20 Jul 2014 12:10:26 +0200
+
+base-files (7.4) unstable; urgency=medium
+
+  * Updated FAQ to match current policy wording about common-licenses.
+    Thanks to Gioele Barabucci for the report. Closes: #723195.
+  * Moved /etc/os-release to /usr/lib/os-release. Put a symlink pointing to
+    the new place. Thanks to Marco d'Itri for the report. Closes: #753658.
+  * Changed BUG_REPORT_URL in os-release to https, as the BTS has moved.
+    Thanks to Martin Zobel-Helas for the report. Closes: #754455.
+
+ -- Santiago Vila <sanvila@debian.org>  Sat, 19 Jul 2014 18:00:08 +0200
+
+base-files (7.3) unstable; urgency=medium
+
+  * Added gshadow entry to default /etc/nsswitch.conf. Closes: #699090.
+  * Update /etc/nsswitch.conf if not modified by the user. Closes: #716786.
+  * Added nsswitch.conf.md5sums which works exactly like profile.md5sums.
+  * Changed debian/check-etc-profile-md5sum to debian/check-md5sum-etc.
+    This is now used twice in debian/rules, for profile and nsswitch.conf.
+  * Build package with -Zgzip to ease bootstrapping. Closes: #740278.
+  * Reformat paragraph in previous changelog to avoid too long lines.
+  * Added build-arch and build-indep targets to debian/rules.
+  * Standards-Version: 3.9.5 (no special changes for this).
+
+ -- Santiago Vila <sanvila@debian.org>  Sun, 04 May 2014 14:39:06 +0200
+
+base-files (7.2) unstable; urgency=medium
+
+  * Changed issue, issue.net, debian_version and os-release to read
+    "jessie/sid", and dropped VERSION and VERSION_ID from os-release.
+
+ -- Santiago Vila <sanvila@debian.org>  Sun, 05 May 2013 18:19:00 +0200
+
+base-files (7.1) unstable; urgency=low
+
+  * Added Multi-Arch: foreign. This is needed even if base-files is
+    "Essential: yes" because there are quite a number of packages
+    having versioned dependencies on it. Closes: #695863.
+
+ -- Santiago Vila <sanvila@debian.org>  Fri, 14 Dec 2012 13:55:36 +0100
+
+base-files (7.0) unstable; urgency=low
+
+  * Oops. Even if the Breaks on sendfile does not help APT to decide about
+    the configuration order, removing the breaks is wrong, because then it is
+    possible to upgrade base-files and not sendfile, which would effectively
+    break sendfile. Readded Breaks on sendfile.
+
+ -- Santiago Vila <sanvila@debian.org>  Wed, 12 Dec 2012 13:05:12 +0100
+
+base-files (7) unstable; urgency=low
+
+  * Added 89126d8bba3325594e1539bcc97847f3 to the list of /etc/profile
+    md5sums which are ok to be replaced by the current default version to
+    help sendfile to fix its /etc/profile modification bug in a single
+    upgrade (instead of waiting for the next point release). Closes: #689835.
+    Drop "unmodified" word in postinst, as it may not always be true.
+  * Dropped versioned Breaks on sendfile, as it had no effect.
+  * Changed debian_version, issue, issue.net and os-release to read "7.0".
+    Added also "(wheezy)" in VERSION and PRETTY_NAME.
+  * Added VERSION and VERSION_ID to /etc/os-release, for release as stable.
+    Please remember: Applications should not rely on these fields to be set.
+  * Updated README (wheezy -> jessie).
+
+ -- Santiago Vila <sanvila@debian.org>  Wed, 12 Dec 2012 12:55:00 +0100
+
+base-files (6.12) unstable; urgency=low
+
+  * Added HOME_URL, SUPPORT_URL and BUG_REPORT_URL to /etc/os-release.
+    Reported by Raphaël Hertzog. Closes: #681480.
+  * Added Breaks: sendfile (<< version in squeeze) to help sendfile bug
+    regarding improper modification of /etc/profile to be fixed faster.
+    Reported by Andreas Beckmann. Closes: #689835.
+  * Make /var/run and /var/lock absolute again.
+    Reported by Roger Leigh. Closes: #690345.
+
+ -- Santiago Vila <sanvila@debian.org>  Sat, 27 Oct 2012 17:41:00 +0200
+
+base-files (6.11) unstable; urgency=medium
+
+  * Create /etc/motd instead of /etc/motd.tail, with same default contents,
+    as initscripts is now using /etc/motd again as a real file.
+
+ -- Santiago Vila <sanvila@debian.org>  Sun, 17 Jun 2012 14:14:44 +0200
+
+base-files (6.10) unstable; urgency=low
+
+  * Record md5sums of unmodified /etc/profile versions so that we can
+    upgrade it automatically, as it's done in Ubuntu.
+  * In the initial install, create /etc/motd.tail instead of /etc/motd,
+    as /etc/motd is converted to a symlink by initscripts and /etc/motd.tail
+    is since a long time the master copy to which the output of uname is added.
+    Remove postinst code which tries to update /etc/motd, as it does no longer
+    work and the file has not changed in a lot of time. Will add code to
+    update /etc/motd.tail based on md5sum if it ever changes in a future.
+  * Implement proposed transition plan for group staff in /usr/local.
+    The file /etc/staff-group-for-usr-local is now created on upgrades
+    from releases before 6.10 and (for now) also on initial install.
+  * Removed reference to /etc/nsswitch.conf in extended description, as
+    the file is being moved to libc-bin.
+
+ -- Santiago Vila <sanvila@debian.org>  Sat, 09 Jun 2012 17:41:30 +0200
+
+base-files (6.9) unstable; urgency=low
+
+  * We can't make /etc/profile a conffile without triggering a piuparts
+    check which is considered to be serious. Sorry, /etc/profile
+    will be handled as before for now. Closes: #673767.
+
+ -- Santiago Vila <sanvila@debian.org>  Mon, 21 May 2012 15:12:06 +0200
+
+base-files (6.8) unstable; urgency=low
+
+  * Added /etc/os-release. Closes: #659853. Note: for stable releases
+    this file will look like it's suggested in the bug report above.
+    Also, like /etc/debian_version, this file should only be considered
+    meaningful for stable releases, which testing and unstable are not.
+  * By popular demand, make /etc/profile a conffile. Closes: #668871.
+  * Added /sys for all systems but the Hurd. Closes: #670091.
+  * Added /proc for the Hurd, as it's already being used.
+  * Added a lintian override for /root being 700.
+
+ -- Santiago Vila <sanvila@debian.org>  Thu, 17 May 2012 00:08:42 +0200
+
+base-files (6.7) unstable; urgency=low
+
+  * Switch to "compat" again in default /etc/nsswitch.conf. It is not
+    obsolete and it should not go away. Closes: #651356.
+    Thanks a lot to Petter Reinholdtsen.
+
+ -- Santiago Vila <sanvila@debian.org>  Sun, 04 Mar 2012 01:02:00 +0100
+
+base-files (6.6) unstable; urgency=low
+
+  * Switch to "files" instead of "compat" in default /etc/nsswitch.conf.
+    That was only useful for libc5. The new default will only take
+    effect for new installs. Thanks to Roger Leigh. Closes: #651356.
+  * Reword the very first question in base-files FAQ. Closes: #622200.
+  * When migrating /var/run and /var/lock, create relative symlinks
+    instead of absolute ones. Useful for chroots. Closes: #652301.
+
+ -- Santiago Vila <sanvila@debian.org>  Sat, 03 Mar 2012 16:35:22 +0100
+
+base-files (6.5) unstable; urgency=low
+
+  * Modified default /etc/profile to not read /etc/bash.bashrc if bash
+    is invoked as /bin/sh. Closes: #632887.
+
+ -- Santiago Vila <sanvila@debian.org>  Fri, 29 Jul 2011 21:03:02 +0200
+
+base-files (6.4) unstable; urgency=low
+
+  * Added /run. Closes: #620157.
+  * On new installs:
+    - Create /run/lock (debian-installer will remove it but this will
+    ensure that it exists even on chroot environments).
+    - Symlink /var/run to /run.
+    - Symlink /var/lock to /run/lock.
+  * On upgraded systems, initscripts will handle the transition to /run.
+  * Added "Breaks: initscripts << (2.88dsf-13.3)" to ensure that initscripts
+    is upgraded first, as otherwise udev would break.
+  * Thanks a lot to Roger Leigh.
+
+ -- Santiago Vila <sanvila@debian.org>  Fri, 27 May 2011 14:25:42 +0200
+
+base-files (6.3) unstable; urgency=low
+
+  * Dropped /run until everything else is ready for it. In particular,
+    udev should not blindly assume that it works just because it exists.
+
+ -- Santiago Vila <sanvila@debian.org>  Wed, 06 Apr 2011 20:33:02 +0200
+
+base-files (6.2) unstable; urgency=low
+
+  * Added /run. Requested by Roger Leigh. Closes: #620157.
+
+ -- Santiago Vila <sanvila@debian.org>  Tue, 05 Apr 2011 18:03:36 +0200
+
+base-files (6.1) unstable; urgency=medium
+
+  * Changed issue, issue.net and debian_version to read "wheezy/sid".
+
+ -- Santiago Vila <sanvila@debian.org>  Mon, 07 Feb 2011 19:24:00 +0100
+
+base-files (6.0) unstable; urgency=low
+
+  * Changed issue, issue.net and debian_version to read "6.0".
+  * Updated README accordingly.
+
+ -- Santiago Vila <sanvila@debian.org>  Tue, 14 Dec 2010 22:20:38 +0100
+
+base-files (5.10) unstable; urgency=medium
+
+  * Changed postinst to not reset /var/run/utmp permissions on every upgrade.
+    It is definitely not base-files business to change the permissions of
+    an already existing /var/run/utmp, as the system admin might have
+    changed them on purpose after the file was created. Closes: #601746.
+
+ -- Santiago Vila <sanvila@debian.org>  Sat, 13 Nov 2010 13:01:12 +0100
+
+base-files (5.9) unstable; urgency=medium
+
+  * Changed /etc/profile so that it defines PATH again. Closes: #571086.
+    We will have plenty of time to discuss about this after the release
+    of squeeze, but for now, this is the safe thing to do.
+
+ -- Santiago Vila <sanvila@debian.org>  Fri, 06 Aug 2010 19:37:40 +0200
+
+base-files (5.8) unstable; urgency=low
+
+  * Added GPL version 1 from http://ftp.gnu.org/gnu/Licenses/ as there
+    are a lot of packages still using it. Bug #436105.
+
+ -- Santiago Vila <sanvila@debian.org>  Mon, 05 Jul 2010 19:10:54 +0200
+
+base-files (5.7) unstable; urgency=low
+
+  * Drop umask setting from /etc/profile, will be handled by pam_umask.
+    Closes: #583967.
+
+ -- Santiago Vila <sanvila@debian.org>  Tue, 01 Jun 2010 23:57:52 +0200
+
+base-files (5.6) unstable; urgency=low
+
+  * Ordinary user accounts start at UID 1000 by default, but they also
+    end at 29999 by default. Modified default /etc/profile accordingly.
+
+ -- Santiago Vila <sanvila@debian.org>  Thu, 20 May 2010 11:34:34 +0200
+
+base-files (5.5) unstable; urgency=low
+
+  * Changed default /etc/profile so that the new umask of 002 is only
+    used for ordinary user accounts, which, according to policy, start
+    at uid 1000 by default.
+
+ -- Santiago Vila <sanvila@debian.org>  Wed, 19 May 2010 18:57:10 +0200
+
+base-files (5.4) unstable; urgency=low
+
+  * Changed umask in default /etc/profile to 002, which has a little bit
+    more sense than 022 on systems like Debian having User Private Groups.
+    As usual for /etc/profile, only new installs will have the new default,
+    so nobody will be surprised by this on upgrades. Hopefully, this change
+    will be documented in the release notes for squeeze as well, for users
+    who install squeeze from scratch. Closes: #248140, #581434.
+  * Refresh GNU licenses from http://ftp.gnu.org/gnu/Licenses/, as they
+    have expanded the embedded tabs. Closes: #572245.
+  * Switch to "3.0 (native)" format.
+
+ -- Santiago Vila <sanvila@debian.org>  Thu, 13 May 2010 18:35:42 +0200
+
+base-files (5.3) unstable; urgency=low
+
+  * Changed default /etc/profile so that it sources /etc/profile.d/*.sh
+    as mandated by the LSB section 16.2. Closes: #545756.
+    Package maintainers: Please don't use profile.d if you can avoid it,
+    as policy says "A program must not depend on environment variables
+    to get reasonable defaults".
+  * Removed questions about profile.d from FAQ.
+
+ -- Santiago Vila <sanvila@debian.org>  Fri, 09 Apr 2010 18:07:20 +0200
+
+base-files (5.2) unstable; urgency=low
+
+  * Added question in FAQ to document the fact that some configuration
+    files in /etc are never updated on upgrades. Closes: #571083.
+  * Changed default /usr/src to be root:root and 755. Closes: #573701.
+    The old permissions were of little benefit, and the user can still
+    change this after installing a new system anyway.
+  * Renamed FAQ to README and added a compatibility symlink.
+  * Removed obsolete Depends on base-passwd, as version 2.0.3.4 is more
+    than 10 years old and we don't support upgrades which skip releases.
+  * Dropped preinst completely, as it was there just to support upgrades
+    from very old releases (that we don't support anymore).
+  * Removed postinst code that supports upgrades from very old releases.
+
+ -- Santiago Vila <sanvila@debian.org>  Sun, 04 Apr 2010 13:22:04 +0200
+
+base-files (5.1) unstable; urgency=low
+
+  * Changed default permissions for /root to 700, as many admins consider
+    it should be more private than other home directories. Closes: #514794.
+  * Changed default permissions for /var/log/btmp to 660, to be in sync
+    with permissions set by logrotate. Closes: #547407.
+  * Do not export PS1 in /root/.bashrc, as it has bash escapes and it's
+    inherited to subshells that do not have to be bash. Closes: #567733.
+  * Added debian_chroot variable to default PS1 in /root/.bashrc.
+  * Comment out PS1 in /root/.bashrc anyway, as /etc/profile and
+    /etc/bash.bashrc already care about it. Closes: #443245.
+  * Comment out umask as well, as it's already in /etc/profile.
+  * Added /usr/local/games to default PATH in /etc/profile. Closes: #487105.
+  * While we are at it, comment out everything about PATH, as /etc/login.defs
+    should already care about this.
+  * Changed default /etc/profile so that it sources /etc/bash.bashrc
+    if the shell is bash. Closes: #275622.
+  * Drop \u part from default PS1 in /etc/profile, as it's only useful
+    for people with several non-root accounts. Most people are either root
+    or an ordinary user, so $ and # are enough to differentiate between them.
+  * Comment out PS1 setting in /etc/profile anyway, as we have bash.bashrc.
+
+ -- Santiago Vila <sanvila@debian.org>  Sun, 31 Jan 2010 13:16:14 +0100
+
+base-files (5.0.0) unstable; urgency=low
+
+  * Drop README.base, remove-base, and the lines in postinst which checked
+    for the old base package being present.
+  * Do not fiddle with /etc/adjtime anymore, as it does not belong here.
+  * Added file /etc/dpkg/origins/debian from dpkg package, for the benefit
+    of Debian-derived distributions, as base-files is trivial to fork.
+    Hopefully, this will be one less reason to fork dpkg. Closes: #487437.
+  * Added dpkg (<= 1.15.0) to Replaces, because of the above.
+  * On initial install and also on upgrades, create /etc/dpkg/origins/default
+    as a symlink to /etc/dpkg/origins/debian, if it does not exist.
+  * Updated copyright year in copyright file.
+
+ -- Santiago Vila <sanvila@debian.org>  Fri, 24 Apr 2009 21:02:42 +0200
+
+base-files (5.0) unstable; urgency=medium
+
+  * Changed issue, issue.net and debian_version to read "squeeze/sid".
+  * Added GFDL-1.3 from http://www.gnu.org/licenses/fdl-1.3.txt as new
+    packages in unstable are starting to use it. Closes: #517196.
+  * Updated generic GFDL symlink accordingly, as it is always supposed
+    to point to the latest version.
+
+ -- Santiago Vila <sanvila@debian.org>  Thu, 26 Feb 2009 17:09:38 +0100
+
+base-files (5) unstable; urgency=low
+
+  * Changed issue, issue.net and debian_version to read "5.0".
+  * Changed FAQ so that users of lenny as stable will know what happens
+    when they upgrade to the new testing.
+
+ -- Santiago Vila <sanvila@debian.org>  Thu, 04 Dec 2008 10:04:04 +0100
+
+base-files (4.0.6) unstable; urgency=low
+
+  * Changed the way wtmp, btmp and lastlog are handled. They are no longer
+    recreated at every base-files upgrade. Instead, they are only created
+    once, when base-files is installed by debootstrap. It is really not
+    base-files business to fiddle with those files, as it is documented
+    that removing them is the standard way to disable logging to them.
+    Closes: #488376.
+
+ -- Santiago Vila <sanvila@debian.org>  Tue, 04 Nov 2008 20:34:12 +0100
+
+base-files (4.0.5) unstable; urgency=low
+
+  * Changed awk from Depends to Pre-Depends. Closes: #314571, #469552.
+    This is required to make the awk virtual package to be truly essential,
+    as only essential packages, their predependencies, and the dependencies
+    of their predependencies are guaranteed to be "working at all times".
+    Previously, the packaging system was allowed to remove an awk flavour
+    and install another one in the middle of an upgrade, which may break
+    packages using awk in their preinsts (and in fact, it happened).
+    Tkanks a lot to Steve Langasek for clarifying this issue.
+  * It's still soon to change /etc/debian_version. Please be patient.
+
+ -- Santiago Vila <sanvila@debian.org>  Tue,  5 Aug 2008 18:06:06 +0200
+
+base-files (4.0.4) unstable; urgency=low
+
+  * Added Apache-2.0 to common-licenses. Closes: #471736.
+    Retrieved from http://www.apache.org/licenses/LICENSE-2.0.txt.
+  * Fixed typo in README.base. Closes: #475201.
+
+ -- Santiago Vila <sanvila@debian.org>  Sun, 18 May 2008 16:26:00 +0200
+
+base-files (4.0.3) unstable; urgency=low
+
+  * Added md5sums. Closes: #464479.
+  * Do not create /initrd at install time anymore. Closes: #467429.
+
+ -- Santiago Vila <sanvila@debian.org>  Tue, 11 Mar 2008 11:04:00 +0100
+
+base-files (4.0.2) unstable; urgency=low
+
+  * Changed default /root/.profile so that it sources /root/.bashrc only
+    if the shell is bash. Closes: #364326.
+
+ -- Santiago Vila <sanvila@debian.org>  Mon, 19 Nov 2007 19:04:10 +0100
+
+base-files (4.0.1) unstable; urgency=low
+
+  * Added GPL-3 and LGPL-3 to common-licenses, as they are expected to
+    become common licenses. Closes: #431176. Please note that GPL and LGPL
+    will now point to GPL-3 and LGPL-3, as they are the most recent ones.
+    Packages under GPLv2 without "or any later version" must definitely
+    refer to the versioned file, not to the GPL symlink anymore.
+
+ -- Santiago Vila <sanvila@debian.org>  Sun, 19 Aug 2007 19:15:30 +0200
+
+base-files (4.0.0) unstable; urgency=low
+
+  * Added GFDL-1.2 from ftp://ftp.gnu.org/gnu/Licenses/COPYING.DOC-1.2
+    to common-licenses, following policy (Closes: #420599).
+
+ -- Santiago Vila <sanvila@debian.org>  Tue, 24 Apr 2007 09:39:36 +0200
+
+base-files (4.0) unstable; urgency=low
+
+  * Changed issue, issue.net and debian_version to read "lenny/sid".
+  * Changed FAQ accordingly.
+
+ -- Santiago Vila <sanvila@debian.org>  Tue,  3 Apr 2007 11:45:30 +0200
+
+base-files (4) unstable; urgency=low
+
+  * Changed issue, issue.net and debian_version to read "4.0".
+  * Changed PATHs in default /etc/profile to not contain /usr/bin/X11,
+    as this is no longer needed by the X packages in etch (Closes: #388586).
+
+ -- Santiago Vila <sanvila@debian.org>  Sat, 28 Oct 2006 15:44:00 +0200
+
+base-files (3.1.16) unstable; urgency=low
+
+  * Changed comment in default /etc/nsswitch.conf so that it refers to
+    glibc-doc-reference, not glibc-doc (Closes: #384722).
+
+ -- Santiago Vila <sanvila@debian.org>  Mon, 28 Aug 2006 18:32:42 +0200
+
+base-files (3.1.15) unstable; urgency=low
+
+  * Added /usr/local/etc, required by FHS (Closes: #383493).
+    [ As usual, please note that this will only affect new installs ].
+    This directory is also allowed to be a symlink to /etc/local, but that's
+    a decision to be made by the end user after installing the system.
+  * Standards-Version: 3.7.2.
+
+ -- Santiago Vila <sanvila@debian.org>  Sun, 20 Aug 2006 12:44:00 +0200
+
+base-files (3.1.14) unstable; urgency=low
+
+  * Removed (obsolete) order line from default host.conf (Closes: #354115).
+  * Updated GPL-2 from ftp://ftp.gnu.org/gnu/Licenses (Closes: #380067).
+
+ -- Santiago Vila <sanvila@debian.org>  Mon,  7 Aug 2006 19:21:54 +0200
+
+base-files (3.1.13) unstable; urgency=low
+
+  * Updated LGPL-2 from ftp://ftp.gnu.org/gnu/Licenses (Closes: #332390).
+
+ -- Santiago Vila <sanvila@debian.org>  Fri,  5 May 2006 18:08:14 +0200
+
+base-files (3.1.12) unstable; urgency=low
+
+  * Changed default /usr/share/info/dir so that it does not refer to
+    documentation not available in etch/main (Closes: #362597).
+
+ -- Santiago Vila <sanvila@debian.org>  Sat, 15 Apr 2006 18:41:36 +0200
+
+base-files (3.1.11) unstable; urgency=low
+
+  * The file /etc/nsswitch.conf is now created by postinst in the first
+    install (made by debootstrap), and it's no longer a conffile.
+
+ -- Santiago Vila <sanvila@debian.org>  Sat,  4 Mar 2006 13:26:14 +0100
+
+base-files (3.1.10) unstable; urgency=medium
+
+  * Removed mdns item from hosts line in default /etc/nsswitch.conf, since
+    it does not make everybody happy (Bugs #348578, #348580 and #351990).
+  * Updated default /etc/adjtime to current year.
+
+ -- Santiago Vila <sanvila@debian.org>  Thu,  9 Feb 2006 18:41:22 +0100
+
+base-files (3.1.9) unstable; urgency=low
+
+  * The file /etc/inputrc is now handled by readline-common.
+  * Changed to section admin to match override file.
+
+ -- Santiago Vila <sanvila@debian.org>  Fri, 30 Sep 2005 18:51:54 +0200
+
+base-files (3.1.8) unstable; urgency=low
+
+  * Added mdns to hosts line in default /etc/nsswitch.conf to support
+    mDNS when available (Closes: #324954). Suggested by Joey Hess.
+  * Dropped %h from issue.net, as it's not supported by all telnetd
+    daemons and it's not even supported by ssh (Closes: #329682).
+    Thanks to Dave Love for the report.
+
+ -- Santiago Vila <sanvila@debian.org>  Thu, 29 Sep 2005 19:40:08 +0200
+
+base-files (3.1.7) unstable; urgency=medium
+
+  * Removed trailing spaces from default inputrc (Closes: #325007).
+
+ -- Santiago Vila <sanvila@debian.org>  Thu, 25 Aug 2005 20:16:08 +0200
+
+base-files (3.1.6) unstable; urgency=low
+
+  * Removed /usr/doc and /usr/info.
+  * Modified postinst to create /usr/share/info/dir, not /usr/info/dir.
+
+ -- Santiago Vila <sanvila@debian.org>  Tue, 12 Jul 2005 17:29:48 +0200
+
+base-files (3.1.5) unstable; urgency=medium
+
+  * Updated GPL-2 and LGPL-2.1 from ftp://ftp.gnu.org/gnu/Licenses again.
+    There should be no references to the old address anymore (Bug #312586).
+
+ -- Santiago Vila <sanvila@debian.org>  Wed, 22 Jun 2005 00:36:32 +0200
+
+base-files (3.1.4) unstable; urgency=medium
+
+  * Updated GPL-2 and LGPL-2.1 from ftp://ftp.gnu.org/gnu/Licenses,
+    as FSF has moved again (Closes: #312586).
+
+ -- Santiago Vila <sanvila@debian.org>  Fri, 10 Jun 2005 20:12:06 +0200
+
+base-files (3.1.3) unstable; urgency=low
+
+  * Changed issue, issue.net and debian_release to "testing/unstable".
+    Not that this is a lot useful, but at least is what people expect.
+  * Made /home to be 755 and root:root by default, since nobody finds
+    the sgid bit in such directory useful for anything.
+
+ -- Santiago Vila <sanvila@debian.org>  Mon,  6 Jun 2005 19:32:20 +0200
+
+base-files (3.1.2) unstable; urgency=low
+
+  * Changed example line in default /root/.bashrc from eval `dircolors` to
+    eval "`dircolors`" as the old form may be dangerous (Closes: #285836).
+    Thanks a lot to Paul Eggert for the report.
+
+ -- Santiago Vila <sanvila@debian.org>  Wed, 15 Dec 2004 23:51:58 +0100
+
+base-files (3.1.1) unstable; urgency=low
+
+  * The file /etc/profile is not a conffile anymore. Instead, it is created
+    by postinst in the very first base-files install, made by debootstrap.
+  * Accordingly, removed bash from Replaces field.
+
+ -- Santiago Vila <sanvila@debian.org>  Tue, 14 Dec 2004 19:06:00 +0100
+
+base-files (3.1.0) unstable; urgency=low
+
+  * Moved PATH definition for root from the default /root/.profile to the
+    default /etc/profile, by popular demand (Closes: #278865).
+  * The file /etc/inputrc is now created by postinst in the first install.
+    Removed libreadline incarnations from Replaces field accordingly.
+    This file will probably be managed by libreadline-common some day.
+
+ -- Santiago Vila <sanvila@debian.org>  Wed, 10 Nov 2004 17:32:00 +0100
+
+base-files (3.1) unstable; urgency=high
+
+  * Changed issue, issue.net and debian_version to read "3.1".
+
+ -- Santiago Vila <sanvila@debian.org>  Mon, 26 Jul 2004 20:25:32 +0200
+
+base-files (3.0.16) unstable; urgency=low
+
+  * Changed -a to && in postinst (Closes #254781).
+  * Updated copyright year.
+
+ -- Santiago Vila <sanvila@debian.org>  Sat, 19 Jun 2004 17:41:54 +0200
+
+base-files (3.0.15) unstable; urgency=low
+
+  * FAQ: Documented the fact that some FHS "mandatory" directories are
+    only created in the initial install (Closes: #242192).
+  * Do not create /cdrom and /floppy anymore (Closes: #245188).
+  * Use "ln -sf" to create /usr/local/man symlink (Closes: #245687).
+
+ -- Santiago Vila <sanvila@debian.org>  Mon, 26 Apr 2004 19:44:44 +0200
+
+base-files (3.0.14) unstable; urgency=low
+
+  * Added /var/log/btmp, following /etc/login.defs (Closes: #239587).
+
+ -- Santiago Vila <sanvila@debian.org>  Wed, 24 Mar 2004 13:40:46 +0100
+
+base-files (3.0.13) unstable; urgency=low
+
+  * Added /srv, /media and /usr/local/share/man (Closes: #230909).
+  * Added /usr/local/man as a symlink to /usr/local/share/man,
+    since FHS says both directories should be "synonymous".
+  * I'm not populating /media because subdirectories are optional.
+    They only must exist "if the corresponding subsystem is installed".
+    Detecting such things is not really base-files business. I would
+    expect debian-installer to create those subdirectories instead.
+  * /cdrom and /floppy will still be created in the first install until
+    debian-installer and/or apt stop using them for new installs.
+
+ -- Santiago Vila <sanvila@debian.org>  Sat, 21 Feb 2004 17:47:34 +0100
+
+base-files (3.0.12) unstable; urgency=low
+
+  * Made issue and issue.net generated files, to prevent a double "GNU/"
+    prefix on GNU/K*BSD systems (Closes: #217383).
+
+ -- Santiago Vila <sanvila@debian.org>  Sun, 26 Oct 2003 21:38:44 +0100
+
+base-files (3.0.11) unstable; urgency=low
+
+  * Updated /etc/inputrc (from readline maintainer). Closes: #213666.
+
+ -- Santiago Vila <sanvila@debian.org>  Thu,  2 Oct 2003 16:42:58 +0200
+
+base-files (3.0.10) unstable; urgency=low
+
+  * Use `:' for chown, not `.' (Closes: #204860).
+
+ -- Santiago Vila <sanvila@debian.org>  Mon, 11 Aug 2003 00:42:22 +0200
+
+base-files (3.0.9) unstable; urgency=low
+
+  * Prevent OSNAME from having the GNU/ prefix twice (Closes: #200741).
+  * Updated LGPL-2.1 from ftp.gnu.org. Instead of form feeds, the old
+    version was using `^' followed by `L' (Closes: #201867).
+
+ -- Santiago Vila <sanvila@debian.org>  Mon, 21 Jul 2003 19:25:12 +0200
+
+base-files (3.0.8) unstable; urgency=low
+
+  * Fixed the way /etc/motd is updated so that it still works when md5sum
+    prints a `-' after the md5sum value (Closes: #180920).
+
+ -- Santiago Vila <sanvila@debian.org>  Sat, 15 Feb 2003 14:30:04 +0100
+
+base-files (3.0.7) unstable; urgency=low
+
+  * Added "Why isn't license `foo' included in common-licenses?" to the FAQ.
+    Thanks to Colin Watson for the suggestion.
+
+ -- Santiago Vila <sanvila@debian.org>  Sat, 18 Jan 2003 20:32:16 +0100
+
+base-files (3.0.6) unstable; urgency=low
+
+  * Changed /etc/profile so that PS1 isn't set for non-interactive shells.
+    This should make the usual way of testing for interactive shells
+    (checking for PS1) to always work (Closes: #164846).
+  * Changed /etc/motd to better reflect the truth about Debian: s/Most of//
+    and s/freely redistributable/free software/ (Closes: #169543).
+
+ -- Santiago Vila <sanvila@debian.org>  Tue, 19 Nov 2002 22:06:12 +0100
+
+base-files (3.0.5) unstable; urgency=low
+
+  * Added a small FAQ. The current topics are:
+  - Why Debian does not have a profile.d directory?
+  - I upgraded to testing, why /etc/issue does not read "testing"?
+  * Standards-Version: 3.5.7 (do not create or remove doc symlinks).
+    Note: In theory, packages still creating doc symlinks are allowed
+    to blindly assume /usr/doc exists, so /usr/doc will still be part of
+    base-files for some time.
+  * Removed prerm, since it's not required anymore.
+
+ -- Santiago Vila <sanvila@debian.org>  Sat, 12 Oct 2002 15:21:52 +0200
+
+base-files (3.0.4) unstable; urgency=low
+
+  * /etc/profile does no longer export PS1. This should prevent
+    strange prompts to be shown when switching from bash to a shell which
+    does not understand bash escapes (Closes: #141193).
+  * Set distribution to "testing/unstable".
+
+ -- Santiago Vila <sanvila@debian.org>  Wed, 17 Jul 2002 16:01:02 +0200
+
+base-files (3.0.3) unstable; urgency=low
+
+  * Fixed wrong group ownerships under GNU/Hurd. This may also happen under
+    Linux when using the `bsdgroups' mount option, but even in this case
+    it will not happen if the package is built using fakeroot.
+
+ -- Santiago Vila <sanvila@debian.org>  Sat, 27 Apr 2002 14:18:44 +0200
+
+base-files (3.0.2) unstable; urgency=medium
+
+  * Made /usr/share/doc/base-files/remove-base more robust (Closes: #132969).
+
+ -- Santiago Vila <sanvila@debian.org>  Fri,  8 Feb 2002 16:36:54 +0100
+
+base-files (3.0.1) unstable; urgency=medium
+
+  * Modified postinst to use awk only on upgrades, not in the first install.
+    This should help debootstrap (Closes: #130056, #130087).
+
+ -- Santiago Vila <sanvila@debian.org>  Sun, 20 Jan 2002 14:52:34 +0100
+
+base-files (3.0.0) unstable; urgency=medium
+
+  * Restored /usr/doc since it's still required by the system according
+    to the doc transition plan.
+
+ -- Santiago Vila <sanvila@debian.org>  Sat, 19 Jan 2002 13:18:12 +0100
+
+base-files (3.0) unstable; urgency=medium
+
+  * Changed issue, issue.net and debian_version to read "3.0".
+
+ -- Santiago Vila <sanvila@debian.org>  Wed, 28 Nov 2001 11:22:42 +0100
+
+base-files (2.2.15) unstable; urgency=low
+
+  * Removed /usr/doc.
+
+ -- Santiago Vila <sanvila@debian.org>  Sat, 24 Nov 2001 13:23:32 +0100
+
+base-files (2.2.14) unstable; urgency=low
+
+  * Created /opt, /etc/opt and /var/opt in the first install.
+    They are mentioned in FHS 2.1 and required in FHS 2.2 (Closes: #118505).
+  * The copyright file now refers to GNU/Linux or GNU/Hurd as appropriate.
+  * Updated README.base and postinst to refer to /usr/share/doc.
+  * Updated default /etc/adjtime to current millenium.
+
+ -- Santiago Vila <sanvila@debian.org>  Fri,  9 Nov 2001 17:02:50 +0100
+
+base-files (2.2.13) unstable; urgency=low
+
+  * GPL is now a symlink to GPL-2, which is the real file.
+
+ -- Santiago Vila <sanvila@debian.org>  Sun,  2 Sep 2001 13:26:34 +0200
+
+base-files (2.2.12) unstable; urgency=low
+
+  * s/info readline/info rluserman/ in /etc/inputrc (Closes: #109110).
+  * Updated LGPL-2.1 from ftp.gnu.org to fix line breaks (Closes: #109319).
+
+ -- Santiago Vila <sanvila@debian.org>  Wed, 22 Aug 2001 17:29:10 +0200
+
+base-files (2.2.11) unstable; urgency=low
+
+  * In the first install, populate /usr/local even if it exists.
+    Allows /usr/local to be mounted in a separate partition during the
+    install process (Closes: #107662).
+
+ -- Santiago Vila <sanvila@debian.org>  Sat,  4 Aug 2001 19:09:16 +0200
+
+base-files (2.2.10) unstable; urgency=low
+
+  * Removed /var/state and /var/state/misc, added /usr/local/games.
+    Reported by Sebastian Riedel.
+  * Made /boot mode 755 and owned by root group, since no part of the system
+    seems to require special permissions here (Closes: #102080).
+
+ -- Santiago Vila <sanvila@debian.org>  Wed, 27 Jun 2001 19:45:46 +0200
+
+base-files (2.2.9) unstable; urgency=medium
+
+  * Creates /etc/motd in the initial install (now made by debootstrap).
+    Forgot to do this in 2.2.7. Reported by Matt Kraai (Closes: #101342).
+
+ -- Santiago Vila <sanvila@debian.org>  Tue, 19 Jun 2001 14:38:33 +0200
+
+base-files (2.2.8) unstable; urgency=low
+
+  * Made /etc/debian_version a `conffile' (Closes: #81249). To prevent
+    unneeded dpkg prompting, this file is overwritten in the preinst
+    if upgrading from a base-files release previous to 2.2.6
+    (thanks to Joey Hess for suggesting this solution).
+
+ -- Santiago Vila <sanvila@debian.org>  Sat, 17 Mar 2001 19:33:22 +0100
+
+base-files (2.2.7) unstable; urgency=low
+
+  * The file /etc/motd is no longer a conffile. Instead, it will be updated
+    if its md5sum (minus its first two lines) matches the one in a list of
+    md5sums of previous Debian releases. This will reduce dpkg prompting
+    on upgrades (Closes: #71083).
+
+ -- Santiago Vila <sanvila@debian.org>  Mon, 12 Mar 2001 20:23:06 +0100
+
+base-files (2.2.6) unstable; urgency=medium
+
+  * Use "testing/unstable" instead of "2.2" for the distribution number.
+    It seems everybody prefers to see something else other than "2.2".
+
+ -- Santiago Vila <sanvila@debian.org>  Sun, 31 Dec 2000 11:41:55 +0100
+
+base-files (2.2.5) unstable; urgency=low
+
+  * Modified debian_version, issue and issue.net in /etc so that they
+    read "2.2" again, since this is the last Debian *stable* release so far.
+    Since packages in `unstable' are now automatically moved to `testing',
+    a codename in /etc/debian_version will never be "right" for everybody, so
+    the only sensible thing to do here is to wait until a new release number
+    has been officially decided (Closes: #80784).
+
+ -- Santiago Vila <sanvila@debian.org>  Sat, 30 Dec 2000 20:40:05 +0100
+
+base-files (2.2.4) unstable; urgency=low
+
+  * Restored LGPL -> LGPL-2.1 symlink, which was mistakenly removed
+    in base-files_2.2.1 (Bug #75949).
+
+ -- Santiago Vila <sanvila@debian.org>  Tue,  7 Nov 2000 11:21:54 +0100
+
+base-files (2.2.3) unstable; urgency=low
+
+  * Added /var/lib/misc, since it's required by FHS (Closes: Bug #74317).
+
+ -- Santiago Vila <sanvila@debian.org>  Wed, 11 Oct 2000 20:09:48 +0200
+
+base-files (2.2.2) unstable; urgency=low
+
+  * Reduced verbosity, as suggested by Sean Perry (Closes: #70686).
+
+ -- Santiago Vila <sanvila@debian.org>  Wed, 27 Sep 2000 14:05:12 +0200
+
+base-files (2.2.1) unstable; urgency=low
+
+  * Release for woody (debian_version, issue and issue.net).
+  * /etc/motd now refers to /usr/share/doc/*/copyright.
+  * Removed /usr/doc/copyright and /usr/man.
+
+ -- Santiago Vila <sanvila@debian.org>  Thu, 20 Jul 2000 13:20:17 +0200
+
+base-files (2.2.0) frozen unstable; urgency=high
+
+  * The recipe in README.base does not work properly because dpkg
+    removes the conffiles listed in the status file (Bug #64734).
+    So, getting rid of base involves editing the status file.
+    To avoid mistakes, a shell script is now provided for that.
+    Thanks to Kevin Dalley <kevind@alacosta.org> for the report.
+
+ -- Santiago Vila <sanvila@ctv.es>  Sat, 27 May 2000 20:27:13 +0200
+
+base-files (2.2) frozen unstable; urgency=low
+
+  * preinst and postinst: Do not deal with /dev/pts anymore.
+  * issue and issue.net: Removed the `frozen' word.
+  * Final release for potato (hopefully).
+
+ -- Santiago Vila <sanvila@ctv.es>  Mon, 24 Apr 2000 14:02:44 +0200
+
+base-files (2.1.20) frozen unstable; urgency=high
+
+  * Made /var/log mode 755 and root.root (Bug #35504).
+  * Made /cdrom and /floppy mode 755 and root.root (Bug #25847).
+  * Removed /dev/pts. It made the package impossible to upgrade when
+    using devfs with Linux 2.4. libc6 is already supposed to deal
+    with /dev/pts (Bug #61408).
+  * postinst removes base.conffiles as well (otherwise, some files
+    like /etc/motd or /root/.bash_profile may disappear).
+    Thanks a lot to Mikko Oilinki for the report.
+  * Slightly improved README.base.
+
+ -- Santiago Vila <sanvila@ctv.es>  Tue,  4 Apr 2000 17:31:01 +0200
+
+base-files (2.1.19) frozen unstable; urgency=low
+
+  * Removed /usr/dict (Bug #60118).
+  * Minimal handling of the old base package (Bug #32888).
+  * Removed redundant directive in /etc/inputrc (Bug #59689).
+  * Do not reference /usr/share/doc in /etc/motd yet (Bug #61116).
+
+ -- Santiago Vila <sanvila@ctv.es>  Tue, 28 Mar 2000 17:51:46 +0200
+
+base-files (2.1.18) frozen unstable; urgency=low
+
+  * Handle better the /var/spool/mail-being-a-symlink case.
+  * Added /dev/pts for UNIX98-style pty handling under Linux.
+  * Added a README.FHS.
+
+ -- Santiago Vila <sanvila@ctv.es>  Mon,  7 Feb 2000 18:29:00 +0100
+
+base-files (2.1.17) frozen unstable; urgency=high
+
+  * Some people has /var/spool/mail symlinked to somewhere else.
+    For this case, preinst now saves the symlink target before dpkg
+    removes it and postinst restores it.
+  * Do not fiddle with /usr/local on upgrades. From now on, users
+    will be free to remove it if they wish.
+
+ -- Santiago Vila <sanvila@ctv.es>  Sat,  5 Feb 2000 20:10:17 +0100
+
+base-files (2.1.16) frozen unstable; urgency=low
+
+  * Generate default info dir file from /usr/share/base-files/info.dir.
+  * Do not generate an info dir file if one exists at /usr/share/info.
+  * Updated LGPL version 2 from ftp.gnu.org to fix a typo.
+  * Mail spool is /var/mail as per FHS (only in new installs).
+  * Acknowledge in the copyright file that the GNU Public Licenses are
+    copyrighted by the Free Software Foundation, Inc.
+
+ -- Santiago Vila <sanvila@ctv.es>  Fri,  4 Feb 2000 14:26:21 +0100
+
+base-files (2.1.15) frozen unstable; urgency=low
+
+  * Removed misleading copyright notice in /etc/motd.
+  * Distribution set to "2.2" (adding `frozen' in issue and issue.net).
+  * Use DEB_HOST_GNU_SYSTEM for the architecture stuff wherever possible.
+
+ -- Santiago Vila <sanvila@ctv.es>  Fri, 28 Jan 2000 14:03:25 +0100
+
+base-files (2.1.14) unstable; urgency=high
+
+  * Swap binary-arch and binary-indep targets in debian/rules, since this
+    is now Architecture: any. Thanks to Roman Hodek for the report.
+
+ -- Santiago Vila <sanvila@ctv.es>  Wed, 22 Dec 1999 19:48:24 +0100
+
+base-files (2.1.13) unstable; urgency=low
+
+  * Made "Architecture: any" for /etc/motd to be os-dependant.
+    [ A binary-all-<os> scheme would simplify this ].
+  * Exclude /proc from the .deb under GNU/Hurd (reported by Marcus Brinkmann).
+  * Added `set -e' to postinst.
+  * Standards-Version: 3.1.1 (doc symlinks).
+  * Removed obsolete README. If someone still asks about /usr/spool or
+    /var/adm then a paragraph could be added to the Debian FAQ.
+  * Follow changes suggested by Branden Robinson:
+  * Removed remaining bashisms in default /root/.profile and use
+    /usr/bin/X11 for X11 binaries.
+  * Improved package description.
+  * Removed unused bin/edit in the source.
+  * Changed root test in /etc/profile to use id -u.
+
+ -- Santiago Vila <sanvila@ctv.es>  Tue, 21 Dec 1999 11:53:35 +0100
+
+base-files (2.1.12) unstable; urgency=high
+
+  * Fixed Replaces field (reported a zillion times).
+  * Updated /etc/profile to use '$ ' as the shell prompt for normal
+    users and '# ' for the superuser if $BASH is not set.
+
+ -- Santiago Vila <sanvila@ctv.es>  Mon, 20 Dec 1999 12:56:18 +0100
+
+base-files (2.1.11) unstable; urgency=low
+
+  * Include /etc/inputrc and /etc/profile from readline and bash,
+    as suggested by Matthias Klose.
+
+ -- Santiago Vila <sanvila@ctv.es>  Fri, 17 Dec 1999 14:36:23 +0100
+
+base-files (2.1.10) unstable; urgency=low
+
+  * Create /var/log/lastlog as root.utmp, mode 664.
+  * Removed Linuxisms from /etc/motd.
+  * Updated GPL from ftp.gnu.org to be Y2K-compliant.
+
+ -- Santiago Vila <sanvila@ctv.es>  Tue, 21 Sep 1999 12:18:57 +0200
+
+base-files (2.1.9) unstable; urgency=low
+
+  * Removed the advertising clause from BSD license (Bug #43347).
+    Reason: ftp://ftp.cs.berkeley.edu/ucb/4bsd/README.Impt.License.Change
+    Thanks to J.H.M. Dassen for the report.
+
+ -- Santiago Vila <sanvila@ctv.es>  Thu, 26 Aug 1999 14:04:51 +0200
+
+base-files (2.1.8) unstable; urgency=low
+
+  * Added base-passwd (>= 2.0.3.4) to the Depends field.
+  * utmp and wtmp are now root.utmp and mode 664 (Bug #41569).
+  * Updated extended description regarding the common licenses.
+
+ -- Santiago Vila <sanvila@ctv.es>  Tue, 27 Jul 1999 14:03:23 +0200
+
+base-files (2.1.7) unstable; urgency=low
+
+  * LGPL is now the Lesser Gnu Public License (Bug #40759).
+    For now, the old version is renamed to "LGPL-2".
+  * Changed compatibility symlink /usr/doc/copyright/LGPL so that it
+    points to the old version.
+  * Moved docs to /usr/share/doc/base-files.
+  * Changed default /etc/motd so that it refers both to /usr/doc/*/copyright
+    and /usr/share/doc/*/copyright.
+
+ -- Santiago Vila <sanvila@ctv.es>  Fri, 16 Jul 1999 19:45:09 +0200
+
+base-files (2.1.6) unstable; urgency=low
+
+  * preinst: Do not fiddle with /etc/issue.net anymore.
+  * Changed the way /cdrom, /floppy and /initrd are handled.
+    These directories will now be created by postinst in the initial install.
+    This is a compromise after discussing in debian-policy about Bug #35928.
+    It will save people who like them the work of creating them after
+    installing a new system, and it will save people who dislike them the
+    work of removing them every time base-files is upgraded.
+    Since these directories are only a convenience for the user, who
+    is free to use them or not, the spirit of FHS is preserved.
+  * preinst and postinst: Following the principle of least surprise,
+    added code so that existing directories are not removed when upgrading
+    this package from previous releases.
+
+ -- Santiago Vila <sanvila@ctv.es>  Tue, 20 Apr 1999 15:39:36 +0200
+
+base-files (2.1.5) unstable; urgency=low
+
+  * When /usr/local does not exist, create also /usr/local/src.
+  * Added /var/cache, /var/state and /var/state/misc.
+  * Added /usr/share/info and /usr/share/man.
+
+ -- Santiago Vila <sanvila@ctv.es>  Wed,  7 Apr 1999 17:34:13 +0200
+
+base-files (2.1.4) unstable; urgency=low
+
+  * Removed the utmpx/wtmpx stuff from postinst.
+  * Updated the Artistic License (Bug #34685).
+
+ -- Santiago Vila <sanvila@ctv.es>  Thu, 18 Mar 1999 17:14:51 +0100
+
+base-files (2.1.3) unstable; urgency=low
+
+  * Use `nis' for the `netgroup:' entry in /etc/nsswitch.conf (Bug #33091).
+
+ -- Santiago Vila <sanvila@ctv.es>  Thu, 11 Mar 1999 17:50:22 +0100
+
+base-files (2.1.2) unstable; urgency=high
+
+  * Fixed a typo in postinst (Bug #34094).
+
+ -- Santiago Vila <sanvila@ctv.es>  Thu,  4 Mar 1999 15:57:24 +0100
+
+base-files (2.1.1) unstable; urgency=low
+
+  * postinst: touch /var/log/wtmpx and /var/run/utmpx to support
+    the utmpd in glibc 2.1 (reported by Joel Klecker).
+  * Replaced "Debian Linux" by just "Debian" in the default info dir file.
+  * Updated for potato.
+
+ -- Santiago Vila <sanvila@ctv.es>  Mon,  1 Mar 1999 18:47:23 +0100
+
+base-files (2.1.0) frozen unstable; urgency=medium
+
+  * Updated copyright date in /etc/motd (Bug #32646).
+
+ -- Santiago Vila <sanvila@ctv.es>  Mon,  1 Feb 1999 13:40:07 +0100
+
+base-files (2.1) frozen unstable; urgency=low
+
+  * debian_version, issue and issue.net: `slink' replaced by `2.1'.
+  * Added /usr/share/dict, since there are already some packages
+    using it.
+
+ -- Santiago Vila <sanvila@ctv.es>  Sun, 20 Dec 1998 17:40:56 +0100
+
+base-files (2.0.3) unstable; urgency=low
+
+  * Moved common licenses to /usr/share/common-licenses.
+  * Default dotfiles for root are now installed only the first time.
+  * /usr/local and subdirectories are now created mode 2775
+    and root.staff, according to policy.
+  * Added /usr/local/share.
+
+ -- Santiago Vila <sanvila@ctv.es>  Mon, 26 Oct 1998 19:05:04 +0100
+
+base-files (2.0.2) unstable; urgency=low
+
+  * If it does not exist, now a default /root/.profile file is installed,
+    not a /root/.bash_profile file, for slightly better POSIX compliance.
+
+ -- Santiago Vila <sanvila@ctv.es>  Wed, 14 Oct 1998 18:29:52 +0200
+
+base-files (2.0.1) unstable; urgency=low
+
+  * Added (commented out) some more alias for root's default .bashrc.
+  * issue, issue.net and debian_version: updated for slink (Bug #26325).
+  * Changed the way /etc/adjtime is handled (Bug #23255).
+  * Removed usr/man/man8 from directory-list.
+
+ -- Santiago Vila <sanvila@ctv.es>  Sun,  6 Sep 1998 16:58:50 +0200
+
+base-files (2.0) frozen unstable; urgency=medium
+
+  * Removed the "frozen" word from /etc/debian_version.
+  * Removed the use of the ROOT variable in preinst and postinst for two
+    reasons: a) It is no longer needed, since the base system is built
+    by using dpkg's --root=dir option, which works in a chrooted environment;
+    and b) Unexpected results would be obtained if user root had actually
+    defined a variable named ROOT.
+
+ -- Santiago Vila <sanvila@ctv.es>  Sun, 24 May 1998 13:33:25 +0200
+
+base-files (1.9) frozen unstable; urgency=low
+
+  * Default prompt for root is now '\h:\w\$ '.
+  * issue and issue.net: Removed the "frozen" word.
+  * Added a README explaining the /usr/spool symlink removal.
+  * nsswitch.conf: Use "compat" instead of "db files" for passwd, group
+    and shadow (Bug #10896).
+
+ -- Santiago Vila <sanvila@ctv.es>  Sun, 26 Apr 1998 14:18:43 +0200
+
+base-files (1.8) unstable; urgency=low
+
+  * Added /usr/share/misc.
+  * Removed /var/local/usr.
+  * Distribution set to "frozen".
+  * Moved root's default dotfiles to /usr/share/base-files.
+
+ -- Santiago Vila <sanvila@ctv.es>  Sun, 15 Mar 1998 13:05:54 +0100
+
+base-files (1.7) unstable; urgency=low
+
+  * Added "Depends: awk", so that awk is a "virtual essential package".
+  * /root/.bash_profile and /root/.bashrc are not `conffiles' anymore.
+    Instead, they are created from /root/.bash_profile.dpkg-dist and
+    /root/.bashrc.dpkg-dist if they do not exist.
+  * Default /root/.bash_profile sources /root/.bashrc.
+  * PS1 and umask are now set only once in default /root/.bashrc.
+  * Replaced /usr/bin/X11 by /usr/X11R6/bin in root's PATH.
+  * Manpage hierarchy is no longer created under /usr/local/man.
+  * Added a small comment in /etc/nsswitch.conf saying where
+    to find documentation about this file (libc6-doc package).
+  * Added some aliases for colorized `ls' commented out in .bashrc, so
+    that the user will simply have to uncomment them.
+
+ -- Santiago Vila <sanvila@ctv.es>  Mon, 23 Feb 1998 18:42:28 +0100
+
+base-files (1.6.1) unstable; urgency=low
+
+  * Removed "Depends: awk". It has not been discussed yet.
+
+ -- Santiago Vila <sanvila@ctv.es>  Sat, 14 Feb 1998 19:16:29 +0100
+
+base-files (1.6) unstable; urgency=low
+
+  * Default prompt for root is now PS1='\u@\h:\w\$ ', which may not
+    please everybody and/or generate a flame war, but at least is better
+    than nothing (previosuly it was PS1='\h\$ ').
+  * Added two blank lines to /etc/motd to keep Copyright notice from being
+    overwritten by /etc/init.d/bootmisc.sh.
+  * Removed compatibility symlinks /usr/spool, /usr/tmp, /usr/adm
+    and /var/adm. Now is when we have to see if something breaks.
+  * Removed /usr/lib/locale. Added /usr/share and /usr/include.
+  * Removed the /bin/edit script.
+
+ -- Santiago Vila <sanvila@ctv.es>  Sat,  7 Feb 1998 13:30:46 +0100
+
+base-files (1.5) unstable; urgency=medium
+
+  * Removed "dns" from the "networks:" line in /etc/nsswitch.conf.
+
+ -- Santiago Vila <sanvila@ctv.es>  Tue,  3 Feb 1998 21:32:52 +0100
+
+base-files (1.4) unstable; urgency=medium
+
+  * Uncompressed copyright files.
+  * debian/rules: package does no longer need to be built by root.
+    Changed `prototype' directory by an install -d `cat directories`,
+    and then set special permissions and ownerships directly.
+  * Added "Depends: awk", so that awk is a "virtual essential package".
+  * Updated GPL and LGPL. FSF's address changed some time ago to:
+    59 Temple Place, Suite 330, Boston, MA  02111-1307  USA.
+  * /bin/edit is now #!/bin/sh.
+  * /etc/debian_version, /etc/issue and /etc/issue.net now read
+    "2.0 (unstable)" instead of "1.3".
+  * /etc/issue now reads "GNU/Linux" (not "GNU Linux").
+  * Updated copyright year for /etc/motd.
+  * Added an extended description.
+  * Removed debstd dependency.
+  * New maintainer.
+
+ -- Santiago Vila <sanvila@ctv.es>  Mon,  2 Feb 1998 21:46:29 +0100
+
+base-files (1.3.5) frozen unstable; urgency=low
+
+  * Synchronization release to make sure my latest version is in 1.3 .
+    This is my last release before going on vacation, if anything
+    needs to be fixed in this package for 1.3, someone else must
+    fix it.
+
+ -- Bruce Perens <bruce@pixar.com>  Wed, 30 Apr 1997 12:36:49 -0700
+
+base-files (1.3.4) frozen unstable; urgency=low
+
+  * /etc/issue had the wrong escapes.
+
+ -- Bruce Perens <bruce@pixar.com>  Sun, 20 Apr 1997 22:50:21 -0700
+
+base-files (1.3.3) frozen unstable; urgency=low
+
+  * Add "frozen" to the distribution.
+
+ -- Bruce Perens <bruce@pixar.com>  Fri, 18 Apr 1997 22:46:18 -0700
+
+base-files (1.3.2) unstable; urgency=low
+
+  * Remove /etc/issue.net -> /etc/issue symlink in the preinst if it
+    exists.
+
+ -- Bruce Perens <bruce@pixar.com>  Fri, 18 Apr 1997 15:22:06 -0700
+
+base-files (1.3.1) unstable; urgency=low
+
+  * Install nsswitch.cnf, required for libc 6 name service .
+
+ -- Bruce Perens <bruce@pixar.com>  Fri, 18 Apr 1997 15:09:31 -0700
+
+base-files (1.3.0) unstable; urgency=low
+
+  * Edit for Debian 1.3
+
+ -- Bruce Perens <bruce@pixar.com>  Fri, 18 Apr 1997 13:51:19 -0800
+
+base-files (1.2.4) unstable; urgency=low
+
+  * Add "Provides: base", and "Requires: base-passwd, makedev".
+
+ -- Bruce Perens <bruce@pixar.com>  Sun, 17 Dec 1996 10:48:41 -0800
+
+base-files (1.2.0-4) unstable; urgency=low
+
+  * Symlink /var/run/wtmp -> /var/log/wtmp. Create utmp and wtmp if they
+    don't exist, but don't clobber them if they do exist.
+
+ -- Bruce Perens <bruce@pixar.com>  Sun, 1 Dec 1996 10:48:41 -0800
+
+base-files (1.2.0-3) unstable; urgency=low
+
+  * Wrong modes on /tmp. Set explicit umask 0 before copying files.
+
+ -- Bruce Perens <bruce@pixar.com>  Tue, 26 Nov 1996 13:07:05 -0800
+
+base-files (1.2.0-2) unstable; urgency=low
+
+  * Don't clobber utmp and wtmp. Take spurious "Inc." off of SPI name,
+    California corporations aren't required to say "Inc." at the end of
+    their names.
+
+ -- Bruce Perens <bruce@pixar.com>  Sat, 23 Nov 1996 12:16:28 -0800
+
+base-files (1.2.0-1) unstable; urgency=low
+
+  * Initial Release.
+  * Removed devices, passwd, and group. Devices are made by the C MAKEDEV at
+    run-time. /etc/MAKEDEV is installed by the "makedev" package.
+    /etc/passwd and /etc/group are installed by the "base-passwd" package.
+
+ -- Bruce Perens <bruce@pixar.com>  Thu, 14 Nov 1996 21:02:09 -0800
