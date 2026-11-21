@@ -1,9 +1,11 @@
 
-name: Sync LingmoOS Source
+name: LingmoOS Source Sync
 
 on:
   schedule:
+    # 每天 UTC 18:00 执行（北京时间次日 02:00）
     - cron: "0 18 * * *"
+
   workflow_dispatch:
 
 permissions:
@@ -15,19 +17,33 @@ concurrency:
 
 jobs:
   sync:
+    name: Sync and Release Source
     runs-on: ubuntu-latest
 
     steps:
+      # ==========================================
+      # 1. 检出 LingmoOS 主仓库
+      # ==========================================
+
       - name: Checkout LingmoOS
         uses: actions/checkout@v4
         with:
           path: output
+          ref: ${{ github.ref }}
           fetch-depth: 0
+
+      # ==========================================
+      # 2. 安装依赖
+      # ==========================================
 
       - name: Install dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y git rsync curl
+
+      # ==========================================
+      # 3. 安装 Repo
+      # ==========================================
 
       - name: Install Repo
         run: |
@@ -38,7 +54,12 @@ jobs:
             -o "$HOME/bin/repo"
 
           chmod +x "$HOME/bin/repo"
+
           echo "$HOME/bin" >> "$GITHUB_PATH"
+
+      # ==========================================
+      # 4. 初始化 Repo 工作区
+      # ==========================================
 
       - name: Initialize source workspace
         run: |
@@ -50,11 +71,19 @@ jobs:
             -u https://github.com/LingmoOS/manifest.git \
             -m manifests/standard.xml
 
+      # ==========================================
+      # 5. 同步所有源码
+      # ==========================================
+
       - name: Sync source repositories
         run: |
           cd "$RUNNER_TEMP/lingmo-workspace"
 
           repo sync -c -j8
+
+      # ==========================================
+      # 6. 导出完整源码
+      # ==========================================
 
       - name: Export source code
         run: |
@@ -65,29 +94,51 @@ jobs:
 
           rsync -a \
             --exclude='/.repo/' \
-            --exclude='.git' \
+            --exclude='.git/' \
             "$WORKSPACE/" "$EXPORT/"
+
+      # ==========================================
+      # 7. 生成 Manifest 清单
+      # ==========================================
+
+      - name: Generate source manifests
+        run: |
+          WORKSPACE="$RUNNER_TEMP/lingmo-workspace"
+          EXPORT="$RUNNER_TEMP/lingmo-export"
 
           cd "$WORKSPACE"
 
+          # 原始 Manifest
           repo manifest \
             -o "$EXPORT/SOURCE_MANIFEST.xml"
 
+          # 固定每个项目的实际 Commit SHA
           repo manifest -r \
             -o "$EXPORT/SOURCE_MANIFEST.lock.xml"
 
+      # ==========================================
+      # 8. 更新主仓库源码
+      # ==========================================
+
       - name: Update source snapshot
         run: |
+          EXPORT="$RUNNER_TEMP/lingmo-export"
+          OUTPUT="$GITHUB_WORKSPACE/output"
+
           rsync -a --delete \
             --exclude='/.git/' \
             --exclude='/.github/' \
             --exclude='/README.md' \
             --exclude='/LICENSE' \
             --exclude='/.gitignore' \
-            "$RUNNER_TEMP/lingmo-export/" \
-            "$GITHUB_WORKSPACE/output/"
+            "$EXPORT/" "$OUTPUT/"
+
+      # ==========================================
+      # 9. 提交源码变更
+      # ==========================================
 
       - name: Commit and push
+        id: commit
         run: |
           cd "$GITHUB_WORKSPACE/output"
 
@@ -95,14 +146,87 @@ jobs:
           git config user.email \
             "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add -f -A
+          git add -A
 
           if git diff --cached --quiet; then
             echo "No source changes detected."
+            echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
           git commit -m "chore: sync Lingmo OS source tree"
 
-          git push origin HEAD
+          # 推送当前分支
+          git push origin "HEAD:${GITHUB_REF}"
 
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      # ==========================================
+      # 10. 生成时间戳 Tag 和源码包
+      # ==========================================
+
+      - name: Create source archive
+        if: steps.commit.outputs.changed == 'true'
+        run: |
+          TIMESTAMP=$(date -u +%Y%m%d%H%M%S)
+
+          TAG="source-${TIMESTAMP}"
+          ARCHIVE_NAME="LingmoOS-source-${TIMESTAMP}.tar.gz"
+          ARCHIVE_PATH="$RUNNER_TEMP/$ARCHIVE_NAME"
+
+          # 打包完整源码
+          tar -czf "$ARCHIVE_PATH" \
+            -C "$RUNNER_TEMP" \
+            lingmo-export
+
+          echo "TAG=$TAG" >> "$GITHUB_ENV"
+          echo "ARCHIVE_PATH=$ARCHIVE_PATH" >> "$GITHUB_ENV"
+
+      # ==========================================
+      # 11. 创建并推送 Git Tag
+      # ==========================================
+
+      - name: Create Git tag
+        if: steps.commit.outputs.changed == 'true'
+        run: |
+          cd "$GITHUB_WORKSPACE/output"
+
+          git tag -a "$TAG" \
+            -m "LingmoOS source snapshot $TAG"
+
+          git push origin "refs/tags/$TAG"
+
+      # ==========================================
+      # 12. 发布 GitHub Release
+      # ==========================================
+
+      - name: Publish GitHub Release
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "$TAG" \
+            "$ARCHIVE_PATH" \
+            --repo "$GITHUB_REPOSITORY" \
+            --verify-tag \
+            --title "LingmoOS Source Snapshot $TAG" \
+            --generate-notes
+
+      # ==========================================
+      # 13. 完成
+      # ==========================================
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## LingmoOS Source Sync" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "${{ steps.commit.outputs.changed }}" = "true" ]; then
+            echo "Source synchronization completed." >> "$GITHUB_STEP_SUMMARY"
+            echo "" >> "$GITHUB_STEP_SUMMARY"
+            echo "- Tag: $TAG" >> "$GITHUB_STEP_SUMMARY"
+            echo "- Archive: $(basename "$ARCHIVE_PATH")" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No source changes detected." >> "$GITHUB_STEP_SUMMARY"
+          fi
