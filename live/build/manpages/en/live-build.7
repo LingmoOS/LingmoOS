@@ -1,0 +1,240 @@
+.TH LIVE\-BUILD 7 2020\-04\-27 1:20191222 "Debian Live Project"
+
+.SH NAME
+\fBlive\-build\fR \- the Debian Live tool suite
+
+.SH SYNOPSIS
+\fBlb\fR {\fB\-h\fR|\fB\-\-help\fR|\fB\-u\fR|\fB\-\-usage\fR|\fB\-v\fR|\fB\-\-version\fR}
+.PP
+\fBlb\fR \fICOMMAND\fR [\fIOPTIONS\fR]
+
+.SH DESCRIPTION
+live\-build is a set of scripts to build live system images. The idea behind live\-build is a tool suite that uses a configuration directory to completely automate and customize all aspects of building a Live image.
+.PP
+The \fICOMMAND\fR is a name of a live\-build command (see below).
+.PP
+More documentation about how to use live\-build is available in the individual manpages for each helper and in the manual at <\fIhttps://live-team.pages.debian.net/live-manual/\fR>.
+
+.SH OPTIONS
+.SS Shared live\-build options
+The following command line options are supported by all live\-build programs.
+.IP "\fB-h, \-\-help\fR" 4
+display help and exit.
+.IP "\fB-u, \-\-usage\fR" 4
+show usage and exit.
+.IP "\fB-v, \-\-version\fR" 4
+output version information and exit.
+.SS Common live\-build options
+The following command line options are supported by most live\-build programs. See the man page of each program for a complete explanation of what each option does.
+.IP "\fB\-\-breakpoints\fR" 4
+run with breakpoints.
+.IP "\fB\-\-color\fR" 4
+enable color use in messages.
+.IP "\fB\-\-debug\fR" 4
+show debug information.
+.IP "\fB\-\-force\fR" 4
+force helper execution, even if stage file exists.
+.IP "\fB\-\-no-color\fR" 4
+disable color use in messages.
+.IP "\fB\-\-quiet\fR" 4
+be quiet.
+.IP "\fB\-\-verbose\fR" 4
+be verbose.
+
+.SH LIVE\-BUILD COMMANDS
+We divide live\-build into high level ("porcelain") commands, secondary major build stage ("porcelain") commands, and low level ("plumbing") commands.
+.PP
+Here is the complete list of all available live\-build commands. See their man
+pages for additional documentation.
+
+.SH HIGH\-LEVEL COMMANDS (PORCELAIN)
+We separate the porcelain commands into the main commands and some ancillary user utilities.
+.SS Main porcelain commands
+.IP "\fBlb config\fR(1)" 4
+creates configuration for live\-build
+.IP "\fBlb build\fR(1)" 4
+executes the build process (by executing all of the secondary level major build stages in sequence)
+.IP "\fBlb clean\fR(1)" 4
+cleans up system build directories
+.SS Ancillary Commands
+.IP "\fBlb\fR(1)" 4
+generic live\-build script execution wrapper
+
+.SH SECONDARY\-LEVEL BUILD COMMANDS (PORCELAIN)
+The following are the commands that execute each major stage of the build process, in their necessary order of execution. Normally a user might just execute the higher level \fBlb build\fR(1) command rather than use these individually.
+.IP "\fBlb bootstrap\fR(1)" 4
+executes the first build stage, creating (bootstraping) a basic Debian root filesystem
+.IP "\fBlb chroot\fR(1)" 4
+executes the second build stage, building the live OS filesystem
+.IP "\fBlb installer\fR(1)" 4
+executes the third build stage, obtaining installer components (optional)
+.IP "\fBlb binary\fR(1)" 4
+executes the fourth build stage, generating the binary (live) image
+.IP "\fBlb source\fR(1)" 4
+executes the fifth build stage, generating a corresponding source image (optional)
+
+.SH LOW\-LEVEL COMMANDS (PLUMBING) - BUILD STAGE COMPONENTS
+The actual work of live\-build is implemented in the low-level commands, called plumbing. They are not supposed to be used by end users, who should stick with porcelains as they ensure that all the different plumbing commands are executed in the right order. However, if you intend to reuse live\-build commands in your own scripts, then the plumbings might be of interest for you.
+.PP
+Note that the interface (set of options and the semantics) to these low\-level commands are meant to be a lot more stable than Porcelain level commands. The interface to Porcelain commands on the other hand are subject to change in order to improve the end user experience.
+.SS Bootstrap stage specific commands
+.IP "\fBlb bootstrap_cache\fR(1)" 4
+in save mode, saves to cache a copy of the generated bootstrap directory, and in restore mode, restores from cache a previously generated copy
+.IP "\fBlb bootstrap_debootstrap\fR(1)" 4
+creates (bootstraps) a basic Debian root filesystem using debootstrap(8)
+.SS Chroot stage specific commands
+.PP
+Note: The following chroot_ prefixed commands are used in building the live OS filesystem. Another set of similarly prefixed files are listed separately (see further down).
+.IP "\fBlb chroot_cache\fR(1)" 4
+in save mode, saves to cache a copy of the chroot directory, and in restore mode, restores from cache a previously generated copy
+.IP "\fBlb chroot_firmware\fR(1)" 4
+compiles a list of firmware packages to be installed in the live OS root filesystem
+.IP "\fBlb chroot_hacks\fR(1)" 4
+executes local hacks against the live OS root filesystem, if any are provided
+.IP "\fBlb chroot_hooks\fR(1)" 4
+executes local hooks against the live OS root filesystem, if any are provided
+.IP "\fBlb chroot_includes\fR(1)" 4
+copies a set of local files from the config directory into the live OS root filesystem, if any are provided
+.IP "\fBlb chroot_install\-packages\fR(1)" 4
+installs into the live OS root filesystem any packages listed in local package lists
+.IP "\fBlb chroot_interactive\fR(1)" 4
+pauses the build process and starts an interactive shell from the live OS root filesystem, providing an oportunity for manual modifications or testing; note that this is (currently) usually executed with several chroot prep modifications applied (see description of these further down)
+.IP "\fBlb chroot_linux\-image\fR(1)" 4
+compiles a list of kernel images to be installed in the live OS root filesystem
+.IP "\fBlb chroot_package\-lists\fR(1)" 4
+compiles a list of packages provided in the user\' local config to be installed in the live OS root filesystem
+.IP "\fBlb chroot_preseed\fR(1)" 4
+installs pre-configured answers to certain install prompts into the live OS root filesystem
+.SS Installer stage specific commands
+.IP "\fBlb installer_debian\-installer\fR(1)" 4
+obtains and sets up Debian installer (d-i) components
+.IP "\fBlb installer_preseed\fR(1)" 4
+installs pre-configured answers to certain install prompts
+.SS Binary stage specific commands
+.IP "\fBlb binary_checksums\fR(1)" 4
+creates checksums (md5, sha1, and/or sha256) for live image content
+.IP "\fBlb binary_chroot\fR(1)" 4
+duplicates the chroot directory, to place a copy of what would be the completed live OS root filesystem to one side, allowing the original to continue to be used in executing certain parts of the remainder of the build process
+.IP "\fBlb binary_disk\fR(1)" 4
+creates disk information files to be added to live image
+.IP "\fBlb binary_grub_cfg\fR(1)" 4
+creates the config for grub-pc and grub-efi, and also enables loopback support (which depends upon it) in the live image
+.IP "\fBlb binary_grub-efi\fR(1)" 4
+installs grub-efi (grub2 for EFI) into live image to provide image boot capability. It relies upon \fBlb binary_grub_cfg\fR to create the config.
+.IP "\fBlb binary_grub-legacy\fR(1)" 4
+installs grub into live image to provide image boot capability
+.IP "\fBlb binary_grub-pc\fR(1)" 4
+installs grub-pc (grub2 for BIOS) into live image to provide image boot capability. It relies upon \fBlb binary_grub_cfg\fR to create the config.
+.IP "\fBlb binary_hdd\fR(1)" 4
+compiles the final live image into an HDD image file
+.IP "\fBlb binary_hooks\fR(1)" 4
+executes local hooks against the live image, if any are provided
+.IP "\fBlb binary_includes\fR(1)" 4
+copies a set of local files from the config directory into the live image, if any are provided
+.IP "\fBlb binary_iso\fR(1)" 4
+compiles the final live image into an ISO file
+.IP "\fBlb binary_linux\-image\fR(1)" 4
+copies the linux\-image into the live image
+.IP "\fBlb binary_loadlin\fR(1)" 4
+bundles a copy of loadlin into the live image
+.IP "\fBlb binary_manifest\fR(1)" 4
+creates manifest of packages installed into live OS filesystem, and list of packages to be excluded by a persistence mechanism installing the live OS to disk
+.IP "\fBlb binary_memtest\fR(1)" 4
+bundles a copy of memtest into the live image
+.IP "\fBlb binary_netboot\fR(1)" 4
+compiles the final live image into a netboot tar archive
+.IP "\fBlb binary_onie\fR(1)" 4
+installs onie into the live image
+.IP "\fBlb binary_package\-lists\fR(1)" 4
+processes local lists of packages to obtain and bundle into image (from which they could later be installed if not already)
+.IP "\fBlb binary_rootfs\fR(1)" 4
+wraps up the completed live OS root filesystem into a virtual file system image
+.IP "\fBlb binary_syslinux\fR(1)" 4
+installs syslinux into live image to provide image boot capability
+.IP "\fBlb binary_tar\fR(1)" 4
+compiles the final live image into a tar archive
+.IP "\fBlb binary_win32\-loader\fR(1)" 4
+bundles a copy of win32\-loader into the live image and creates an autorun.inf file
+.IP "\fBlb binary_zsync\fR(1)" 4
+builds zsync control files
+.SS Source stage specific commands
+.IP "\fBlb source_checksums\fR(1)" 4
+creates checksums (md5, sha1, and/or sha256) for source image content
+.IP "\fBlb source_debian\fR(1)" 4
+downloads source packages for bundling into source image
+.IP "\fBlb source_disk\fR(1)" 4
+creates disk information files to be added to source image
+.IP "\fBlb source_hdd\fR(1)" 4
+compiles the final source image into an HDD image file
+.IP "\fBlb source_hooks\fR(1)" 4
+executes local hooks against the source image, if any are provided
+.IP "\fBlb source_iso\fR(1)" 4
+compiles the final source image into an ISO file
+.IP "\fBlb source_live\fR(1)" 4
+copies live-build config into source
+.IP "\fBlb source_tar\fR(1)" 4
+compiles the final source image into a tar archive
+
+.SH LOW\-LEVEL COMMANDS (PLUMBING) - CHROOT PREP COMPONENTS
+The notes above under the section regarding build-stage specific low-level plumbing commands also apply here.
+.PP
+The following chroot_ prefixed commands are used throughout the various primary stages of the build process to apply and remove modifications to a chroot root filesystem. Generally these are used to apply modification that setup the chroot for use (execution of programs within it) during the build process, and later to remove those modification, unmounting things that were mounted, and making the chroot suitable for use as the root filesystem of the live OS to be bundled into the live image.
+.PP
+Note that the \fBlb chroot_prep\fR(1) command can be used to run these components in bulk.
+.IP "\fBlb chroot_prep\fR(1)" 4
+a helper to run the below components in bulk. The first parameter it takes is the execution mode - install or remove - to pass along. The second parameter is the set of helpers to run (they can be space or comma separated; remember to quote if space separated). Following this one or more of the special parameters 'mode-archives-chroot', 'mode-archives-binary', 'mode-archives-source' and 'mode-apt-install-binary' can optionally be used, to select the 'pass' parameter for \fBlb chroot_archives\fR(1) in the case of the first three (required if 'archives' is one of the helpers to be run), and to run \fBlb chroot_apt\fR(1) in 'install-binary' mode in the last case. Any remaining parameters (i.e. options like --force) are passed along to all scripts run. The second parameter can be simply 'all' in which case a default set of all components are used, or 'all-except-archives' which differs in skipping \fBlb chroot_archives\fR(1). Components can be specified without their filename 'chroot_' prefix for brevity. In remove mode the list of components are run in reverse order, so no need to provide them in reverse order yourself.
+.IP "\fBlb chroot_apt\fR(1)" 4
+manages apt configuration; in apply mode it applies configuration for use during build process, and in remove mode removes that configuration
+.IP "\fBlb chroot_archives\fR(1)" 4
+manages apt archive source lists; in apply mode it applies source list configurations suitable for use of the chroot in the build process, and in remove mode replaces that with a configuration suitable for the final live OS
+.IP "\fBlb chroot_debianchroot\fR(1)" 4
+manages a /etc/debian_chroot file
+.IP "\fBlb chroot_devpts\fR(1)" 4
+manages mounting of /dev/pts
+.IP "\fBlb chroot_dpkg\fR(1)" 4
+manages dpkg; in apply mode disabling things like the start-stop-daemon, and in remove mode enabling them again
+.IP "\fBlb chroot_hostname\fR(1)" 4
+manages the hostname configuration
+.IP "\fBlb chroot_hosts\fR(1)" 4
+manages the /etc/hosts file
+.IP "\fBlb chroot_proc\fR(1)" 4
+manages mounting of /proc
+.IP "\fBlb chroot_resolv\fR(1)" 4
+manages configuration of the /etc/resolv.conf file
+.IP "\fBlb chroot_selinuxfs\fR(1)" 4
+manages mounting of /sys/fs/selinux
+.IP "\fBlb chroot_sysfs\fR(1)" 4
+manages mounting of /sys
+.IP "\fBlb chroot_sysv\-rc\fR(1)" 4
+manages the /usr/sbin/policy\-rc.d file
+.IP "\fBlb chroot_tmpfs\fR(1)" 4
+manages configuration of dpkg to use a tmpfs filesystem
+
+.SH CONFIG FILES
+Many live\-build commands make use of files in the \fIconfig/\fR directory to control what they do. Besides the common \fIconfig/common\fR, which is used by all live\-build commands, some additional files can be used to configure the behavior of specific live\-build commands. These files are typically named config/stage (where "stage" of course, is replaced with the name of the stage that they belong to).
+.PP
+Note that live\-build will respect environment variables which are present in the context of the shell it is running. If variables can be read from config files, then they override environment variables, and if command line options are used, they override values from config files. If no value for a given variable can be found and thus is unset, live\-build will automatically set it to the default value.
+.PP
+In some rare cases, you may want to have different versions of these files for different architectures or distributions. If files named config/stage.arch and config/stage.dist exist, where "arch" is the same as the output of "dpkg \-\-print\-architecture" and "dist" is the same as the codename of the target distribution, then they will be used in preference to other, more general files.
+.PP
+All config files are shell scripts which are sourced by a live\-build program. That means they have to follow the normal shell syntax. You can also put comments in these files; lines beginning with "#" are ignored.
+
+.SH FILES
+.IP "\fB/etc/live/build.conf\fR" 4
+.IP "\fB/etc/live/build/*\fR" 4
+
+.SH SEE ALSO
+\fIlive\-boot\fR(7)
+.PP
+\fIlive\-config\fR(7)
+.PP
+This program is a part of live\-build.
+
+.SH HOMEPAGE
+More information about live\-build and the Debian Live project can be found on the homepage at <\fIhttps://wiki.debian.org/DebianLive\fR>.
+
+.SH BUGS
+Bugs can be reported by submitting a bug report for the live\-build package in the Bug Tracking System at <\fIhttp://bugs.debian.org/\fR> or by writing a mail to the Debian Live mailing list at <\fIdebian-live@lists.debian.org\fR>.
+
+.SH AUTHOR
+live\-build was originally written by Daniel Baumann <\fImail@daniel-baumann.ch\fR>. Since 2016 development has been continued by the Debian Live team.

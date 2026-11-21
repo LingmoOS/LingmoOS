@@ -1,0 +1,97 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Copy chroot into chroot"
+USAGE="${PROGRAM} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+Echo_message "Begin copying chroot..."
+
+# Requiring stage file
+Require_stagefiles config bootstrap
+
+# Checking stage file
+Check_stagefile
+
+# Acquire lock file
+Acquire_lockfile
+
+# Normally, virtual filesystems are not mounted here, but people tend to be lazy
+if [ -f chroot/proc/version ]
+then
+	umount chroot/proc
+fi
+
+if [ -d chroot/sys/kernel ]
+then
+	umount chroot/sys
+fi
+
+if [ "${LB_BUILD_WITH_CHROOT}" = "false" ]
+then
+	Create_stagefile
+	exit 0
+fi
+
+if [ "${LB_CACHE}" = "true" ] && Find_files cache/binary_rootfs/filesystem*
+then
+	Create_stagefile
+	exit 0
+fi
+
+Echo_message "This may take a while."
+
+# Removing old chroot
+rm -rf chroot/chroot
+rm -rf chroot.tmp
+
+# Copying new chroot
+if [ -d cache/bootstrap ] && [ "${LB_CHROOT_FILESYSTEM}" != "none" ]
+then
+	mv chroot chroot.tmp
+	cp -a cache/bootstrap chroot
+	touch chroot/chroot.cache
+else
+	cp -a chroot chroot.tmp
+fi
+
+mv chroot.tmp chroot/chroot
+
+# Handling chroot excludes
+if [ -f config/rootfs/excludes ] && [ "${LB_CHROOT_FILESYSTEM}" != "squashfs" ]
+then
+	case "${LB_BUILD_WITH_CHROOT}" in
+		true)
+			cp config/rootfs/excludes chroot/chroot/excludes
+			# Not using Chroot() here because we want explicitly /bin/bash (for the time being)
+			chroot chroot/chroot /usr/bin/env -i xargs --arg-file=/excludes -I FILE bash -c 'rm -rf FILE'
+			rm -f chroot/chroot/excludes
+			;;
+
+		false)
+			cp config/rootfs/excludes chroot/excludes
+			# Not using Chroot() here because we want explicitly /bin/bash (for the time being)
+			chroot chroot /usr/bin/env -i xargs --arg-file=/excludes -I FILE bash -c 'rm -rf FILE'
+			rm -f chroot/excludes
+			;;
+	esac
+fi
+
+# Creating stage file
+Create_stagefile

@@ -1,0 +1,170 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Install local packages into binary"
+USAGE="${PROGRAM} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+Echo_message "Begin installing local package lists..."
+
+# Requiring stage file
+Require_stagefiles config bootstrap
+
+# Checking stage file
+Check_stagefile
+
+# Acquire lock file
+Acquire_lockfile
+
+DISTS="dists"
+POOL="pool"
+
+if ls config/package-lists/*.list > /dev/null 2>&1 || \
+   ls config/package-lists/*.list.binary > /dev/null 2>&1
+then
+	# Check depends
+	Check_package host /usr/bin/apt-ftparchive apt-utils
+	Check_package chroot /usr/bin/grep-aptavail dctrl-tools
+
+	# Restoring cache
+	Restore_package_cache chroot
+
+	# Installing depends
+	Install_packages
+
+	if [ -e "${LIVE_BUILD}/share/bin/Packages" ]
+	then
+		cp "${LIVE_BUILD}/share/bin/Packages" chroot/bin
+	else
+		cp /usr/share/live/build/bin/Packages chroot/bin
+	fi
+
+	mkdir -p chroot/binary.deb/archives/partial
+
+	for LIST in config/package-lists/*.list \
+		    config/package-lists/*.list.binary
+	do
+		if [ -e "${LIST}" ]
+		then
+			# Generate package list
+			Expand_packagelist "${LIST}" "config/package-lists" > chroot/root/"$(basename ${LIST})"
+
+			# Downloading additional packages
+			Chroot chroot "xargs --no-run-if-empty --arg-file=/root/$(basename ${LIST}) apt-get ${APT_OPTIONS} -o Dir::Cache=/binary.deb -o Dir::State::status=/dev/null -o Debug::NoLocking=true --download-only install"
+
+			# Remove package list
+			rm chroot/root/"$(basename ${LIST})"
+		fi
+	done
+
+	for FILE in chroot/binary.deb/archives/*.deb
+	do
+		if [ ! -e ${FILE} ]; then
+			break # Do nothing if the package lists were empty...
+		fi
+
+		SOURCE="$(dpkg -f ${FILE} Source | awk '{ print $1 }')"
+		SECTION="$(dpkg -f ${FILE} Section | awk '{ print $1 }')"
+
+		if [ -z "${SOURCE}" ]
+		then
+			SOURCE="$(basename ${FILE} | awk -F_ '{ print $1 }')"
+		fi
+
+		case "${SOURCE}" in
+			lib?*)
+				LETTER="$(echo ${SOURCE} | sed 's|\(....\).*|\1|')"
+				;;
+
+			*)
+				LETTER="$(echo ${SOURCE} | sed 's|\(.\).*|\1|')"
+				;;
+		esac
+
+		if echo "${SECTION}" | grep -qs contrib
+		then
+			SECTION="contrib"
+		elif echo "${SECTION}" | grep -qs non-free
+		then
+			SECTION="non-free"
+		else
+			SECTION="main"
+		fi
+
+		# Install directory
+		mkdir -p binary/${POOL}/${SECTION}/"${LETTER}"/"${SOURCE}"
+
+		# Move files
+		mv "${FILE}" binary/${POOL}/${SECTION}/"${LETTER}"/"${SOURCE}"
+	done
+
+	if [ -e chroot/etc/os-release ]; then
+		_VERSION="$(. chroot/etc/os-release && echo ${VERSION_ID})"
+	fi
+
+	if [ -n "${_VERSION}" ]; then
+		_LB_APT_VERSION_OPT='-o APT::FTPArchive::Release::Version="'"${_VERSION}"'"'
+	fi
+
+	cd binary
+
+	for SECTION in ${POOL}/*
+	do
+		if [ ! -d "${SECTION}" ]; then
+			break # Do nothing if the package lists were empty...
+		fi
+
+		SECTION="$(basename ${SECTION})"
+
+		mkdir -p ${DISTS}/${LB_PARENT_DISTRIBUTION_BINARY}/${SECTION}/binary-${LB_ARCHITECTURE}
+		apt-ftparchive packages ${POOL}/${SECTION} > ${DISTS}/${LB_PARENT_DISTRIBUTION_BINARY}/${SECTION}/binary-${LB_ARCHITECTURE}/Packages
+		touch ${DISTS}/${LB_PARENT_DISTRIBUTION_BINARY}/${SECTION}/binary-${LB_ARCHITECTURE}/Packages -d@${SOURCE_DATE_EPOCH}
+		gzip -9 -c ${DISTS}/${LB_PARENT_DISTRIBUTION_BINARY}/${SECTION}/binary-${LB_ARCHITECTURE}/Packages > ${DISTS}/${LB_PARENT_DISTRIBUTION_BINARY}/${SECTION}/binary-${LB_ARCHITECTURE}/Packages.gz
+	done
+
+	if [ -d dists/${LB_PARENT_DISTRIBUTION_BINARY} ]; then
+		apt-ftparchive \
+			-o APT::FTPArchive::Release::Origin="Debian" \
+			-o APT::FTPArchive::Release::Label="Debian" \
+			-o APT::FTPArchive::Release::Suite="${LB_PARENT_DISTRIBUTION_BINARY}" \
+			${_LB_APT_VERSION_OPT} \
+			-o APT::FTPArchive::Release::Codename="${LB_PARENT_DISTRIBUTION_BINARY}" \
+			-o APT::FTPArchive::Release::Date="$(date -R --utc -d@${SOURCE_DATE_EPOCH})" \
+			-o APT::FTPArchive::Release::Architectures="${LB_ARCHITECTURE}" \
+			-o APT::FTPArchive::Release::Components="${LB_PARENT_ARCHIVE_AREAS}" \
+			-o APT::FTPArchive::Release::Description="Last updated: $(date -R --utc -d@${SOURCE_DATE_EPOCH})" \
+			release dists/${LB_PARENT_DISTRIBUTION_BINARY} \
+			> dists/${LB_PARENT_DISTRIBUTION_BINARY}/Release
+	fi
+
+	cd "${OLDPWD}"
+
+	rm -f chroot/bin/Packages
+
+	rm -rf chroot/binary.deb
+
+	# Removing depends
+	Remove_packages
+
+	# Saving cache
+	Save_package_cache chroot
+fi
+
+# Creating stage file
+Create_stagefile

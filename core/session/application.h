@@ -1,91 +1,52 @@
-/*
- * Copyright (C) 2023-2024 LingmoOS Team.
- *
- * Author:     revenmartin <revenmartin@gmail.com>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+// SPDX-FileCopyrightText: 2026 Reion Wong <reionwong@gmail.com>
+// SPDX-FileCopyrightText: 2026 LingmoOS Contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
 
-#ifndef APPLICATION_H
-#define APPLICATION_H
+#pragma once
 
-#include <QApplication>
-#include <chrono>
-#include <thread>
+#include <QString>
+#include <QStringList>
+
+#include "base/dbus.h"
+#include "base/event_loop.h"
+#include "base/session_language.h"
+#include "base/timer.h"
 
 #include "processmanager.h"
-#include "networkproxymanager.h"
-#include "powermanager/power.h"
 
-class Application : public QApplication
+namespace Lingmo {
+
+class SessionApplication
 {
-    Q_OBJECT
-
 public:
-    explicit Application(int &argc, char **argv);
+    SessionApplication(int argc, char **argv, Lingmo::Base::EventLoop &loop);
+    ~SessionApplication();
 
-    bool wayland() const;
+    int exec() { return m_loop.run(); }
 
-public slots:
-    void logout() {
-        m_processManager->logout();
-    }
-
-    void reboot() {
-        m_power.reboot();
-        QCoreApplication::exit(0);
-    }
-
-    void powerOff() {
-        m_power.shutdown();
-        QCoreApplication::exit(0);
-    }
-
-    void suspend() {
-        m_power.suspend();
-    }
-
-    [[maybe_unused]] void startDesktopProcess() {
-        // Start Lingmo Desktop Environment
-        m_processManager->startDesktopProcess();
-    }
-
-    [[maybe_unused]] void updateNetworkProxy() {
-        m_networkProxyManager->update();
-    }
-
-    void launch(const QString &exec, const QStringList &args);
-    void launch(const QString &exec, const QString &workingDir, const QStringList &args);
+    void logout()             { m_processManager->logout(); }
+    void reboot();
+    void powerOff();
+    bool suspend();
+    void startDesktopProcess() { m_processManager->startDesktopProcess(); }
 
 private:
+    void endSessionOnTerminationSignals();
+    void exportSession();
     void initEnvironments();
     void initLanguage();
-    void initScreenScaleFactors();
-    void initXResource();
-    void initKWinConfig();
     bool syncDBusEnvironment();
-    void importSystemdEnvrionment();
+    void importSystemdEnvironment();
     void createConfigDirectory();
-    void updateUserDirs();
-    int runSync(const QString &program, const QStringList &args, const QStringList &env = {});
+    int  runSync(const QString &program, const QStringList &args);
 
 private:
-    ProcessManager *m_processManager;
-    NetworkProxyManager *m_networkProxyManager;
-    Power m_power;
-
-    bool m_wayland;
+    Lingmo::Base::EventLoop &m_loop;
+    std::unique_ptr<SessionProcessManager> m_processManager;
+    std::unique_ptr<Lingmo::Base::DBus::Object> m_sessionObject;
+    std::unique_ptr<Lingmo::Base::SessionLanguage> m_language;
+    Lingmo::Base::Timer m_startTimer;
+    int m_terminationWatch = 0;
 };
 
-#endif // APPLICATION_H
+} // namespace Lingmo

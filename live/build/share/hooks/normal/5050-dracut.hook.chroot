@@ -1,0 +1,55 @@
+#!/bin/sh
+
+set -e
+
+# Adjust the remaining bits for dracut-live instead of initramfs-tools.
+
+if [ ! -d /usr/share/doc/dracut-live ]
+then
+	exit 0
+fi
+
+# Get access to LB_PARENT_DISTRIBUTION_CHROOT
+. /live-build/config/bootstrap
+
+# Remove remainder of initramfs-tools
+apt-get remove --purge --yes initramfs-tools
+# Remove live packages that work with initramfs-tools
+apt-get remove --purge --yes live-tools
+apt-get remove --purge --yes live-boot
+apt-get remove --purge --yes live-boot-initramfs-tools
+apt-get autoremove --yes
+
+# Dracut mounts on /run/initramfs/live
+# d-i, calamares and debian-installer-launcher have /run/live/medium hardcoded
+# d-i -> fixed in live-build: installer_debian-installer
+# calamares -> fixed here
+# debian-installer-launcher -> probably not needed, is not part of the regular images
+
+# Adjust the path for Calamares
+if [ -e /etc/calamares/modules/unpackfs.conf ]
+then
+	sed --follow-symlinks -i -e 's|/run/live/medium|/run/initramfs/live|' /etc/calamares/modules/unpackfs.conf
+fi
+# Use dracut instead of initramfs-tools
+if [ -e /etc/calamares/settings.conf ]
+then
+	sed --follow-symlinks -i -e '/initramfscfg/d;s/initramfs/dracut/' /etc/calamares/settings.conf
+fi
+# Add dracut-live to the list of packages to uninstall
+if [ -e /etc/calamares/modules/packages.conf ]
+then
+	sed --follow-symlinks -i -e "s/'live-boot'/'dracut-live'/" /etc/calamares/modules/packages.conf
+fi
+# Calamares script for /etc/apt/sources.list during the installation
+SOURCES_MEDIA=/usr/share/calamares/helpers/calamares-sources-media
+if [ -e /usr/sbin/sources-media ]
+then
+	# Until calamares-settings-debian 13.0.11 the filename was more generic
+	SOURCES_MEDIA=/usr/sbin/sources-media
+fi
+if [ -e ${SOURCES_MEDIA} ]
+then
+	sed -i -e 's|/run/live/medium|/run/initramfs/live|;s|/run/live|/run/initramfs|' ${SOURCES_MEDIA}
+	sed -i -e "s|RELEASE=\".*\"|RELEASE=\"${LB_PARENT_DISTRIBUTION_CHROOT}\"|" ${SOURCES_MEDIA}
+fi

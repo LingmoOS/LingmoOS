@@ -1,6 +1,0 @@
-#cmakedefine01 HAVE_SYS_PRCTL_H
-#cmakedefine01 HAVE_PR_SET_DUMPABLE
-#cmakedefine01 HAVE_SYS_PROCCTL_H
-#cmakedefine01 HAVE_PROC_TRACE_CTL
-#cmakedefine01 HAVE_SIGNALFD_H
-#cmakedefine01 HAVE_EVENT_H

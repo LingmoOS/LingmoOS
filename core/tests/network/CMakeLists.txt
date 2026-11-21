@@ -1,0 +1,13 @@
+cmake_minimum_required(VERSION 3.22)
+project(connectivity_tests LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 20)
+find_package(LingmoSDK REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(SYSTEMD REQUIRED IMPORTED_TARGET libsystemd)
+find_program(DBUS_RUN_SESSION dbus-run-session REQUIRED)
+add_executable(connectivity-test connectivity_test.cpp
+    ../../lingmo-services/network/connectivity.cpp ../../lingmo-services/notification.cpp)
+target_include_directories(connectivity-test PRIVATE ../../lingmo-services)
+target_link_libraries(connectivity-test PRIVATE Lingmo::SDKBase PkgConfig::SYSTEMD)
+enable_testing()
+add_test(NAME connectivity COMMAND ${DBUS_RUN_SESSION} -- $<TARGET_FILE:connectivity-test>)

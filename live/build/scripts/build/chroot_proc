@@ -1,0 +1,79 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Mount /proc"
+USAGE="${PROGRAM} {install|remove} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+_ACTION="${1}"
+shift
+
+# Requiring stage file
+Require_stagefiles config bootstrap
+
+case "${_ACTION}" in
+	install)
+		Echo_message "Begin mounting /proc..."
+
+		# Checking stage file
+		Check_stagefile
+
+		# Acquire lock file
+		Acquire_lockfile
+
+		# Creating mountpoint
+		mkdir -p chroot/proc
+
+		# Mounting /proc
+		mount -t proc -o x-gvfs-hide proc-live chroot/proc
+
+		# Creating stage file
+		Create_stagefile
+		;;
+
+	remove)
+		Echo_message "Begin unmounting /proc..."
+
+		# Checking stage file
+		Ensure_stagefile_exists
+
+		# Acquire lock file
+		Acquire_lockfile
+
+		# Workaround binfmt-support /proc locking
+		if [ -e chroot/proc/sys/fs/binfmt_misc/status ]
+		then
+			umount chroot/proc/sys/fs/binfmt_misc
+		fi
+
+		# Unmounting /proc
+		if [ -e chroot/proc/version ]
+		then
+			umount chroot/proc
+		fi
+
+		# Removing stage file
+		Remove_stagefile
+		;;
+
+	*)
+		Echo_error "Invalid action parameter: '${_ACTION}'"
+		Usage --fail
+		;;
+esac

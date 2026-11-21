@@ -1,0 +1,14 @@
+# PAM stack for the Lingmo authentication screen.
+#
+# Its own service rather than reusing "login": the lock screen re-checks the
+# credential of a session that is already running, so it authenticates and
+# checks the account, and does nothing else. It opens no session, sets up no
+# environment and starts no keyring - login mode is greetd's job, and greetd
+# runs its own stack for that.
+#
+# pam_unix here runs unprivileged and reaches /etc/shadow through the setuid
+# helper, which is what makes a lock screen that is not itself setuid possible.
+
+auth     requisite  pam_nologin.so
+auth     include    common-auth
+account  include    common-account

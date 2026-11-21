@@ -1,0 +1,17 @@
+@PACKAGE_INIT@
+
+include(CMakeFindDependencyMacro)
+find_dependency(LingmoSDK)
+
+foreach(_component IN LISTS LingmoClients_FIND_COMPONENTS)
+    set(_targets "${CMAKE_CURRENT_LIST_DIR}/LingmoClient${_component}Targets.cmake")
+    if(EXISTS "${_targets}")
+        include("${_targets}")
+        set(LingmoClients_${_component}_FOUND TRUE)
+    else()
+        set(LingmoClients_${_component}_FOUND FALSE)
+    endif()
+    unset(_targets)
+endforeach()
+
+check_required_components(LingmoClients)

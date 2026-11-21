@@ -1,0 +1,35 @@
+lingmo_add_client(networkmanager TARGET NetworkManagerClient
+    SOURCES
+        client.cpp
+        connections.cpp
+        handler.cpp
+        hotspot.cpp
+        inet.cpp
+        inet.h
+        ip_utils.cpp
+        network_model.cpp
+        secret_reader.cpp
+        text.cpp
+        text.h
+        variants.cpp
+        vpn_schema.cpp
+        vpn_utils.cpp
+        wifi_utils.cpp
+    HEADERS
+        client.h
+        connections.h
+        handler.h
+        hotspot.h
+        ip_utils.h
+        network_model.h
+        secret_reader.h
+        types.h
+        variants.h
+        vpn_schema.h
+        vpn_utils.h
+        wifi_utils.h
+)
+
+if(BUILD_TESTING)
+    add_subdirectory(tests)
+endif()

@@ -1,0 +1,104 @@
+#!/bin/sh
+
+. /usr/lib/live/config.sh
+
+## live-config(7) - System Configuration Components
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+#set -e
+
+Cmdline ()
+{
+	# Reading kernel command line
+	for _PARAMETER in ${LIVE_CONFIG_CMDLINE}
+	do
+		case "${_PARAMETER}" in
+			live-config.hostname=*|hostname=*)
+				LIVE_HOSTNAME="${_PARAMETER#*hostname=}"
+				;;
+		esac
+	done
+}
+
+Init ()
+{
+	# Checking if package is installed or already configured
+	if [ -z "${LIVE_HOSTNAME}" ] || \
+	   component_was_executed "hostname"
+	then
+		exit 0
+	fi
+
+	echo -n " hostname"
+}
+
+Config ()
+{
+	# Change hostname only if it is not set
+	if [ ! -e /etc/hostname ] || \
+	   grep -qs localhost\.localdomain /etc/hostname
+	then
+		# Supporting variables within hostnames
+		if [ -e /bin/ip ]
+		then
+			LINK="$(ip -oneline -family link address show dev eth0 | awk '{ print $13 }' | sed -e "s|:|${_IP_SEPARATOR}|g")"
+			INET="$(ip -oneline -family inet address show dev eth0 | awk '{ print $4 }' | sed -e "s|\.|${_IP_SEPARATOR}|g" -e 's|/.*||')"
+			INET6="$(ip -oneline -family inet6 address show dev eth0 | awk '{ print $4 }' | sed -e "s|:|${_IP_SEPARATOR}|g" -e 's|/.*||' -e 's|--|-|')"
+
+			eval LIVE_HOSTNAME="${LIVE_HOSTNAME}"
+		fi
+
+		echo "${LIVE_HOSTNAME}" > /etc/hostname
+	else
+		LIVE_HOSTNAME="$(cat /etc/hostname)"
+	fi
+
+	# Updating hostname in /etc/hosts
+	if [ -s /etc/hosts ]
+	then
+		# /etc/hosts exists but has no 127.0.0.1
+		if ! grep -Eq "^ *127.0.0.1" /etc/hosts
+		then
+			mv /etc/hosts /etc/hosts.tmp
+
+			echo "127.0.0.1       localhost ${LIVE_HOSTNAME}" > /etc/hosts
+			cat /etc/hosts.tmp >> /etc/hosts
+
+			rm -f /etc/hosts.tmp
+		# /etc/hosts exists and has no matching 127.0.0.1
+		elif ! grep -Eq "^ *127.0.0.1.*${LIVE_HOSTNAME}" /etc/hosts
+		then
+			_HOSTS="$(grep -E "^ *127.0.0.1" /etc/hosts | awk '{ $1=""; print $0 }' | sed -e 's|localhost||')"
+			_HOSTS="$(echo localhost ${_HOSTS} ${LIVE_HOSTNAME} | sed -e 's|^ ||' -e 's|  | |g')"
+
+			sed -i -e "s|^ *127.0.0.1.*|127.0.0.1       ${_HOSTS}|" /etc/hosts
+		fi
+	else
+		# /etc/hosts does not exist
+
+cat > /etc/hosts << EOF
+127.0.0.1       localhost ${LIVE_HOSTNAME}
+::1             localhost ip6-localhost ip6-loopback
+fe00::0         ip6-localnet
+ff00::0         ip6-mcastprefix
+ff02::1         ip6-allnodes
+ff02::2         ip6-allrouters
+EOF
+
+	fi
+
+	hostname "${LIVE_HOSTNAME}" || true
+
+	# Creating state file
+	touch /var/lib/live/config/hostname
+}
+
+Cmdline
+Init
+Config

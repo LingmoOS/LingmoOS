@@ -1,0 +1,180 @@
+// SPDX-FileCopyrightText: 2026 Reion Wong <reionwong@gmail.com>
+// SPDX-FileCopyrightText: 2026 LingmoOS Contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+#include <gtest/gtest.h>
+
+#include <cmath>
+
+#include "base/transform.h"
+#include "ui/bitmap.h"
+#include "ui/canvas_2d.h"
+#include "ui/path.h"
+#include "ui/text_layout.h"
+#include "ui/theme.h"
+
+using namespace Lingmo;
+using ui::Bitmap;
+using ui::ColorF;
+using ui::Canvas2D;
+using ui::Path;
+using Format = Bitmap::Format;
+
+static constexpr ColorF kRed = {1, 0, 0, 1};
+static constexpr ColorF kBlue = {0, 0, 1, 1};
+
+TEST(Canvas2DTest, FillsThroughTheTransform)
+{
+    Bitmap bitmap(20, 20, Format::Argb32Premultiplied);
+    Canvas2D canvas(bitmap);
+    ASSERT_TRUE(canvas.isValid());
+    canvas.setFillColor(kRed);
+    canvas.translate(10, 0);
+    canvas.scale(2, 2);
+    canvas.fillRect({0, 0, 2, 2});
+    EXPECT_EQ(bitmap.pixel(11, 1), 0xFFFF0000u);
+    EXPECT_EQ(bitmap.pixel(13, 3), 0xFFFF0000u);
+    EXPECT_EQ(bitmap.pixel(9, 1), 0u);
+    EXPECT_EQ(bitmap.pixel(15, 1), 0u);
+
+    // Mirrored vertically.
+    canvas.setTransform(base::AffineTransform(1, 0, 0, -1, 0, 20));
+    canvas.setFillColor(kBlue);
+    canvas.fillRect({0, 0, 4, 4});
+    EXPECT_EQ(bitmap.pixel(1, 18), 0xFF0000FFu);
+    EXPECT_EQ(bitmap.pixel(1, 1), 0u);
+}
+
+TEST(Canvas2DTest, ClipsSavesAndAlpha)
+{
+    Bitmap bitmap(10, 10, Format::Argb32Premultiplied);
+    Canvas2D canvas(bitmap);
+    canvas.save();
+    canvas.clipToRect({0, 0, 5, 10});
+    canvas.setFillColor(kRed);
+    canvas.fillRect({0, 0, 10, 10});
+    canvas.restore();
+    EXPECT_EQ(bitmap.pixel(2, 2), 0xFFFF0000u);
+    EXPECT_EQ(bitmap.pixel(7, 2), 0u);
+    EXPECT_EQ(canvas.clipBounds().width, 10);
+
+    canvas.setGlobalAlpha(0.5);
+    canvas.setFillColor(kBlue);
+    canvas.fillRect({5, 0, 5, 10});
+    EXPECT_NEAR(double(bitmap.alpha(7, 2)), 128, 1);
+
+    Path triangle;
+    triangle.moveTo(0, 0);
+    triangle.lineTo(10, 0);
+    triangle.lineTo(0, 10);
+    triangle.close();
+    canvas.setGlobalAlpha(1);
+    canvas.clearRect({0, 0, 10, 10});
+    canvas.clipToPath(triangle);
+    canvas.setFillColor(kRed);
+    canvas.fillRect({0, 0, 10, 10});
+    EXPECT_EQ(bitmap.pixel(1, 1), 0xFFFF0000u);
+    EXPECT_EQ(bitmap.pixel(8, 8), 0u);
+}
+
+TEST(Canvas2DTest, StrokesAndDashes)
+{
+    Bitmap bitmap(20, 5, Format::Argb32Premultiplied);
+    Canvas2D canvas(bitmap);
+    canvas.setStrokeColor(kRed);
+    canvas.setLineWidth(2);
+    canvas.setLineDash({4, 4});
+    Path line;
+    line.moveTo(0, 2);
+    line.lineTo(20, 2);
+    canvas.strokePath(line);
+    EXPECT_EQ(bitmap.pixel(1, 2), 0xFFFF0000u);
+    EXPECT_EQ(bitmap.pixel(6, 2), 0u);
+    EXPECT_EQ(bitmap.pixel(9, 2), 0xFFFF0000u);
+    EXPECT_EQ(bitmap.pixel(1, 4), 0u);
+}
+
+TEST(Canvas2DTest, GradientsStopWhereTold)
+{
+    Bitmap bitmap(30, 2, Format::Argb32Premultiplied);
+    Canvas2D canvas(bitmap);
+    canvas.fillLinearGradient({{0, kRed}, {1, kBlue}}, {10, 0}, {20, 0}, false, true);
+    EXPECT_EQ(bitmap.pixel(5, 1), 0u);
+    EXPECT_GT((bitmap.pixel(10, 1) >> 16) & 0xFF, 0xE0u);
+    EXPECT_EQ(bitmap.pixel(25, 1), 0xFF0000FFu);
+    const uint32_t middle = bitmap.pixel(15, 1);
+    EXPECT_GT((middle >> 16) & 0xFF, 0x60u);
+    EXPECT_GT(middle & 0xFF, 0x60u);
+}
+
+TEST(Canvas2DTest, GroupsCompositeWithTheirAlpha)
+{
+    Bitmap bitmap(4, 4, Format::Argb32Premultiplied);
+    Canvas2D canvas(bitmap);
+    canvas.setGlobalAlpha(0.5);
+    canvas.beginGroup();
+    canvas.setFillColor(kRed);
+    canvas.fillRect({0, 0, 4, 4});
+    canvas.fillRect({0, 0, 4, 4});
+    canvas.endGroup();
+    EXPECT_NEAR(double(bitmap.alpha(1, 1)), 128, 1);
+    EXPECT_EQ(canvas.globalAlpha(), 0.5);
+}
+
+TEST(Canvas2DTest, GroupsCastOneShadow)
+{
+    Bitmap bitmap(20, 20, Format::Argb32Premultiplied);
+    Canvas2D canvas(bitmap);
+    canvas.scale(2, 2);
+    canvas.setShadow({6, 6}, 0, {0, 0, 0, 0.5});
+    canvas.beginGroup();
+    canvas.setFillColor(kRed);
+    canvas.fillRect({0, 0, 2, 2});
+    canvas.fillRect({0, 0, 2, 2});
+    canvas.endGroup();
+    EXPECT_EQ(bitmap.pixel(1, 1), 0xFFFF0000u);
+    EXPECT_NEAR(double(bitmap.alpha(7, 7)), 128, 2);
+    EXPECT_EQ(bitmap.pixel(11, 11), 0u);
+}
+
+TEST(Canvas2DTest, ShadowsIgnoreTheTransform)
+{
+    Bitmap bitmap(20, 20, Format::Argb32Premultiplied);
+    Canvas2D canvas(bitmap);
+    canvas.scale(2, 2);
+    canvas.setShadow({6, 6}, 0, {0, 0, 0, 1});
+    canvas.setFillColor(kRed);
+    canvas.fillRect({0, 0, 2, 2});
+    EXPECT_EQ(bitmap.pixel(1, 1), 0xFFFF0000u);
+    EXPECT_EQ(bitmap.pixel(7, 7), 0xFF000000u);
+    EXPECT_EQ(bitmap.pixel(11, 11), 0u);
+}
+
+TEST(Canvas2DTest, TextStaysUprightUnderAMirror)
+{
+    Bitmap bitmap(80, 40, Format::Argb32Premultiplied);
+    Canvas2D canvas(bitmap);
+    canvas.setTransform(base::AffineTransform(1, 0, 0, -1, 0, 40));
+    ui::TextLayout layout("Hg", ui::FontSpec{ui::Theme::current().fontFamily, 20}, canvas.deviceScale());
+    layout.setDefaultColor(ui::Color::rgb(0x000000));
+    layout.beginLayout();
+    layout.createLine(1000, {0, 0});
+    layout.endLayout();
+    // The layout's top left at (2, 38) lands at (2, 2).
+    canvas.drawText(layout, {2, 38});
+    int top = -1;
+    int bottom = -1;
+    for (int y = 0; y < 40; ++y) {
+        for (int x = 0; x < 80; ++x) {
+            if (bitmap.alpha(x, y) > 128) {
+                if (top < 0)
+                    top = y;
+                bottom = y;
+            }
+        }
+    }
+    ASSERT_GE(top, 0);
+    EXPECT_GE(top, 2);
+    EXPECT_LT(top, 12);
+    EXPECT_GT(bottom, top + 10);
+}

@@ -1,0 +1,57 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Execute hooks in binary"
+USAGE="${PROGRAM} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+Echo_message "Begin executing hooks..."
+
+# Requiring stage file
+Require_stagefiles config bootstrap
+
+# Checking stage file
+Check_stagefile
+
+# Acquire lock file
+Acquire_lockfile
+
+## Processing hooks
+for HOOK in config/hooks/normal/*.binary config/hooks/live/*.binary
+do
+	if [ ! -e "${HOOK}" ]
+	then
+		continue
+	fi
+
+	# Making hook executable
+	if [ ! -x "${HOOK}" ]
+	then
+		chmod +x "${HOOK}"
+	fi
+
+	# Executing hook
+	Echo_message "Executing hook ${HOOK}..."
+	cd binary
+	../"${HOOK}" || { Echo_error "${HOOK} failed (exit non-zero). You should check for errors."; exit 1 ;}
+	cd "${OLDPWD}"
+done
+
+# Creating stage file
+Create_stagefile

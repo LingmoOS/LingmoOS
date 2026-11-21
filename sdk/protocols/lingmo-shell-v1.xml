@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<protocol name="lingmo_shell_v1">
+
+  <description summary="the desktop surface of the trusted session client">
+    This protocol lets the trusted client the session starts on its own
+    connection (the file manager's daemon) say that a surface is the desktop
+    of an output: below every window, kept to the output, told the work area
+    its icons go in.
+
+    It is an *extension* of an ordinary wl_surface, not a replacement for
+    xdg-shell. The client keeps creating xdg_toplevel objects through
+    xdg_wm_base exactly like any other Wayland client; this protocol only adds
+    the role, the output, the focus policy and the work area that plain
+    xdg-shell cannot express.
+
+    The compositor only advertises this global on the one trusted connection
+    it was handed by the session. Ordinary applications never see it.
+
+    Warning! Not a standard protocol. Backward-incompatible changes are made by
+    bumping the interface version.
+  </description>
+
+  <interface name="lingmo_shell_v1" version="1">
+    <description summary="private shell interface">
+      A factory for lingmo_shell_surface_v1 objects.
+    </description>
+
+    <enum name="error">
+      <entry name="role" value="0"
+             summary="the wl_surface already has a lingmo_shell_surface_v1"/>
+    </enum>
+
+    <request name="destroy" type="destructor">
+      <description summary="release the shell interface">
+        Destroying the factory does not destroy the shell surfaces it created.
+      </description>
+    </request>
+
+    <request name="get_shell_surface">
+      <description summary="extend a wl_surface with shell metadata">
+        Creates a lingmo_shell_surface_v1 for the given wl_surface.
+
+        The wl_surface must belong to the same client and the same connection.
+        Giving a surface two shell surfaces raises the role error.
+
+        The metadata carried by the new object should be set before the first
+        buffer is committed on the surface, so the compositor never has to
+        place the surface as an ordinary window first.
+      </description>
+      <arg name="id" type="new_id" interface="lingmo_shell_surface_v1"/>
+      <arg name="surface" type="object" interface="wl_surface"/>
+    </request>
+  </interface>
+
+  <interface name="lingmo_shell_surface_v1" version="1">
+    <description summary="shell metadata attached to a wl_surface">
+      Describes what the compositor should make of a shell surface. All state
+      here takes effect immediately rather than on the next wl_surface.commit:
+      the shell sets it once when the surface is created and the compositor
+      applies it to the window the surface's xdg role produces.
+    </description>
+
+    <enum name="error">
+      <entry name="invalid_role" value="0" summary="unknown role value"/>
+      <entry name="invalid_focus_policy" value="3" summary="unknown focus policy"/>
+      <entry name="invalid_output" value="4" summary="unknown logical output"/>
+    </enum>
+
+    <enum name="role">
+      <description summary="what the surface is">
+        The desktop of its output: stacked below every window, over the
+        compositor's wallpaper, and covering the output.
+      </description>
+      <entry name="desktop" value="0" summary="the desktop, below everything"/>
+    </enum>
+
+    <enum name="focus_policy">
+      <entry name="normal" value="0" summary="the window can take keyboard focus"/>
+      <entry name="no_focus" value="1"
+             summary="the window receives pointer input but never keyboard focus"/>
+    </enum>
+
+    <request name="destroy" type="destructor">
+      <description summary="drop the shell metadata">
+        The surface goes back to being an ordinary window.
+      </description>
+    </request>
+
+    <request name="set_role">
+      <description summary="set the surface role">
+        Must be sent before the surface is first mapped. Changing the role of a
+        mapped surface is allowed but the compositor may only apply it the next
+        time the surface is mapped.
+      </description>
+      <arg name="role" type="uint" enum="role"/>
+    </request>
+
+    <request name="set_focus_policy">
+      <arg name="policy" type="uint" enum="focus_policy"/>
+    </request>
+
+    <request name="activate">
+      <description summary="give this surface the keyboard focus">
+        The trusted way for the desktop to take the keyboard, as it does once
+        when first shown. No serial is required: the client is trusted, and
+        this activation does not come from an input event it can point at.
+
+        Ignored while the surface has no window, or while its focus policy is
+        no_focus.
+      </description>
+    </request>
+
+    <request name="set_output">
+      <description summary="associate this surface with a logical output">
+        Selects the logical output by its stable wl_output name. A desktop is
+        placed at its output's origin, by default the primary output's, and
+        follows it when the layout changes; the client sizes it to the
+        output.
+      </description>
+      <arg name="name" type="string" summary="wl_output name"/>
+    </request>
+
+    <event name="work_area">
+      <description summary="where a desktop lays out its content">
+        Sent to a desktop surface: its output's bounds less what the
+        compositor's own panels and every exclusive zone reserve, where
+        windows are laid out. In surface-local logical pixels, the surface
+        being placed at its output's origin. Sent once the surface is a
+        desktop, before its first configure, and again whenever the work area
+        or the surface's output changes.
+      </description>
+      <arg name="x" type="int"/>
+      <arg name="y" type="int"/>
+      <arg name="width" type="int"/>
+      <arg name="height" type="int"/>
+    </event>
+  </interface>
+</protocol>

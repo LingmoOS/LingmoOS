@@ -1,0 +1,226 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2024 The Debian Live team
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Prepares the bootloader splash image"
+USAGE="${PROGRAM} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+if [ -z "${LB_BOOTLOADER_BIOS}" -a -z "${LB_BOOTLOADER_EFI}" ]; then
+	exit 0
+fi
+
+Echo_message "Begin preparing the bootloader splash image..."
+
+# Requiring stage file
+Require_stagefiles config bootstrap
+
+# Checking stage file
+Check_stagefile
+
+# Acquire lock file
+Acquire_lockfile
+
+if [ "${LB_BOOTLOADER_BIOS}" = "syslinux" ]; then
+	# Assembling image specifics
+	case "${LB_IMAGE_TYPE}" in
+		iso|iso-hybrid)
+			_TARGET="binary/isolinux"
+			;;
+
+		netboot)
+			_TARGET="tftpboot"
+			;;
+
+		hdd|tar)
+			case ${LB_BINARY_FILESYSTEM} in
+				fat*|ntfs)
+					_TARGET="binary/syslinux"
+					;;
+
+				ext[234]|btrfs)
+					_TARGET="binary/boot/extlinux"
+					;;
+				*)
+					Echo_error "syslinux/extlinux doesn't support ${LB_BINARY_FILESYSTEM}"
+					exit 1
+					;;
+			esac
+			;;
+	esac
+else
+	# If not syslinux, then it is grub
+	_TARGET="binary/boot/grub"
+fi
+_TARGETGRUB="binary/boot/grub"
+
+# Checking depends
+Check_package chroot /usr/bin/rsvg-convert librsvg2-bin
+Check_package chroot /usr/share/fonts/truetype/dejavu/DejaVuSans.ttf fonts-dejavu-core
+
+# Restoring cache
+Restore_package_cache binary
+
+# Installing depends
+Install_packages
+
+if [ -e chroot/etc/os-release ]
+then
+	_VERSION="$(. chroot/etc/os-release && echo ${VERSION_ID})"
+fi
+
+_VERSION="${_VERSION:-none}"
+
+_DISTRIBUTION="${LB_DISTRIBUTION_BINARY}"
+
+_DATE="$(date $DATE_UTC_OPTION -R -d@${SOURCE_DATE_EPOCH})"
+_YEAR="$(date $DATE_UTC_OPTION -d "${_DATE}" +%Y)"
+_MONTH="$(date $DATE_UTC_OPTION -d "${_DATE}" +%m)"
+_DAY="$(date $DATE_UTC_OPTION -d "${_DATE}" +%d)"
+_HOUR="$(date $DATE_UTC_OPTION -d "${_DATE}" +%H)"
+_MINUTE="$(date $DATE_UTC_OPTION -d "${_DATE}" +%M)"
+_SECOND="$(date $DATE_UTC_OPTION -d "${_DATE}" +%S)"
+_TIMEZONE="$(date $DATE_UTC_OPTION -d "${_DATE}" +%Z)"
+_TIMEZONE_NUM="$(date $DATE_UTC_OPTION -d "${_DATE}" +%z)"
+
+_LINUX_VERSIONS="$(for _LINUX in chroot/boot/vmlinuz-* ; do chroot chroot apt-cache policy $(basename ${_LINUX} | sed -e 's|vmlinuz-|linux-image-|') | awk '/Installed: / { print $2 }' ; done | sort -Vru | tr "\n" " ")"
+
+_LIVE_BOOT_VERSION="$(chroot chroot apt-cache policy live-boot | awk '/Installed: / { print $2 }')"
+_LIVE_CONFIG_VERSION="$(chroot chroot apt-cache policy live-config | awk '/Installed: / { print $2 }')"
+_LIVE_TOOLS_VERSION="$(chroot chroot apt-cache policy live-tools | awk '/Installed: / { print $2 }')"
+
+_PROJECT="Debian GNU/Linux"
+
+# If there is no SVG file and no PNG file, try to find a suitable SVG file
+if [ ! -e "${_TARGET}"/splash.svg -a ! -e "${_TARGET}"/splash.png ]; then
+	if [ -n "${LIVE_BUILD}" ]; then
+		_FALLBACK_SPLASH_LOCATION="${LIVE_BUILD}/share/bootloaders/splash.svg"
+	else
+		_FALLBACK_SPLASH_LOCATION="/usr/share/live/build/bootloaders/splash.svg"
+	fi
+	# In older versions of live-build the SVG file was in share/bootloaders/syslinux_common
+	_LEGACY_SPLASH_LOCATIONS="config/bootloaders/grub-pc/splash.svg config/bootloaders/syslinux_common/splash.svg"
+
+	# The last entry which is found will be used
+	for _FILE in ${_FALLBACK_SPLASH_LOCATION} ${_LEGACY_SPLASH_LOCATIONS} config/bootloaders/splash.svg
+	do
+		if [ -e ${_FILE} ]; then
+			_SVG_SOURCE=${_FILE}
+		fi
+	done
+
+	# Tweak the grub theme to remove the title-text for the fallback image
+	if [ -e binary/boot/grub/live-theme/theme.txt ] && [ "${_SVG_SOURCE}" = "${_FALLBACK_SPLASH_LOCATION}" ]; then
+		sed -i -e 's|^title-text:.*|title-text: ""|' \
+		binary/boot/grub/live-theme/theme.txt
+	fi
+
+	cp ${_SVG_SOURCE} ${_TARGET}
+	cp ${_SVG_SOURCE} ${_TARGETGRUB}
+fi
+
+for _FILE in "${_TARGET}"/*.svg "${_TARGETGRUB}"/*.svg
+do
+	if [ -e "${_FILE}" ] && [ ! -d "${_FILE}" ]
+	then
+		sed -i  -e "s#@APPEND_LIVE@#${LB_BOOTAPPEND_LIVE}#g" \
+			-e "s#@APPEND_LIVE_FAILSAFE@#${LB_BOOTAPPEND_LIVE_FAILSAFE}#g" \
+			-e "s#@APPEND_INSTALL@#${LB_BOOTAPPEND_INSTALL}#g" \
+			-e "s|@PROJECT@|${_PROJECT}|g" \
+			-e "s|@DISTRIBUTION@|${_DISTRIBUTION}|g" \
+			-e "s|@PARENT_DISTRIBUTION@|${LB_PARENT_DISTRIBUTION_BINARY}|g" \
+			-e "s|@VERSION@|${_VERSION}|g" \
+			-e "s|@ARCHITECTURE@|${LB_ARCHITECTURE}|g" \
+			-e "s|@DATE@|${_DATE}|g" \
+			-e "s|@YEAR@|${_YEAR}|g" \
+			-e "s|@MONTH@|${_MONTH}|g" \
+			-e "s|@DAY@|${_DAY}|g" \
+			-e "s|@HOUR@|${_HOUR}|g" \
+			-e "s|@MINUTE@|${_MINUTE}|g" \
+			-e "s|@SECOND@|${_SECOND}|g" \
+			-e "s|@TIMEZONE@|${_TIMEZONE}|g" \
+			-e "s|@TIMEZONE_NUM@|${_TIMEZONE_NUM}|g" \
+			-e "s|@LINUX_VERSIONS@|${_LINUX_VERSIONS}|g" \
+			-e "s|@LIVE_BUILD_VERSION@|${LIVE_BUILD_VERSION}|g" \
+			-e "s|@LIVE_BOOT_VERSION@|${_LIVE_BOOT_VERSION}|g" \
+			-e "s|@LIVE_CONFIG_VERSION@|${_LIVE_CONFIG_VERSION}|g" \
+			-e "s|@LIVE_TOOLS_VERSION@|${_LIVE_TOOLS_VERSION}|g" \
+			-e "s|@LB_ISO_APPLICATION@|${LB_ISO_APPLICATION}|g" \
+			-e "s|@LB_ISO_PUBLISHER@|${LB_ISO_PUBLISHER}|g" \
+			-e "s|@LB_LINUX_PACKAGES@|${LB_LINUX_PACKAGES}|g" \
+		"${_FILE}"
+	fi
+done
+
+# Scenarios for generated PNG files:
+# * BIOS = syslinux EFI = -     -> isolinux/splash (640x480)
+# * BIOS = grub     EFI = -     -> boot/grub/splash (800x600)
+# * BIOS = syslinux EFI = grub  -> isolinux/splash (640x480) && boot/grub/splash (800x600)
+# * BIOS = grub     EFI = grub  -> boot/grub/splash (800x600)
+# * BIOS = -        EFI = grub  -> boot/grub/splash (800x600)
+if [ -e "${_TARGET}/splash.svg" -o -e "${_TARGETGRUB}/splash.svg" ]; then
+	case "${LB_BUILD_WITH_CHROOT}" in
+		true)
+			# Non-grub version is required
+			if [ "${LB_BOOTLOADER_BIOS}" = "syslinux" ]; then
+				if [ -e "${_TARGET}/splash.svg" -a ! -e "${_TARGET}/splash.png" ]; then
+					cp "${_TARGET}/splash.svg" chroot
+					Chroot chroot "rsvg-convert --format png --height 480 --width 640 splash.svg -o splash.png"
+					mv chroot/splash.png "${_TARGET}"
+					rm -f chroot/splash.svg
+				fi
+			fi
+			# Grub version is required
+			if [ "${LB_BOOTLOADER_BIOS}" != "syslinux" -o -n "${LB_BOOTLOADER_EFI}" ]; then
+				if [ -e "${_TARGETGRUB}/splash.svg" -a ! -e "${_TARGETGRUB}/splash.png" ]; then
+					cp "${_TARGETGRUB}/splash.svg" chroot
+					Chroot chroot "rsvg-convert --format png --height 600 --width 800 splash.svg -o splash.png"
+					mv chroot/splash.png "${_TARGETGRUB}"
+					rm -f chroot/splash.svg
+				fi
+			fi
+			;;
+
+		false)
+			if [ "${LB_BOOTLOADER_BIOS}" = "syslinux" ]; then
+				if [ -e "${_TARGET}/splash.svg" -a ! -e "${_TARGET}/splash.png" ]; then
+					rsvg-convert --format png --height 480 --width 640 "${_TARGET}/splash.svg" -o "${_TARGET}/splash.png"
+				fi
+			fi
+			if [ "${LB_BOOTLOADER_BIOS}" != "syslinux" -o -n "${LB_BOOTLOADER_EFI}" ]; then
+				if [ -e "${_TARGETGRUB}/splash.svg" -a ! -e "${_TARGETGRUB}/splash.png" ]; then
+					rsvg-convert --format png --height 600 --width 800 "${_TARGET}/splash.svg" -o "${_TARGETGRUB}/splash.png"
+				fi
+			fi
+			;;
+	esac
+fi
+rm -f "${_TARGET}/splash.svg"
+rm -f "${_TARGETGRUB}/splash.svg"
+
+case "${LB_BUILD_WITH_CHROOT}" in
+	true)
+		# Saving cache
+		Save_package_cache binary
+
+		# Removing depends
+		Remove_packages
+		;;
+esac
+
+# Creating stage file
+Create_stagefile

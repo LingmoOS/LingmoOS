@@ -1,0 +1,203 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Redirecting to auto script if required
+if [ "${1}" = "noauto" ]; then
+	shift
+else
+	Maybe_auto_redirect clean "${@}"
+fi
+
+# Setting static variables
+DESCRIPTION="Clean up system build directories"
+USAGE="${PROGRAM} [--all] [--cache] [--chroot] [--binary] [--purge] [--remove] [--stage] [--source] [COMMON_OPTIONS]"
+
+# Reading, preparing and validating config
+Read_conffiles $(Common_conffiles)
+Prepare_config
+#Validate_config
+
+# Avoiding cases were users accidentally nuke their config/binary
+if [ ! -d config ] && [ "$(basename ${PWD})" = "config" ]
+then
+	Echo_error "%s is not a good live-build working directory to clean." "${PWD}"
+	exit 1
+fi
+
+Remove_lockfile
+
+ACTION_SELECTED="false"
+
+for ARGUMENT in "${@}"; do
+	IS_ACTION="true"
+	case "${ARGUMENT}" in
+		--all)
+			RM_ALL="true"
+			;;
+
+		--cache)
+			RM_CACHE="true"
+			;;
+
+		--chroot)
+			RM_CHROOT="true"
+			;;
+
+		--binary)
+			RM_BINARY="true"
+			;;
+
+		--remove)
+			RM_REMOVE="true"
+			;;
+
+		--purge)
+			RM_PURGE="true"
+			;;
+
+		--stage)
+			RM_STAGE="true"
+			;;
+
+		--source)
+			RM_SOURCE="true"
+			;;
+
+		*)
+			IS_ACTION="false"
+			;;
+	esac
+	if [ "${IS_ACTION}" = "true" ]; then
+		ACTION_SELECTED="true"
+		continue
+	fi
+
+	case "${ARGUMENT}" in
+		--breakpoints|--color|--debug|--force|-h|--help|--no-color|--quiet|-u|--usage|--verbose|-v|--version)
+			Handle_common_option "${ARGUMENT}"
+			shift
+			;;
+
+		*)
+			Echo_error "invalid arguments"
+			Usage --fail
+			;;
+	esac
+done
+if [ "${ACTION_SELECTED}" = "false" ]; then
+	RM_ALL="true"
+fi
+
+STAGEFILES_DIR="$(Stagefiles_dir)"
+
+if [ "${RM_PURGE}" = "true" ]; then
+	Echo_debug "Initialising --purge cleaning"
+	RM_ALL="true"
+	RM_CACHE="true"
+	# Clear config stagefile
+	if [ -e auto/config ]; then
+		Remove_stagefile config
+	fi
+fi
+
+if [ "${RM_REMOVE}" = "true" ]; then
+	Echo_debug "Initialising --remove cleaning"
+	RM_ALL="true"
+	rm -rf cache/packages.*
+fi
+
+if [ "${RM_ALL}" = "true" ]; then
+	Echo_debug "Initialising --all cleaning"
+	RM_STAGE="true"
+	RM_CHROOT="true"
+	RM_BINARY="true"
+	RM_SOURCE="true"
+	rmdir --ignore-fail-on-non-empty auto > /dev/null 2>&1 || true
+	rmdir --ignore-fail-on-non-empty local/bin > /dev/null 2>&1 || true
+	rmdir --ignore-fail-on-non-empty local > /dev/null 2>&1 || true
+fi
+
+if [ "${RM_STAGE}" = "true" ]; then
+	Echo_debug "Cleaning stage files"
+	rm -rf "${STAGEFILES_DIR}"/*
+fi
+
+if [ "${RM_CACHE}" = "true" ]; then
+	Echo_debug "Cleaning cache"
+	rm -rf cache
+fi
+
+if [ "${RM_CHROOT}" = "true" ]; then
+	# This one is not debug because it can potentially take some time
+	Echo_message "Cleaning chroot"
+	umount -f chroot/run > /dev/null 2>&1 || true
+	umount -f chroot/sys > /dev/null 2>&1 || true
+	umount -f chroot/proc/sys/fs/binfmt_misc > /dev/null 2>&1 || true
+	umount -f chroot/proc > /dev/null 2>&1 || true
+	umount -f chroot/lib/init/rw > /dev/null 2>&1 || true
+	umount -f chroot/dev/shm > /dev/null 2>&1 || true
+	umount -f chroot/dev/pts > /dev/null 2>&1 || true
+	umount -f chroot/dev > /dev/null 2>&1 || true
+	umount -f chroot/var/lib/dpkg > /dev/null 2>&1 || true
+	umount -f chroot/root/config > /dev/null 2>&1 || true
+
+	umount -f chroot/binary.tmp > /dev/null 2>&1 || true
+	umount -f chroot/dev.tmp/pts > /dev/null 2>&1 || true
+
+	rm -rf chroot chroot.tmp
+
+	rm -f chroot.packages.live chroot.packages.install
+	rm -f chroot.files
+
+	rm -f "$(Installed_tmp_packages_file)"
+
+	rm -f "${STAGEFILES_DIR}"/chroot*
+fi
+
+if [ "${RM_BINARY}" = "true" ]; then
+	Echo_debug "Cleaning binary"
+	umount -f binary.tmp > /dev/null 2>&1 || true
+	rm -rf binary.tmp binary.deb binary.udeb
+	rm -f ${LB_IMAGE_NAME}*.iso
+	rm -f ${LB_IMAGE_NAME}*.img
+	rm -f ${LB_IMAGE_NAME}*.tar.gz
+	rm -f ${LB_IMAGE_NAME}*.zsync*
+	rm -f ${LB_IMAGE_NAME}.sh
+	rm -f ${LB_IMAGE_NAME}*.contents ${LB_IMAGE_NAME}*.packages ${LB_IMAGE_NAME}*.files
+	rm -f ${LB_IMAGE_NAME}*.iso-ONIE.bin
+	rm -f MD5SUMS SHA1SUMS SHA256SUMS SHA512SUMS
+	rm -f md5sum.txt sha1sum.txt sha256sum.txt sha512sum.txt
+	rm -f binary.modified_timestamps
+
+	rm -rf binary
+	rm -rf tftpboot
+
+	rm -f "${STAGEFILES_DIR}"/binary*
+fi
+
+if [ "${RM_SOURCE}" = "true" ]; then
+	Echo_debug "Cleaning source"
+	rm -f ${LB_IMAGE_NAME}-source*.iso
+	rm -f ${LB_IMAGE_NAME}-source*.img
+	rm -f ${LB_IMAGE_NAME}-source*.tar
+	rm -f ${LB_IMAGE_NAME}-source*.tar.gz
+	rm -f ${LB_IMAGE_NAME}-source*.list
+	rm -f ${LB_IMAGE_NAME}-source-selection.txt
+
+	rm -rf source
+
+	rm -f "${STAGEFILES_DIR}"/source*
+fi

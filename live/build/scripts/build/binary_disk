@@ -1,0 +1,149 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Install disk information into binary"
+USAGE="${PROGRAM} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+if ! In_list "${LB_IMAGE_TYPE}" iso iso-hybrid hdd; then
+	exit 0
+fi
+
+Echo_message "Begin installing disk information..."
+
+# Requiring stage file
+Require_stagefiles config bootstrap
+
+# Checking stage file
+Check_stagefile
+
+# Acquire lock file
+Acquire_lockfile
+
+mkdir -p binary/.disk
+
+ARCHITECTURE="$(echo ${LB_ARCHITECTURE} | sed -e 's| |/|g')"
+DISTRIBUTION="$(echo ${LB_DISTRIBUTION_BINARY} | cut -b 1 | tr '[a-z]' '[A-Z]')"
+DISTRIBUTION="${DISTRIBUTION}$(echo ${LB_DISTRIBUTION_BINARY} | cut -b 2-)"
+
+if [ -e chroot/etc/os-release ]
+then
+	VERSION="$(. chroot/etc/os-release && echo ${VERSION_ID})"
+fi
+
+VERSION="${VERSION:-none}"
+
+case "${LB_MODE}" in
+	debian)
+		TITLE="Debian GNU/Linux"
+		STRING="Snapshot ${ARCHITECTURE}"
+		;;
+
+	*)
+		TITLE="Debian GNU/Linux"
+		STRING="Snapshot ${ARCHITECTURE}"
+		;;
+esac
+
+case "${LB_DEBIAN_INSTALLER}" in
+	cdrom)
+		DISK_LABEL="LIVE/CD"
+		DISK_TYPE="full_cd"
+		;;
+	netboot)
+		DISK_LABEL="LIVE/NETBOOT"
+		#FIXME: type?
+		DISK_TYPE=""
+		;;
+	netinst)
+		DISK_LABEL="LIVE/NETINST"
+		DISK_TYPE="not_complete"
+		;;
+	live)
+		DISK_LABEL="LIVE/INSTALL"
+		DISK_TYPE="live"
+		;;
+	businesscard)
+		DISK_LABEL="LIVE/BC"
+		DISK_TYPE="not_complete"
+		;;
+	none)
+		DISK_LABEL="LIVE"
+		DISK_TYPE=""
+		;;
+esac
+
+_DATE="$(date $DATE_UTC_OPTION -d@${SOURCE_DATE_EPOCH} +%Y%m%d-%H:%M)"
+
+echo "${TITLE} ${VERSION} \"${DISTRIBUTION}\" - ${STRING} ${DISK_LABEL} Binary ${_DATE}" > binary/.disk/info
+
+if [ -n "${DISK_TYPE}" ]; then
+	echo "${DISK_TYPE}" > binary/.disk/cd_type
+fi
+
+#FIXME review the netboot case
+case "${LB_DEBIAN_INSTALLER}" in
+	none|netboot)
+		;;
+	businesscard)
+		echo "main" > binary/.disk/base_components
+		;;
+	*)
+		echo "main" > binary/.disk/base_components
+		touch binary/.disk/base_installable
+		;;
+esac
+
+# If the same file exists in multiple locations, take the version from the first
+LOCATIONS="/usr/share/live/build/data/debian-cd"
+if [ -n "${LIVE_BUILD}" ]
+then
+	LOCATIONS="${LIVE_BUILD}/data/debian-cd ${LOCATIONS}"
+fi
+for LOCATION in ${LOCATIONS}
+do
+	if [ -e "${LOCATION}/${LB_PARENT_DISTRIBUTION_BINARY}" ] && [ ! -e binary/.disk/udeb_include ]
+	then
+		case "${LB_DEBIAN_INSTALLER}" in
+			cdrom)
+				cp -a "${LOCATION}/${LB_PARENT_DISTRIBUTION_BINARY}/${LB_ARCHITECTURE}_udeb_include" binary/.disk/udeb_include
+				;;
+			netinst|live)
+				if [ -r "${LOCATION}/${LB_PARENT_DISTRIBUTION_BINARY}/${LB_ARCHITECTURE}_netinst_udeb_include" ]
+				then
+					cp -a "${LOCATION}/${LB_PARENT_DISTRIBUTION_BINARY}/${LB_ARCHITECTURE}_netinst_udeb_include" binary/.disk/udeb_include
+				fi
+				;;
+			businesscard)
+				cp -a "${LOCATION}/${LB_PARENT_DISTRIBUTION_BINARY}/${LB_ARCHITECTURE}_businesscard_udeb_include" binary/.disk/udeb_include
+				;;
+			none|netboot)
+				#FIXME review the netboot case
+				;;
+		esac
+	fi
+done
+
+if [ "${LB_DEBIAN_INSTALLER}" = "live" ]
+then
+	echo "live-installer" >> binary/.disk/udeb_include
+fi
+
+# Creating stage file
+Create_stagefile

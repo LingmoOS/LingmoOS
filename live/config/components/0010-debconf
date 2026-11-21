@@ -1,0 +1,97 @@
+#!/bin/sh
+
+. /usr/lib/live/config.sh
+
+## live-config(7) - System Configuration Components
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+. /lib/live/setup-network.sh
+
+#set -e
+
+Cmdline ()
+{
+	# Reading kernel command line
+	for _PARAMETER in ${LIVE_CONFIG_CMDLINE}
+	do
+		case "${_PARAMETER}" in
+			live-config.debconf-preseed=*|debconf-preseed=*)
+				LIVE_DEBCONF_PRESEED="${_PARAMETER#*debconf-preseed=}"
+				;;
+		esac
+	done
+}
+
+Init ()
+{
+	# Checking if package is installed or already configured
+	if ! pkg_is_installed "debconf" || \
+	   component_was_executed "debconf"
+	then
+		exit 0
+	fi
+
+	echo -n " debconf"
+}
+
+Config ()
+{
+	if [ -z "${LIVE_DEBCONF_PRESEED}" ]
+	then
+		exit 0
+	fi
+
+	for _PRESEED in $(echo ${LIVE_DEBCONF_PRESEED} | sed -e 's/|/ /g')
+	do
+		case "${_PRESEED}" in
+			filesystem)
+				if ls /usr/lib/live/config-preseed/* 2>&1
+				then
+					_PRESEEDS="${_PRESEEDS} $(for _FILE in /usr/lib/live/config-preseed/*; do echo file://${_FILE}; done)"
+				fi
+				;;
+
+			medium)
+				if ls /lib/live/mount/medium/live/config-preseed/* 2>&1
+				then
+					_PRESEEDS="${_PRESEEDS} $(for _FILE in /lib/live/mount/medium/live/config-preseed/*; do echo file://${_FILE}; done)"
+				fi
+				;;
+
+			*)
+				_PRESEEDS="${_PRESEEDS} ${_PRESEED}"
+				;;
+		esac
+	done
+
+	for _PRESEED in ${_PRESEEDS}
+	do
+		_TMPFILE="$(mktemp -t live-config.XXXXXXXX)"
+
+		if echo "${_PRESEED}" | grep -qs file://
+		then
+			# local file
+			cp $(echo ${_PRESEED} | sed 's|file://||') "${_TMPFILE}"
+		else
+			# remote file
+			Setup_network
+
+			wget --quiet "${_PRESEED}" -O "${_TMPFILE}"
+		fi
+
+		debconf-set-selections < "${_TMPFILE}"
+		rm -f "${_TMPFILE}"
+	done
+
+	# Creating state file
+	touch /var/lib/live/config/debconf
+}
+
+Cmdline
+Init
+Config

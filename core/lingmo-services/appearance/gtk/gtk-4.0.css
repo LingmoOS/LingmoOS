@@ -1,0 +1,200 @@
+/* Lingmo's palette, taken from cutefish-toolkit's ui/theme.cpp so that a GTK
+   application sits next to a Lingmo one without looking like another system.
+   libadwaita draws from the named colours below; a GTK 4 application that does
+   not use it still reads the Adwaita names. */
+
+@define-color lingmo_bg #F5F6FA;
+@define-color lingmo_second_bg #FFFFFF;
+@define-color lingmo_alt_bg #F2F4F5;
+@define-color lingmo_text #323238;
+@define-color lingmo_disabled #64646E;
+@define-color lingmo_highlight #3385FF;
+@define-color lingmo_highlight_text #FFFFFF;
+@define-color lingmo_destructive #FF5C6D;
+@define-color lingmo_border alpha(#323238, 0.12);
+
+/* libadwaita's names. */
+@define-color window_bg_color @lingmo_bg;
+@define-color window_fg_color @lingmo_text;
+@define-color view_bg_color @lingmo_second_bg;
+@define-color view_fg_color @lingmo_text;
+@define-color headerbar_bg_color @lingmo_second_bg;
+@define-color headerbar_fg_color @lingmo_text;
+@define-color headerbar_border_color @lingmo_border;
+@define-color headerbar_backdrop_color @lingmo_second_bg;
+@define-color headerbar_shade_color @lingmo_border;
+@define-color card_bg_color @lingmo_second_bg;
+@define-color card_fg_color @lingmo_text;
+@define-color card_shade_color @lingmo_border;
+@define-color dialog_bg_color @lingmo_second_bg;
+@define-color dialog_fg_color @lingmo_text;
+@define-color popover_bg_color @lingmo_second_bg;
+@define-color popover_fg_color @lingmo_text;
+@define-color accent_color @lingmo_highlight;
+@define-color accent_bg_color @lingmo_highlight;
+@define-color accent_fg_color @lingmo_highlight_text;
+@define-color destructive_color @lingmo_destructive;
+@define-color destructive_bg_color @lingmo_destructive;
+@define-color destructive_fg_color @lingmo_highlight_text;
+
+/* Adwaita's, for the applications that still use them. */
+@define-color theme_bg_color @lingmo_bg;
+@define-color theme_fg_color @lingmo_text;
+@define-color theme_base_color @lingmo_second_bg;
+@define-color theme_text_color @lingmo_text;
+@define-color theme_selected_bg_color @lingmo_highlight;
+@define-color theme_selected_fg_color @lingmo_highlight_text;
+@define-color insensitive_bg_color @lingmo_alt_bg;
+@define-color insensitive_fg_color @lingmo_disabled;
+
+window.background {
+  background-color: @lingmo_bg;
+  color: @lingmo_text;
+}
+
+headerbar {
+  background-color: @lingmo_second_bg;
+  background-image: none;
+  color: @lingmo_text;
+  border-bottom: 1px solid @lingmo_border;
+  box-shadow: none;
+}
+
+entry,
+spinbutton,
+textview text {
+  background-color: @lingmo_second_bg;
+  color: @lingmo_text;
+  border-radius: 8px;
+}
+
+entry:focus-within {
+  outline-color: @lingmo_highlight;
+}
+
+selection,
+*:selected {
+  background-color: @lingmo_highlight;
+  color: @lingmo_highlight_text;
+}
+
+popover,
+popover.background {
+  background-color: @lingmo_second_bg;
+  color: @lingmo_text;
+  border-radius: 10px;
+}
+
+switch:checked {
+  background-color: @lingmo_highlight;
+}
+
+progressbar progress {
+  background-color: @lingmo_highlight;
+}
+
+link {
+  color: @lingmo_highlight;
+}
+
+/* libadwaita pushes the bar 1px past each window edge; the padding makes up for it */
+headerbar {
+  min-height: 40px;
+  padding: 0;
+  margin-left: -1px;
+  margin-right: -1px;
+}
+
+headerbar > windowhandle > box {
+  padding: 6px 6px;
+}
+
+headerbar entry,
+headerbar spinbutton,
+headerbar separator:not(.sidebar),
+headerbar button,
+headerbar menubutton,
+headerbar switch {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* Only direct header bar buttons; a descendant selector would reach into popovers */
+headerbar box.start > button,
+headerbar box.end > button,
+headerbar box.start > menubutton > button,
+headerbar box.end > menubutton > button,
+headerbar box.start > splitbutton > button,
+headerbar box.end > splitbutton > button,
+headerbar box.start > splitbutton > menubutton > button,
+headerbar box.end > splitbutton > menubutton > button,
+headerbar box.start > box > button,
+headerbar box.end > box > button,
+headerbar box.start > box > menubutton > button,
+headerbar box.end > box > menubutton > button,
+headerbar box.start > .linked > button,
+headerbar box.end > .linked > button,
+headerbar box.start > dropdown > button,
+headerbar box.end > dropdown > button,
+headerbar stackswitcher > button {
+  min-height: 18px;
+}
+
+headerbar entry,
+headerbar spinbutton:not(.vertical) {
+  min-height: 26px;
+}
+
+headerbar windowcontrols.start,
+headerbar windowcontrols.end {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+/* A 26px circle, 7px from the next one and centred 20px from the top and right edges */
+headerbar windowcontrols > button {
+  min-width: 26px;
+  min-height: 26px;
+  padding: 2px;
+  margin: -1px 0;
+}
+
+headerbar windowcontrols > button > image {
+  min-width: 16px;
+  min-height: 16px;
+  padding: 5px;
+  background-color: transparent;
+  transition: none;
+}
+
+/* Restated because the transparent rest state above outranks libadwaita's state rules too */
+headerbar windowcontrols > button:hover > image {
+  background-color: color-mix(in srgb, currentColor 15%, transparent);
+}
+
+headerbar windowcontrols > button:active > image {
+  background-color: color-mix(in srgb, currentColor 30%, transparent);
+}
+
+headerbar viewswitcher:not(.narrow) {
+  min-height: 28px;
+}
+
+headerbar viewswitcher:not(.narrow) button.toggle > stack > box.narrow {
+  margin-top: -4px;
+  margin-bottom: -4px;
+}
+
+headerbar windowcontrols > .icon {
+  margin: 6px 7px;
+}
+
+/* With the bar's own 3px above and below, a stacked header bar still totals 40px */
+toolbarview > .top-bar .collapse-spacing headerbar {
+  min-height: 34px;
+}
+
+toolbarview > .top-bar .collapse-spacing headerbar > windowhandle > box {
+  padding-top: 3px;
+  padding-bottom: 3px;
+}

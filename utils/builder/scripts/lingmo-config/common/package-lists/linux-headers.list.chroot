@@ -1,0 +1,28 @@
+##
+## Add linux headers to build DKMS packages even after the kernel
+## used to build the live images is gone from lingmo-rolling.
+##
+
+# DKMS only recommends a C compiler, while this image disables recommends.
+# Install the toolchain in the target chroot, not just the CI host container.
+build-essential
+
+#if ARCHITECTURES i386
+linux-headers-686-pae
+#endif
+#if ARCHITECTURES amd64
+# Compiler used to build 6.18.62-lingmo.
+gcc-14
+linux-image-amd64
+linux-headers-amd64
+#endif
+#if ARCHITECTURES arm64
+linux-headers-arm64
+#endif
+#if ARCHITECTURES armel
+linux-headers-marvell
+#endif
+#if ARCHITECTURES armhf
+linux-headers-armmp
+linux-headers-armmp-lpae
+#endif

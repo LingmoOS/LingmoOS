@@ -1,0 +1,30 @@
+#!/bin/sh -e
+
+# Detect resume partition and write it to configuration file
+
+. /usr/lib/base-installer/library.sh
+
+resumeconf=$IT_CONFDIR/resume
+
+resume_devfs="$(get_resume_partition)" || resume_devfs=
+if [ "$resume_devfs" ] && [ -e "$resume_devfs" ]; then
+	resume="$(mapdevfs "$resume_devfs")" || resume=
+else
+	resume=
+fi
+
+if [ "$resume" ]; then
+	resume_uuid="$(block-attr --uuid "$resume" || true)"
+	if [ "$resume_uuid" ]; then
+		resume="UUID=$resume_uuid"
+	fi
+fi
+
+if [ -n "$resumeconf" ] && [ "$resume" ]; then
+	if [ -f $resumeconf ] ; then
+		sed -e "s@^#* *RESUME=.*@RESUME=$resume@" < $resumeconf > $resumeconf.new
+		mv $resumeconf.new $resumeconf
+	else
+		echo "RESUME=$resume" >> $resumeconf
+	fi
+fi

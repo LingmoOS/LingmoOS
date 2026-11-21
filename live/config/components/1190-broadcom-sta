@@ -1,0 +1,117 @@
+#!/bin/sh
+
+. /usr/lib/live/config.sh
+
+## live-config(7) - System Configuration Components
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+#set -e
+
+Cmdline ()
+{
+	for _PARAMETER in ${LIVE_CONFIG_CMDLINE}
+	do
+		case "${_PARAMETER}" in
+			live-config.wlan-driver=*|wlan-driver=*)
+				LIVE_WLAN_DRIVER="${_PARAMETER#*wlan-driver=}"
+				;;
+		esac
+	done
+}
+
+Init ()
+{
+	# Checking if package is installed
+	if ! pkg_is_installed "broadcom-sta-common" || \
+	   component_was_executed "broadcom-sta-common"
+	then
+		exit 0
+	fi
+
+	echo -n " broadcom-sta-common"
+}
+
+Config ()
+{
+	if [ -z "${LIVE_WLAN_DRIVER}" ] && [ -e /usr/bin/lspci ]
+	then
+		# pci-id of pci class "network controller" subclass "network controller"
+		_DEVICE="$(lspci -mn | awk '$2 == "\"0280\"" { gsub ("\"",""); print $3$4 }' | uniq)"
+
+		if [ -n "${_DEVICE}" ]
+		then
+			if ls /usr/share/live/config/broadcom-sta/*.ids > /dev/null 2>&1
+			then
+				# wlan-driver manual overrides
+				for _OVERRIDE_IDS in /usr/share/live/config/broadcom-sta/*.ids
+				do
+					if [ -e "${_OVERRIDE_IDS}" ]
+					then
+						if grep -qs "${_DEVICE}" "${_OVERRIDE_IDS}"
+						then
+							LIVE_WLAN_DRIVER="$(basename ${_OVERRIDE_IDS} .ids)"
+
+							break
+						fi
+					fi
+				done
+			fi
+
+			if [ -z "${LIVE_WLAN_DRIVER}" ]
+			then
+				# wlan-driver automatic override for broadcom-sta
+				if echo "${_DEVICE}" | grep -qs '^14e4'
+				then
+					if grep -qs "${_DEVICE}" /usr/share/broadcom-sta/broadcom-sta.ids
+					then
+						LIVE_WLAN_DRIVER="broadcom-sta"
+					fi
+				fi
+			fi
+		fi
+	fi
+
+	if [ -n "${LIVE_WLAN_DRIVER}" ]
+	then
+		mkdir -p /etc/modprobe.d
+
+		if [ -e "/usr/share/live/config/broadcom-sta/${LIVE_WLAN_DRIVER}.conf" ]
+		then
+			# wlan-driver manual override
+			cp "/usr/share/live/config/broadcom-sta/${LIVE_WLAN_DRIVER}.conf" /etc/modprobe.d/broadcom-sta-dkms.conf
+		else
+			# wlan-driver automatic override
+			if [ -e /etc/modprobe.d/broadcom-sta-dkms.conf ]
+			then
+				case "${LIVE_WLAN_DRIVER}" in
+					broadcom-sta)
+						sed -i -e 's|^ *blacklist|# blacklist|' /etc/modprobe.d/broadcom-sta-dkms.conf
+
+						if ! grep -qs "^blacklist wl" /etc/modprobe.d/broadcom-sta-dkms.conf
+						then
+							echo "blacklist wl" >> /etc/modprobe.d/broadcom-sta-dkms.conf
+						fi
+						;;
+
+					*)
+						sed -i -e 's|^# *blacklist|blacklist|g' /etc/modprobe.d/broadcom-sta-dkms.conf
+						sed -i -e 's|^blacklist wl|#blacklist wl|g' /etc/modprobe.d/broadcom-sta-dkms.conf
+						;;
+				esac
+			fi
+		fi
+
+		# Creating state file
+		touch /var/lib/live/config/broadcom-sta
+	fi
+}
+
+Cmdline
+Init
+Config

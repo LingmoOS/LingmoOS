@@ -1,0 +1,98 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Cache bootstrap stage"
+USAGE="${PROGRAM} {restore|save} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+_ACTION="${1}"
+shift
+
+if ! In_list "bootstrap" ${LB_CACHE_STAGES}; then
+	exit 0
+fi
+
+# Set non-default stage file name
+# Note, this (plus the applicable extension added below) must match that used in `bootstrap_debootstrap`
+STAGE_FILE="bootstrap_cache.${_ACTION}"
+
+case "${_ACTION}" in
+	restore)
+		# Checking stage file
+		Check_stagefile "${STAGE_FILE}"
+
+		if [ -d cache/bootstrap ]
+		then
+			Echo_message "Restoring bootstrap stage from cache..."
+
+			# Acquire lock file
+			Acquire_lockfile
+
+			# Removing old chroot
+			rm -rf chroot
+
+			# Catch failure condition.
+			# The installer stage, if not 'none' or 'live' needs to copy cached
+			# bootstrap packages, and will error if these do not exist. This
+			# could be the case if bootstrap is cached but the packages were
+			# wiped from the cache. This detects this condition and if it is the
+			# case, ignores the cached bootstrap, forcing it to be rebuilt thus
+			# re-caching the packages.
+			if ! In_list "${LB_DEBIAN_INSTALLER}" live none &&
+			   ! ls cache/packages.bootstrap/*.deb > /dev/null 2>&1
+			then
+				Echo_message "Cached bootstrap packages required but missing, ignoring cached bootstrap to force rebuild."
+				exit 0
+			fi
+
+			# Restoring old cache
+			cp -a cache/bootstrap chroot
+
+			# Creating stage file
+			Create_stagefile "${STAGE_FILE}"
+			Create_stagefile "bootstrap"
+
+			exit 0
+		fi
+		;;
+
+	save)
+		Echo_message "Saving bootstrap stage to cache..."
+
+		# Checking stage file
+		Check_stagefile "${STAGE_FILE}"
+
+		# Acquire lock file
+		Acquire_lockfile
+
+		rm -rf cache/bootstrap
+
+		mkdir -p cache
+
+		cp -a chroot cache/bootstrap
+
+		# Creating stage file
+		Create_stagefile "${STAGE_FILE}"
+		;;
+
+	*)
+		Echo_error "Invalid action parameter: '${_ACTION}'"
+		Usage --fail
+		;;
+esac

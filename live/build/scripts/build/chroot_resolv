@@ -1,0 +1,115 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Manage /etc/resolv.conf"
+USAGE="${PROGRAM} {install|remove} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+_ACTION="${1}"
+shift
+
+# Requiring stage file
+Require_stagefiles config bootstrap
+
+case "${_ACTION}" in
+	install)
+		Echo_message "Configuring file /etc/resolv.conf"
+
+		# Checking stage file
+		Check_stagefile
+
+		# Acquire lock file
+		Acquire_lockfile
+
+		if [ -e chroot/etc/resolv.conf ]
+		then
+			# Save resolv file or symlink
+			mv chroot/etc/resolv.conf chroot/etc/resolv.conf.orig
+
+			# Also truncate it, otherwise we'll end up with the one
+			# created by debootstrap in the final image.
+			#
+			# If you want to have a custom resolv.conf, please
+			# overwrite it with normal local_includes mechanism.
+			Truncate chroot/etc/resolv.conf.orig
+		elif [ -L chroot/etc/resolv.conf ]
+		then
+			# Move resolv.conf aside if it's a symlink (likely resolvconf)
+			mv chroot/etc/resolv.conf chroot/etc/resolv.conf.orig
+		fi
+
+		if [ -f /etc/resolv.conf ]
+		then
+			# Copy resolv file
+			cp /etc/resolv.conf chroot/etc/resolv.conf
+			chmod 644 chroot/etc/resolv.conf
+			Chroot chroot "chown root:root /etc/resolv.conf"
+		fi
+
+		# Creating stage file
+		Create_stagefile
+		;;
+
+	remove)
+		Echo_message "Deconfiguring file /etc/resolv.conf"
+
+		# Checking stage file
+		Ensure_stagefile_exists
+
+		# Acquire lock file
+		Acquire_lockfile
+
+		INCLUDE_DIR=$(select_includes_chroot)
+		# includes.chroot_before_packages takes the highest precedence
+		if [ -e config/includes.chroot_before_packages/etc/resolv.conf ]
+		then
+			INCLUDE_DIR="includes.chroot_before_packages"
+		fi
+		if [ -n "${INCLUDE_DIR}" ] && [ -e config/"${INCLUDE_DIR}"/etc/resolv.conf ]
+		then
+			# Copying local resolv.conf
+			cp config/"${INCLUDE_DIR}"/etc/resolv.conf chroot/etc/resolv.conf
+			chmod 644 chroot/etc/resolv.conf
+			Chroot chroot "chown root:root /etc/resolv.conf"
+			rm -f chroot/etc/resolv.conf.orig
+		elif [ -e chroot/etc/resolv.conf.orig ] || [ -L chroot/etc/resolv.conf.orig ]
+		then
+			# Restoring resolv file or symlink
+			mv chroot/etc/resolv.conf.orig chroot/etc/resolv.conf
+		else
+			# Truncating resolv file
+			Truncate chroot/etc/resolv.conf
+		fi
+
+		# Clean up resolvconf's pollution
+		if [ -e chroot/etc/resolvconf/resolv.conf.d ]
+		then
+			rm -f chroot/etc/resolvconf/resolv.conf.d/original
+			rm -f chroot/etc/resolvconf/resolv.conf.d/tail
+		fi
+
+		# Removing stage file
+		Remove_stagefile
+		;;
+
+	*)
+		Echo_error "Invalid action parameter: '${_ACTION}'"
+		Usage --fail
+		;;
+esac

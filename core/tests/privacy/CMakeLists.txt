@@ -1,0 +1,21 @@
+cmake_minimum_required(VERSION 3.22)
+project(usb_cameras_test LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+find_package(LingmoSDK REQUIRED)
+find_package(GTest REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(Systemd REQUIRED IMPORTED_TARGET libsystemd)
+set(SERVICE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../privacy)
+add_executable(usb_cameras_test usb_cameras_test.cpp ${SERVICE_DIR}/usbcameras.cpp)
+target_include_directories(usb_cameras_test PRIVATE ${SERVICE_DIR})
+target_link_libraries(usb_cameras_test PRIVATE Lingmo::SDKBase GTest::gtest_main)
+# The service on a private bus, with a polkit of its own in a child process.
+add_executable(privacy_service_test privacy_service_test.cpp ${SERVICE_DIR}/privacyservice.cpp
+    ${SERVICE_DIR}/captureswitches.cpp ${SERVICE_DIR}/usbcameras.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/../../common/detached_call.cpp)
+target_include_directories(privacy_service_test PRIVATE ${SERVICE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/../..)
+target_link_libraries(privacy_service_test PRIVATE Lingmo::SDKBase PkgConfig::Systemd GTest::gtest_main)
+enable_testing()
+add_test(NAME usb_cameras_test COMMAND usb_cameras_test)
+add_test(NAME privacy_service_test COMMAND privacy_service_test)

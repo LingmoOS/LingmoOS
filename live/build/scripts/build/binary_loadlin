@@ -1,0 +1,96 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Copy loadlin into binary"
+USAGE="${PROGRAM} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+if [ "${LB_LOADLIN}" != "true" ] || [ "${LB_BINARY_IMAGES}" = "netboot" ]
+then
+	exit 0
+fi
+
+Echo_message "Begin copying loadlin..."
+
+# Requiring stage file
+Require_stagefiles config bootstrap
+
+# Checking stage file
+Check_stagefile
+
+# Acquire lock file
+Acquire_lockfile
+
+case "${LB_ARCHITECTURE}" in
+	amd64|i386)
+		# Checking depends
+		Check_package chroot /usr/lib/loadlin/loadlin.exe.gz loadlin
+
+		# Restoring cache
+		Restore_package_cache binary
+
+		# Installing depends
+		Install_packages
+
+		case "${LB_BUILD_WITH_CHROOT}" in
+			true)
+				_PREFIX="chroot"
+				;;
+
+			false)
+				_PREFIX=""
+				;;
+		esac
+
+		# Copying loadlin
+		mkdir -p binary/tools
+		cp -a "${_PREFIX}/usr/lib/loadlin/loadlin.exe.gz" binary/tools
+		cp -a "${_PREFIX}/usr/share/doc/loadlin/manual.txt.gz" binary/tools/loadlin.txt.gz
+		gunzip binary/tools/loadlin.exe.gz
+		gunzip binary/tools/loadlin.txt.gz
+
+		# Saving cache
+		Save_package_cache binary
+
+		# Removing depends
+		Remove_packages
+
+		mkdir -p binary/install
+
+cat > binary/install/install.bat << EOF
+\tools\loadlin.exe vmlinuz initrd=initrd.gz
+EOF
+
+		if [ "${LB_DEBIAN_INSTALLER_GUI}" = "true" ]; then
+
+			mkdir -p binary/install/gtk
+
+cat > binary/install/gtk/install.bat << EOF
+\tools\loadlin.exe \install\vmlinuz initrd=initrd.gz vga=788
+EOF
+
+		fi
+		;;
+	*)
+		Echo_warning "loadlin inclusion is set to true but not compatible with your architecture, ignoring."
+		;;
+esac
+
+# Creating stage file
+Create_stagefile

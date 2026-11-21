@@ -1,0 +1,282 @@
+/* Lingmo's palette, taken from cutefish-toolkit's ui/theme.cpp so that a GTK
+   application sits next to a Lingmo one without looking like another system.
+   Radii follow the same file: 8 small, 10 medium, 12 big, 14 window. */
+
+@define-color lingmo_bg #F5F6FA;
+@define-color lingmo_second_bg #FFFFFF;
+@define-color lingmo_alt_bg #F2F4F5;
+@define-color lingmo_text #323238;
+@define-color lingmo_disabled #64646E;
+@define-color lingmo_highlight #3385FF;
+@define-color lingmo_highlight_text #FFFFFF;
+@define-color lingmo_destructive #FF5C6D;
+@define-color lingmo_border alpha(#323238, 0.12);
+@define-color lingmo_shadow alpha(#323238, 0.08);
+
+/* Adwaita's names, for the rules and the applications that use them. */
+@define-color theme_bg_color @lingmo_bg;
+@define-color theme_fg_color @lingmo_text;
+@define-color theme_base_color @lingmo_second_bg;
+@define-color theme_text_color @lingmo_text;
+@define-color theme_selected_bg_color @lingmo_highlight;
+@define-color theme_selected_fg_color @lingmo_highlight_text;
+@define-color insensitive_bg_color @lingmo_alt_bg;
+@define-color insensitive_fg_color @lingmo_disabled;
+@define-color borders @lingmo_border;
+
+window,
+.background {
+  background-color: @lingmo_bg;
+  color: @lingmo_text;
+}
+
+/* A white bar over the grey window, as the compositor draws its own. */
+headerbar,
+.titlebar:not(headerbar) {
+  background-color: @lingmo_second_bg;
+  background-image: none;
+  color: @lingmo_text;
+  border-bottom: 1px solid @lingmo_border;
+  box-shadow: none;
+}
+
+headerbar:backdrop,
+.titlebar:not(headerbar):backdrop {
+  background-color: @lingmo_second_bg;
+  color: @lingmo_disabled;
+}
+
+/* The title buttons keep their circle, so they are left out of the radius. */
+button {
+  background-image: none;
+  background-color: @lingmo_second_bg;
+  color: @lingmo_text;
+  border: 1px solid @lingmo_border;
+  border-radius: 8px;
+  box-shadow: none;
+  text-shadow: none;
+}
+
+button:hover {
+  background-color: @lingmo_alt_bg;
+  border-color: @lingmo_border;
+}
+
+button:active,
+button:checked {
+  background-color: @lingmo_alt_bg;
+  box-shadow: none;
+}
+
+button:disabled {
+  background-color: @lingmo_alt_bg;
+  color: @lingmo_disabled;
+}
+
+button.flat,
+button.titlebutton,
+button.image-button.circular,
+button.circular {
+  background-color: transparent;
+  border-color: transparent;
+}
+
+button.flat:hover,
+button.titlebutton:hover {
+  background-color: @lingmo_alt_bg;
+}
+
+button.suggested-action {
+  background-color: @lingmo_highlight;
+  color: @lingmo_highlight_text;
+  border-color: transparent;
+}
+
+button.suggested-action:hover {
+  background-color: shade(@lingmo_highlight, 1.08);
+}
+
+button.destructive-action {
+  background-color: @lingmo_destructive;
+  color: @lingmo_highlight_text;
+  border-color: transparent;
+}
+
+entry,
+spinbutton,
+textview text,
+textview {
+  background-color: @lingmo_second_bg;
+  color: @lingmo_text;
+  border-radius: 8px;
+}
+
+entry {
+  border: 1px solid @lingmo_border;
+  box-shadow: none;
+}
+
+entry:focus,
+entry:focus-within {
+  border-color: @lingmo_highlight;
+  box-shadow: none;
+}
+
+entry:disabled {
+  background-color: @lingmo_alt_bg;
+  color: @lingmo_disabled;
+}
+
+selection,
+*:selected,
+*:selected:focus {
+  background-color: @lingmo_highlight;
+  color: @lingmo_highlight_text;
+}
+
+menu,
+.menu,
+popover,
+popover.background {
+  background-color: @lingmo_second_bg;
+  color: @lingmo_text;
+  border: 1px solid @lingmo_border;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px @lingmo_shadow;
+}
+
+menuitem:hover,
+menuitem:selected {
+  background-color: alpha(@lingmo_highlight, 0.12);
+  color: @lingmo_text;
+}
+
+scrollbar slider {
+  background-color: alpha(@lingmo_text, 0.25);
+  border-radius: 8px;
+  border: none;
+  min-width: 6px;
+  min-height: 6px;
+}
+
+scrollbar slider:hover {
+  background-color: alpha(@lingmo_text, 0.4);
+}
+
+scrollbar trough {
+  background-color: transparent;
+}
+
+switch {
+  border-radius: 8px;
+}
+
+switch:checked {
+  background-color: @lingmo_highlight;
+}
+
+switch:checked slider {
+  background-color: @lingmo_highlight_text;
+}
+
+check,
+radio {
+  border-radius: 4px;
+}
+
+check:checked,
+radio:checked {
+  background-color: @lingmo_highlight;
+  color: @lingmo_highlight_text;
+  border-color: @lingmo_highlight;
+}
+
+tooltip,
+tooltip.background {
+  background-color: alpha(#1C1C1D, 0.92);
+  color: #FFFFFF;
+  border-radius: 8px;
+  border: none;
+}
+
+progressbar progress {
+  background-color: @lingmo_highlight;
+  border-radius: 8px;
+}
+
+levelbar block.filled {
+  background-color: @lingmo_highlight;
+  border-radius: 4px;
+}
+
+link,
+button.link {
+  color: @lingmo_highlight;
+}
+
+separator {
+  background-color: @lingmo_border;
+}
+
+/* The window's own decoration is the compositor's; a GTK one only shows on
+   Xwayland, where it is drawn to match. */
+decoration {
+  border-radius: 14px 14px 0 0;
+  box-shadow: 0 8px 24px @lingmo_shadow;
+}
+
+headerbar,
+.titlebar:not(headerbar) {
+  min-height: 40px;
+}
+
+headerbar entry,
+headerbar spinbutton,
+headerbar separator:not(.sidebar),
+headerbar button {
+  margin-top: 6px;
+  margin-bottom: 6px;
+}
+
+/* User CSS outranks theme specificity, so undo the margin on nested spin buttons */
+headerbar spinbutton button {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+headerbar button:not(.titlebutton) {
+  min-height: 18px;
+}
+
+headerbar button.image-button:not(.titlebutton) {
+  min-width: 16px;
+}
+
+headerbar entry,
+headerbar spinbutton:not(.vertical) {
+  min-height: 26px;
+}
+
+headerbar switch {
+  margin-top: 7px;
+  margin-bottom: 7px;
+}
+
+/* A 26px circle, 7px from the next one and centred 20px from the top and right edges */
+headerbar button.titlebutton:not(.appmenu),
+.titlebar button.titlebutton:not(.appmenu) {
+  padding: 4px;
+  margin: 7px 1px 7px 0;
+  transition: none;
+}
+
+headerbar.default-decoration,
+.default-decoration.titlebar:not(headerbar) {
+  padding: 0 6px;
+}
+
+headerbar.default-decoration button.titlebutton,
+.default-decoration.titlebar:not(headerbar) button.titlebutton {
+  min-height: 0;
+  min-width: 0;
+}

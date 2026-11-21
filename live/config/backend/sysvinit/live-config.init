@@ -1,0 +1,36 @@
+#!/bin/sh
+
+## live-config contains the components that configure a live system during
+## the boot process (late userspace).
+##
+## This is the sysvinit initscript for live-config.
+
+
+### BEGIN INIT INFO
+# Provides:		live-config
+# Required-Start:
+# Required-Stop:
+# Should-Start:
+# Should-Stop:
+# Default-Start:	S
+# Default-Stop:
+# Short-Description:	live-config - System Configuration Components
+# Description:		live-config contains the components that configure a
+#			live system during the boot process (late userspace).
+# X-Start-Before:	mountkernfs
+# X-Stop-After:
+# X-Interactive:	true
+### END INIT INFO
+
+case "${1}" in
+	start)
+		if [ -e /usr/bin/live-config ]
+		then
+			/usr/bin/live-config ${@}
+		fi
+		;;
+
+	force-reload|restart|stop)
+
+		;;
+esac

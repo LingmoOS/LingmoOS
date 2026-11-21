@@ -1,0 +1,30 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    container: debian:testing
+    steps:
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y ca-certificates cmake g++ pkg-config libgtest-dev debhelper devscripts
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Configure
+        run: cmake -S . -B build -DCADENCE_BUILD_TESTS=ON
+      - name: Build
+        run: cmake --build build --parallel
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
+      - name: Build Debian source package
+        run: dpkg-buildpackage -S -us -uc -d

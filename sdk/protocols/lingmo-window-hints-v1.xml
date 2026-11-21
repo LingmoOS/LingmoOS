@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<protocol name="lingmo_window_hints_v1">
+  <interface name="lingmo_window_hints_v1" version="1">
+    <description summary="per-surface application presentation hints">
+      Clients may set hints only on their own surfaces. Hints are immediate
+      metadata, independent of wl_surface.commit, and persist until replaced
+      or the surface is destroyed. Destroying the manager does not reset them.
+      Set initial hints before the first buffer commit to avoid task-list flashes.
+      These hints grant no focus or privileged shell role.
+    </description>
+    <enum name="error">
+      <entry name="invalid_value" value="0" summary="a value is out of range"/>
+    </enum>
+    <enum name="resize_anchor">
+      <entry name="top_left" value="0" summary="the top-left corner stays put"/>
+      <entry name="center" value="1" summary="the centre stays put"/>
+    </enum>
+    <enum name="placement_edge">
+      <description summary="a side or corner of a rectangle">
+        The values and meanings of xdg_positioner's anchor and gravity.
+      </description>
+      <entry name="none" value="0" summary="the centre"/>
+      <entry name="top" value="1"/>
+      <entry name="bottom" value="2"/>
+      <entry name="left" value="3"/>
+      <entry name="right" value="4"/>
+      <entry name="top_left" value="5"/>
+      <entry name="bottom_left" value="6"/>
+      <entry name="top_right" value="7"/>
+      <entry name="bottom_right" value="8"/>
+    </enum>
+    <request name="destroy" type="destructor"/>
+    <request name="set_skip_taskbar">
+      <description summary="exclude a surface from application presentation">
+        A value of 1 excludes the window from the dock and window switcher and
+        preserves the previous status bar application context when focused.
+        A value of 0 restores normal policy and is the default. Keyboard focus
+        and input are unaffected. The compositor may also exclude windows by role.
+      </description>
+      <arg name="surface" type="object" interface="wl_surface"/>
+      <arg name="skip" type="uint"/>
+    </request>
+    <request name="set_always_on_top">
+      <description summary="keep a window above ordinary application windows">
+        A value of 1 stacks the window above ordinary application windows, and
+        still below the shell's panels, dock and system dialogs. A value of 0
+        restores normal stacking and is the default. Only application
+        windows are affected; activation and focus are unchanged.
+      </description>
+      <arg name="surface" type="object" interface="wl_surface"/>
+      <arg name="on_top" type="uint"/>
+    </request>
+    <request name="set_resize_anchor">
+      <description summary="choose the point a client resize keeps in place">
+        When the client changes the size of a normal window on its own, with a
+        new buffer or window geometry rather than in answer to a configure, the
+        compositor keeps this point of the window where it was and then keeps
+        the window inside the work area. Resizes the compositor initiates,
+        interactive resizes and maximized, fullscreen or tiled windows are
+        unaffected. top_left is the default.
+      </description>
+      <arg name="surface" type="object" interface="wl_surface"/>
+      <arg name="anchor" type="uint" enum="resize_anchor"/>
+    </request>
+    <request name="set_server_resize">
+      <description summary="let the compositor resize a client-decorated window">
+        A value of 1 makes the compositor own resize handles along the edges
+        of a resizable normal window that draws its own frame: they reach a
+        few pixels outside the window, follow its rounded outline, set the
+        cursor and start an interactive resize when pressed. Use it instead
+        of drawing edge handles and calling xdg_toplevel.resize. A value of 0
+        is the default.
+      </description>
+      <arg name="surface" type="object" interface="wl_surface"/>
+      <arg name="enabled" type="uint"/>
+    </request>
+    <request name="set_restore_id">
+      <description summary="reopen a window where it was last left">
+        A non-empty id makes the compositor remember where a normal window was
+        when it unmapped, for the rest of the session. The next window of the
+        same application, by xdg_toplevel app_id, that maps with the same id
+        opens there on the same output and inside its work area: its centre
+        goes back to the remembered centre with the center resize anchor, its
+        top-left corner otherwise. Set it before the first commit. An empty id
+        is the default and remembers nothing.
+      </description>
+      <arg name="surface" type="object" interface="wl_surface"/>
+      <arg name="id" type="string"/>
+    </request>
+    <request name="set_restore_size">
+      <description summary="the size a window first shown maximized returns to">
+        When a window maps maximized or fullscreen, the compositor has no
+        normal size of its own to return it to. A non-empty size, in surface
+        coordinates, makes such a window return to a window geometry of this
+        size when it leaves that state, placed as a normal window of that size
+        mapping at the same time would have been. Set it before the first
+        commit. 0x0 is the default and leaves the choice to the compositor; a
+        negative width or height is an invalid_value error.
+      </description>
+      <arg name="surface" type="object" interface="wl_surface"/>
+      <arg name="width" type="int"/>
+      <arg name="height" type="int"/>
+    </request>
+    <request name="set_placement_anchor">
+      <description summary="open a window next to a point on the screen">
+        Places a normal window next to a rectangle given in the compositor's
+        global logical coordinates, such as the point a status notifier item
+        receives with Activate. Each time the window maps, its outer bounds
+        are placed as an xdg_positioner with this anchor rectangle, anchor
+        and gravity places a popup, inside the work area of the output that
+        holds the rectangle's centre: a window that does not fit flips to the
+        other side of the rectangle, then slides into the work area. A width
+        and height of 0 make the rectangle a point. This takes precedence
+        over set_restore_id and the compositor's own placement; windows with
+        a transient parent, maximized and fullscreen windows are unaffected,
+        and the user moves the window freely once it is shown. A negative
+        width or height or an unknown edge is an invalid_value error.
+      </description>
+      <arg name="surface" type="object" interface="wl_surface"/>
+      <arg name="x" type="int"/>
+      <arg name="y" type="int"/>
+      <arg name="width" type="int"/>
+      <arg name="height" type="int"/>
+      <arg name="anchor" type="uint" enum="placement_edge"/>
+      <arg name="gravity" type="uint" enum="placement_edge"/>
+    </request>
+    <request name="unset_placement_anchor">
+      <description summary="let the compositor place the window again">
+        The window maps where the compositor places it, as before any
+        set_placement_anchor. This is the default.
+      </description>
+      <arg name="surface" type="object" interface="wl_surface"/>
+    </request>
+    <request name="set_body_shape">
+      <description summary="the outline a window draws its body in">
+        For a normal window that draws a body of its own outline inside a
+        transparent surface, such as a bubble with an arrow: the compositor
+        neither clips the window to its rounded rectangle nor outlines it, and
+        the window's shadow is cast by this outline instead of its rectangle.
+        path is in surface-local logical pixels, encoded as
+        lingmo_surface_blur_v1.set_shape's path. Applies at once and
+        persists until replaced; an empty array is the same as
+        unset_body_shape. A malformed path is an invalid_value error.
+      </description>
+      <arg name="surface" type="object" interface="wl_surface"/>
+      <arg name="path" type="array"/>
+    </request>
+    <request name="unset_body_shape">
+      <description summary="the window's body is its rectangle again">
+        The compositor clips, outlines and shadows the window as its rounded
+        rectangle, the default.
+      </description>
+      <arg name="surface" type="object" interface="wl_surface"/>
+    </request>
+    <request name="set_shadow">
+      <description summary="whether the compositor casts the window's shadow">
+        A value of 0 casts no shadow for the window, as for a client that
+        draws its own shadow inside a transparent surface; with a body shape,
+        such a window shows exactly as the client drew it. A value of 1
+        restores the compositor's policy and is the default. Applies at once
+        and persists until replaced.
+      </description>
+      <arg name="surface" type="object" interface="wl_surface"/>
+      <arg name="shadow" type="uint"/>
+    </request>
+    <request name="set_opacity">
+      <description summary="draw the whole window translucent">
+        The window, its frame and shadow included, is drawn at this opacity,
+        from 0 to 1. At 0 it is unseen but still stacked and still takes
+        input; a window that should be neither seen nor clicked is unmapped.
+        1 is the default. Applies at once and persists until replaced; a
+        value outside 0 to 1 is an invalid_value error.
+      </description>
+      <arg name="surface" type="object" interface="wl_surface"/>
+      <arg name="opacity" type="fixed"/>
+    </request>
+    <event name="interactive_resize">
+      <description summary="an interactive resize started or ended">
+        Sent with active 1 when the user starts resizing one of the client's
+        windows by an edge or corner, and with active 0 when the resize ends,
+        before the xdg_toplevel.configure that drops the resizing state. A
+        client can tell a size the user chose from one it was given this way.
+      </description>
+      <arg name="surface" type="object" interface="wl_surface"/>
+      <arg name="active" type="uint"/>
+    </event>
+    <event name="work_area">
+      <description summary="the part of an output windows are laid out in">
+        An output, by its wl_output name, less what the desktop's panels and
+        dock reserve, in the compositor's global logical coordinates, where
+        xdg_output places the output itself. primary is 1 for the primary
+        output, the one with the status bar, and 0 for the others. Sent for
+        every output when the manager is bound, and again for an output
+        whose work area or primary flag changes; an output going away is
+        announced by its wl_output global alone.
+      </description>
+      <arg name="output" type="string"/>
+      <arg name="x" type="int"/>
+      <arg name="y" type="int"/>
+      <arg name="width" type="int"/>
+      <arg name="height" type="int"/>
+      <arg name="primary" type="uint"/>
+    </event>
+  </interface>
+</protocol>

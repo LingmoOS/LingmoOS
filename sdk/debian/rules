@@ -1,0 +1,15 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+# The Skia build looks for GN in its own bin/; the package builds with the
+# system's.
+override_dh_auto_configure:
+	mkdir -p third_party/skia/bin
+	ln -sf /usr/bin/gn third_party/skia/bin/gn
+	dh_auto_configure -- -DBUILD_TESTING=OFF
+
+override_dh_auto_clean:
+	dh_auto_clean
+	rm -f third_party/skia/bin/gn

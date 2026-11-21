@@ -1,0 +1,24 @@
+#!/bin/sh -e
+
+# Unfortunately, we can't use in-target here as this doesn't allow to set the
+# debconf frontend to noninteractive.
+
+. /lib/chroot-setup.sh
+
+if ! chroot_setup; then
+	logger -t live-installer -- "Unexpected error; command not executed: '$@'"
+	exit 1
+fi
+
+DEBIAN_FRONTEND=noninteractive
+export DEBIAN_FRONTEND
+
+# Reconfigure openssh-server to regenerate host keys
+if [ -e /target/var/lib/dpkg/info/openssh-server.postinst ]; then
+	if ! ls /target/etc/ssh/ssh_host_*_key > /dev/null 2>&1; then
+		log-output -t live-installer chroot /target \
+		dpkg-reconfigure --no-reload openssh-server
+	fi
+fi
+
+chroot_cleanup

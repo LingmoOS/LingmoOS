@@ -1,76 +1,96 @@
-/*
- * Copyright (C) 2023-2024 LingmoOS Team.
- *
- * Author:     revenmartin <revenmartin@gmail.com>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+// SPDX-FileCopyrightText: 2026 Reion Wong <reionwong@gmail.com>
+// SPDX-FileCopyrightText: 2026 LingmoOS Contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
 
-#ifndef PROCESSMANAGER_H
-#define PROCESSMANAGER_H
+#pragma once
 
-#include <QApplication>
-#include <QAbstractNativeEventFilter>
-#include <QObject>
-#include <QProcess>
-#include <QEventLoop>
-#include <QMap>
-#include <memory>
+#include <functional>
+#include <map>
 
-#include "daemon-helper.h"
+#include <QString>
+#include <QStringList>
+#include <QList>
 
-class Application;
-class ProcessManager : public QObject, public QAbstractNativeEventFilter
+#include "base/dbus.h"
+#include "base/process.h"
+#include "base/signal.h"
+#include "base/timer.h"
+
+namespace Lingmo {
+
+class XwaylandEnvironment;
+class CompositorProcess;
+class ShellConnection;
+class ShellProcess;
+class RestartPolicy;
+struct Publisher;
+
+class SessionProcessManager
 {
-    Q_OBJECT
-
 public:
-    explicit ProcessManager(Application *app, QObject *parent = nullptr);
-    ~ProcessManager();
+    SessionProcessManager();
+    ~SessionProcessManager();
+
+    enum class Ending {
+        Logout,
+        Restart,
+        Shutdown,
+    };
 
     void start();
     void logout();
 
-    void startWindowManager();
+    // Asks every application to quit, and runs `then` once all have.
+    // One that cancels or stops responding keeps the session going,
+    // and the user is told which. `then` returns false when the session
+    // goes on after all, as after a refused restart.
+    void endAfterApplications(Ending ending, std::function<bool()> then);
+
+    // What logout does once the display manager has been told, for when
+    // it or the system is the one ending the session.
+    void endSession(bool behindLoginScreen = false);
+
     void startDesktopProcess();
     void startDaemonProcess();
-    void checkAndDeactivateScreenSaver();
-
-    /**
-     * @brief Start the user defined autostart process.
-     *        Typically, they are in <home>/.config/autostart/xxx.desktop
-     */
     void loadAutoStartProcess();
 
-    bool nativeEventFilter(const QByteArray & eventType, void * message, long * result) override;
+private:
+    void leave();
+    void notifyEndingStopped(Ending ending, const QString &outcome,
+                              const QString &applicationId);
+    void startAfterCompositorReady();
+    void publishXwaylandEnvironment(bool startDesktop);
+    void startShell();
+    void onShellFinished(int code, bool crashed);
+
+    // Started once and restarted by the same bounded rule as the shell.
+    void startCoreProcess(const QString &program,
+                           const QStringList &arguments = {});
+    void stopRestarts();
+    void stopShellAndDaemons();
+    void stopProcesses(std::map<QString, std::unique_ptr<Lingmo::Base::Process>> &processes);
 
 private:
-    Application *m_app;
-    QMap<QString, QProcess *> m_systemProcess;
-    QMap<QString, QProcess *> m_autoStartProcess;
-
-    // Daemon helper for desktop components
-    std::shared_ptr<LINGMO_SESSION::Daemon> m_desktopAutoStartD;
-
-    // Daemon helper for other daemon components
-    std::shared_ptr<LINGMO_SESSION::Daemon> m_daemonAutoStartD;
-
-    // Daemon helper for User Auto Start Process
-    std::shared_ptr<LINGMO_SESSION::Daemon> m_userAutoStartD;
-
-    bool m_wmStarted;
-    QEventLoop *m_waitLoop;
+    std::unique_ptr<XwaylandEnvironment> m_xwaylandEnvironment;
+    std::unique_ptr<CompositorProcess> m_compositorProcess;
+    std::unique_ptr<ShellConnection> m_shellConnection;
+    std::unique_ptr<ShellProcess> m_shellProcess;
+    std::unique_ptr<RestartPolicy> m_shellRestart;
+    Lingmo::Base::DBus::NameWatch m_servicesWatch;
+    Lingmo::Base::DBus::PendingCall m_quitAllCall;
+    Lingmo::Base::Subscription m_registryChanged;
+    Lingmo::Base::Timer m_autostartTimer;
+    Lingmo::Base::Timer m_exitTimer;
+    std::vector<std::unique_ptr<Publisher>> m_publishers;
+    bool m_started = false;
+    bool m_compositorReady = false;
+    bool m_desktopStarted = false;
+    bool m_loggingOut = false;
+    bool m_ending = false;
+    QString m_waylandSocket;
+    QString m_controlSocket;
+    std::map<QString, std::unique_ptr<Lingmo::Base::Process>> m_coreProcesses;
+    std::map<QString, std::unique_ptr<RestartPolicy>> m_restartPolicies;
 };
 
-#endif // PROCESSMANAGER_H
+} // namespace Lingmo

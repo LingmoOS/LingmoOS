@@ -1,79 +1,56 @@
 # Lingmo OS
 
-This is the source tree of the LingmoOS desktop environment.
+The source tree of Lingmo OS.
 
-### Introduction
+This repository provides a unified source tree for Lingmo OS, bringing together its core components, desktop environment, applications, system services, and related infrastructure.
+
 ![Lingmo OS](res/screenshots/screenshot2.png)
 ![Lingmo OS Desktop](res/screenshots/screenshot1.png)
-Lingmo OS is a Linux operating system based on the desktop environment. It is developed based on the open source Linux kernel and is compatible with the amd64 architecture. It has a beautiful desktop environment, software adapted to the desktop environment, and a unified UI style.
 
-### UI, new desktop environment
+## Source Synchronization
 
-Lingmo OS adopts a new design that is different from the traditional KDE, making the operation no longer cumbersome; the operation is more user-friendly, making the interaction and vision more dynamic.
+This repository is automatically synchronized on a daily basis with the individual source repositories maintained by the LingmoOS organization.
 
-# Preparations
-## Build Host Requirements
+It includes all configured LingmoOS source components, **excluding the Linux Kernel source code**, which is maintained and synchronized separately.
 
- - Debian GNU/Linux 12(Bookworm), 13(Trixie) or later.
- - Disk free space > 50GB
- - Multi-core multi-threaded processor
- - 8 GB minimum running memory
+## Repository Structure
 
-## Tool preparation
+| Directory | Description |
+|---|---|
+| `apps/` | Desktop applications |
+| `base/` | Base system components |
+| `boot/` | Boot configuration and themes |
+| `core/` | System core |
+| `fm/` | File manager |
+| `framework/` | Desktop framework |
+| `lib/` | Shared libraries |
+| `live/` | Live system components |
+| `meta/` | Package and system metadata |
+| `platform/` | Platform infrastructure |
+| `sdk/` | Software development kit |
+| `services/` | System services |
+| `shell/` | Desktop shell |
+| `shellExtra/` | Desktop assets and resources |
+| `system/` | System-level components |
+| `third-party/` | Third-party dependencies |
+| `utils/` | Utilities and build tools |
+| `vendor/` | Hardware and vendor integrations |
+| `xdg/` | XDG integration |
 
-### Clone This Code Warehouse.
-   ```
-   git clone https://github.com/LingmoOS/LingmoOS.git
-```
+## Linux Kernel
 
-# Initialize repo warehouse
+The Linux Kernel is maintained separately and is not included in this repository's daily synchronization.
 
-## Enter source directory:
-```
-cd LingmoOS
-```
-## Dependencies
-Before building the project, ensure the following tools are installed:
-- `lingmo-pkgbuild`: Used to build packages.
-- `make`: Used to execute the build process.
-- `gcc` or another C compiler.
+Refer to the [LingmoOS Manifest](https://github.com/LingmoOS/manifest) repository for kernel source synchronization configuration.
 
-On Debian/Ubuntu systems, you can install the dependencies with:
-```bash
-sudo apt-get install autoconf automake build-essential
-```
+## Related Repositories
 
----
+- [LingmoOS Organization](https://github.com/LingmoOS)
+- [Manifest](https://github.com/LingmoOS/manifest)
 
-## Build Process
+## License
 
-### 1. Initialize the Project
-```bash
-make config-pkgs
-```
-
-### 2. Build the Project
-Use the following commands to build the project:
-```bash
-make build-pkgs     # Build all packages
-make third-party # Process third-party packages
-```
-
-### 3. Clean the Project
-Run the following command to clean the build directories:
-```bash
-make clean       # Clean the build directories
-```
-
----
-
-## Target Descriptions
-- **`make`**: Default target, builds all components.
-- **`make build-pkgs`**: Builds all packages using `lingmo-pkgbuild`.
-- **`make third-party`**: Processes third-party packages in the `third-party` directory.
-- **`make clean`**: Cleans the build directories.
-
----
+Individual components retain their respective licenses. Please refer to the corresponding source repositories for licensing information.
 
 ## ❤️ Support LingmoOS
 
@@ -84,7 +61,3 @@ If you find the project useful, you can support it via a
 
 Your support helps keep LingmoOS moving forward.
 Thank you for supporting open-source ❤️
-
-## License
-
-This project has been licensed by GPLv3.

@@ -1,0 +1,226 @@
+#!/bin/sh
+# 20-make-layer-images.binary —— 把单一 filesystem.squashfs 拆成多个 *.img 层
+#
+# ★ 默认关闭：只有 LINGMO_LAYERED_ROOTFS=yes 时才执行。
+#   在引导参数（live-media-path= / module=）与 Calamares 配置同步完成之前保持关闭，
+#   现有 ISO 构建行为完全不变。
+#
+# 执行环境（由 live-build 的 binary_hooks 决定）：
+#   - CWD = binary/            ⇒ 层目录 ./${LB_LIVE_DIR}，chroot ../chroot
+#   - 作为独立程序执行          ⇒ 不能用 live-build 内部函数，全部自包含
+#   - 在 binary_checksums 之前 ⇒ 生成的 .img 会被 sha256sum.txt 覆盖
+#   - 非零退出会使构建失败      ⇒ 出错明确报错；且带“安全阀”，层内容异常就中止
+#
+# 性能设计：分类只做一次（每包一次 dpkg-query + 一次 awk）；每层用一条
+#   `cp -dl --parents` 批量硬链接，不做“每文件 mkdir/ln”（那样 20 万文件要十几分钟）。
+#
+# 参见：core.lm-分层构建方案.md / ISO-结构分析.md
+
+set -e
+
+if [ "${LINGMO_LAYERED_ROOTFS:-no}" != "yes" ]; then
+    echo "I: LINGMO_LAYERED_ROOTFS != yes ⇒ 跳过分层（保持单个 filesystem.squashfs）"
+    exit 0
+fi
+
+LIVE_DIR="${LB_LIVE_DIR:-live}"                 # 例：core.lm
+MODULE="${LINGMO_LAYER_MODULE:-core}"           # 例：core ⇒ core.module
+ORDER="system firmware kernel desktop lingmo apps vendor device misc"   # 前 → 后 = 优先级 低 → 高
+
+BINDIR="$(pwd)"                                 # binary/
+DEST="${BINDIR}/${LIVE_DIR}"
+CHROOT="$(cd ../chroot && pwd)"
+ADMINDIR="${CHROOT}/var/lib/dpkg"
+WORK="$(cd .. && pwd)/layer-work"               # 与 chroot 同一文件系统 ⇒ 硬链接才省空间
+MAP="$(cd .. && pwd)/config/layer-images.conf"
+
+echo "I: 分层构建开始：目录=${LIVE_DIR} 清单=${MODULE}.module 映射=${MAP}"
+
+for t in mksquashfs xargs awk sort find du; do
+    command -v "$t" >/dev/null 2>&1 || { echo "E: 缺少命令 $t" >&2; exit 1; }
+done
+[ -d "${CHROOT}/usr" ] || { echo "E: 找不到 ${CHROOT}（chroot 不完整？）" >&2; exit 1; }
+[ -f "${MAP}" ] || { echo "E: 缺少映射文件 ${MAP}" >&2; exit 1; }
+[ -d "${ADMINDIR}" ] || { echo "E: 找不到 dpkg 数据库 ${ADMINDIR}" >&2; exit 1; }
+
+rm -rf "${WORK}"; mkdir -p "${WORK}" "${DEST}"
+
+# ── 1) 规则预载 ────────────────────────────────────────────────
+awk '$1=="path"{printf "%s|%s\n",$2,$3}' "${MAP}" > "${WORK}/pathrules"
+awk '$1=="pkg" {printf "%s|%s\n",$2,$3}' "${MAP}" > "${WORK}/pkgrules"
+[ -s "${WORK}/pkgrules" ] || { echo "E: 映射里没有 pkg 规则（缺少兜底）" >&2; exit 1; }
+
+layer_for_pkg() {
+    while IFS='|' read -r pat lay; do
+        [ -n "${pat}" ] || continue
+        case "$1" in ${pat}) printf '%s' "${lay}"; return 0 ;; esac
+    done < "${WORK}/pkgrules"
+    return 1
+}
+
+# ── 2) 包 → 层，输出 “层<TAB>路径” ─────────────────────────────
+echo "I: 读取已安装包清单…"
+dpkg-query --admindir="${ADMINDIR}" -W -f='${Package}\n' 2>/dev/null > "${WORK}/pkgs"
+: > "${WORK}/paths.raw"
+while read -r pkg; do
+    lay="$(layer_for_pkg "${pkg}" || true)"; [ -n "${lay}" ] || lay="system"
+    dpkg-query --admindir="${ADMINDIR}" -L "${pkg}" 2>/dev/null \
+        | awk -v l="${lay}" 'length($0)>1 && $0!="/" {print l "\t" $0}'
+done < "${WORK}/pkgs" >> "${WORK}/paths.raw"
+echo "I: 包数 $(wc -l < "${WORK}/pkgs")，路径条目 $(wc -l < "${WORK}/paths.raw")"
+
+# ── 3) 符号链接集合（一次 find；不跨 /proc 等挂载） ─────────────
+find "${CHROOT}" -xdev \( -path "${CHROOT}/proc" -o -path "${CHROOT}/sys" \
+     -o -path "${CHROOT}/dev"  -o -path "${CHROOT}/run" \
+     -o -path "${CHROOT}/mnt"  -o -path "${CHROOT}/media" \) -prune -o \
+     -type l -printf '%P\n' 2>/dev/null | LC_ALL=C sort -u > "${WORK}/symlinks"
+echo "I: 符号链接 $(wc -l < "${WORK}/symlinks") 个 ⇒ 全部进 misc"
+
+# 目录集合：目录必须用 mkdir -p 创建（不能交给 cp，cp 会报 "-r not specified" 并跳过）
+find "${CHROOT}" -xdev \( -path "${CHROOT}/proc" -o -path "${CHROOT}/sys" \
+     -o -path "${CHROOT}/dev"  -o -path "${CHROOT}/run" \
+     -o -path "${CHROOT}/mnt"  -o -path "${CHROOT}/media" \) -prune -o \
+     -type d -printf '%P\n' 2>/dev/null | LC_ALL=C sort -u > "${WORK}/dirs"
+echo "I: 目录 $(wc -l < "${WORK}/dirs") 个 ⇒ 由 mkdir -p 创建"
+
+# ── 3b) 漏网文件兜底：chroot 里不在任何包清单中的文件 ─────────────
+#      （hook 生成的 /etc/os-version、update-initramfs 产物等都必须进层，否则 ISO 会缺文件）
+find "${CHROOT}" -xdev \( -path "${CHROOT}/proc" -o -path "${CHROOT}/sys" \
+     -o -path "${CHROOT}/dev"  -o -path "${CHROOT}/run" \
+     -o -path "${CHROOT}/mnt"  -o -path "${CHROOT}/media" \) -prune -o \
+     \( -type f -o -type l \) -printf '%P\n' 2>/dev/null | LC_ALL=C sort -u > "${WORK}/allfiles"
+cut -f2 "${WORK}/paths.raw" | LC_ALL=C sort -u > "${WORK}/covered"
+sed 's|^|/|' "${WORK}/allfiles" | LC_ALL=C sort -u > "${WORK}/allfiles.slash"
+# 注意：sort 与 comm 必须用同一 collation（都加 LC_ALL=C），否则 comm 会报
+#       "file 1 is not in sorted order" 并给出错误结果
+LC_ALL=C comm -13 "${WORK}/covered" "${WORK}/allfiles.slash" | awk '{print "system\t" $0}' > "${WORK}/leftovers.raw"
+echo "I: 非包所有文件（hook 产物等）$(wc -l < "${WORK}/leftovers.raw") 个 ⇒ 兜底进 system（符号链接仍进 misc）"
+cat "${WORK}/leftovers.raw" >> "${WORK}/paths.raw"
+
+# ── 4) 一次 awk 分类 ────────────────────────────────────────────
+#     目录 → L-<层>.dirs（值已带 ${WORK}/<层> 前缀，可直接 mkdir -p）
+#     文件/符号链接 → L-<层>.paths（NUL 分隔，交给 cp -dl --parents）
+awk -F'\t' -v work="${WORK}" '
+  BEGIN {
+    while ((getline s < (work "/symlinks")) > 0) sym["/" s] = 1
+    while ((getline d < (work "/dirs"))     > 0) dir["/" d] = 1
+    while ((getline a < (work "/allfiles")) > 0) exist["/" a] = 1   # 只有真实存在的路径才建层
+    np = 0
+    while ((getline r < (work "/pathrules")) > 0) { split(r, a2, "|"); pat[++np] = a2[1]; lay[np] = a2[2] }
+  }
+  {
+    p = $2
+    if (p == "/" || p == "/." ) next
+    if (!(p in exist) && !(p in dir)) next        # dpkg 清单里已不存在的文件（被 hook 删过/rc 状态）
+    if (p in sym) tgt = "misc"
+    else {
+      tgt = ""
+      for (i = 1; i <= np; i++) if (index(p, pat[i]) == 1) { tgt = lay[i]; break }
+      if (tgt == "") tgt = $1
+    }
+    if (p in dir) printf "%s%c", (work "/" tgt p), 0 > (work "/L-" tgt ".dirs")
+    else {
+        # 写成相对路径：钩子随后会 cd 到 chroot 再 cp，绝对路径会误指向构建机
+        rel = p; sub(/^\//, "", rel)
+        printf "%s%c", rel, 0 > (work "/L-" tgt ".paths")
+    }
+  }
+' "${WORK}/paths.raw"
+
+# ── 4b) FHS 骨架：保证必需目录进入 system 层 ─────────────────────
+#  上面三处 find 都 -prune 了 /dev /proc /sys /run /mnt /media（避免把挂载内容打进镜像），
+#  但这些**目录本身**必须存在：否则合并后的 rootfs 缺 /dev 等目录，
+#  initramfs 执行 mount --move /dev /root/dev 会失败 ⇒ init 死亡 ⇒ kernel panic。
+FHS_DIRS="dev proc sys run tmp root home srv opt mnt media etc var usr boot"
+for D in ${FHS_DIRS}; do
+    if [ -d "${CHROOT}/${D}" ]; then
+        mkdir -p "${WORK}/system/${D}"
+        chmod --reference="${CHROOT}/${D}" "${WORK}/system/${D}" 2>/dev/null || true
+        printf '%s\0' "${WORK}/system/${D}" >> "${WORK}/L-system.dirs"
+    fi
+done
+chmod 1777 "${WORK}/system/tmp" 2>/dev/null || true
+echo "I: 已补全 FHS 骨架目录（dev proc sys run tmp root home srv opt mnt media …）"
+
+# ── 5) 每层：建目录 + 批量硬链接 + mksquashfs ───────────────────
+: > "${WORK}/layers.list"
+chroot_files=$(find "${CHROOT}" -xdev -type f 2>/dev/null | wc -l)   # 仅作量级参考
+layered_files=0
+for L in ${ORDER}; do
+    pf="${WORK}/L-${L}.paths"; df="${WORK}/L-${L}.dirs"
+    d="${WORK}/${L}"; mkdir -p "$d"
+    if [ ! -s "$pf" ]; then
+        echo "I: 层 ${L} 无内容（仍生成空层：保证层集合恒定，Calamares 的列表无需随映射变化）"
+    fi
+
+    [ -s "$df" ] && sort -zu "$df" | xargs -0 -r mkdir -p --
+    # 先尝试硬链接（省空间、快）；跨文件系统会整批失败 ⇒ 回退为复制
+    [ -s "$pf" ] && { ( cd "${CHROOT}" && xargs -0 -r cp -dl --parents -t "$d" < "$pf" ) 2>"${WORK}/${L}.err" || true; }
+
+    # ⭐ 按文件精准回退：硬链接失败通常是 chroot 里被 bind-mount 的少数文件（跨设备），
+    #    绝不能因此把整层重新复制一遍（27G rootfs 会又慢又爆盘）。
+    sed -n "s/^cp: cannot create hard link .* to '\(.*\)': .*/\1/p" "${WORK}/${L}.err" 2>/dev/null \
+        | LC_ALL=C sort -u | tr '\n' '\0' > "${WORK}/${L}.failed"
+    if [ -s "${WORK}/${L}.failed" ]; then
+        nlinkfail=$(tr -cd '\0' < "${WORK}/${L}.failed" | wc -c)
+        echo "W: 层 ${L} 有 ${nlinkfail} 个文件无法硬链接（多为 chroot 内 bind-mount 的跨设备文件）⇒ 仅对这些复制补齐"
+        ( cd "${CHROOT}" && xargs -0 -r cp -d --preserve=all --parents -t "$d" < "${WORK}/${L}.failed" ) 2>>"${WORK}/${L}.err" || true
+    fi
+
+    if [ -s "${WORK}/${L}.err" ]; then
+        echo "W: 层 ${L} 有 $(grep -c . "${WORK}/${L}.err") 行拷贝告警（前 3 行如下；多为 dpkg 清单里已不存在的文件）"
+        head -3 "${WORK}/${L}.err" | sed 's/^/     /'
+    fi
+
+    nlist=$(tr '\0' '\n' < "$pf" 2>/dev/null | grep -c . || true)
+    cnt=$(find "$d" -mindepth 1 ! -type d 2>/dev/null | wc -l)      # 文件 + 符号链接（不含目录）
+    nf=$(find "$d" -type f 2>/dev/null | wc -l)
+    nl=$(find "$d" -type l 2>/dev/null | wc -l)
+    nd=$(find "$d" -mindepth 1 -type d 2>/dev/null | wc -l)
+    if [ "$nlist" -gt 0 ] && [ "$cnt" -eq 0 ]; then
+        echo "E: 层 ${L} 列了 ${nlist} 条路径却一条都没建出来，切分失败 ⇒ 中止" >&2
+        head -5 "${WORK}/${L}.err" | sed 's/^/     /' >&2
+        exit 1
+    fi
+    layered_files=$((layered_files + cnt))
+    echo "I: 生成 ${L}.img（清单 ${nlist} 条 → 文件 ${nf} + 符号链接 ${nl} + 目录 ${nd}，$(du -sh "$d" | cut -f1)）"
+    mksquashfs "$d" "${DEST}/${L}.img" -comp xz -no-progress -noappend > /dev/null
+    echo "${L}.img" >> "${WORK}/layers.list"
+done
+
+[ -s "${WORK}/layers.list" ] || { echo "E: 一个层都没生成，中止（保留原 filesystem.squashfs）" >&2; exit 1; }
+
+# ── 5b) 安全阀：层内文件数不应远少于 chroot ─────────────────────
+echo "I: 层内文件合计 ${layered_files} / chroot ${chroot_files}"
+if [ "${layered_files}" -le 0 ]; then
+    echo "E: 层内一个文件都没有，切分失败 ⇒ 中止（保留原 filesystem.squashfs）" >&2
+    exit 1
+fi
+if [ "${chroot_files}" -gt 0 ] && [ "${layered_files}" -lt $(( chroot_files / 2 )) ]; then
+    echo "E: 层内文件数不足 chroot 的一半（${layered_files} < $(( chroot_files / 2 ))）⇒ 切分异常，中止（保留原 filesystem.squashfs）" >&2
+    exit 1
+fi
+
+# ── 6) 写清单：越靠后优先级越高 ⇒ misc 放最后 ───────────────────
+: > "${DEST}/${MODULE}.module"
+for L in ${ORDER}; do
+    [ "${L}" = "misc" ] && continue
+    grep -qx "${L}.img" "${WORK}/layers.list" && echo "${L}.img" >> "${DEST}/${MODULE}.module"
+done
+grep -qx "misc.img" "${WORK}/layers.list" && echo "misc.img" >> "${DEST}/${MODULE}.module"
+echo "I: 清单 ${DEST}/${MODULE}.module："; sed 's/^/     /' "${DEST}/${MODULE}.module"
+
+if grep -qx "oem.img" "${WORK}/layers.list"; then
+    cp -f "${DEST}/${MODULE}.module" "${DEST}/oem.module"
+    echo "oem.img" >> "${DEST}/oem.module"
+    echo "I: 另写 ${DEST}/oem.module（含 oem.img）"
+fi
+
+# ── 7) 全部成功后才删除单体 squashfs ────────────────────────────
+if [ -f "${DEST}/filesystem.squashfs" ]; then
+    echo "I: 删除单体 ${DEST}/filesystem.squashfs（$(du -h "${DEST}/filesystem.squashfs" | cut -f1)）"
+    rm -f "${DEST}/filesystem.squashfs"
+fi
+
+rm -rf "${WORK}"
+echo "I: 分层构建完成：$(cd "${DEST}" && ls -1 *.img 2>/dev/null | tr '\n' ' ')"

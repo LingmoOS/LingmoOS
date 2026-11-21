@@ -1,0 +1,36 @@
+cmake_minimum_required(VERSION 3.22)
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
+    project(lingmo-idle LANGUAGES C CXX)
+    find_package(LingmoSDK REQUIRED)
+    include(CTest)
+endif()
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(IdleWayland REQUIRED IMPORTED_TARGET wayland-client)
+pkg_check_modules(IdleProtocols REQUIRED wayland-protocols>=1.39)
+pkg_get_variable(IDLE_PROTOCOL_DIR wayland-protocols pkgdatadir)
+pkg_get_variable(IDLE_SCANNER wayland-scanner wayland_scanner)
+set(xml ${IDLE_PROTOCOL_DIR}/staging/ext-idle-notify/ext-idle-notify-v1.xml)
+set(header ${CMAKE_CURRENT_BINARY_DIR}/ext-idle-notify-v1-client-protocol.h)
+set(code ${CMAKE_CURRENT_BINARY_DIR}/ext-idle-notify-v1-protocol.c)
+add_custom_command(OUTPUT ${header} ${code}
+    COMMAND ${IDLE_SCANNER} client-header ${xml} ${header}
+    COMMAND ${IDLE_SCANNER} private-code ${xml} ${code}
+    DEPENDS ${xml} VERBATIM)
+add_library(lingmo-idle-backend STATIC waylandidle.cpp waylandidle.h ${header} ${code})
+set_target_properties(lingmo-idle-backend PROPERTIES CXX_STANDARD 20 CXX_STANDARD_REQUIRED ON)
+target_include_directories(lingmo-idle-backend PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
+target_link_libraries(lingmo-idle-backend PUBLIC Lingmo::SDKBase PRIVATE PkgConfig::IdleWayland)
+
+if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR AND BUILD_TESTING)
+    find_package(GTest REQUIRED)
+    pkg_check_modules(IdleServer REQUIRED IMPORTED_TARGET wayland-server)
+    set(server_header ${CMAKE_CURRENT_BINARY_DIR}/ext-idle-notify-v1-server-protocol.h)
+    add_custom_command(OUTPUT ${server_header}
+        COMMAND ${IDLE_SCANNER} server-header ${xml} ${server_header}
+        DEPENDS ${xml} VERBATIM)
+    add_executable(waylandidle_test tests/waylandidle_test.cpp ${server_header})
+    set_target_properties(waylandidle_test PROPERTIES CXX_STANDARD 20 CXX_STANDARD_REQUIRED ON)
+    target_include_directories(waylandidle_test PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
+    target_link_libraries(waylandidle_test PRIVATE lingmo-idle-backend GTest::gtest_main PkgConfig::IdleServer)
+    add_test(NAME waylandidle_test COMMAND waylandidle_test)
+endif()

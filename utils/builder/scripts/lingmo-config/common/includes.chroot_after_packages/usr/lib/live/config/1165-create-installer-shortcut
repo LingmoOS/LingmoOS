@@ -1,0 +1,17 @@
+#!/bin/sh
+
+# The live account is lingmo/live. live-config may already have created it
+# with a locked password, so unlock and set it on every boot, not only for a
+# new account.
+if ! id -u lingmo >/dev/null 2>&1; then
+    useradd -m -G sudo,audio,cdrom,dip,floppy,video,plugdev,netdev -s /bin/bash lingmo
+fi
+echo "lingmo:live" | chpasswd
+
+bash /usr/bin/add-calamares-desktop-icon
+
+# Installer startup is handled by /etc/xdg/autostart/lingmo-live-installer.desktop.
+# Do not copy an unshipped launcher into the Live user home.
+
+# Fix the permision of ~/.config dir
+chown -R lingmo /home/lingmo

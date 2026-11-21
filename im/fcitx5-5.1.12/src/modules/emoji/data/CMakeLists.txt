@@ -1,5 +1,0 @@
-file(GLOB DICT_FILES *.dict)
-
-install(FILES ${DICT_FILES} DESTINATION ${FCITX_INSTALL_PKGDATADIR}/emoji/data
-        COMPONENT config)
-

@@ -1,0 +1,64 @@
+#!/bin/sh
+set -e
+
+# /etc/ssl/certs/java/cacerts is a keystore
+# Due to cryptographic requirements, it will be non-reproducible
+# as it embeds timestamps
+# It can be re-generated with low overhead
+
+# Don't run if ca-certificates-java is not installed
+if [ ! -e /etc/ssl/certs/java/cacerts ];
+then
+	exit 0
+fi
+
+# Remove the file
+rm -f /etc/ssl/certs/java/cacerts
+
+# Add a hook to live-config to recreate it
+cat << EOF > /usr/lib/live/config/5000-ca-certificates-java
+#!/bin/sh
+
+. /lib/live/config.sh
+
+## live-config(7) - System Configuration Components
+## Copyright (C) 2024 The Debian Live team
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+Init ()
+{
+	# Checking if package is installed
+	if ! pkg_is_installed "ca-certificates-java" || \\
+		component_was_executed "ca-certificates-java"
+	then
+		exit 0
+	fi
+	# If the keystore is embedded in the image, don't touch it
+	if [ -e /etc/ssl/certs/java/cacerts ]
+	then
+		exit 0
+	fi
+
+	echo -n " ca-certificates-java"
+}
+
+Config ()
+{
+	# Re-generate the keystore
+	touch /var/lib/ca-certificates-java/fresh
+	dpkg-reconfigure ca-certificates-java
+
+	# Creating state file
+	touch /var/lib/live/config/ca-certificates-java
+}
+
+Init
+Config
+EOF
+chmod u=rwx,go=rx /usr/lib/live/config/5000-ca-certificates-java
+
+echo "P: $(basename $0) Reproducible hook has been applied"
+

@@ -1,0 +1,121 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Copy win32-loader into binary"
+USAGE="${PROGRAM} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+if [ "${LB_WIN32_LOADER}" != "true" ]
+then
+	exit 0
+fi
+
+Echo_message "Begin copying win32-loader..."
+
+# Requiring stage file
+Require_stagefiles config bootstrap
+
+# Checking stage file
+Check_stagefile
+
+# Acquire lock file
+Acquire_lockfile
+
+RUN_LABEL="Run Debian GNU/Linux"
+
+case "${LB_ARCHITECTURE}" in
+	amd64|i386)
+		# Checking depends
+		Check_package chroot /usr/share/win32/win32-loader.exe win32-loader
+
+		# Restoring cache
+		Restore_package_cache binary
+
+		# Installing depends
+		Install_packages
+
+		if [ "${LB_BUILD_WITH_CHROOT}" = "true" ]
+		then
+			# Copying win32-loader
+			cp -a chroot/usr/share/win32/* binary
+		else
+			cp -a usr/share/win32/* binary
+		fi
+
+		mv binary/win32-loader.exe binary/setup.exe
+		mv binary/win32-loader/g2ldr* binary
+		rmdir binary/win32-loader > /dev/null 2>&1 || true
+
+cat > binary/autorun.inf << EOF
+[autorun]
+open=setup.exe
+icon=setup.exe,0
+label=${RUN_LABEL}
+
+[Content]
+MusicFiles=false
+PictureFiles=false
+VideoFiles=false
+EOF
+
+		if [ "${LB_DEBIAN_INSTALLER}" != "none" ]
+		then
+
+cat > binary/win32-loader.ini << EOF
+[installer]
+kernel=linux
+arch=${LB_ARCHITECTURE}
+default_desktop=gnome
+${LB_ARCHITECTURE}/linux=install/vmlinuz
+${LB_ARCHITECTURE}/initrd=install/initrd.gz
+EOF
+
+			if [ -e binary/install/gtk ]
+			then
+
+cat >> binary/win32-loader.ini << EOF
+${LB_ARCHITECTURE}/gtk/linux=install/vmlinuz
+${LB_ARCHITECTURE}/gtk/initrd=install/gtk/initrd.gz
+EOF
+
+			fi
+
+cat >> binary/win32-loader.ini << EOF
+
+[grub]
+g2ldr=g2ldr
+g2ldr.mbr=g2ldr.mbr
+EOF
+
+		fi
+
+		# Saving cache
+		Save_package_cache binary
+
+		# Removing depends
+		Remove_packages
+		;;
+
+	*)
+		Echo_warning "win32-loader inclusion is set to true but not compatible with your architecture, ignoring."
+		;;
+esac
+
+# Creating stage file
+Create_stagefile

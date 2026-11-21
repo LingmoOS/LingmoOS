@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<protocol name="lingmo_surface_blur_v1">
+  <interface name="lingmo_surface_blur_v1" version="1">
+    <description summary="compositor background blur for translucent surfaces">
+      A Lingmo extension inspired by Chromium ui::Layer backdrop filters.
+      This is not a ChromeOS wire protocol. Requests modify pending wl_surface
+      state, applied atomically on wl_surface.commit, including synchronized
+      subsurface commits. Blur samples content behind the surface, before the
+      client buffer is blended. The compositor chooses sigma and filter quality;
+      clients paint their own translucent tint. No additional surface role is
+      assigned. The effect is available to both toplevels and popups.
+
+      The same rectangle can carry a glass material instead, which refracts and
+      lights the backdrop rather than only blurring it.
+
+      A client that draws a body of any other outline - a popup with an arrow,
+      say - describes that outline with set_shape, and the blur, the window
+      outline and the shadow follow it.
+    </description>
+    <enum name="error">
+      <entry name="invalid_geometry" value="0" summary="invalid blur rectangle, radius, shape or glass parameter"/>
+    </enum>
+    <request name="destroy" type="destructor">
+      <description summary="destroy the binding">
+        Existing surface state is unchanged. Use unset before committing to
+        remove an effect. Surface destruction discards all its blur state.
+      </description>
+    </request>
+    <request name="set">
+      <description summary="set a rounded background blur rectangle">
+        Coordinates and radius are surface-local logical pixels, independent
+        of buffer scale and transform. Width and height must be positive;
+        radius must be nonnegative and is clamped to half the smaller dimension.
+        Output is clipped to the surface content and rounded rectangle. Input
+        sampling extends beyond that rectangle to avoid blur edge artifacts.
+        A subsequent set replaces the pending rectangle.
+      </description>
+      <arg name="surface" type="object" interface="wl_surface"/>
+      <arg name="x" type="int"/>
+      <arg name="y" type="int"/>
+      <arg name="width" type="int"/>
+      <arg name="height" type="int"/>
+      <arg name="radius" type="int"/>
+    </request>
+    <request name="unset">
+      <description summary="disable blur on the next surface commit"/>
+      <arg name="surface" type="object" interface="wl_surface"/>
+    </request>
+    <request name="set_glass">
+      <description summary="turn the blur rectangle into a glass lens">
+        Refracts the backdrop through a rounded lens shaped by the rectangle and
+        radius of the most recent set request, then lights it. Without such a
+        rectangle the request has no effect. The material starts at the
+        compositor defaults; set_glass_material, set_glass_lighting and
+        set_glass_tint override parts of it and may be sent in any order, before
+        or after this request. All of it is pending surface state.
+
+        Glass replaces the plain blur for this surface. Clients should not paint
+        a translucent tint of their own on top of it; use set_glass_tint so the
+        tint sits under the highlights instead of over them.
+      </description>
+      <arg name="surface" type="object" interface="wl_surface"/>
+    </request>
+    <request name="unset_glass">
+      <description summary="go back to plain blur on the next commit">
+        The blur rectangle is unaffected. Material parameters are retained, so a
+        later set_glass restores them.
+      </description>
+      <arg name="surface" type="object" interface="wl_surface"/>
+    </request>
+    <request name="set_glass_material">
+      <description summary="set the optical properties of the glass">
+        blur_sigma softens the backdrop before it is refracted; it is much
+        smaller than the plain blur radius because a heavily blurred backdrop
+        leaves nothing for the lens to bend. bevel is the width of the roll-off
+        band, the visible lip of the glass, in surface-local logical pixels; it
+        is clamped to half the smaller side of the rectangle and falls back to
+        the rectangle's corner radius when zero. depth is the height of the
+        glass surface above its back face: against the bevel width it decides
+        how steeply the surface turns over at the edge. profile is the
+        superellipse exponent of the surface, so low values give a dome and
+        high values a flat top with a roll-off so sharp the lip stops bending
+        light over a visible width.
+        displacement is the length of the refracted ray inside the glass, in
+        logical pixels, and may be negative to bend the other way. chroma splits
+        red from blue as a fraction of the resulting offset.
+
+        Negative blur_sigma, bevel, depth, profile or chroma, and an index of
+        refraction below one, are invalid geometry.
+      </description>
+      <arg name="surface" type="object" interface="wl_surface"/>
+      <arg name="blur_sigma" type="fixed"/>
+      <arg name="bevel" type="fixed"/>
+      <arg name="depth" type="fixed"/>
+      <arg name="ior" type="fixed"/>
+      <arg name="profile" type="fixed"/>
+      <arg name="displacement" type="fixed"/>
+      <arg name="chroma" type="fixed"/>
+    </request>
+    <request name="set_glass_lighting">
+      <description summary="set the lighting of the glass">
+        light_angle is in degrees, measured from the surface-local x axis with y
+        growing downwards. sheen brightens the whole surface by how much it
+        faces the light and specular_intensity adds a mirror highlight, which on
+        a panel reads as plastic and is normally left at zero.
+        ambient_occlusion darkens the inside of the edge over
+        ambient_occlusion_radius logical pixels. Intensities are fractions of
+        full brightness and are combined with a screen blend, so they brighten
+        towards white rather than clipping.
+
+        The material draws no edge of its own unless set_glass_rim asks for
+        one: otherwise the hairline around a rounded body belongs to the
+        compositor's window outline.
+
+        A negative radius, intensity or shininess is invalid geometry.
+      </description>
+      <arg name="surface" type="object" interface="wl_surface"/>
+      <arg name="light_angle" type="fixed"/>
+      <arg name="specular_intensity" type="fixed"/>
+      <arg name="shininess" type="fixed"/>
+      <arg name="sheen" type="fixed"/>
+      <arg name="ambient_occlusion" type="fixed"/>
+      <arg name="ambient_occlusion_radius" type="fixed"/>
+    </request>
+    <request name="set_glass_tint">
+      <description summary="set the glass tint">
+        A straight-alpha colour mixed over the refracted backdrop, under the
+        highlights. Components are clamped to the 0 to 1 range.
+      </description>
+      <arg name="surface" type="object" interface="wl_surface"/>
+      <arg name="red" type="fixed"/>
+      <arg name="green" type="fixed"/>
+      <arg name="blue" type="fixed"/>
+      <arg name="alpha" type="fixed"/>
+    </request>
+    <enum name="path_command">
+      <entry name="move_to" value="0" summary="followed by x, y"/>
+      <entry name="line_to" value="1" summary="followed by x, y"/>
+      <entry name="cubic_to" value="2" summary="followed by two control points and the end point"/>
+      <entry name="close" value="3" summary="followed by nothing"/>
+    </enum>
+    <request name="set_shape">
+      <description summary="replace the rounded rectangle by an outline">
+        The outline the client paints its body in. It takes the place of the
+        rounded rectangle of set: the blur is masked by it, and the window
+        outline and the shadow are drawn around it. It is clipped to that
+        rectangle, which must still be set for any effect to show.
+
+        path is an array of int32 values: a path_command followed by its
+        points, each point an x and a y in wl_fixed, surface-local logical
+        pixels. The filled area follows the nonzero winding rule. An empty
+        array removes the shape, the same as unset_shape.
+
+        With the glass material the lens stays on the rectangle and the shape
+        masks it instead of replacing it. The shape is then not clipped to the
+        rectangle; the part outside it is flat tinted glass. It is pending
+        surface state; a subsequent set_shape replaces it.
+
+        An unknown command, a command cut short, a path that does not start
+        with move_to or an array longer than 4096 values is invalid geometry.
+      </description>
+      <arg name="surface" type="object" interface="wl_surface"/>
+      <arg name="path" type="array"/>
+    </request>
+    <request name="unset_shape">
+      <description summary="go back to the rounded rectangle on the next commit"/>
+      <arg name="surface" type="object" interface="wl_surface"/>
+    </request>
+    <request name="set_glass_saturation">
+      <description summary="set the saturation of the refracted backdrop">
+        Applied to the backdrop before the tint. 1 leaves it unchanged, 0 turns
+        it grey and values above 1 make it more vivid. A negative value is
+        invalid geometry. Pending surface state, like the rest of the material.
+      </description>
+      <arg name="surface" type="object" interface="wl_surface"/>
+      <arg name="saturation" type="fixed"/>
+    </request>
+    <request name="set_glass_rim">
+      <description summary="light the edge of the glass">
+        A thin edge drawn by the material itself: where it faces up or down it
+        is lit in the colour of the backdrop behind it, and along the sides it
+        is shaded. intensity runs from 0, no rim, to 1 and is clamped to that
+        range; a negative value is invalid geometry. While the rim is on the
+        compositor draws no window outline around the body, so the two do not
+        stack. Pending surface state, like the rest of the material.
+      </description>
+      <arg name="surface" type="object" interface="wl_surface"/>
+      <arg name="intensity" type="fixed"/>
+    </request>
+  </interface>
+</protocol>

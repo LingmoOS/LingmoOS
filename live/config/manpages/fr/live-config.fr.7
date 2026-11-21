@@ -1,0 +1,423 @@
+.\" live-config(7) - System Configuration Components
+.\" Copyright (C) 2016-2020 The Debian Live team
+.\" Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+.\"
+.\" This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+.\" This is free software, and you are welcome to redistribute it
+.\" under certain conditions; see COPYING for details.
+.\"
+.\"
+.\"*******************************************************************
+.\"
+.\" This file was generated with po4a. Translate the source file.
+.\"
+.\"*******************************************************************
+.TH LIVE\-CONFIG 7 23.09.2015 5.0~a4\-1 "Projet Debian Live"
+
+.SH NOM
+\fBlive\-config\fP \- Composants de configuration du système
+
+.SH DESCRIPTION
+\fBlive\-config\fP contient les composants chargés de configurer le système live
+lors du processus de démarrage (espace utilisateur tardif).
+
+.SH CONFIGURATION
+\fBlive\-config\fP peut être configuré en utilisant des paramètres d'amorçage ou
+des fichiers de configuration. Si ces deux mécanismes sont utilisés pour
+certaines options, les paramètres d'amorçage sont prioritaires sur les
+fichiers de configuration. Lorsque la persistance est utilisée, les
+composants de \fBlive\-config\fP ne sont lancés qu'une seule fois.
+.PP
+Si \fIlive\-build\fP(7) est utilisé pour construire le système live, les
+paramètres de live\-config utilisés par défaut peuvent être réglés avec
+l'option \-\-bootappend\-live, consultez la page de manuel \fIlb_config\fP(1)
+
+.SS "Paramètres d'amorçage (composants)"
+\fBlive\-config\fP est uniquement activé si 'boot=live' est utilisé en tant que
+paramètre d'amorçage. De plus, \fBlive\-config\fP a besoin d'être informé des
+composants qui seront lancés via le paramètre «live\-config.components» ou de
+ceux qui ne doivent pas être lancés en utilisant le paramètre
+«live\-config.nocomponents». Si «live\-config.components» et
+«live\-config.nocomponents» sont utilisés ou, si l'un d'eux est spécifié
+plusieurs fois, c'est toujours le dernier qui prévaut sur ceux qui
+précèdent.
+
+.IP "\fBlive\-config.components\fP | \fBcomponents\fP" 4
+Tous les composants sont lancés. C'est la configuration par défaut des
+images live.
+.IP "\fBlive\-config.components\fP=\fICOMPONENT1\fP,\fICOMPONENT2\fP, ... \fICOMPONENTn\fP | \fBcomponents\fP=\fICOMPONENT1\fP,\fICOMPONENT2\fP, ... \fICOMPONENTn\fP" 4
+Seuls les scripts spécifiés sont lancés. Notez que leur ordre importe, ainsi
+\&'live\-config=sudo,user\-setup' ne peut pas fonctionner tant que l'utilisateur
+configuré pour utiliser sudo n'a pas été créé. Regardez l'ordre numérique
+des noms de fichiers des composants dans /usr/lib/live/config.
+.IP "\fBlive\-config.nocomponents\fP | \fBnocomponents\fP" 4
+Aucun composant n'est lancé. Cela revient au même que de n'utiliser ni
+«live\-config.components», ni «live\-config.nocomponents».
+.IP "\fBlive\-config.nocomponents\fP=\fICOMPONENT1\fP,\fICOMPONENT2\fP, ... \fICOMPONENTn\fP | \fBnocomponents\fP=\fICOMPONENT1\fP,\fICOMPONENT2\fP, ... \fICOMPONENTn\fP" 4
+Tous les composants sont lancés, à l'exception de ceux spécifiés.
+
+.SS "Paramètres d'amorçage (options)"
+Certains des composants peuvent changer leur comportement en fonction d'un
+paramètre d'amorçage.
+
+.IP "\fBlive\-config.debconf\-preseed\fP=filesystem|medium|\fIURL1\fP|\fIURL2\fP| ... |\fIURLn\fP | \fBdebconf\-preseed\fP=medium|filesystem|\fIURL1\fP|\fIURL2\fP| ... |\fIURLn\fP" 4
+Allows one to fetch and apply one or more debconf preseed files to be
+applied to the debconf database. Note that the URLs must be fetchable by
+wget (http, ftp or file://).
+.br
+Si le fichier est placé dans le dispositif live, il peut être utilisé avec
+file:///lib/live/mount/medium/\fIFILE\fP, ou bien avec file:///\fIFILE\fP s'il est
+placé à la racine du système de fichiers du système live.
+.br
+Tous les fichiers de pré\-configuration dans /usr/lib/live/config\-preseed/ dans
+le système de fichiers racine du système live peuvent être automatiquement
+activés avec le mot clé 'filesystem'.
+.br
+Tous les fichiers de pré\-configuration dans /live/config\-preseed/ du
+dispositif live peuvent être automatiquement activés avec le mot clé
+\&'medium'
+.br
+Si plusieurs mécanismes sont combinés, alors les fichiers de
+pré\-configuration du système de fichiers sont appliqués en premier, puis les
+fichiers de pré\-configuration du dispositif, et enfin les fichiers de
+pré\-configuration du réseau.
+.IP "\fBlive\-config.hostname\fP=\fINOM_D_HÔTE\fP | \fBhostname\fP=\fINOM_D_HÔTE\fP" 4
+Allows one to set the hostname of the system. The default is 'debian'.
+.IP "\fBlive\-config.username\fP=\fINOM_D_UTILISATEUR\fP | \fBusername\fP=\fINOM_D_UTILISATEUR\fP" 4
+Allows one to set the username that gets created for autologin. The default
+is 'user'.
+.IP "\fBlive\-config.user\-default\-groups\fP=\fIGROUP1\fP,\fIGROUP2\fP ... \fIGROUPn\fP | \fBuser\-default\-groups\fP=\fIGROUP1\fP,\fIGROUP2\fP ... \fIGROUPn\fP" 4
+Allows one to set the default groups of the users that gets created for
+autologin is member of. The default is 'audio cdrom dip floppy video plugdev
+netdev powerdev scanner bluetooth'.
+.IP "\fBlive\-config.user\-fullname\fP=\(dq\fINOM_COMPLET_D_UTILISATEUR\fP\(dq | \fBuser\-fullname\fP=\(dq\fINOM_COMPLET_D_UTILISATEUR\fP\(dq" 4
+Allows one to set the fullname of the users that gets created for
+autologin. On Debian the default is 'Debian Live user'.
+.IP "\fBlive\-config.locales\fP=\fILOCALISATION1\fP,\fILOCALISATION2\fP ... \fILOCALISATIONn\fP | \fBlocales\fP=\fILOCALISATION1\fP,\fILOCALISATION2\fP ... \fILOCALISATIONn\fP" 4
+Allows one to set the locale of the system, e.g. 'de_CH.UTF\-8'. The default
+is 'en_US.UTF\-8'. In case the selected locale is not already available on
+the system, it is automatically generated on the fly.
+.IP "\fBlive\-config.timezone\fP=\fITIMEZONE\fP | \fBtimezone\fP=\fITIMEZONE\fP" 4
+Allows one to set the timezone of the system, e.g. 'Europe/Zurich'. The
+default is 'UTC'.
+.IP "\fBlive\-config.keyboard\-model\fP=\fIMODELE_DE_CLAVIER\fP | \fBkeyboard\-model\fP=\fIMODELE_DE_CLAVIER\fP" 4
+Allows one to change the keyboard model. There is no default value set.
+.IP "\fBlive\-config.keyboard\-layouts\fP=\fIKEYBOARD_LAYOUT1\fP,\fIKEYBOARD_LAYOUT2\fP ... \fIKEYBOARD_LAYOUTn\fP | \fBkeyboard\-layouts\fP=\fIKEYBOARD_LAYOUT1\fP,\fIKEYBOARD_LAYOUT2\fP ... \fIKEYBOARD_LAYOUTn\fP" 4
+Allows one to change the keyboard layouts. If more than one is specified,
+the tools of the desktop environment will allow one to switch it under
+X11. There is no default value set.
+.IP "\fBlive\-config.keyboard\-variants\fP=\fIKEYBOARD_VARIANT1\fP,\fIKEYBOARD_VARIANT2\fP ... \fIKEYBOARD_VARIANTn\fP | \fBkeyboard\-variants\fP=\fIKEYBOARD_VARIANT1\fP,\fIKEYBOARD_VARIANT2\fP ... \fIKEYBOARD_VARIANTn\fP" 4
+Allows one to change the keyboard variants. If more than one is specified,
+the same number of values as keyboard\-layouts values should be specified as
+they will be matched one\-to\-one in the order specified. Blank values are
+allowed. The tools of the desktop environment will allow one to switch
+between each layout and variant pair under X11. There is no default value
+set.
+.IP "\fBlive\-config.keyboard\-options\fP=\fIOPTIONS_DU_CLAVIER\fP | \fBkeyboard\-options\fP=\fIOPTIONS_DU_CLAVIER\fP" 4
+Allows one to change the keyboard options. There is no default value set.
+.IP "\fBlive\-config.sysv\-rc\fP=\fISERVICE1\fP,\fISERVICE2\fP ... \fISERVICEn\fP | \fBsysv\-rc\fP=\fISERVICE1\fP,\fISERVICE2\fP ... \fISERVICEn\fP" 4
+Allows one to disable sysv services through update\-rc.d.
+.IP "\fBlive\-config.utc\fP=\fByes\fP|no | \fButc\fP=\fByes\fP|no" 4
+Allows one to change if the system is assuming that the hardware clock is
+set to UTC or not. The default is 'yes'.
+.IP "\fBlive\-config.x\-session\-manager=\fP\fIGESTIONNAIRE_DE_SESSION_X\fP | \fBx\-session\-manager\fP=\fIGESTIONNAIRE_DE_SESSION_X\fP" 4
+Allows one to set the x\-session\-manager through update\-alternatives.
+.IP "\fBlive\-config.xorg\-driver\fP=\fIPILOTE_XORG\fP | \fBxorg\-driver\fP=\fIPILOTE_XORG\fP" 4
+Allows one to set xorg driver instead of autodetecting it. If a PCI ID is
+specified in /usr/share/live/config/xserver\-xorg/\fIDRIVER\fP.ids within the
+live system, the \fIDRIVER\fP is enforced for these devices. If both a boot
+parameter and an override are found, the boot parameter takes precedence.
+.IP "\fBlive\-config.xorg\-resolution\fP=\fIRESOLUTION_XORG\fP | \fBxorg\-resolution\fP=\fIRESOLUTION_XORG\fP" 4
+Allows one to set xorg resolution instead of autodetecting it,
+e.g. 1024x768.
+.IP "\fBlive\-config.wlan\-driver\fP=\fIPILOTE_WLAN\fP | \fBwlan\-driver\fP=\fIPILOTE_WLAN\fP" 4
+Allows one to set WLAN driver instead of autodetecting it. If a PCI ID is
+specified in /usr/share/live/config/broadcom\-sta/\fIDRIVER\fP.ids within the
+live system, the \fIDRIVER\fP is enforced for these devices. If both a boot
+parameter and an override are found, the boot parameter takes precedence.
+.IP "\fBlive\-config.hooks\fP=filesystem|medium|\fIURL1\fP|\fIURL2\fP| ... |\fIURLn\fP | \fBhooks\fP=\fIURL1\fP|\fIURL2\fP| ... |\fIURLn\fP" 4
+Allows one to fetch and execute one or more arbitrary files. Note that the
+URLs must be fetchable by wget (http, ftp or file://), the files are
+executed in /tmp of the running live system, and that the files needs their
+dependencies, if any, already installed, e.g. if a python script should be
+executed the system needs python installed. Some hooks for some common
+use\-cases are available at /usr/share/doc/live\-config/examples/hooks/.
+.br
+Si le fichier est placé dans le dispositif live, il peut être utilisé avec
+file:///lib/live/mount/medium/\fIFILE\fP, ou bien avec file:///\fIFILE\fP s'il est
+placé à la racine du système de fichiers du système live.
+.br
+Tous les hooks, placés dans /usr/lib/live/config\-hooks/ à la racine du système
+de fichiers, peuvent être automatiquement activés avec le mot clé
+\&'filesystem'.
+.br
+Tous les hooks dans /live/config\-hooks/ du dispositif live peuvent être
+automatiquement activés avec le mot clé 'medium'.
+.br
+Si plusieurs mécanismes sont combinés, alors les hooks du système de
+fichiers sont exécutés en premiers, puis les hooks du dispositif, et enfin
+les hooks du réseau.
+
+.SS "Paramètres d'amorçage (raccourcis)"
+Dans certains cas communs où il est nécessaire de combiner plusieurs
+paramètres individuels, \fBlive\-config\fP fournit des raccourcis. Ceci permet à
+la fois d'avoir une granularité complète à travers les options, et également
+de rester simples.
+
+.IP "\fBlive\-config.noroot\fP | \fBnoroot\fP" 4
+Désactive sudo et policykit, dans ce cas l'utilisateur ne peut pas obtenir
+des privilèges d'administrateur (root) sur le système.
+.IP "\fBlive\-config.nottyautologin\fP | \fBnoautologin\fP" 4
+Désactive l'auto\-login sur la console et l'auto\-login graphique.
+.IP "\fBlive\-config.nottyautologin\fP | \fBnottyautologin\fP" 4
+Désactive l'auto\-login sur la console, mais ne concerne pas l'auto\-login
+graphique.
+.IP "\fBlive\-config.nox11autologin\fP | \fBnox11autologin\fP" 4
+Désactive l'auto\-login avec tout gestionnaire graphique, sans affecter
+l'auto\-login en console (tty).
+
+.SS "Paramètres d'amorçage (options particulières)"
+For special use cases there are some special boot parameters.
+
+.IP "\fBlive\-config.debug\fP | \fBdebug\fP" 4
+Active les messages de debug dans live\-config.
+
+.SS "Fichiers de configuration"
+\fBlive\-config\fP peut être configuré (mais pas activé) par certains fichiers
+de configuration. Tout, sauf les touches de raccourcis qui peuvent être
+configurées avec un paramètre d'amorçage, peut alternativement être
+configuré via un ou plusieurs fichiers. Si des fichiers de configuration
+sont utilisés, le paramètre 'boot=live' est toujours requis pour activer
+\fBlive\-config\fP.
+.PP
+\fBRemarque :\fP Si des fichiers de configuration sont utilisés, soit (de
+préférence) tous les paramètres d'amorçage devraient être mis dans la
+variable \fBLIVE_CONFIG_CMDLINE\fP, ou bien des variables individuelles peuvent
+être réglées. Si des variables individuelles sont utilisées, l'utilisateur
+doit s'assurer que toutes les variables nécessaires sont réglées pour créer
+une configuration valide.
+.PP
+Les fichiers de configuration peuvent être placés soit dans la racine du
+système de fichiers (/etc/live/config.conf, /etc/live/config.conf.d/*.conf),
+soit sur le média live (live/config.conf, live/config.conf.d/*.conf). Si ces
+deux emplacements sont utilisés pour une même option, ceux placés dans le
+média live sont prioritaires sur ceux dans la racine du système.
+.PP
+Although the configuration files placed in the configuration directories do
+not require a particular name, it is suggested for consistency reasons to
+either use 'vendor.conf' or 'project.conf' as a naming scheme (whereas
+\&'vendor' or 'project' is replaced with the actual name, resulting in a
+filename like 'progress\-linux.conf').
+.PP
+Le contenu réel des fichiers de configuration se compose d'une ou plusieurs
+des variables suivantes.
+
+.IP "\fBLIVE_CONFIG_CMDLINE\fP=\fIPARAMÈTRE1\fP \fIPARAMÈTRE2\fP ... \fIPARAMETREn\fP" 4
+Cette variable correspond à la ligne de commande du chargeur d'amorçage.
+.IP "\fBLIVE_CONFIG_COMPONENTS\fP=\fICOMPOSANT1\fP,\fICOMPOSANT2\fP, ... \fICOMPOSANTn\fP" 4
+Cette variable correspond au paramètre
+\&'\fBlive\-config.components\fP=\fICOMPOSANT1\fP,\fICOMPOSANT2\fP, ... \fICOMPOSANTn\fP'
+.IP "\fBLIVE_CONFIG_NOCOMPONENTS\fP=\fICOMPOSANT1\fP,\fICOMPOSANT2\fP, ... \fICOMPOSANTn\fP" 4
+Cette variable correspond au paramètre
+\&'\fBlive\-config.nocomponents\fP=\fICOMPOSANT1\fP,\fICOMPOSANT2\fP, ... \fICOMPOSANTn\fP'
+.IP "\fBLIVE_DEBCONF_PRESEED\fP=filesystem|medium|\fIURL1\fP|\fIURL2\fP| ... |\fIURLn\fP" 4
+Cette variable correspond au paramètre
+\&'\fBlive\-config.debconf\-preseed\fP=filesystem|medium|\fIURL1\fP|\fIURL2\fP|
+\&... |\fIURLn\fP'.
+.IP \fBLIVE_HOSTNAME\fP=\fINOM_D_HÔTE\fP 4
+Cette variable correspond au paramètre
+\&'\fBlive\-config.hostname\fP=\fINOM_D_HÔTE\fP'.
+.IP \fBLIVE_USERNAME\fP=\fINOM_D_UTILISATEUR\fP 4
+Cette variable correspond au paramètre
+\&'\fBlive\-config.username\fP=\fINOM_D_UTILISATEUR\fP'.
+.IP "\fBLIVE_USER_DEFAULT_GROUPS\fP=\fIGROUPE1\fP,\fIGROUPE2\fP ... \fIGROUPEn\fP" 4
+Cette variable correspond au paramètre
+\&'\fBlive\-config.user\-default\-groups\fP="\fIGROUPE1\fP,\fIGROUPE2\fP ... \fIGROUPEn\fP"'
+.IP \fBLIVE_USER_FULLNAME\fP=\(dq\fINOM_COMPLET_D_UTILISATEUR\(dq\fP 4
+Cette variable correspond au paramètre
+\&'\fBlive\-config.user\-fullname\fP="\fINOM_COMPLET_D_UTILISATEUR"\fP'.
+.IP "\fBLIVE_LOCALES\fP=\fILOCALISATION1\fP,\fILOCALISATION2\fP ... \fILOCALISATIONn\fP" 4
+Cette variable correspond au paramètre
+\&'\fBlive\-config.locales\fP=\fILOCALISATION1\fP,\fILOCALISATION2\fP
+\&... \fILOCALISATIONn\fP'.
+.IP \fBLIVE_TIMEZONE\fP=\fITIMEZONE\fP 4
+Cette variable correspond au paramètre
+\&'\fBlive\-config.timezone\fP=\fITIMEZONE\fP'.
+.IP \fBLIVE_KEYBOARD_MODEL\fP=\fIMODELE_DE_CLAVIER\fP 4
+Cette variable correspond au paramètre
+\&'\fBlive\-config.keyboard\-model\fP=\fIMODELE_DE_CLAVIER\fP'.
+.IP "\fBLIVE_KEYBOARD_LAYOUTS\fP=\fICONFIG_CLAVIER1\fP,\fICONFIG_CLAVIER2\fP ... \fICONFIG_CLAVIERn\fP" 4
+Cette variable correspond au paramètre
+\&'\fBlive\-config.keyboard\-layouts\fP=\fICONFIGURATION1_DU_CLAVIER\fP,\fICONFIGURATION2_DU_CLAVIER\fP
+\&... \fICONFIGURATIONn_DU_CLAVIER\fP'.
+.IP "\fBLIVE_KEYBOARD_VARIANTS\fP=\fIVARIANTE_CLAVIER1\fP,\fIVARIANTE_CLAVIER2\fP ... \fIVARIANTE_CLAVIERn\fP" 4
+Cette variable correspond au paramètre
+\&'\fBlive\-config.keyboard\-variants\fP=\fIVARIANTE_CLAVIER1\fP,\fIVARIANTE_CLAVIER2\fP
+\&... \fIVARIANTE_CLAVIERn\fP'.
+.IP \fBLIVE_KEYBOARD_OPTIONS\fP=\fIOPTIONS_DU_CLAVIER\fP 4
+Cette variable correspond au paramètre
+\&'\fBlive\-config.keyboard\-options\fP=\fIOPTIONS_DU_CLAVIER\fP'.
+.IP "\fBLIVE_SYSV_RC\fP=\fISERVICE1\fP,\fISERVICE2\fP ... \fISERVICEn\fP" 4
+Cette variable correspond au paramètre
+\&'\fBlive\-config.sysv\-rc\fP=\fISERVICE1\fP,\fISERVICE2\fP ... \fISERVICEn\fP'.
+.IP \fBLIVE_UTC\fP=\fByes\fP|no 4
+Cette variable correspond au paramètre '\fBlive\-config.utc\fP=\fByes\fP|no'.
+.IP \fBLIVE_X_SESSION_MANAGER\fP=\fIGESTIONNAIRE_DE_SESSION_X\fP 4
+Cette variable correspond au paramètre
+\&'\fBlive\-config.x\-session\-manager\fP=\fIGESTIONNAIRE_DE_SESSION_X\fP'.
+.IP \fBLIVE_XORG_DRIVER\fP=\fIPILOTE_XORG\fP 4
+Cette variable correspond au paramètre
+\&'\fBlive\-config.xorg\-driver\fP=\fIPILOTE_XORG\fP.
+.IP \fBLIVE_XORG_RESOLUTION\fP=\fIRESOLUTION_XORG\fP 4
+Cette variable correspond au paramètre
+\&'\fBlive\-config.xorg\-resolution\fP=\fIRESOLUTION_XORG\fP'.
+.IP \fBLIVE_WLAN_DRIVER\fP=\fIPILOTE_WLAN\fP 4
+Cette variable correspond au paramètre
+\&'\fBlive\-config.wlan\-driver\fP=\fIPILOTE_WLAN\fP.
+.IP "\fBLIVE_HOOKS\fP=filesystem|medium|\fIURL1\fP|\fIURL2\fP| ... |\fIURLn\fP" 4
+Cette variable correspond au paramètre
+\&'\fBlive\-config.hooks\fP=filesystem|medium|\fIURL1\fP|\fIURL2\fP| ... |\fIURLn\fP'.
+.IP \fBLIVE_CONFIG_DEBUG\fP=true|false 4
+Cette variable correspond au paramètre '\fBlive\-config.debug\fP'.
+
+.SH PERSONNALISATION
+\fBlive\-config\fP peut être facilement personnalisé pour des projets dérivés,
+ou pour un usage local.
+
+.SS "Ajout de nouveaux composants de configuration"
+Les projets dérivés peuvent utiliser leurs propres composants dans
+/lib/live/config et n'ont besoin de rien d'autre, les composants seront
+appelés lors du démarrage.
+.PP
+Il est préférable que les composants soient mis dans leur propre paquet
+Debian. Un paquet contenant un composant d'exemple est proposé dans
+/usr/share/doc/live\-config/examples.
+
+.SS "Enlever des composants de configuration existants"
+It is not really possible to remove components itself in a sane way yet
+without requiring either to ship a locally modified \fBlive\-config\fP package
+or using dpkg\-divert. However, the same can be achieved by disabling the
+respective components through the live\-config.nocomponents mechanism, see
+above. To avoid to always need specifying disabled components through the
+boot parameter, a configuration file should be used, see above.
+.PP
+Les fichiers de configuration pour le système live lui\-même devront de
+préférence être inclus dans leur propre paquet debian. Un paquet de
+démonstration contenant un exemple de configuration est proposé dans
+/usr/share/doc/live\-config/examples.
+
+.SH COMPOSANTS
+\fBlive\-config\fP fournit actuellement les composants suivants dans
+/lib/live/config.
+
+.IP \fBdebconf\fP 4
+allows one to apply arbitrary preseed files placed on the live media or an
+http/ftp server.
+.IP \fBhostname\fP 4
+configure /etc/hostname et /etc/hosts.
+.IP \fBuser\-setup\fP 4
+ajoute un compte d'utilisateur live.
+.IP \fBsudo\fP 4
+offre les privilèges sudo à l'utilisateur live.
+.IP \fBlocales\fP 4
+configure les locales.
+.IP \fBlocales\-all\fP 4
+configure les locales\-all.
+.IP \fBtzdata\fP 4
+configure /etc/timezone.
+.IP \fBgdm3\fP 4
+configure l'auto\-login dans gdm3.
+.IP \fBkdm\fP 4
+configure l'auto\-login dans kdm.
+.IP \fBlightdm\fP 4
+configure l'auto\-login dans lightdm.
+.IP \fBlxdm\fP 4
+configure l'auto\-login dans lxdm.
+.IP \fBnodm\fP 4
+configure l'auto\-login dans nodm.
+.IP \fBslim\fP 4
+configure l'auto\-login dans slim.
+.IP \fBxinit\fP 4
+configure l'auto\-login avec xinit.
+.IP \fBkeyboard\-configuration\fP 4
+configure le clavier.
+.IP \fBsystemd\fP 4
+configure l'auto\-login avec systemd.
+.IP \fBsysvinit\fP 4
+configure sysvinit.
+.IP \fBsysv\-rc\fP 4
+configure sysv\-rc en désactivant les services listés.
+.IP \fBlogin\fP 4
+désactive lastlog.
+.IP \fBapport\fP 4
+désactive apport.
+.IP \fBgnome\-panel\-data\fP 4
+désactive le bouton de verrouillage de l'écran.
+.IP \fBgnome\-power\-manager\fP 4
+désactive l'hibernation.
+.IP \fBgnome\-screensaver\fP 4
+désactive le verrouillage de session par l'économiseur d'écran.
+.IP \fBkaboom\fP 4
+désactive l'assistant de migration de KDE (squeeze et plus récent).
+.IP \fBkde\-services\fP 4
+désactive des services de KDE non souhaités (squeeze et plus récent).
+.IP \fBpolicykit\fP 4
+accorde à l'utilisateur des privilèges via le policykit.
+.IP \fBssl\-cert\fP 4
+regénère les certificats snake\-oil ssl.
+.IP \fBanacron\fP 4
+désactive anacron.
+.IP \fButil\-linux\fP 4
+désactive util\-linux' hwclock.
+.IP \fBlogin\fP 4
+désactive lastlog.
+.IP \fBxserver\-xorg\fP 4
+configure xserver\-xorg.
+.IP \fBbroadcom\-sta\fP 4
+configure les pilotes WLAN broadcom\-sta.
+.IP \fBopenssh\-server\fP 4
+regénère les clés de l'hôte openssh\-server.
+.IP \fBxfce4\-panel\fP 4
+configure xfce4\-panel avec les réglages par défaut.
+.IP \fBxscreensaver\fP 4
+désactive le verrouillage de session par l'économiseur d'écran.
+.IP \fBhooks\fP 4
+allows one to run arbitrary commands from a file placed on the live media or
+an http/ftp server.
+
+.SH FICHIERS
+.IP \fB/etc/live/config.conf\fP 4
+.IP \fB/etc/live/config.conf.d/*.conf\fP 4
+.IP \fBlive/config.conf\fP 4
+.IP \fBlive/config.conf.d/*.conf\fP 4
+.IP \fB/lib/live/config.sh\fP 4
+.IP \fB/lib/live/config/\fP 4
+.IP \fB/var/lib/live/config/\fP 4
+.IP \fB/var/log/live/config.log\fP 4
+.PP
+.IP \fB/live/config\-hooks/*\fP 4
+.IP \fBlive/config\-hooks/*\fP 4
+.IP \fB/live/config\-preseed/*\fP 4
+.IP "\fBlive/config\-preseed/* \fP" 4
+
+.SH "VOIR AUSSI"
+\fIlive\-boot\fP(7)
+.PP
+\fIlive\-build\fP(7)
+.PP
+\fIlive\-tools\fP(7)
+
+.SH "PAGE D'ACCUEIL"
+Davantage d'informations sur live\-config et le project Debian Live peuvent
+être trouvées sur la page <\fIhttps://wiki.debian.org/DebianLive\fP> et dans le
+manuel sur <\fIhttps://live-team.pages.debian.net/live-manual/\fP>.
+
+.SH BOGUES
+Les bogues peuvent être signalés en soumettant un rapport de bogue à propos
+du paquet live\-config dans le système de gestion des bogues sur
+<\fIhttp://bugs.debian.org/\fP> ou en envoyant un courrier électronique
+à la liste de diffusion Debian Live à
+<\fIdebian\-live@lists.debian.org\fP>
+
+.SH AUTEUR
+live\-config was originally written by Daniel Baumann <\fImail@daniel-baumann.ch\fR>. Since 2016 development has been continued by the Debian Live team.

@@ -1,0 +1,85 @@
+#!/bin/sh
+
+#set -e
+
+Read_only ()
+{
+	for _PARAMETER in ${LIVE_BOOT_CMDLINE}
+	do
+		case "${_PARAMETER}" in
+			live-boot.read-only=*|read-only=*)
+				LIVE_READ_ONLY="true"
+				LIVE_READ_ONLY_DEVICES="${_PARAMETER#*read-only=}"
+				;;
+
+			live-boot.read-only|read-only)
+				LIVE_READ_ONLY="true"
+				;;
+		esac
+	done
+
+	case "${LIVE_READ_ONLY}" in
+		true)
+			;;
+
+		*)
+			return 0
+			;;
+	esac
+
+	# Marking some block devices as read-only to ensure that nothing
+	# gets written as linux still writes to 'only' read-only mounted filesystems.
+	LIVE_READ_ONLY_DEVICES="${LIVE_READ_ONLY_DEVICES:-/dev/* /dev/*/*}"
+
+	for _DEVICE in $(echo ${LIVE_READ_ONLY_DEVICES} | sed -e 's|,| |g')
+	do
+		# ignore symlinks like /dev/cdrom, /dev/block/* which point to actual devices
+		if [ -L "${_DEVICE}" ]
+		then
+			continue
+		fi
+
+		# only consider actual block devices
+		if [ ! -b "${_DEVICE}" ]
+		then
+			continue
+		fi
+
+		if ! blockdev --getsz "${_DEVICE}" >/dev/null 2>&1
+		then
+			printf " * live-boot: Ignoring '%-10s' (not present?)\n" "${_DEVICE}" > /dev/console
+			continue
+		fi
+
+		printf " * live-boot: Setting %-10s read-only..." "${_DEVICE}" > /dev/console
+
+		blockdev --setro "${_DEVICE}"
+		_RETURN="${?}"
+
+		case "${_RETURN}" in
+			0)
+				printf " done, use 'blockdev --setrw %-10s' to set read-write.\n" "${_DEVICE}" > /dev/console
+				;;
+
+			*)
+				printf " failed.\n" > /dev/console
+				;;
+		esac
+	done
+
+	if grep -qw persistence /proc/cmdline
+		then
+		printf " * Persistence mode enabled, searching for persistency related devices to unlock\n" >/dev/console
+
+		for label in custom-ov home-rw home-sn live-rw live-sn persistence
+		do
+			if blkid -t LABEL="$label" | grep -q '.'
+			then
+				device=$(blkid -t LABEL="$label" | awk -F: '{print $1}')
+				printf "   - Setting device %-9s with label '%s' to write mode for persistence mode: " "$device" "$label" >/dev/console
+				blockdev --setrw $device && printf "done\n" >/dev/console || printf "failed\n" >/dev/console
+			fi
+		done
+	fi
+
+}

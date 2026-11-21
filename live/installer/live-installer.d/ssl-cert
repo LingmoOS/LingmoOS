@@ -1,0 +1,16 @@
+#!/bin/sh
+
+set -e
+
+for config in /target/lib/live/config/*-ssl-cert;
+do
+    if [ -x $config ]; then
+	in-target ${config##/target}
+    elif [ -e $config ]; then
+	in-target sh ${config##/target}
+    else
+	echo "WARNING: no live-config script matching $config !" >&2
+    fi
+done
+
+exit 0

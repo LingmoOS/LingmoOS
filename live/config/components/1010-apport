@@ -1,0 +1,38 @@
+#!/bin/sh
+
+. /usr/lib/live/config.sh
+
+## live-config(7) - System Configuration Components
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+#set -e
+
+Init ()
+{
+	# Checking if package is installed or already configured
+	if ! pkg_is_installed "apport" || \
+	   component_was_executed "apport"
+	then
+		exit 0
+	fi
+
+	echo -n " apport"
+}
+
+Config ()
+{
+	# Enabling detection of crashes
+	sed -i -e 's|enabled=0|enabled=1|' /etc/default/apport
+
+	# Creating state file
+	touch /var/lib/live/config/apport
+}
+
+Init
+Config

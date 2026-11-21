@@ -1,0 +1,62 @@
+#!/bin/sh
+set -e
+
+# libxmlb2 creates random GUIDs
+# See https://github.com/hughsie/libxmlb/issues/110
+# Fixed upstream: https://github.com/hughsie/libxmlb/commit/0652ec042cc0611b9b98e080e64e1025db9b4183
+# See https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1006358
+#
+# Until a sufficiently new version is installed, apply the work-around
+
+# Don't run if libxmlb2 is not installed
+if [ ! -e /usr/share/doc/libxmlb2 ];
+then
+  exit 0
+fi
+
+# Don't run if AppStream is not installed
+if [ ! -e /usr/bin/appstreamcli ];
+then
+  exit 0
+fi
+
+# Don't run if the version of libxmlb2 is sufficiently new
+if dpkg --compare-versions $(dpkg-query --show --showformat '${Version}\n' libxmlb2 | head -1) ge 0.3.7~;
+then
+  exit 0
+fi
+
+# Refresh the compressed XML files
+appstreamcli refresh --force > /dev/null
+
+# appstream <= 0.15.1 uses /var/cache/app-info
+# appstream >= 0.15.2 uses /var/cache/swcatalog
+if [ -d /var/cache/swcatalog ];
+then
+  CACHE_PATH=/var/cache/swcatalog/cache
+else
+  CACHE_PATH=/var/cache/app-info/cache
+fi
+
+# Set the GUID field for each compressed XML file to zero
+for f in $(ls ${CACHE_PATH}/*.xb);
+do
+  dd if=$f of=tmp.xb count=8 iflag=count_bytes status=none
+  dd if=/dev/zero of=tmp.xb count=16 iflag=count_bytes status=none oflag=append conv=notrunc
+  dd if=$f of=tmp.xb skip=24 iflag=skip_bytes status=none oflag=append conv=notrunc
+  rm $f
+  mv tmp.xb $f
+done
+
+# When apt update is invoked, 50appstream calls 'appstreamcli refresh'
+# so add another hook to reset the guid again
+#
+# Before the chroot is finalised, 'apt update' is invoked again, so the reset guid step needs to be re-applied
+cat << EOF > /etc/apt/apt.conf.d/51appstream_reset_guid
+# Reset the GUID of the AppStream cache files when APT's cache is updated (i.e. apt update)
+APT::Update::Post-Invoke-Success {
+    "if /usr/bin/test -w ${CACHE_PATH} -a -e /usr/bin/appstreamcli; then for f in \$(ls ${CACHE_PATH}/*.xb); do dd if=\$f of=tmp.xb count=8 iflag=count_bytes status=none; dd if=/dev/zero of=tmp.xb count=16 iflag=count_bytes status=none oflag=append conv=notrunc; dd if=\$f of=tmp.xb skip=24 iflag=skip_bytes status=none oflag=append conv=notrunc; rm \$f; mv tmp.xb \$f; done; fi";
+};
+EOF
+
+echo "P: $(basename $0) Reproducible hook has been applied"

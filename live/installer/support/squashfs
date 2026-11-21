@@ -1,0 +1,34 @@
+#!/bin/sh -e
+
+# Debian (live-boot)
+PLACES="$PLACES /cdrom/live/filesystem.squashfs"
+# Ubuntu (casper)
+PLACES="$PLACES /cdrom/casper/filesystem.squashfs"
+
+squashfs_prepare() {
+	ANNA_QUIET=1 anna-install squashfs-modules || true
+
+	if [ -x /sbin/depmod ]; then
+		depmod -a > /dev/null 2>&1 || true
+	fi
+
+	modprobe squashfs || true
+	modprobe loop || true
+
+	mkdir -p /mnt
+	umount /mnt > /dev/null 2>&1 || true
+	if ! mount -t squashfs -o loop $place /mnt; then
+		error "$place has failed to be mounted as squashfs."
+		exit 1
+	fi
+
+	cd /mnt
+}
+
+squashfs_teardown() {
+	umount -d /mnt > /dev/null 2>&1 || true
+}
+
+squashfs_count() {
+	echo `print-inodes /mnt`
+}

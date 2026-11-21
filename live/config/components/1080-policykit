@@ -1,0 +1,90 @@
+#!/bin/sh
+
+. /usr/lib/live/config.sh
+
+## live-config(7) - System Configuration Components
+## Copyright (C) 2016-2023 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+#set -e
+
+Cmdline ()
+{
+	# Reading kernel command line
+	for _PARAMETER in ${LIVE_CONFIG_CMDLINE}
+	do
+		case "${_PARAMETER}" in
+			live-config.noroot|noroot)
+				LIVE_CONFIG_NOROOT="true"
+				;;
+
+			live-config.username=*|username=*)
+				LIVE_USERNAME="${_PARAMETER#*username=}"
+				;;
+		esac
+	done
+}
+
+Init ()
+{
+	# Disable root access, no matter what mechanism
+	case "${LIVE_CONFIG_NOROOT}" in
+		true)
+			exit 0
+			;;
+	esac
+
+	# Checking if package is installed
+	if (! pkg_is_installed "polkitd" &&
+		! pkg_is_installed "policykit-1") || \
+	   component_was_executed "policykit"
+	then
+		exit 0
+	fi
+
+	echo -n " policykit"
+}
+
+Config ()
+{
+	# Configure PolicyKit in live session
+	mkdir -p /usr/share/polkit-1/rules.d
+
+	if [ -n "${LIVE_USERNAME}" ]
+	then
+		cat > /usr/share/polkit-1/rules.d/sudo_on_live.rules << EOF
+// Grant the live user access without a prompt
+polkit.addRule(function(action, subject) {
+	if (subject.local &&
+		subject.active &&
+		subject.user === "${LIVE_USERNAME}" &&
+		subject.isInGroup("sudo")) {
+		return polkit.Result.YES;
+	}
+});
+EOF
+	else
+		cat > /usr/share/polkit-1/rules.d/sudo_on_live.rules << EOF
+// Grant the sudo users access without a prompt
+polkit.addRule(function(action, subject) {
+	if (subject.local &&
+		subject.active &&
+		subject.isInGroup("sudo")) {
+		return polkit.Result.YES;
+	}
+});
+EOF
+	fi
+
+	# Creating state file
+	touch /var/lib/live/config/policykit
+}
+
+Cmdline
+Init
+Config

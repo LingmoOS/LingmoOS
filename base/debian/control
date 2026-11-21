@@ -1,0 +1,42 @@
+Source: base-files
+Section: admin
+Priority: required
+Maintainer: Lingmo OS Team <team@lingmo.org>
+Standards-Version: 4.7.2
+Build-Depends: debhelper-compat (= 13), debhelper (>= 13.10~)
+Vcs-Git: https://salsa.debian.org/sanvila/base-files.git
+Vcs-Browser: https://salsa.debian.org/sanvila/base-files
+Rules-Requires-Root: no
+
+Package: lingmo-base-files
+Provides: base, usr-is-merged, base-files (= ${binary:Version})
+Architecture: any
+Pre-Depends: awk
+Depends: ${misc:Depends}
+Recommends: lingmo-workspace-base
+Essential: yes
+Priority: required
+Replaces: base, miscutils, dpkg (<= 1.15.0), base-files
+Breaks: debian-security-support (<< 2019.04.25), initscripts (<< 2.88dsf-13.3), sendfile (<< 2.1b.20080616-5.2~)
+Multi-Arch: foreign
+Description: Lingmo OS base system miscellaneous files
+ This package contains the basic filesystem hierarchy of a Lingmo OS system, and
+ several important miscellaneous files, such as /etc/debian_version,
+ /etc/host.conf, /etc/issue, /etc/motd, /etc/profile, and others,
+ and the text of several common licenses in use on Lingmo OS systems.
+
+Package: base-files
+Architecture: all
+Depends: lingmo-base-files (= ${binary:Version}), ${misc:Depends}
+Section: admin
+Priority: optional
+Multi-Arch: foreign
+Description: base system miscellaneous files (empty placeholder)
+ This is an intentionally empty package. The actual filesystem hierarchy and
+ miscellaneous files are shipped by lingmo-base-files.
+ .
+ It exists so that anything depending on "base-files" resolves inside the Lingmo
+ OS repository instead of pulling Debian's original base-files: a real package
+ always wins over a virtual provider, and this one carries an epoch (1:) so its
+ version sorts higher than Debian's. It depends on lingmo-base-files, so
+ installing it installs the Lingmo implementation.

@@ -1,0 +1,94 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Build binary images"
+USAGE="${PROGRAM} [--force]"
+
+# Automatically populating config tree
+Auto_build_config
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+# Setting up cleanup function
+Setup_clean_exit
+
+# Preparing root filesystem
+lb binary_chroot "${@}"
+
+# Chroot preparation component lists
+# We deliberately exclude 'debianchroot'
+CHROOT_PREP_MOUNTS="devpts proc selinuxfs sysfs"
+CHROOT_PREP_OTHER="dpkg tmpfs sysv-rc hosts resolv hostname apt"
+
+if [ "${LB_BUILD_WITH_CHROOT}" = "true" ]; then
+	# Configuring chroot
+	# FIXME: cannot run in 'all' mode while excluding 'debianchroot', do we really need to exclude it?
+	#lb chroot_prep install all mode-apt-install-binary mode-archives-chroot "${@}"
+	lb chroot_prep install "${CHROOT_PREP_MOUNTS}" "${@}"
+	lb chroot_prep install "${CHROOT_PREP_OTHER}" mode-apt-install-binary mode-archives-chroot "${@}"
+	lb chroot_archives chroot install "${@}"
+fi
+
+# Building root filesystem
+lb binary_rootfs "${@}"
+lb binary_dm-verity "${@}"
+lb binary_manifest "${@}"
+
+# Prepare images
+lb binary_package-lists "${@}"
+lb binary_linux-image "${@}"
+lb binary_memtest "${@}"
+lb binary_grub-legacy "${@}"
+lb binary_grub-pc "${@}"
+lb binary_grub_cfg "${@}"
+lb binary_syslinux "${@}"
+lb binary_disk "${@}"
+lb binary_loadlin "${@}"
+lb binary_win32-loader "${@}"
+lb binary_includes "${@}"
+lb binary_grub-efi "${@}"
+lb binary_bootloader_splash "${@}"
+lb binary_hooks "${@}"
+lb binary_checksums "${@}"
+
+if [ "${LB_BUILD_WITH_CHROOT}" != "true" ]; then
+	lb chroot_prep install "${CHROOT_PREP_MOUNTS}" "${@}"
+fi
+
+# Apply SOURCE_DATE_EPOCH to all modified and created files
+find binary -newermt "$(date -d@${SOURCE_DATE_EPOCH} '+%Y-%m-%d %H:%M:%S')" -printf "%y %p\n" -exec touch '{}' -d@${SOURCE_DATE_EPOCH} --no-dereference ';' > binary.modified_timestamps
+
+# Building images
+lb binary_iso "${@}"
+lb binary_onie "${@}"
+lb binary_netboot "${@}"
+lb binary_tar "${@}"
+lb binary_hdd "${@}"
+
+lb binary_zsync "${@}"
+
+if [ "${LB_BUILD_WITH_CHROOT}" = "true" ]; then
+	# Deconfiguring chroot
+	Remove_stagefile chroot_archives
+
+	lb chroot_prep remove "${CHROOT_PREP_OTHER}" "${@}"
+fi
+
+lb chroot_prep remove "${CHROOT_PREP_MOUNTS}" "${@}"
+
+Echo_message "Binary stage completed"

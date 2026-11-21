@@ -1,0 +1,234 @@
+#!/bin/sh
+
+. /usr/lib/live/config.sh
+
+## live-config(7) - System Configuration Components
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+#set -e
+
+Cmdline ()
+{
+	for _PARAMETER in ${LIVE_CONFIG_CMDLINE}
+	do
+		case "${_PARAMETER}" in
+			live-config.keyboard-layouts=*|keyboard-layouts=*)
+				LIVE_KEYBOARD_LAYOUTS="${_PARAMETER#*keyboard-layouts=}"
+				;;
+
+			live-config.keyboard-model=*|keyboard-model=*)
+				LIVE_KEYBOARD_MODEL="${_PARAMETER#*keyboard-model=}"
+				;;
+
+			live-config.keyboard-options=*|keyboard-options=*)
+				LIVE_KEYBOARD_OPTIONS="${_PARAMETER#*keyboard-options=}"
+				;;
+
+			live-config.keyboard-variants=*|keyboard-variants=*)
+				LIVE_KEYBOARD_VARIANTS="${_PARAMETER#*keyboard-variants=}"
+				;;
+
+			live-config.xorg-xsession-manager=*|x-session-manager=*)
+				LIVE_X_SESSION_MANAGER="${_PARAMETER#*x-session-manager=}"
+				;;
+
+			live-config.xorg-driver=*|xorg-driver=*)
+				LIVE_XORG_DRIVER="${_PARAMETER#*xorg-driver=}"
+				;;
+
+			live-config.xorg-resolution=*|xorg-resolution=*)
+				LIVE_XORG_RESOLUTION="${_PARAMETER#*xorg-resolution=}"
+				;;
+		esac
+	done
+}
+
+Init ()
+{
+	# Checking if package is installed
+	if ! pkg_is_installed "xserver-xorg" || \
+	   component_was_executed "xserver-xorg"
+	then
+		exit 0
+	fi
+
+	echo -n " xserver-xorg"
+}
+
+Config ()
+{
+	if [ -n "${LIVE_KEYBOARD_MODEL}" ]
+	then
+		echo "xserver-xorg xserver-xorg/config/inputdevice/keyboard/model select ${LIVE_KEYBOARD_MODEL}" >> /tmp/live-config.cfg
+	fi
+
+	if [ -n "${LIVE_KEYBOARD_LAYOUTS}" ]
+	then
+		echo "xserver-xorg xserver-xorg/config/inputdevice/keyboard/layout select ${LIVE_KEYBOARD_LAYOUTS}" >> /tmp/live-config.cfg
+	fi
+
+	if [ -n "${LIVE_KEYBOARD_VARIANTS}" ]
+	then
+		echo "xserver-xorg xserver-xorg/config/inputdevice/keyboard/variant select ${LIVE_KEYBOARD_VARIANTS}" >> /tmp/live-config.cfg
+	fi
+
+	if [ -n "${LIVE_KEYBOARD_OPTIONS}" ]
+	then
+		echo "xserver-xorg xserver-xorg/config/inputdevice/keyboard/options string ${LIVE_KEYBOARD_OPTIONS}" >> /tmp/live-config.cfg
+	fi
+
+	if [ -n "${LIVE_X_SESSION_MANAGER}" ]
+	then
+		case "${LIVE_X_SESSION_MANAGER}" in
+			none)
+				_DM_FILE="/etc/X11/default-display-manager"
+				if [ -e "${_DM_FILE}" ]
+				then
+					sed -i "s|\(.*\)|\1 # disabled by live-config:|" -- "${_DM_FILE}"
+				fi
+				;;
+
+			*)
+				update-alternatives --quiet --set x-session-manager "${LIVE_X_SESSION_MANAGER}"
+				;;
+		esac
+	fi
+
+	if [ "${LIVE_XORG_DRIVER}" = "noproprietary" ] ; then
+		NOPROPRIETARY=true
+		unset LIVE_XORG_DRIVER
+	fi
+
+	if [ -z "${LIVE_XORG_DRIVER}" ] && [ -e /usr/bin/lspci ]
+	then
+		# pci-id of the first graphic card
+		_DEVICE="$(lspci -mn | awk '/0300/ { print $3$4 }' | sed -e 's|"||g' | tr [a-z] [A-Z] | head -n1)"
+
+		if [ -n "${_DEVICE}" ]
+		then
+			if ls /usr/share/live/config/xserver-xorg/*.ids > /dev/null 2>&1
+			then
+				# xorg-driver manual overrides
+				for _OVERRIDE_IDS in /usr/share/live/config/xserver-xorg/*.ids
+				do
+					if [ -e "${_OVERRIDE_IDS}" ]
+					then
+						if grep -qs "${_DEVICE}" "${_OVERRIDE_IDS}"
+						then
+							LIVE_XORG_DRIVER="$(basename ${_OVERRIDE_IDS} .ids)"
+
+							break
+						fi
+					fi
+				done
+			fi
+
+			if [ -z "${LIVE_XORG_DRIVER}" ] && [ -z "${NOPROPRIETARY}" ]
+			then
+				# xorg-driver automatic override for fglrx
+				if echo "${_DEVICE}" | grep -qs '^1002'
+				then
+					if grep -qs "${_DEVICE}" /usr/share/fglrx/fglrx.ids
+					then
+						LIVE_XORG_DRIVER="fglrx"
+					fi
+				fi
+
+				# xorg-driver automatic override for nvidia
+				if echo "${_DEVICE}" | grep -qs -E '^(10DE|12D2)'
+				then
+					for _NVIDIA_IDS in /usr/lib/nvidia/current/nvidia.ids $(ls /usr/lib/nvidia/legacy-*/nvidia.ids | sort -V -r)
+					do
+						if [ -e "${_NVIDIA_IDS}" ]
+						then
+							if grep -qs "${_DEVICE}" ${_NVIDIA_IDS}
+							then
+								_NVIDIA_VERSION="$(basename $(dirname ${_NVIDIA_IDS}))"
+								_NVIDIA_MODULE="$(echo nvidia-${_NVIDIA_VERSION} | sed -e 's|-current$||')"
+
+								break
+							fi
+						fi
+					done
+
+					if [ -n "${_NVIDIA_VERSION}" ]
+					then
+						LIVE_XORG_DRIVER="nvidia"
+					fi
+				fi
+			fi
+		fi
+	fi
+
+	if [ -n "${LIVE_XORG_DRIVER}" ]
+	then
+		mkdir -p /etc/X11/xorg.conf.d
+
+		if [ -e "/usr/share/live/config/xserver-xorg/${LIVE_XORG_DRIVER}.conf" ]
+		then
+			# xorg-driver manual override
+			cp "/usr/share/live/config/xserver-xorg/${LIVE_XORG_DRIVER}.conf" /etc/X11/xorg.conf.d/zz-live-config_xserver-xorg.conf
+		else
+
+			# xorg-driver automatic override
+
+cat > /etc/X11/xorg.conf.d/zz-live-config_xserver-xorg.conf << EOF
+Section "Device"
+	Identifier	"Default screen"
+	Driver		"${LIVE_XORG_DRIVER}"
+EndSection
+EOF
+
+		fi
+
+		case "${LIVE_XORG_DRIVER}" in
+			fglrx)
+				update-alternatives --quiet --set glx /usr/lib/fglrx
+
+				modprobe --ignore-install fglrx || true
+				;;
+
+			nvidia)
+				update-alternatives --quiet --set glx /usr/lib/nvidia
+				update-alternatives --quiet --set nvidia /usr/lib/nvidia/${_NVIDIA_VERSION:-current}
+
+				modprobe --ignore-install ${_NVIDIA_MODULE:-nvidia} || true
+				;;
+
+			*)
+				update-alternatives --quiet --set glx /usr/lib/mesa-diverted
+				;;
+		esac
+	fi
+
+	if [ -n "${LIVE_XORG_RESOLUTION}" ]
+	then
+		echo "xrandr -s ${LIVE_XORG_RESOLUTION} || /bin/true" >> /etc/X11/Xsession.d/21xvidemode
+	else
+		rm -f /etc/X11/Xsession.d/21xvidemode
+	fi
+
+	if [ -e /tmp/live-config.cfg ]
+	then
+		debconf-set-selections < /tmp/live-config.cfg
+		rm -f /tmp/live-config.cfg
+
+		dpkg-reconfigure -f noninteractive -p critical \
+			xserver-xorg 2>&1 \
+			| grep -v "overwriting possibly-customised configuration" \
+			| grep -v "file; backup in /etc/X11/xorg.conf" || true
+
+		# Creating state file
+		touch /var/lib/live/config/xserver-xorg
+	fi
+}
+
+Cmdline
+Init
+Config

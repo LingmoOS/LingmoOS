@@ -1,0 +1,73 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Automatically building config
+Auto_build_config
+
+# Redirecting to auto script if required
+if [ "${1}" = "noauto" ]; then
+	shift
+else
+	Maybe_auto_redirect build "${@}"
+fi
+
+# Setting static variables
+DESCRIPTION="Build a Debian Live system"
+USAGE="${PROGRAM} [--force]"
+
+# Checking build directory suitability
+
+if [ ! -d config ]; then
+	Echo_warning "No config/ directory; using defaults for all options"
+	lb config
+fi
+
+if [ "$(pwd)" = "/" ]; then
+	Echo_error "Cannot build live image from the root directory (/)"
+	exit 1
+fi
+
+if echo $(pwd) | grep -qs " "; then
+	Echo_error "Cannot build live image from a directory containing spaces"
+	exit 1
+fi
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+Echo_message "live-build ${LIVE_BUILD_VERSION}"
+Echo_message "Building for a ${LB_MODE}/${LB_DISTRIBUTION_BINARY}/${LB_ARCHITECTURE} system"
+
+# Stage #1: Bootstrap new root filesystem
+lb bootstrap "${@}"
+
+# Stage #2: Build live OS file system
+lb chroot "${@}"
+
+# Stage #3: Build installer components
+lb installer "${@}"
+
+# Stage #4: Build binary (live disc) images
+lb binary "${@}"
+
+# Stage #5: Build supplimentary source disc images
+lb source "${@}"
+
+if [ "${_COLOR_OUT}" = "false" ]; then
+	Echo_message "Build completed successfully"
+else
+	Echo_message "%sBuild completed successfully%s" "$(echo ${GREEN})" "$(echo ${NO_COLOR})"
+fi

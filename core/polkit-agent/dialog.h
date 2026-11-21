@@ -1,86 +1,77 @@
-/*
- * Copyright (C) 2023-2024 LingmoOS Team.
- *
- * Author:     revenmartin <revenmartin@gmail.com>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+// SPDX-FileCopyrightText: 2026 Reion Wong <reionwong@gmail.com>
+// SPDX-FileCopyrightText: 2026 LingmoOS Contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 #ifndef DIALOG_H
 #define DIALOG_H
 
-#include <QObject>
-#include <QString>
-#include <QVariant>
-#include <QQuickView>
+#include <functional>
+#include <memory>
+#include <string>
 
-#include <PolkitQt1/Agent/Listener>
+namespace Lingmo::ui {
+class DialogButton;
+class Label;
+class TextField;
+class Window;
+}
 
-class Dialog : public QObject
+// The password dialog of one authentication request.
+class Dialog
 {
-    Q_OBJECT
-
 public:
-    explicit Dialog(const QString &action, const QString &message,
-                    const QString &cookie, const QString &identity,
-                    const QString &iconName,
-                    PolkitQt1::Agent::AsyncResult *result);
+    Dialog(const std::string &message, const std::string &identity);
     ~Dialog();
 
-    Q_INVOKABLE void setConfirmationResult(const QString &password = QString());
-    Q_INVOKABLE void rejected();
-    Q_INVOKABLE void show();
+    Dialog(const Dialog &) = delete;
+    Dialog &operator=(const Dialog &) = delete;
 
-    Q_INVOKABLE void authenticationFailure();
+    void show();
+    void hide();
 
-    Q_PROPERTY(QString message READ message NOTIFY changed)
-    Q_PROPERTY(QString action READ action NOTIFY changed)
-    Q_PROPERTY(QString cookie READ cookie NOTIFY changed)
-    Q_PROPERTY(QString identity READ identity NOTIFY changed)
-    Q_PROPERTY(QString password READ password NOTIFY changed)
-    Q_PROPERTY(QString iconName READ iconName NOTIFY changed)
+    // PAM rejected the answer: the field empties for another try.
+    void authenticationFailure();
 
-    QString message() { return m_message; }
-    QString action() { return m_action; }
-    QString cookie() { return m_cookie; }
-    QString identity() { return m_identity; }
-    QString password() { return m_password; }
-    QString iconName() { return m_iconName; }
+    // PAM asks; an empty prompt shows the dialog's own placeholder.
+    void setRequest(const std::string &prompt, bool echo);
+    void setNotice(const std::string &text, bool error);
 
-    PolkitQt1::Agent::AsyncResult *result() { return m_result; }
+    const std::string &message() const { return m_message; }
+    const std::string &identity() const { return m_identity; }
+    const std::string &password() const { return m_password; }
+    const std::string &prompt() const { return m_prompt; }
+    bool echo() const { return m_echo; }
+    const std::string &notice() const { return m_notice; }
+    bool noticeIsError() const { return m_noticeIsError; }
 
-signals:
-    // This signal is never emitted at the moment, as we don't change the
-    // properties of this window dynamically for now
-    void changed();
+    Lingmo::UI::Window *window() const { return m_window.get(); }
 
-    void failure();
-
-    void cancel();
-    void accepted();
+    // Authenticate or Return with a password typed.
+    std::function<void()> onAccepted;
+    // Cancel, Escape or the compositor closed it.
+    std::function<void()> onCancel;
 
 private:
-    QString m_action;
-    QString m_message;
-    QVariantMap m_details;
-    QString m_cookie;
-    QString m_identity;
-    QString m_password;
-    QString m_iconName;
-    PolkitQt1::Agent::AsyncResult *m_result;
+    class Content;
 
-    QQuickView *m_view;
+    // An empty response would still count as an attempt, and pass on an
+    // account without a password.
+    void submit();
+    void ready();
+    void updateNotice();
+
+    std::string m_message;
+    std::string m_identity;
+    std::string m_password;
+    std::string m_prompt;
+    bool m_echo = false;
+    std::string m_notice;
+    bool m_noticeIsError = false;
+
+    std::unique_ptr<Lingmo::UI::Window> m_window;
+    Lingmo::UI::TextField *m_passwordInput = nullptr;
+    Lingmo::UI::Label *m_noticeLabel = nullptr;
+    Lingmo::UI::DialogButton *m_doneButton = nullptr;
 };
 
 #endif // DIALOG_H

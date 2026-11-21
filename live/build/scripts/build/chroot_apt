@@ -1,0 +1,211 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Manage /etc/apt/apt.conf"
+USAGE="${PROGRAM} {install|install-binary|remove} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+_ACTION="${1}"
+shift
+
+# Requiring stage file
+Require_stagefiles config bootstrap
+
+CONFD="chroot/etc/apt/apt.conf.d"
+
+case "${_ACTION}" in
+	install|install-binary)
+		Echo_message "Configuring file /etc/apt/apt.conf"
+
+		# Checking stage file
+		Check_stagefile
+
+		# Acquire lock file
+		Acquire_lockfile
+
+		mkdir -p ${CONFD}
+
+		# Configuring apt pipeline
+		if [ -n "${LB_APT_PIPELINE}" ]
+		then
+			echo "Acquire::http::Pipeline-Depth \"${LB_APT_PIPELINE}\";" > ${CONFD}/00pipeline
+		fi
+
+		# Configuring apt recommends
+		case "${LB_APT_RECOMMENDS}" in
+			true)
+				echo "APT::Install-Recommends \"true\";" > ${CONFD}/00recommends
+				echo "Aptitude::Recommends-Important \"true\";" >> ${CONFD}/00recommends
+				;;
+
+			false)
+				echo "APT::Install-Recommends \"false\";" > ${CONFD}/00recommends
+				echo "Aptitude::Recommends-Important \"false\";" >> ${CONFD}/00recommends
+				;;
+		esac
+
+		# Configuring apt secure
+		case "${LB_APT_SECURE}" in
+			true)
+				echo "APT::Get::AllowUnauthenticated \"false\";" > ${CONFD}/00secure
+				echo "Aptitude::CmdLine::Ignore-Trust-Violations \"false\";" >> ${CONFD}/00secure
+				echo "Acquire::AllowInsecureRepositories \"false\";" >> ${CONFD}/00secure
+				;;
+
+			false)
+				echo "APT::Get::AllowUnauthenticated \"true\";" > ${CONFD}/00secure
+				echo "Aptitude::CmdLine::Ignore-Trust-Violations \"true\";" >> ${CONFD}/00secure
+				echo "Acquire::AllowInsecureRepositories \"true\";" >> ${CONFD}/00secure
+				;;
+		esac
+
+		# Configuring apt config
+		CONFIG_FILE="config/apt/apt.conf"
+		CHROOT_FILE="chroot/etc/apt/apt.conf"
+		if [ -f ${CONFIG_FILE} ]; then
+			if [ -f ${CHROOT_FILE} ]; then
+				mv ${CHROOT_FILE} ${CHROOT_FILE}.orig
+			fi
+			cp ${CONFIG_FILE} ${CHROOT_FILE}
+		fi
+
+		# Configuring apt preferences
+		CONFIG_FILE="config/apt/preferences"
+		CHROOT_FILE="chroot/etc/apt/preferences"
+		if [ -f ${CONFIG_FILE} ]; then
+			if [ -f ${CHROOT_FILE} ]; then
+				mv ${CHROOT_FILE} ${CHROOT_FILE}.orig
+			fi
+			cp ${CONFIG_FILE} ${CHROOT_FILE}
+		fi
+
+		if Find_files config/apt/*.pref; then
+			for CONFIG_FILE in config/apt/*.pref; do
+				CHROOT_FILE="chroot/etc/apt/preferences.d/$(basename ${CONFIG_FILE})"
+				if [ -f ${CHROOT_FILE} ]; then
+					mv ${CHROOT_FILE} ${CHROOT_FILE}.orig
+				fi
+				cp -aL ${CONFIG_FILE} chroot/etc/apt/preferences.d
+			done
+		fi
+
+		if Find_files config/packages.chroot/*.deb || Find_files config/packages/*.deb
+		then
+			CHROOT_FILE="chroot/etc/apt/preferences"
+			echo >> ${CHROOT_FILE}
+			echo "# Added by lb_chroot_apt ${_ACTION} ${@}" >> ${CHROOT_FILE}
+			echo "Package: *" >> ${CHROOT_FILE}
+			echo "Pin: release o=config/packages.chroot" >> ${CHROOT_FILE}
+
+			case "${_ACTION}" in
+				install)
+					# Ensure local packages have priority
+					echo "Pin-Priority: 1001" >> ${CHROOT_FILE}
+					;;
+
+				install-binary)
+					# Ensure local packages are not re-installed during lb_binary
+					echo "Pin-Priority: 99" >> ${CHROOT_FILE}
+
+					echo >> ${CHROOT_FILE}
+					echo "Package: *" >> ${CHROOT_FILE}
+					echo "Pin: release o=debian" >> ${CHROOT_FILE}
+					echo "Pin-Priority: 99" >> ${CHROOT_FILE}
+					;;
+			esac
+		fi
+
+		# Creating stage file
+		Create_stagefile
+		;;
+
+	remove)
+		Echo_message "Deconfiguring file /etc/apt/apt.conf"
+
+		# Checking stage file
+		Ensure_stagefile_exists
+
+		# Acquire lock file
+		Acquire_lockfile
+
+		# Deconfiguring aptitude pipeline
+		rm -f ${CONFD}/00pipeline
+
+		# Deconfiguring aptitude recommends
+		if [ "${LB_APT_RECOMMENDS}" = "true" ]; then
+			rm -f ${CONFD}/00recommends
+		fi
+
+		# Deconfiguring aptitude secure
+		if [ "${LB_APT_SECURE}" = "true" ]; then
+			rm -f ${CONFD}/00secure
+		fi
+
+		# Configuring apt config
+		CONFIG_FILE="config/apt/apt.conf"
+		CHROOT_FILE="chroot/etc/apt/apt.conf"
+		if [ -f ${CONFIG_FILE} ]; then
+			rm -f ${CHROOT_FILE}
+
+			if [ -f ${CHROOT_FILE}.orig ]; then
+				mv ${CHROOT_FILE}.orig ${CHROOT_FILE}
+			fi
+		fi
+
+		# Deconfiguring apt preferences
+		CONFIG_FILE="config/apt/preferences"
+		CHROOT_FILE="chroot/etc/apt/preferences"
+		if [ -f ${CONFIG_FILE} ]; then
+			rm -f ${CHROOT_FILE}
+
+			if [ -f ${CHROOT_FILE}.orig ]; then
+				mv ${CHROOT_FILE}.orig ${CHROOT_FILE}
+			fi
+		elif [ -f ${CHROOT_FILE} ]; then
+			# delete additions from lb_chroot_apt install|install-binary to preferences
+			sed -i '/# Added by lb_chroot_apt/,$d' ${CHROOT_FILE}
+			# delete the last empty line
+			sed -i '${/^[[:blank:]]*$/d;}' ${CHROOT_FILE}
+			# if the resulting preferences file is empty, we must have created it, remove it
+			if [ ! -s ${CHROOT_FILE} ]; then
+				rm -f ${CHROOT_FILE}
+			fi
+		fi
+
+		if Find_files config/apt/*.pref; then
+			for CONFIG_FILE in config/apt/*.pref; do
+				CHROOT_FILE="chroot/etc/apt/preferences.d/$(basename ${CONFIG_FILE})"
+
+				rm -f ${CHROOT_FILE}
+
+				if [ -f ${CHROOT_FILE}.orig ]; then
+					mv ${CHROOT_FILE}.orig ${CHROOT_FILE}
+				fi
+			done
+		fi
+
+		# Removing stage file
+		Remove_stagefile
+		;;
+
+	*)
+		Echo_error "Invalid action parameter: '${_ACTION}'"
+		Usage --fail
+		;;
+esac

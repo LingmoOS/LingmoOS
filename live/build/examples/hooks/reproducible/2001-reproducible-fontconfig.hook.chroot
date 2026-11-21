@@ -1,0 +1,31 @@
+#!/bin/sh
+set -e
+
+# fontconfig creates non-reproducible files with UUIDs
+# See https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=864082
+#
+# Because the UUIDs should not be deleted, the proposed work-around is:
+# * Use LD_PRELOAD to replace uuid_generate_random with a less random version
+
+# Don't run if fontconfig is not installed
+if [ ! -e /usr/bin/fc-cache ];
+then
+  exit 0
+fi
+
+# Don't run if fontconfig is sufficiently new
+if dpkg --compare-versions $(dpkg-query --show --showformat '${Version}\n' fontconfig | head -1) ge 2.13.1-4.4~;
+then
+  exit 0
+fi
+
+# Don't run if the LD_PRELOAD module is not compiled
+if [ ! -e /usr/lib/unrandomize_uuid_generate_random.so ];
+then
+  echo "P: $(basename $0) Reproducible hook inactive: The UUID module was not found"
+  exit 0
+fi
+
+LD_PRELOAD=/usr/lib/unrandomize_uuid_generate_random.so /usr/bin/fc-cache --force --really-force --system-only --verbose
+
+echo "P: $(basename $0) Reproducible hook has been applied"

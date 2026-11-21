@@ -1,1 +1,0 @@
-# configuration settings framework for Qt

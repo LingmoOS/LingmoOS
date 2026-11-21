@@ -1,0 +1,146 @@
+#!/usr/bin/env bash
+
+DISTRO_NAME="Lingmo OS"
+VERSION="5.0"
+CODENAME="Lithium"
+BUILD_VER="26b08"
+DEBIAN_VER="13.7"
+VERSION_TYPE="Beta"
+VARIANT="Desktop"
+VARIANT_ID="desktop"
+
+BUILD_ID="$(date +%Y%m%d)"
+BUILD_TIME="2611190228"
+
+# Handle systems where /lib is not merged in /usr/lib
+if [ ! -h /lib ]; then
+  mv /usr/lib/live/config/* /lib/live/config/
+fi
+
+# Enable cryptsetup in the initramfs for later use if the user
+# adds an encrypted persistence partition.
+# This is until https://bugs.debian.org/908220 has a proper fix.
+if [ -e /etc/cryptsetup-initramfs/conf-hook ]; then
+  if grep -q '^#CRYPTSETUP=' /etc/cryptsetup-initramfs/conf-hook; then
+    sed -i -e 's/^#CRYPTSETUP=.*/CRYPTSETUP=y/' /etc/cryptsetup-initramfs/conf-hook
+  else
+    echo "CRYPTSETUP=y" >>/etc/cryptsetup-initramfs/conf-hook
+  fi
+fi
+
+# Rebuild the initramfs to include the last change
+update-initramfs -u
+
+# Run updatedb to initialize the database for the locate command
+if [ -x "$(which updatedb 2>/dev/null)" ]; then
+  updatedb
+fi
+
+# Mark kernel related packages on hold so that they are not upgraded in
+# the live system
+for pkg in $(dpkg-query -W -f'${db:Status-Status} ${binary:Package}\n' 'linux-image-*' 'linux-headers-*' 'linux-kbuild-*' | sed -ne 's/^installed //p'); do
+  apt-mark hold $pkg | true
+done
+
+# Mark lingmo DE as manually installed
+for pkg in $(dpkg-query -W -f'${db:Status-Status} ${binary:Package}\n' 'lingmo*' | sed -ne 's/^installed //p'); do
+  apt-mark manual $pkg | true
+done
+
+# Remove unwanted packages
+apt remove systemsettings -y | true
+apt remove plasma-desktop -y | true
+# apt remove network-manager-gnome konsole kde-baseapps -y | true
+apt remove zutty -y | true
+apt remove breeze eog -y | true
+apt remove xterm -y | true
+apt remove sddm -y | true
+apt autoremove -y | true
+# apt update | true
+
+# Enable lingmo-dm as the display manager and boot to the graphical
+# target instead of a TTY. SDDM was removed above, so lingmo-dm (which
+# ships Alias=display-manager.service) takes over; without enabling it
+# and setting graphical.target as default, the system boots to a
+# console login prompt instead of the Lingmo login screen.
+systemctl enable lingmo-dm.service 2>/dev/null || true
+systemctl set-default graphical.target 2>/dev/null || true
+
+# Configure lingmo-dm to auto-login the live user without a password.
+# scripts/auto/config sets username=lingmo; the session is the default Lingmo Wayland
+# session.  Without this the display manager shows a greeter and the live
+# system never lands on the desktop.
+mkdir -p /etc/lingmo-dm
+cat > /etc/lingmo-dm.conf << EOF
+[Autologin]
+User=lingmo
+Session=lingmo-wayland
+EOF
+
+# Install OnlyOffice —— 已注释停用（2026-10-14）
+# 原因：装完后约 0.7~1 GB，明显推高 ISO 体积；且构建时要联网下载 deb，
+#       上游改版或网络抖动都会让 ISO 构建失败。需要恢复时取消下面注释即可。
+# get_arch=$(arch)
+# if [[ $get_arch =~ "x86_64" ]]; then
+#   apt update
+#   curl -o onlyoffice.deb https://download.onlyoffice.com/install/desktop/editors/linux/onlyoffice-desktopeditors_amd64.deb
+#   apt install -y --no-install-recommends ./onlyoffice.deb
+#   rm -rfv ./onlyoffice.deb
+# fi
+
+chmod +x /bin/config-installer
+
+rm /usr/lib/os-release
+
+cat > /usr/lib/os-release <<EOF
+PRETTY_NAME="${DISTRO_NAME} ${VERSION} (${BUILD_VER})"
+NAME="${DISTRO_NAME}"
+VERSION_ID="${VERSION}"
+VERSION="${VERSION} (${CODENAME}) ${BUILD_VER}"
+BUILD_VERSION="${BUILD_VER}"
+BUILD_ID="${BUILD_ID}"
+BUILD_TIME="${BUILD_TIME}"
+VERSION_TYPE="${VERSION_TYPE}"
+VERSION_CODENAME="${CODENAME}"
+DEBIAN_VERSION_FULL="${DEBIAN_VER}"
+ID=lingmo
+ID_LIKE=debian
+ANSI_COLOR="1;34"
+LOGO=lingmo
+CPE_NAME="cpe:2.3:o:lingmo:lingmo_os:${VERSION}:*:*:*:*:*:*:*"
+VARIANT="${VARIANT}"
+VARIANT_ID="${VARIANT_ID}"
+HOME_URL="https://lingmo.org/"
+SUPPORT_URL="https://lingmo.org/support"
+BUG_REPORT_URL="https://bugs.lingmo.org/"
+EOF
+
+rm /etc/os-release
+ln -sfn /usr/lib/os-release /etc/os-release
+
+# Warm the dynamic linker cache at build time. Without this the cache is
+# built on the first boot and ldconfig.service alone took 11.5s there
+# (measured on the live image).
+ldconfig 2>/dev/null || true
+
+# Recompile the GSettings schemas so the Lingmo defaults shipped in
+# /usr/share/glib-2.0/schemas/99-lingmo-defaults.gschema.override take effect
+# (icon theme). Without this the image keeps the pre-override defaults.
+glib-compile-schemas /usr/share/glib-2.0/schemas 2>/dev/null || true
+
+# dtkcore（OS_VERSION_FILE）、系统监视器、设备管理器读的都是 /etc/os-version。
+# 软件包生成的那份只能用包内已知信息（没有构建号），所以这里按 os-release 重新
+# 生成，保证 SystemName/MajorVersion/OsBuild 与系统版本完全一致（单一来源）。
+cat > /etc/os-version <<EOF
+[Version]
+SystemName=${DISTRO_NAME}
+ProductType=Desktop
+EditionName=
+MajorVersion=${VERSION}
+MinorVersion=${VERSION}
+OsBuild=${BUILD_VER}
+EOF
+chmod 644 /etc/os-version
+
+# Explicit Live-only installer autostart; never enabled on an installed root.
+chmod 755 /usr/bin/lingmo-live-installer

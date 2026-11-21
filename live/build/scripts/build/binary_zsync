@@ -1,0 +1,124 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Build zsync control files"
+USAGE="${PROGRAM} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+if [ "${LB_IMAGE_TYPE}" != "iso" ] && [ "${LB_IMAGE_TYPE}" != "iso-hybrid" ]
+then
+	exit 0
+fi
+
+if [ "${LB_ZSYNC}" != "true" ]
+then
+	exit 0
+fi
+
+Echo_message "Begin building zsync control files..."
+
+# Requiring stage file
+Require_stagefiles config bootstrap
+
+# Checking stage file
+Check_stagefile
+
+# Acquire lock file
+Acquire_lockfile
+
+# Checking depends
+Check_package chroot /usr/bin/zsyncmake zsync
+
+# Restoring cache
+Restore_package_cache binary
+
+# Installing depends
+Install_packages
+
+case "${LB_IMAGE_TYPE}" in
+	iso)
+		_IMAGES="${LB_IMAGE_NAME}-${LB_ARCHITECTURE}.iso"
+		;;
+
+	iso-hybrid)
+		_IMAGES="${LB_IMAGE_NAME}-${LB_ARCHITECTURE}.hybrid.iso"
+		;;
+
+	hdd)
+		_IMAGES="${LB_IMAGE_NAME}-${LB_ARCHITECTURE}.img"
+		;;
+
+	netboot)
+		_IMAGES="${LB_IMAGE_NAME}-${LB_ARCHITECTURE}.netboot.tar*"
+		;;
+
+	tar)
+		_IMAGES="${LB_IMAGE_NAME}-${LB_ARCHITECTURE}.tar*"
+		;;
+esac
+
+for _IMAGE in ${_IMAGES}
+do
+	if [ -e "${_IMAGE}" ]
+	then
+		case "${LB_BUILD_WITH_CHROOT}" in
+			true)
+				mv ${_IMAGE} chroot
+				Chroot chroot "zsyncmake -C -b 2048 -u ${_IMAGE} ${_IMAGE}"
+				mv chroot/${_IMAGE} chroot/${_IMAGE}.zsync ./
+				;;
+
+			false)
+				zsyncmake -C -b 2048 -u "${_IMAGE}" "${_IMAGE}"
+				;;
+		esac
+
+		case "${LB_COMPRESSION}" in
+			bzip2)
+				bzip2 ${BZIP2_OPTIONS} ${_IMAGE}.zsync
+				;;
+
+			gzip)
+				gzip ${GZIP_OPTIONS} ${_IMAGE}.zsync
+				;;
+
+			lzip)
+				lzip ${LZIP_OPTIONS} ${_IMAGE}.zsync
+				;;
+
+			xz)
+				xz ${XZ_OPTIONS} ${_IMAGE}.zsync
+				;;
+
+			none)
+				;;
+		esac
+	fi
+done
+
+#CHECKSUMS
+
+# Saving cache
+Save_package_cache binary
+
+# Removing depends
+Remove_packages
+
+# Creating stage file
+Create_stagefile

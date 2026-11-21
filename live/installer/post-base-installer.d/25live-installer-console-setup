@@ -1,0 +1,53 @@
+#!/bin/sh -e
+
+# Unfortunately, we can't use in-target here as this doesn't allow to set the
+# debconf frontend to noninteractive.
+
+if [ "$(debconf-get live-installer/enable)" != true ]; then
+	# live-installer wasn't run.  Skip this.
+	exit 0
+fi
+
+. /lib/chroot-setup.sh
+
+if ! chroot_setup; then
+	logger -t live-installer -- "Unexpected error; command not executed: '$@'"
+	exit 1
+fi
+
+DEBIAN_FRONTEND=noninteractive
+export DEBIAN_FRONTEND
+
+# Reconfigure keyboard-configuration and/or console-setup as appropriate.
+
+if [ -e /etc/default/keyboard ]; then
+	# console-setup-udeb will already have copied a reasonable
+	# /etc/default/keyboard into the chroot.  /etc/default/console-setup
+	# may still need work.
+	rm -f /target/etc/default/console-setup
+else
+	# kbd-chooser will have set debian-installer/keymap, but we need to
+	# clear out any existing configuration files in order for that to be
+	# noticed.
+	rm -f /target/etc/default/keyboard /target/etc/default/console-setup
+fi
+
+do_setupcon=
+if [ -e /target/var/lib/dpkg/info/keyboard-configuration.postinst ]; then
+	log-output -t live-installer chroot /target \
+	dpkg-reconfigure --no-reload keyboard-configuration
+
+	do_setupcon=1
+fi
+if [ -e /target/var/lib/dpkg/info/console-setup.postinst ]; then
+	log-output -t live-installer chroot /target \
+	dpkg-reconfigure --no-reload console-setup
+
+	do_setupcon=1
+fi
+
+if [ "$do_setupcon" ] && chroot /target which setupcon >/dev/null 2>&1; then
+	chroot /target setupcon --save-only
+fi
+
+chroot_cleanup

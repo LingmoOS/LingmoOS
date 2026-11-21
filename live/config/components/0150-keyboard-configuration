@@ -1,0 +1,102 @@
+#!/bin/sh
+
+. /usr/lib/live/config.sh
+
+## live-config(7) - System Configuration Components
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+#set -e
+
+Cmdline ()
+{
+	# Reading kernel command line
+	for _PARAMETER in ${LIVE_CONFIG_CMDLINE}
+	do
+		case "${_PARAMETER}" in
+			live-config.keyboard-layouts=*|keyboard-layouts=*)
+				LIVE_KEYBOARD_LAYOUTS="${_PARAMETER#*keyboard-layouts=}"
+				;;
+
+			live-config.keyboard-model=*|keyboard-model=*)
+				LIVE_KEYBOARD_MODEL="${_PARAMETER#*keyboard-model=}"
+				;;
+
+			live-config.keyboard-options=*|keyboard-options=*)
+				LIVE_KEYBOARD_OPTIONS="${_PARAMETER#*keyboard-options=}"
+				;;
+
+			live-config.keyboard-variants=*|keyboard-variants=*)
+				LIVE_KEYBOARD_VARIANTS="${_PARAMETER#*keyboard-variants=}"
+				;;
+		esac
+	done
+}
+
+Init ()
+{
+	# Checking if package is installed or already configured
+	if ! pkg_is_installed "keyboard-configuration" || \
+	   component_was_executed "keyboard-configuration"
+	then
+		exit 0
+	fi
+
+	echo -n " keyboard-configuration"
+}
+
+Config ()
+{
+	if [ -n "${LIVE_KEYBOARD_LAYOUTS}" ]
+	then
+		echo "keyboard-configuration keyboard-configuration/layoutcode select ${LIVE_KEYBOARD_LAYOUTS}" >> /tmp/live-config.cfg
+
+		sed -i -e "s|^XKBLAYOUT=.*$|XKBLAYOUT=\"${LIVE_KEYBOARD_LAYOUTS}\"|" /etc/default/keyboard
+	fi
+
+	if [ -n "${LIVE_KEYBOARD_MODEL}" ]
+	then
+		echo "keyboard-configuration keyboard-configuration/modelcode select ${LIVE_KEYBOARD_MODEL}" >> /tmp/live-config.cfg
+
+		sed -i -e "s|^XKBMODEL=.*$|XKBMODEL=\"${LIVE_KEYBOARD_MODEL}\"|" /etc/default/keyboard
+	fi
+
+	if [ -n "${LIVE_KEYBOARD_OPTIONS}" ]
+	then
+		echo "keyboard-configuration keyboard-configuration/optionscode string ${LIVE_KEYBOARD_OPTIONS}" >> /tmp/live-config.cfg
+
+		sed -i -e "s|^XKBOPTIONS=.*$|XKBOPTIONS=\"${LIVE_KEYBOARD_OPTIONS}\"|" /etc/default/keyboard
+	fi
+
+	if [ -n "${LIVE_KEYBOARD_VARIANTS}" ]
+	then
+		echo "keyboard-configuration keyboard-configuration/variantcode select ${LIVE_KEYBOARD_VARIANTS}" >> /tmp/live-config.cfg
+
+		sed -i -e "s|^XKBVARIANT=.*$|XKBVARIANT=\"${LIVE_KEYBOARD_VARIANTS}\"|" /etc/default/keyboard
+	fi
+
+	if [ -e /tmp/live-config.cfg ]
+	then
+		debconf-set-selections < /tmp/live-config.cfg
+		rm -f /tmp/live-config.cfg
+		
+		if [ -x $(which setupcon 2>/dev/null) ]; then
+			setupcon -k
+		fi
+
+		# udev already started, tell it to pick up the new config
+		udevadm trigger --subsystem-match=input --action=change
+
+		# Creating state file
+		touch /var/lib/live/config/keyboard-configuration
+	fi
+}
+
+Cmdline
+Init
+Config

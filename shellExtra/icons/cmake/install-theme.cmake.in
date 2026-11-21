@@ -1,0 +1,103 @@
+set(_lingmo_source_dir "@CMAKE_CURRENT_SOURCE_DIR@")
+set(_lingmo_install_root
+    "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/@LINGMO_ICON_INSTALL_DIR@")
+set(_lingmo_theme_name "@LINGMO_THEME_NAME@")
+
+function(_lingmo_copy_contents source_dir destination_dir)
+  file(MAKE_DIRECTORY "${destination_dir}")
+  file(GLOB _source_entries RELATIVE "${source_dir}" "${source_dir}/*")
+  foreach(_source_entry IN LISTS _source_entries)
+    if(_source_entry STREQUAL ".directory")
+      continue()
+    endif()
+    set(_source_path "${source_dir}/${_source_entry}")
+    set(_destination_path "${destination_dir}/${_source_entry}")
+    if(IS_DIRECTORY "${_source_path}" AND NOT IS_SYMLINK "${_source_path}")
+      _lingmo_copy_contents("${_source_path}" "${_destination_path}")
+    else()
+      file(REMOVE_RECURSE "${_destination_path}")
+      message(STATUS "Installing: ${_destination_path}")
+      file(COPY "${_source_path}" DESTINATION "${destination_dir}")
+    endif()
+  endforeach()
+endfunction()
+
+function(_lingmo_copy_index destination_dir variant_name)
+  file(READ "${_lingmo_source_dir}/src/index.theme" _index_theme)
+  string(REPLACE
+    "Name=${_lingmo_theme_name}"
+    "Name=${variant_name}"
+    _index_theme
+    "${_index_theme}"
+  )
+  file(WRITE "${destination_dir}/index.theme" "${_index_theme}")
+endfunction()
+
+function(_lingmo_create_symlink target link_name)
+  file(CREATE_LINK "${target}" "${link_name}" SYMBOLIC)
+endfunction()
+
+function(_lingmo_create_scaled_links theme_dir)
+  foreach(_directory IN ITEMS
+      actions animations apps categories devices emblems mimes mimetypes places status)
+    _lingmo_create_symlink(
+      "${_directory}" "${theme_dir}/${_directory}@2x"
+    )
+    _lingmo_create_symlink(
+      "${_directory}" "${theme_dir}/${_directory}@3x"
+    )
+  endforeach()
+endfunction()
+
+function(_lingmo_update_cache theme_dir)
+  find_program(_gtk_update_icon_cache gtk-update-icon-cache)
+  if(_gtk_update_icon_cache)
+    execute_process(
+      COMMAND "${_gtk_update_icon_cache}" "${theme_dir}"
+      RESULT_VARIABLE _cache_result
+      OUTPUT_QUIET
+      ERROR_VARIABLE _cache_error
+    )
+    if(NOT _cache_result EQUAL 0)
+      message(WARNING
+        "Could not update the icon cache for ${theme_dir}: ${_cache_error}")
+    endif()
+  endif()
+endfunction()
+
+set(_lingmo_theme "${_lingmo_install_root}/${_lingmo_theme_name}")
+
+message(STATUS "Installing Lingmo icon theme to ${_lingmo_install_root}")
+
+foreach(_stale IN ITEMS "" "-Light" "-Dark")
+  file(REMOVE_RECURSE "${_lingmo_theme}${_stale}")
+endforeach()
+
+file(MAKE_DIRECTORY "${_lingmo_theme}")
+_lingmo_copy_index("${_lingmo_theme}" "${_lingmo_theme_name}")
+foreach(_directory IN ITEMS
+    actions animations apps categories devices emblems mimes mimetypes places status)
+  _lingmo_copy_contents(
+    "${_lingmo_source_dir}/src/${_directory}"
+    "${_lingmo_theme}/${_directory}"
+  )
+endforeach()
+foreach(_directory IN ITEMS
+    actions animations apps categories devices emblems mimes mimetypes places status)
+  _lingmo_copy_contents(
+    "${_lingmo_source_dir}/links/${_directory}"
+    "${_lingmo_theme}/${_directory}"
+  )
+endforeach()
+# Git archives may store icon aliases as tiny text files rather than symlinks.
+# Resolve them only after both artwork and alias directories have been merged.
+find_program(_lingmo_python NAMES python3 REQUIRED)
+execute_process(
+  COMMAND "${_lingmo_python}" "${_lingmo_source_dir}/tools/restore-aliases.py" "${_lingmo_theme}"
+  RESULT_VARIABLE _alias_result
+)
+if(NOT _alias_result EQUAL 0)
+  message(FATAL_ERROR "Lingmo icon aliases could not be restored")
+endif()
+_lingmo_create_scaled_links("${_lingmo_theme}")
+_lingmo_update_cache("${_lingmo_theme}")

@@ -1,0 +1,18 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+override_dh_auto_install:
+	# Update manual pages first
+	$(MAKE) -C manpages update
+	$(MAKE) -C manpages build
+
+	dh_auto_install -- DESTDIR=debian/live-build
+
+	# Removing unused files
+	rm -f debian/live-build/usr/share/doc/live-build/COPYING
+
+override_dh_link:
+	# workaround dh_link conversion of absolute symlinks to relative symlinks
+	dh_link -X.c32 -Xisolinux.bin -Xpxelinux.0

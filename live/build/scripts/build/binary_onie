@@ -1,0 +1,338 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2018-2020 The Debian Live team
+## Copyright (C) 2018 Luca Boccassi <bluca@debian.org>
+## Copyright (C) 2017 Erik Ziegenbalg <eziegenb@brocade.com>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Build ONIE binary image"
+USAGE="${PROGRAM} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+if [ "${LB_ONIE}" != "true" ]
+then
+	exit 0
+fi
+
+case "${LB_IMAGE_TYPE}" in
+	iso)
+		IMAGE="${LB_IMAGE_NAME}-${LB_ARCHITECTURE}.iso"
+		;;
+	iso-hybrid)
+		IMAGE="${LB_IMAGE_NAME}-${LB_ARCHITECTURE}.hybrid.iso"
+		;;
+	*)
+		exit 0
+		;;
+esac
+
+Echo_message "Begin building onie binary..."
+
+# Requiring stage file
+Require_stagefiles config binary_iso
+
+# Checking stage file
+Check_stagefile
+
+# Acquire lock file
+Acquire_lockfile
+
+Check_package host /bin/cpio cpio
+Check_package host /usr/bin/file file
+Check_package host /usr/bin/sha1sum coreutils
+Check_package host /bin/zcat gzip
+Check_package host /bin/gzip gzip
+Check_package host /usr/bin/xzcat xz-utils
+Check_package host /usr/bin/xz xz-utils
+Check_package host /bin/bzcat bzip2
+Check_package host /bin/bzip2 bzip2
+
+### Adds needed helper script
+## Based on https://github.com/opencomputeproject/onie/blob/master/contrib/debian-iso/sharch_body.sh
+cat > sharch_body.sh << EOF
+#!/bin/sh
+
+#
+#  Copyright (C) 2015 Curt Brune <curt@cumulusnetworks.com>
+#
+#  SPDX-License-Identifier:     GPL-2.0
+#
+
+#
+#  Shell archive template
+#
+#  Strings of the form %%VAR%% are replaced during construction.
+#
+
+echo -n "Verifying image checksum ..."
+sha1=\$(sed -e '1,/^exit_marker$/d' "\$0" | sha1sum | awk '{ print \$1 }')
+
+payload_sha1=%%IMAGE_SHA1%%
+
+if [ "\$sha1" != "\$payload_sha1" ] ; then
+	echo
+	echo "ERROR: Unable to verify archive checksum"
+	echo "Expected: \$payload_sha1"
+	echo "Found   : \$sha1"
+	exit 1
+fi
+
+echo " OK."
+
+tmp_dir=
+clean_up() {
+	if [ "\$(id -u)" = "0" ] ; then
+		umount \$tmp_dir > /dev/null 2>&1
+	fi
+	rm -rf \$tmp_dir
+	exit \$1
+}
+
+# Untar and launch install script in a tmpfs
+cur_wd=\$(pwd)
+archive_path=\$(realpath "\$0")
+tmp_dir=\$(mktemp -d)
+if [ "\$(id -u)" = "0" ] ; then
+	mount -t tmpfs tmpfs-installer \$tmp_dir || clean_up 1
+fi
+cd \$tmp_dir
+echo -n "Preparing image archive ..."
+sed -e '1,/^exit_marker\$/d' \$archive_path | tar xf - || clean_up 1
+echo " OK."
+cd \$cur_wd
+
+extract=no
+args=":x"
+while getopts "\$args" a ; do
+	case \$a in
+		x)
+			extract=yes
+			;;
+		*)
+			;;
+	esac
+done
+
+if [ "\$extract" = "yes" ] ; then
+	# stop here
+	echo "Image extracted to: \$tmp_dir"
+	if [ "\$(id -u)" = "0" ] ; then
+		echo "To un-mount the tmpfs when finished type:  umount \$tmp_dir"
+	fi
+	exit 0
+fi
+
+\$tmp_dir/installer/install.sh "\$@"
+rc="\$?"
+
+clean_up \$rc
+
+exit_marker
+EOF
+
+
+### Based on onie cookbits script...
+### https://github.com/opencomputeproject/onie/blob/master/contrib/debian-iso/cook-bits.sh
+
+CURDIR=`pwd`
+OUT=${CURDIR}/output
+rm -rf $OUT
+mkdir -p $OUT
+
+WORKDIR=${CURDIR}/work
+EXTRACTDIR="$WORKDIR/extract"
+INSTALLDIR="$WORKDIR/installer"
+
+IN_IMAGE="${IMAGE}"
+
+output_file="${OUT}/${IN_IMAGE}-ONIE.bin"
+
+Echo_message "Creating $output_file:"
+
+# prepare workspace
+[ -d $EXTRACTDIR ] && chmod +w -R $EXTRACTDIR
+rm -rf $WORKDIR
+mkdir -p $EXTRACTDIR
+mkdir -p $INSTALLDIR
+
+# Link the iso binary root to the onie extract dir
+ln -s ${CURDIR}/binary/* ${EXTRACTDIR}
+echo -n "."
+
+## pack ISO into initrd
+# create initrd working dir
+INITDIR=${WORKDIR}/initrd-extract
+rm -rf ${INITDIR}
+mkdir -p ${INITDIR}
+cd ${INITDIR}
+# extract current initrd
+case $(file --brief --mime --dereference $EXTRACTDIR/live/initrd.img | \
+		sed "s/application\/\(.*\);.*/\1/") in
+	gzip)
+		UNCOMPRESS="zcat"
+		COMPRESS="gzip"
+		;;
+	x-xz)
+		UNCOMPRESS="xzcat"
+		COMPRESS="xz --check=crc32"
+		;;
+	x-bzip2)
+		UNCOMPRESS="bzcat"
+		COMPRESS="bzip2"
+		;;
+	x-lzma)
+		UNCOMPRESS="lzcat --suffix \"\""
+		COMPRESS="lzma"
+		;;
+	octet-stream)
+		UNCOMPRESS="cat"
+		COMPRESS="cat"
+		;;
+	*)
+		echo "" #force newline
+		Echo_error "Unable to detect initrd compression format."
+		exit 1
+		;;
+esac
+
+$UNCOMPRESS $EXTRACTDIR/live/initrd.img | cpio -d -i -m
+echo -n "."
+# copy inputed iso into initrd
+cp "${CURDIR}/${IN_IMAGE}" ./conf/live.iso
+echo -n "."
+# repack
+find . | cpio -o -H newc | $COMPRESS > ${WORKDIR}/initrd.img
+# cd back into root dir
+cd ${CURDIR}
+echo -n "."
+
+KERNEL='vmlinuz'
+IN_KERNEL=$EXTRACTDIR/live/$KERNEL
+[ -r $IN_KERNEL ] || {
+	echo "" #force newline
+	Echo_error "Unable to find kernel in ISO: $IN_KERNEL"
+	exit 1
+}
+INITRD='initrd.img'
+IN_INITRD=$WORKDIR/$INITRD
+[ -r $IN_INITRD ] || {
+	echo "" #force newline
+	Echo_error "Unable to find initrd in ISO: $IN_INITRD"
+	exit 1
+}
+
+# Note: specify kernel args you want the Debian installer to
+# automatically append by putting them after the special marker "---".
+# Here we want the Deb installer to auto include the serial console
+# parameters.
+# The minimal required parameters are included by default, and users
+# can add more depending on what they need, eg: systemd parameters.
+KERNEL_ARGS="--- boot=live nopersistent noeject dhcp fromiso=/conf/live.iso"
+KERNEL_ARGS="${KERNEL_ARGS} ${LB_ONIE_KERNEL_CMDLINE}"
+
+# To debug DI preseed file add these args
+# DI_DEBUG_ARGS="DEBCONF_DEBUG=5 dbg/flags=all-x"
+
+# Debian installer args
+DI_ARGS="auto=true priority=critical $DI_DEBUG_ARGS"
+
+cp -r $IN_KERNEL $IN_INITRD $INSTALLDIR
+
+# Create custom install.sh script
+touch $INSTALLDIR/install.sh
+chmod +x $INSTALLDIR/install.sh
+
+(cat <<EOF
+#!/bin/sh
+
+cd \$(dirname \$0)
+
+# remove old partitions
+for p in \$(seq 3 9) ; do
+	sgdisk -d \$p /dev/vda > /dev/null 2>&1
+done
+
+# bonk out on errors
+set -e
+
+echo "auto-detecting console..."
+tty=\$(cat /sys/class/tty/console/active 2>/dev/null | awk 'END {print \$NF}')
+speed=\$(stty -F /dev/\$tty speed 2>/dev/null)
+bits=\$(stty -F /dev/\$tty -a 2>/dev/null | grep -o cs[5-8])
+bits=\$(echo \$bits | grep -o [5-8])
+
+con=''
+if [ -n "\$speed" ]; then
+	con="console=\$tty,\${speed}n\${bits}"
+else
+	con="console=\$tty"
+fi
+
+echo "using \$con"
+
+kcmd_console=\$(cat /proc/cmdline | grep -o 'console=.* ')
+kcmd_console=\$(echo \$kcmd_console | cut -d' ' -f2) # remove tty0
+
+if [ \${kcmd_console}x != \${con}x ]; then
+	echo "WARNING: Detected console does not match boot console: \$kcmd_console != \$con"
+fi
+
+echo "Loading new kernel ..."
+echo "kexec --load --initrd=$INITRD --append=\"$DI_ARGS $KERNEL_ARGS \$con\" $KERNEL"
+kexec --load --initrd=$INITRD --append="$DI_ARGS $KERNEL_ARGS \$con" $KERNEL
+kexec --exec
+
+EOF
+) >> $INSTALLDIR/install.sh
+echo -n "."
+
+# Repackage $INSTALLDIR into a self-extracting installer image
+sharch="$WORKDIR/sharch.tar"
+tar -C $WORKDIR -cf $sharch installer || {
+	echo "" #force newline
+	Echo_error "Problems creating $sharch archive"
+	exit 1
+}
+
+[ -f "$sharch" ] || {
+	echo "" #force newline
+	Echo_error "$sharch not found"
+	exit 1
+}
+echo -n "."
+
+sha1=$(cat $sharch | sha1sum | awk '{print $1}')
+echo -n "."
+
+cp sharch_body.sh $output_file || {
+	echo "" #force newline
+	Echo_error "Problems copying sharch_body.sh"
+	exit 1
+}
+
+# Replace variables in the sharch template
+sed -i -e "s/%%IMAGE_SHA1%%/$sha1/" $output_file
+echo -n "."
+cat $sharch >> $output_file
+mv $output_file ${CURDIR}
+rm -rf $tmp_dir
+rm -rf $OUT $WORKDIR
+echo " Done."
+ls -la $(basename $output_file)
+Echo_message "onie-installer created..."
+
+# Creating stage file
+Create_stagefile

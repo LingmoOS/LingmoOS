@@ -1,1 +1,0 @@
-#cmakedefine01 HAVE_KF5KExiv2

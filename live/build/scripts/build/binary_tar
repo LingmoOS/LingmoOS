@@ -1,0 +1,66 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Build binary tarball"
+USAGE="${PROGRAM} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+if [ "${LB_IMAGE_TYPE}" != "tar" ]; then
+	exit 0
+fi
+
+Echo_message "Begin building binary tarball..."
+
+# Requiring stage file
+Require_stagefiles config bootstrap
+
+# Checking stage file
+Check_stagefile
+
+# Acquire lock file
+Acquire_lockfile
+
+# Remove old binary
+rm -f ${LB_IMAGE_NAME}-${LB_ARCHITECTURE}.tar.bz2 ${LB_IMAGE_NAME}-${LB_ARCHITECTURE}.tar.gz ${LB_IMAGE_NAME}-${LB_ARCHITECTURE}.tar.lz ${LB_IMAGE_NAME}-${LB_ARCHITECTURE}.tar
+
+tar cf ${LB_IMAGE_NAME}-${LB_ARCHITECTURE}.tar.tar binary
+
+case "${LB_COMPRESSION}" in
+	bzip2)
+		bzip2 ${BZIP2_OPTIONS} ${LB_IMAGE_NAME}-${LB_ARCHITECTURE}.tar.tar
+		;;
+
+	gzip)
+		gzip ${GZIP_OPTIONS} ${LB_IMAGE_NAME}-${LB_ARCHITECTURE}.tar.tar
+		;;
+
+	lzip)
+		lzip ${LZIP_OPTIONS} ${LB_IMAGE_NAME}-${LB_ARCHITECTURE}.tar.tar
+		;;
+
+	xz)
+		xz ${XZ_OPTIONS} ${LB_IMAGE_NAME}-${LB_ARCHITECTURE}.tar.tar
+		;;
+
+	none)
+		;;
+esac
+
+# Creating stage file
+Create_stagefile

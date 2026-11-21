@@ -1,0 +1,94 @@
+#!/bin/sh
+
+. /usr/lib/live/config.sh
+
+## live-config(7) - System Configuration Components
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+#set -e
+
+Cmdline ()
+{
+	# Reading kernel command line
+	for _PARAMETER in ${LIVE_CONFIG_CMDLINE}
+	do
+		case "${_PARAMETER}" in
+			live-config.noautologin|noautologin)
+				LIVE_CONFIG_NOAUTOLOGIN="true"
+				;;
+
+			live-config.nox11autologin|nox11autologin)
+				LIVE_CONFIG_NOX11AUTOLOGIN="true"
+				;;
+
+			live-config.username=*|username=*)
+				LIVE_USERNAME="${_PARAMETER#*username=}"
+				;;
+		esac
+	done
+}
+
+Init ()
+{
+	# Disables both console and graphical autologin.
+	case "${LIVE_CONFIG_NOAUTOLOGIN}" in
+		true)
+			exit 0
+			;;
+	esac
+
+	# Disables graphical autologin, no matter what mechanism
+	case "${LIVE_CONFIG_NOX11AUTOLOGIN}" in
+		true)
+			exit 0
+			;;
+	esac
+
+	# Checking if package is installed or already configured
+	if ! pkg_is_installed "sddm" || \
+	   component_was_executed "sddm"
+	then
+		exit 0
+	fi
+
+	echo -n " sddm"
+}
+
+Config ()
+{
+	# autologin
+	if [ -n "${LIVE_USERNAME}" ]
+	then
+		LIVE_X_SESSION_MANAGER=$(realpath /usr/bin/x-session-manager)
+		case "${LIVE_X_SESSION_MANAGER}" in
+			/usr/bin/startplasma-x11)
+				LIVE_SESSION="plasma.desktop"
+				;;
+
+			/usr/bin/startlxqt)
+				LIVE_SESSION="lxqt.desktop"
+				;;
+		esac
+		cat > /etc/sddm.conf << EOF
+[Autologin]
+User=${LIVE_USERNAME}
+Session=${LIVE_SESSION}
+EOF
+	fi
+
+	# Avoid xinit
+	touch /var/lib/live/config/xinit
+
+	# Creating state file
+	touch /var/lib/live/config/sddm
+}
+
+Cmdline
+Init
+Config

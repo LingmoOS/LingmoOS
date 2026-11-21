@@ -1,0 +1,8 @@
+// Administrators in the active local session switch time sync and the time zone without a password.
+polkit.addRule(function(action, subject) {
+    if ((action.id == "org.freedesktop.timedate1.set-ntp" ||
+         action.id == "org.freedesktop.timedate1.set-timezone") &&
+        subject.local && subject.active && subject.isInGroup("sudo")) {
+        return polkit.Result.YES;
+    }
+});

@@ -1,0 +1,34 @@
+name: Upload to OBS
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*.*.*"]
+  pull_request:
+    branches: [main]
+
+jobs:
+  debian:
+    name: Debian source package
+    runs-on: ubuntu-latest
+    container: docker.io/library/debian:testing
+    steps:
+      - name: Install packaging tools
+        run: apt-get update && apt-get install -y ca-certificates curl debhelper devscripts git
+      - uses: actions/checkout@v4
+      - name: Prepare source package
+        run: dpkg-buildpackage -S -us -uc -d
+      - name: Upload to OBS
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: LingmoOS/action-upload-to-obs@0.0.4
+        with:
+          remove-old-sources: true
+          obs-package-name: lingmo-photos
+          obs-project-name: home:LingmoOS
+          obs-user-name: ${{ secrets.OBS_USERNAME }}
+          obs-password: ${{ secrets.OBS_TOKEN }}
+          obs-instance-url: https://api.opensuse.org
+          local-package-dir: ..

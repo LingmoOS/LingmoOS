@@ -1,0 +1,78 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Use tmpfs to speedup the build"
+USAGE="${PROGRAM} {install|remove} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+_ACTION="${1}"
+shift
+
+if [ "${LB_BUILD_WITH_TMPFS}" != "true" ]
+then
+	exit 0
+fi
+
+# Requiring stage file
+Require_stagefiles config bootstrap
+
+case "${_ACTION}" in
+	install)
+		Echo_message "Configuring tmpfs for /var/lib/dpkg"
+
+		# Checking stage file
+		Check_stagefile
+
+		# Acquire lock file
+		Acquire_lockfile
+
+		mv chroot/var/lib/dpkg chroot/var/lib/dpkg.tmp
+		mkdir chroot/var/lib/dpkg
+		mount -t tmpfs -o x-gvfs-hide tmpfs chroot/var/lib/dpkg
+		mv chroot/var/lib/dpkg.tmp/* chroot/var/lib/dpkg
+		rm -rf chroot/var/lib/dpkg.tmp
+
+		# Creating stage file
+		Create_stagefile
+		;;
+
+	remove)
+		Echo_message "Deconfiguring tmpfs for /var/lib/dpkg"
+
+		# Checking stage file
+		Ensure_stagefile_exists
+
+		# Acquire lock file
+		Acquire_lockfile
+
+		mkdir -p chroot/var/lib/dpkg.tmp
+		mv chroot/var/lib/dpkg/* chroot/var/lib/dpkg.tmp
+		umount chroot/var/lib/dpkg
+		rm -rf chroot/var/lib/dpkg
+		mv chroot/var/lib/dpkg.tmp chroot/var/lib/dpkg
+
+		# Removing stage file
+		Remove_stagefile
+		;;
+
+	*)
+		Echo_error "Invalid action parameter: '${_ACTION}'"
+		Usage --fail
+		;;
+esac

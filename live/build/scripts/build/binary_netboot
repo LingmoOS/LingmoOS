@@ -1,0 +1,90 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Build netboot binary image"
+USAGE="${PROGRAM} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+if [ "${LB_IMAGE_TYPE}" != "netboot" ]; then
+	exit 0
+fi
+
+if [ "${LB_NET_TARBALL}" = "false" ]
+then
+	exit 0
+fi
+
+Echo_message "Begin building binary netboot image..."
+
+# Requiring stage file
+Require_stagefiles config bootstrap
+
+# Checking stage file
+Check_stagefile
+
+# Acquire lock file
+Acquire_lockfile
+
+# Remove old binary
+rm -f ${LB_IMAGE_NAME}-${LB_ARCHITECTURE}.netboot.tar ${LB_IMAGE_NAME}-${LB_ARCHITECTURE}.netboot.tar.gz ${LB_IMAGE_NAME}-${LB_ARCHITECTURE}.netboot.tar.bz2 ${LB_IMAGE_NAME}-${LB_ARCHITECTURE}.netboot.tar.xz ${LB_IMAGE_NAME}-${LB_ARCHITECTURE}.netboot.tar.xz
+
+# Creating image file
+ROOT_DIR=${LB_MODE}-live
+
+mv binary ${ROOT_DIR}
+
+mkdir binary.tmp
+mv ${ROOT_DIR} tftpboot binary.tmp
+cd binary.tmp
+
+# Moving kernel and initrd image arround
+mkdir tftpboot/live
+mv */live/vmlinuz* */live/initrd* tftpboot/live
+
+tar cf ../${LB_IMAGE_NAME}-${LB_ARCHITECTURE}.netboot.tar *
+
+case "${LB_COMPRESSION}" in
+	bzip2)
+		bzip2 ${BZIP2_OPTIONS} ../${LB_IMAGE_NAME}-${LB_ARCHITECTURE}.netboot.tar
+		;;
+
+	gzip)
+		gzip ${GZIP_OPTIONS} ../${LB_IMAGE_NAME}-${LB_ARCHITECTURE}.netboot.tar
+		;;
+
+	lzip)
+		lzip ${LZIP_OPTIONS} ../${LB_IMAGE_NAME}-${LB_ARCHITECTURE}.netboot.tar
+		;;
+
+	xz)
+		xz ${XZ_OPTIONS} ../${LB_IMAGE_NAME}-${LB_ARCHITECTURE}.netboot.tar
+		;;
+
+	none)
+		;;
+esac
+
+mv * ../
+cd "${OLDPWD}"
+rmdir binary.tmp
+
+mv ${ROOT_DIR} binary
+
+# Creating stage file
+Create_stagefile

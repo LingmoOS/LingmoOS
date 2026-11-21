@@ -1,0 +1,117 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Installs grub-pc into binary"
+USAGE="${PROGRAM} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+if [ "${LB_BOOTLOADER_BIOS}" != "grub-pc" ]; then
+	exit 0
+fi
+
+if In_list "${LB_IMAGE_TYPE}" hdd netboot; then
+	exit 0
+fi
+
+Echo_message "Begin installing grub-pc..."
+
+# NOTE: We rely on `binary_grub_cfg` to generate grub.cfg and other configuration files!
+
+# Requiring stage file
+Require_stagefiles config bootstrap
+
+# Checking stage file
+Check_stagefile
+
+# Acquire lock file
+Acquire_lockfile
+
+# Checking depends
+Check_package chroot /usr/bin/grub-mkimage grub-common
+Check_package chroot /usr/lib/grub/i386-pc/vga.mod grub-pc-bin
+
+# Restoring cache
+Restore_package_cache binary
+
+# Installing depends
+Install_packages
+
+# Copying templates
+mkdir -p binary/boot/grub/i386-pc
+
+case ${LB_IMAGE_TYPE} in
+	iso|iso-hybrid)
+		FILES="chroot/usr/lib/grub/i386-pc/*.mod chroot/usr/lib/grub/i386-pc/*.lst chroot/usr/lib/grub/i386-pc/efiemu??.o chroot/usr/share/grub/*.pf2"
+		;;
+
+	hdd|tar)
+		FILES="chroot/usr/lib/grub/i386-pc/*"
+		;;
+esac
+
+if [ "${LB_BUILD_WITH_CHROOT}" = "false" ]
+then
+	FILES="$(echo ${FILES} | sed -e 's|chroot||g')"
+fi
+
+# Copying grub
+cp -a ${FILES} binary/boot/grub/i386-pc
+
+# Create eltorito image for ISO cases
+if [ "${LIVE_IMAGE_TYPE}" = "iso" ] || [ "${LIVE_IMAGE_TYPE}" = "iso-hybrid" ]; then
+
+	cat > binary.sh << EOF
+#!/bin/sh
+
+INPUT_DIR="/usr/lib/grub/i386-pc"
+
+# build core.img
+CORE_IMG=\$(mktemp)
+grub-mkimage -d \${INPUT_DIR} -o \${CORE_IMG} -O i386-pc --prefix=/boot/grub biosdisk iso9660
+
+# build grub_eltorito image
+cat \${INPUT_DIR}/cdboot.img \${CORE_IMG} > grub_eltorito
+
+rm -f \${CORE_IMG}
+EOF
+
+	case "${LB_BUILD_WITH_CHROOT}" in
+		true)
+			mv binary.sh chroot
+			Chroot chroot "sh binary.sh"
+			mv chroot/grub_eltorito binary/boot/grub/grub_eltorito
+			rm -f chroot/binary.sh
+			;;
+
+		false)
+			sh binary.sh
+			mv grub_eltorito binary/boot/grub/grub_eltorito
+			rm -f binary.sh
+			;;
+	esac
+fi
+
+# Saving cache
+Save_package_cache binary
+
+# Removing depends
+Remove_packages
+
+# Creating stage file
+Create_stagefile

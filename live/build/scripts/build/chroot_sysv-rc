@@ -1,0 +1,85 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Manage /usr/sbin/policy-rc.d"
+USAGE="${PROGRAM} {install|remove} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+_ACTION="${1}"
+shift
+
+# Requiring stage file
+Require_stagefiles config bootstrap
+
+case "${_ACTION}" in
+	install)
+		Echo_message "Configuring file /usr/sbin/policy-rc.d"
+
+		# Checking stage file
+		Check_stagefile
+
+		# Acquire lock file
+		Acquire_lockfile
+
+		if [ -e chroot/usr/sbin/policy-rc.d ]
+		then
+			# Save policy-rc.d file
+			Chroot chroot dpkg-divert --rename --quiet --add /usr/sbin/policy-rc.d
+		fi
+
+		# Create policy-rc.d file
+cat > chroot/usr/sbin/policy-rc.d << EOF
+#!/bin/sh
+echo "All runlevel operations denied by policy" >&2
+exit 101
+EOF
+
+		chmod 0755 chroot/usr/sbin/policy-rc.d
+
+		# Creating stage file
+		Create_stagefile
+		;;
+
+	remove)
+		Echo_message "Deconfiguring file /usr/sbin/policy-rc.d"
+
+		# Checking stage file
+		Ensure_stagefile_exists
+
+		# Acquire lock file
+		Acquire_lockfile
+
+		# Remove custom policy-rc.d file
+		rm -f chroot/usr/sbin/policy-rc.d
+
+		if [ -e chroot/usr/sbin/policy-rc.d.distrib ]
+		then
+			# Restore policy-rc.d file
+			Chroot chroot dpkg-divert --rename --quiet --remove /usr/sbin/policy-rc.d
+		fi
+
+		# Removing stage file
+		Remove_stagefile
+		;;
+
+	*)
+		Echo_error "Invalid action parameter: '${_ACTION}'"
+		Usage --fail
+		;;
+esac

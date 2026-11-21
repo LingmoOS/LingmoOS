@@ -1,0 +1,591 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+lingmo-version —— Lingmo OS 系统版本号统一工具
+
+以 base-files/debian/rules 的「统一版本配置」块为**唯一源**，把 lingmo-builder 里
+其余散落的版本信息同步过去，并提供一致性检查。
+
+用法（在同时含有 base-files/ 与 lingmo-builder/ 的目录下执行）：
+
+    lingmo-version check                      只检查，列出差异表；有漂移则退出码 1
+    lingmo-version sync  [--write]            按源同步各副本（默认 dry-run）
+    lingmo-version set 5.0 Lithium 26a01      改源 + 同步（默认 dry-run）
+        [--debian-ver 13.7] [--variant Desktop] [--codename lithium]
+        [--write] [--bump-changelog] [--keep-build-time]
+
+要点：
+  * VERSION_TYPE（Alpha/Beta/Release）不由配置给出，而是按 base-files/debian/rules
+    里的既有规则从 BUILD_VER 派生：含 'a' → Alpha，含 'b' → Beta，否则 Release。
+  * 渠道（stable/unstable/canary）与阶段通过 MAPPING 互映。
+  * BUILD_TIME：os-release 里新增的一项，值 = **工具生成版本号时的时间**，
+    拼法：YY + MM + DD + HH + 分钟的十位，月、日、时补足两位。
+  * 写操作：默认 dry-run、写前 .bak、写后回读校验、幂等。
+"""
+
+import argparse
+import json
+import re
+import shutil
+import sys
+from datetime import datetime
+from pathlib import Path
+
+RULES = "base-files/debian/rules"
+OS_RELEASE = "base-files/etc/os-release"
+HOOK = "lingmo-builder/scripts/lingmo-config/common/hooks/live/lingmo-hacks.chroot"
+BUILD_SH = "lingmo-builder/scripts/build.sh"
+ISSUE_DIR = "lingmo-builder/scripts/lingmo-config/common/includes.chroot_after_packages/etc"
+INSTALLER_BRANDING = "lingmo-installer-config/calamares/branding/lingmo/branding.desc"
+OS_VERSION_TEMPLATE = "lingmo-desktop-base/files/os-version.in"
+
+
+def configure_paths(base_files: str, builder: str, installer: str = "lingmo-installer-config",
+                    desktop_base: str = "lingmo-desktop-base"):
+    """允许用 --base-files / --builder / --live 覆盖各仓库位置（可给绝对路径）。
+    CI 里常见场景：base-files 就是当前 checkout，lingmo-builder 是另 clone 的。"""
+    global RULES, OS_RELEASE, HOOK, BUILD_SH, ISSUE_DIR, INSTALLER_BRANDING, OS_VERSION_TEMPLATE
+    RULES = f"{base_files}/debian/rules"
+    OS_RELEASE = f"{base_files}/etc/os-release"
+    HOOK = f"{builder}/scripts/lingmo-config/common/hooks/live/lingmo-hacks.chroot"
+    BUILD_SH = f"{builder}/scripts/build.sh"
+    ISSUE_DIR = f"{builder}/scripts/lingmo-config/common/includes.chroot_after_packages/etc"
+    INSTALLER_BRANDING = f"{installer}/calamares/branding/lingmo/branding.desc"
+    OS_VERSION_TEMPLATE = f"{desktop_base}/files/os-version.in"
+
+BLOCK_BEGIN = "# ========== Lingmo OS "
+BLOCK_END = "# ==================================================================="
+
+# 源配置块字段（顺序即写回顺序）
+SOURCE_FIELDS = [
+    ("DISTRO_NAME", "distro_name"),
+    ("VERSION", "version"),
+    ("CODENAME", "codename_cap"),
+    ("codename", "codename"),
+    ("DEBIAN_VER", "debian_ver"),
+    ("BUILD_VER", "build_ver"),
+    ("BUILD_TIME", "build_time"),
+    ("VARIANT", "variant"),
+    ("variant_id", "variant_id"),
+]
+REQUIRED_FIELDS = [k for k, _ in SOURCE_FIELDS if k != "BUILD_TIME"]
+
+# 渠道 ↔ 阶段（VERSION_TYPE）
+CHANNEL_TO_STAGE = {"stable": "Release", "unstable": "Beta", "canary": "Alpha"}
+STAGE_TO_CHANNEL = {v: k for k, v in CHANNEL_TO_STAGE.items()}
+
+
+def build_time_stamp(now=None) -> str:
+    """YY+MM+DD+HH+分钟的十位，月、日、时补足两位。
+    例如 2026-11-06 06:25 -> 261106062。"""
+    now = now or datetime.now()
+    return f"{now:%y%m%d%H}{now.minute // 10}"
+
+
+def derive_stage(build_ver: str) -> str:
+    bv = build_ver.lower()
+    if "a" in bv:
+        return "Alpha"
+    if "b" in bv:
+        return "Beta"
+    return "Release"
+
+
+class Ctx:
+    def __init__(self, d):
+        self.distro_name = d["distro_name"]
+        self.version = d["version"]
+        self.codename_cap = d["codename_cap"]
+        self.codename = d["codename"]
+        self.debian_ver = d["debian_ver"]
+        self.build_ver = d["build_ver"]
+        self.build_time = d.get("build_time") or build_time_stamp()
+        self.variant = d["variant"]
+        self.variant_id = d["variant_id"]
+
+    @property
+    def stage(self):
+        return derive_stage(self.build_ver)
+
+    @property
+    def channel(self):
+        return STAGE_TO_CHANNEL.get(self.stage, "stable")
+
+    def as_dict(self):
+        d = {k: getattr(self, k) for _, k in SOURCE_FIELDS}
+        d.update(stage=self.stage, channel=self.channel)
+        return d
+
+
+def rel(p: Path, root: Path):
+    """尽量显示相对路径；目标在 root 之外（CI 里 --live 常传 /tmp/...）时退回绝对路径。"""
+    try:
+        return p.relative_to(root)
+    except ValueError:
+        return p
+
+
+def read_text(p: Path) -> str:
+    return p.read_text(encoding="utf-8")
+
+
+def die(msg, code=2):
+    print(f"错误: {msg}", file=sys.stderr)
+    sys.exit(code)
+
+
+# ------------------------------------------------------------------ 源
+
+def _block_range(lines):
+    begin = next((i for i, l in enumerate(lines) if l.startswith(BLOCK_BEGIN)), None)
+    if begin is None:
+        die(f"{RULES} 里找不到配置块起始行")
+    end = next((i for i in range(begin, len(lines)) if lines[i].startswith(BLOCK_END)), None)
+    if end is None:
+        die(f"{RULES} 里找不到配置块结束行")
+    return begin, end
+
+
+def load_source(root: Path) -> Ctx:
+    path = root / RULES
+    if not path.exists():
+        die(f"找不到 {RULES}（请在同时含有 base-files/ 与 lingmo-builder/ 的目录下运行）")
+    lines = read_text(path).splitlines()
+    begin, end = _block_range(lines)
+    values = {}
+    for line in lines[begin:end]:
+        m = re.match(r"\s*([A-Za-z_]+)\s*\??=\s*(.*?)\s*$", line)
+        if m:
+            values[m.group(1)] = m.group(2)
+    missing = [k for k in REQUIRED_FIELDS if k not in values]
+    if missing:
+        die(f"{RULES} 配置块缺少字段: {', '.join(missing)}")
+    return Ctx({key: values.get(mk, "") for mk, key in SOURCE_FIELDS})
+
+
+def write_source(root: Path, ctx: Ctx, dry: bool):
+    """把 ctx 写回 base-files/debian/rules（配置块内已有字段就地改，BUILD_TIME 缺失则补）。
+    统一返回 5 元组 (kind, path, lineno, old, new)。"""
+    path = root / RULES
+    lines = read_text(path).splitlines(keepends=True)
+    begin, end = _block_range(lines)
+    want = {mk: getattr(ctx, key) for mk, key in SOURCE_FIELDS}
+    raw, seen = [], set()
+    for i in range(begin, end):
+        m = re.match(r"(\s*([A-Za-z_]+)\s*\??=\s*)(.*?)(\s*)$", lines[i].rstrip("\n"))
+        if not m:
+            continue
+        key = m.group(2)
+        if key not in want:
+            continue
+        seen.add(key)
+        if m.group(3) != want[key]:
+            new = f"{m.group(1)}{want[key]}{m.group(4)}\n"
+            raw.append((i + 1, lines[i].rstrip("\n"), new.rstrip("\n")))
+            if not dry:
+                lines[i] = new
+    for key in [k for k, _ in SOURCE_FIELDS if k not in seen]:
+        if any(re.match(rf"\s*{key}\s*=", l) for l in lines[begin:end]):
+            continue
+        anchor = next((i for i in range(begin, end) if re.match(r"\s*BUILD_VER\s*\??=", lines[i])), begin)
+        insert = anchor + 1
+        new_line = f"{key:<13}= {want[key]}\n"
+        raw.append((insert + 1, "<缺失>", new_line.rstrip("\n")))
+        lines.insert(insert, new_line)
+        end += 1
+    if not dry and raw:
+        shutil.copy2(path, str(path) + ".bak")
+        path.write_text("".join(lines), encoding="utf-8")
+    return [("源", path, n, o, e) for n, o, e in raw]
+
+
+# ------------------------------------------------------------------ 副本
+
+def ensure_line(path: Path, pattern: str, new_line: str, after_pattern: str = None, dry=True):
+    """确保文件里存在匹配 pattern 的行；没有则插入（默认插在 after_pattern 之后）。"""
+    if not path.exists():
+        return [("MISSING", path, 0, "", "<文件不存在>")]
+    lines = read_text(path).splitlines(keepends=True)
+    if any(re.search(pattern, l) for l in lines):
+        return []
+    idx = None
+    if after_pattern:
+        idx = next((i for i, l in enumerate(lines) if re.search(after_pattern, l)), None)
+    if idx is None:
+        idx = len(lines) - 1
+    changed = [("新增", path, idx + 2, "<无>", new_line.rstrip("\n"))]
+    if not dry:
+        lines.insert(idx + 1, new_line)
+        shutil.copy2(path, str(path) + ".bak")
+        path.write_text("".join(lines), encoding="utf-8")
+    return changed
+
+
+def rewrite_keys(path: Path, wants, dry=True, kind=""):
+    """wants: [(KEY, 'KEY="value"')] 就地替换 `KEY=...` 行；不存在则新增。"""
+    if not path.exists():
+        return [("MISSING", path, 0, "", "<文件不存在>")]
+    lines = read_text(path).splitlines(keepends=True)
+    changed, seen = [], set()
+    for key, body in wants:
+        pat = re.compile(rf'^(\s*{re.escape(key)}\s*=\s*).*$')
+        hit = None
+        for i, l in enumerate(lines):
+            if pat.match(l):
+                hit = i
+                break
+        value = body.split("=", 1)[1]
+        if hit is None:
+            changed.append((kind, path, len(lines), f"<{key} 缺失>", body))
+            if not dry:
+                lines.append(body + "\n")
+            continue
+        seen.add(key)
+        new = f"{key}={value}\n"
+        if lines[hit].rstrip("\n") != new.rstrip("\n"):
+            changed.append((kind, path, hit + 1, lines[hit].rstrip("\n"), new.rstrip("\n")))
+            if not dry:
+                lines[hit] = new
+    if not dry and changed:
+        shutil.copy2(path, str(path) + ".bak")
+        path.write_text("".join(lines), encoding="utf-8")
+    return changed
+
+
+def hook_build_time(root: Path, ctx: Ctx, dry: bool):
+    """hook 里的 BUILD_TIME 需要两处：
+       ① 变量块（BUILD_ID="$(date +%Y%m%d)" 之后）—— 实际时间戳
+       ② 它生成的 os-release heredoc（BUILD_ID="${BUILD_ID}" 之后）—— 引用变量
+    做法：先算出"删掉所有 BUILD_TIME= 行、再在两处各插一行"的目标内容，
+    与现状逐行比较 —— 内容相同就什么都不做（保证幂等）。"""
+    p = root / HOOK
+    if not p.exists():
+        return [("MISSING", p, 0, "", "<文件不存在>")]
+    lines = read_text(p).splitlines(keepends=True)
+
+    want_var = f'BUILD_TIME="{ctx.build_time}"\n'
+    want_use = 'BUILD_TIME="${BUILD_TIME}"\n'
+
+    stripped = [l for l in lines if not re.match(r"^\s*BUILD_TIME=", l)]
+    idx_var = next((i for i, l in enumerate(stripped) if l.strip().startswith('BUILD_ID="$(date')), None)
+    idx_use = next((i for i, l in enumerate(stripped) if l.strip() == 'BUILD_ID="${BUILD_ID}"'), None)
+
+    out = list(stripped)
+    for pos, text in sorted([(i + 1, t) for i, t in ((idx_var, want_var), (idx_use, want_use))
+                             if i is not None], reverse=True):
+        out.insert(pos, text)
+
+    if out == lines:
+        return []                      # 已经一致 → 无改动（幂等）
+
+    changed = []
+    for i, l in enumerate(lines):
+        if re.match(r"^\s*BUILD_TIME=", l):
+            changed.append(("hook 清理", p, i + 1, l.rstrip("\n"), "<移除，稍后按正确位置重插>"))
+    for i, l in enumerate(out):
+        if re.match(r"^\s*BUILD_TIME=", l) and (i >= len(lines) or lines[i] != l):
+            kind = "hook 变量块" if l.startswith("BUILD_TIME=\"") and "${" not in l else "hook os-release"
+            changed.append((kind, p, i + 1, "<无>", l.rstrip("\n")))
+    if not dry:
+        shutil.copy2(p, str(p) + ".bak")
+        p.write_text("".join(out), encoding="utf-8")
+    return changed
+
+
+def os_version_template(root: Path, ctx: Ctx, dry: bool):
+    """校验 lingmo-desktop-base 的 files/os-version.in。
+
+    该文件是"占位符模板"：@@DISTRO_NAME@@ / @@VERSION@@ / @@BUILD_VER@@ 必须保留，
+    由打包（Makefile）与 live hook 替换。两种退化都要报出来：
+      * 占位符整个不见了（有人删掉了）—— 生成出来的 os-version 会缺字段；
+      * 对应的键还在、但值被写死（例如 SystemName=Lingmo OS）—— 版本一变就不再同步。
+    只做检查，不改文件（写死值改回占位符要人判断语义）。
+    """
+    p = root / OS_VERSION_TEMPLATE
+    if not p.exists():
+        return []                       # 没检出 lingmo-desktop-base 就跳过
+
+    lines = read_text(p).splitlines()
+    text = "\n".join(lines)
+    problems = []
+
+    for placeholder, purpose in (("@@DISTRO_NAME@@", "发行版名称"),
+                                 ("@@VERSION@@", "版本号"),
+                                 ("@@BUILD_VER@@", "构建号")):
+        if placeholder not in text:
+            problems.append(("os-version 模板", p, 0, f"缺少 {placeholder}（{purpose}）",
+                             f"请保留 {placeholder}，由打包/hook 替换"))
+
+    # 键存在但没走占位符（被写死）
+    for key in ("SystemName", "MajorVersion", "MinorVersion", "OsBuild"):
+        for i, line in enumerate(lines, 1):
+            s = line.strip()
+            if not s.startswith(key + "="):
+                continue
+            value = s.split("=", 1)[1].strip()
+            if value and not value.startswith("@@"):
+                problems.append(("os-version 模板", p, i, line,
+                                 f"{key} 被写死为 {value!r}，应使用占位符"))
+    return problems
+
+
+def targets(root: Path, ctx: Ctx, dry: bool):
+    out = []
+
+    # 1) hook 变量块（保留 hook 作生成器，但值来自源；VERSION_TYPE 改为派生值）
+    out += rewrite_keys(root / HOOK, [
+        ("DISTRO_NAME", f'DISTRO_NAME="{ctx.distro_name}"'),
+        ("VERSION", f'VERSION="{ctx.version}"'),
+        ("CODENAME", f'CODENAME="{ctx.codename_cap}"'),
+        ("BUILD_VER", f'BUILD_VER="{ctx.build_ver}"'),
+        ("DEBIAN_VER", f'DEBIAN_VER="{ctx.debian_ver}"'),
+        ("VERSION_TYPE", f'VERSION_TYPE="{ctx.stage}"'),
+        ("VARIANT", f'VARIANT="{ctx.variant}"'),
+        ("VARIANT_ID", f'VARIANT_ID="{ctx.variant_id}"'),
+    ], dry=dry, kind="hook 变量块")
+
+    # 2) hook 的 BUILD_TIME（变量块 + os-release heredoc）
+    out += hook_build_time(root, ctx, dry)
+
+    # 3) build.sh（ISO 文件名那套）
+    out += rewrite_keys(root / BUILD_SH, [
+        ("LINGMO_VERTYPE", f'LINGMO_VERTYPE="{ctx.channel}"'),
+        ("LINGMO_SYS_VERSION", f'LINGMO_SYS_VERSION="{ctx.version}"'),
+        ("LINGMO_BUILD_VER", f'LINGMO_BUILD_VER="{ctx.build_ver}"'),
+        ("RELEASE", f'RELEASE="{ctx.codename}"'),
+    ], dry=dry, kind="build.sh 版本块")
+
+    # 4) builder 自带的 /etc/issue、/etc/issue.net
+    for name in ("issue", "issue.net"):
+        p = root / ISSUE_DIR / name
+        line = f"{ctx.distro_name} {ctx.version} {ctx.build_ver} ({ctx.codename_cap})"
+        new = line + (" \\n \\\n" if name == "issue" else "\n")
+        if p.exists():
+            lines = read_text(p).splitlines(keepends=True)
+            if lines and lines[0].rstrip("\n") != new.rstrip("\n"):
+                out.append(("issue", p, 1, lines[0].rstrip("\n"), new.rstrip("\n")))
+                if not dry:
+                    shutil.copy2(p, str(p) + ".bak")
+                    lines[0] = new
+                    p.write_text("".join(lines), encoding="utf-8")
+
+    # 5) base-files 模板：os-release 增加 BUILD_TIME
+    out += ensure_line(root / OS_RELEASE, r'^BUILD_TIME=', 'BUILD_TIME="@BUILD_TIME@"\n',
+                       after_pattern=r'^BUILD_?VERSION=|^BUILD_ID=', dry=dry)
+
+    # 6) base-files/rules：os-release 的 sed 增加 @BUILD_TIME@ 替换
+    rules = root / RULES
+    txt = read_text(rules)
+    if "@BUILD_TIME@" in read_text(root / OS_RELEASE) and "s|@BUILD_TIME@|" not in txt:
+        lines = txt.splitlines(keepends=True)
+        idx = next((i for i, l in enumerate(lines)
+                    if "DESTDIR)/etc/os-release" in l), None)
+        if idx is not None:
+            # 找到同一 sed 命令里最后一个 -e 行
+            j = idx
+            while j > 0 and not lines[j - 1].lstrip().startswith("-e "):
+                j -= 1
+            indent = re.match(r"\s*", lines[j]).group(0)
+            newline = f'{indent}-e "s|@BUILD_TIME@|$(BUILD_TIME)|g" \\\n'
+            out.append(("rules sed", rules, j + 1, "<无>", newline.rstrip("\n")))
+            if not dry:
+                shutil.copy2(rules, str(rules) + ".bak")
+                lines.insert(j, newline)
+                rules.write_text("".join(lines), encoding="utf-8")
+        else:
+            out.append(("rules sed", rules, 0, "", "⚠️ 找不到 etc/os-release 的 sed 行，需手动补 @BUILD_TIME@ 替换"))
+
+    # 7) Calamares 安装器品牌：branding.desc 的版本字段
+    out += branding(root, ctx, dry)
+
+    # 8) lingmo-desktop-base 的 os-version.in 占位符（只校验，不改写）
+    out += os_version_template(root, ctx, dry)
+    return out
+
+
+def rewrite_yaml(path: Path, wants, dry=True, kind=""):
+    """YAML 的 `key: value` 就地改值，保留原有的缩进与对齐。"""
+    if not path.exists():
+        return []
+    lines = read_text(path).splitlines(keepends=True)
+    changed = []
+    for key, value in wants:
+        pat = re.compile(rf"^(\s*{re.escape(key)}:\s*)(.*?)(\s*)$")
+        for i, l in enumerate(lines):
+            m = pat.match(l.rstrip("\n"))
+            if m:
+                new = f"{m.group(1)}{value}{m.group(3)}\n"
+                if lines[i] != new:
+                    changed.append((kind, path, i + 1, lines[i].rstrip("\n"), new.rstrip("\n")))
+                    if not dry:
+                        lines[i] = new
+                break
+    if not dry and changed:
+        shutil.copy2(path, str(path) + ".bak")
+        path.write_text("".join(lines), encoding="utf-8")
+    return changed
+
+
+def branding(root: Path, ctx: Ctx, dry: bool):
+    """lingmo-installer-config/calamares/branding/lingmo/branding.desc ——
+    安装器界面显示的版本（现行组件）。没有检出该仓库时静默跳过。"""
+    p = root / INSTALLER_BRANDING
+    if not p.exists():
+        return []
+    major = ctx.version.split(".")[0]
+    return rewrite_yaml(p, [
+        ("productName", ctx.distro_name),
+        ("version", f"{ctx.version} ({ctx.codename})"),
+        ("shortVersion", ctx.version),
+        ("versionedName", f"Lingmo {major} ({ctx.codename})"),
+        ("shortVersionedName", f"Lingmo {major}"),
+    ], dry=dry, kind="安装器品牌")
+
+
+# ------------------------------------------------------------------ 命令
+
+def cmd_check(root: Path, as_json: bool):
+    ctx = load_source(root)
+    drift = targets(root, ctx, dry=True)
+    rules_txt = read_text(root / RULES)
+    derived_ok = ("Alpha" in rules_txt and "Beta" in rules_txt)
+    stamp_ok = re.search(r"^\s*BUILD_TIME\s*=", read_text(root / RULES), re.M) is not None
+
+    if as_json:
+        print(json.dumps({"source": ctx.as_dict(),
+                          "drift": [{"file": str(p), "line": n, "current": c, "expected": e}
+                                    for _, p, n, c, e in drift],
+                          "derived_rule_ok": derived_ok, "build_time_in_source": stamp_ok},
+                         ensure_ascii=False, indent=2))
+    else:
+        print("源（base-files/debian/rules）：")
+        for k, v in ctx.as_dict().items():
+            print(f"  {k:12s} = {v}")
+        print()
+        if not drift:
+            print("✅ 所有副本都与源一致")
+        else:
+            print(f"❌ 发现 {len(drift)} 处需要处理：")
+            cur = None
+            for kind, path, lineno, old, new in drift:
+                if path != cur:
+                    cur = path
+                    print(f"\n  {rel(path, root)}  [{kind}]")
+                print(f"    :{lineno:<4} {old!r}")
+                print(f"           → {new!r}")
+        print()
+        print(f"  {'✅' if derived_ok else '⚠️ '} VERSION_TYPE 派生规则（Alpha/Beta/Release）")
+        print(f"  {'✅' if stamp_ok else '⚠️ '} 源里已有 BUILD_TIME")
+    return 1 if drift else 0
+
+
+def cmd_sync(root: Path, write: bool, as_json: bool, stamp: bool = False):
+    ctx = load_source(root)
+    if stamp:
+        ctx.build_time = build_time_stamp()
+    changes = []
+    if write or stamp:
+        changes += write_source(root, ctx, dry=not write)
+    changes += targets(root, ctx, dry=not write)
+    if as_json:
+        print(json.dumps([{"file": str(p), "line": n, "old": o, "new": e}
+                          for _, p, n, o, e in changes], ensure_ascii=False, indent=2))
+    else:
+        print(f"{'已写入' if write else 'dry-run（加 --write 生效）'}：{len(changes)} 处")
+        for kind, path, lineno, old, new in changes:
+            print(f"  {rel(path, root)}:{lineno}  [{kind}]")
+            print(f"      - {old}")
+            print(f"      + {new}")
+    return 0
+
+
+def cmd_set(root: Path, a):
+    ctx = load_source(root)
+    for attr in ("version", "codename_cap", "codename", "build_ver", "debian_ver",
+                 "variant", "variant_id"):
+        v = getattr(a, attr, None)
+        if v:
+            setattr(ctx, attr, v)
+    if not a.keep_build_time:
+        ctx.build_time = build_time_stamp()
+
+    print("将要设置的版本：")
+    for k, v in ctx.as_dict().items():
+        print(f"  {k:12s} = {v}")
+    src_changes = write_source(root, ctx, dry=not a.write)
+    print(f"\n源 {RULES}：{len(src_changes)} 处{'（已写入）' if a.write else '（dry-run）'}")
+    for kind, path, lineno, old, new in src_changes:
+        print(f"  :{lineno} - {old}\n        + {new}")
+    cmd_sync(root, write=a.write, as_json=False)
+    if a.bump_changelog and a.write:
+        bump_changelog(root)
+    if a.write:
+        print("\n回读校验：")
+        return cmd_check(root, as_json=False)
+    return 0
+
+
+def bump_changelog(root: Path):
+    path = root / "base-files/debian/changelog"
+    txt = read_text(path)
+    first = txt.splitlines()[0]
+    m = re.match(r"^(\S+) \((.*)\) (\S+); (\S+)$", first)
+    if not m:
+        print(f"  ⚠️  changelog 首行无法解析: {first!r}")
+        return
+    ver = m.group(2)
+    m2 = re.match(r"^(.*\+lingmo5u)(\d+)$", ver)
+    if not m2:
+        print(f"  ⚠️  版本不符合 <base>+lingmo5uN，跳过: {ver}")
+        return
+    new_ver = f"{m2.group(1)}{int(m2.group(2)) + 1}"
+    print(f"  changelog: {ver} → {new_ver}")
+    path.write_text(txt.replace(f"({ver})", f"({new_ver})", 1), encoding="utf-8")
+
+
+def main():
+    ap = argparse.ArgumentParser(description="Lingmo OS 系统版本号统一工具")
+
+    def common(p):
+        p.add_argument("--root", default=".", help="含有 base-files/ 与 lingmo-builder/ 的目录")
+        p.add_argument("--base-files", default="base-files",
+                       help="base-files 仓库位置（默认 <root>/base-files，可给绝对路径）")
+        p.add_argument("--builder", default="lingmo-builder",
+                       help="lingmo-builder 仓库位置（默认 <root>/lingmo-builder，可给绝对路径）")
+        p.add_argument("--installer-config", "--live", dest="installer", default="lingmo-installer-config",
+                       help="lingmo-installer-config 仓库位置（安装器品牌；不存在则跳过）")
+        p.add_argument("--desktop-base", dest="desktop_base", default="lingmo-desktop-base",
+                       help="lingmo-desktop-base 仓库位置（os-version.in 占位符校验；不存在则跳过）")
+        p.add_argument("--json", action="store_true", help="以 JSON 输出")
+
+    sub = ap.add_subparsers(dest="cmd", required=True)
+    common(sub.add_parser("check", help="只检查差异"))
+    s = sub.add_parser("sync", help="按源同步副本")
+    common(s)
+    s.add_argument("--write", action="store_true", help="真正写入（默认 dry-run）")
+    s.add_argument("--stamp", action="store_true", help="顺便刷新 BUILD_TIME")
+    st = sub.add_parser("set", help="设置源并同步")
+    common(st)
+    st.add_argument("version", nargs="?")
+    st.add_argument("codename_cap", nargs="?")
+    st.add_argument("build_ver", nargs="?")
+    st.add_argument("--codename")
+    st.add_argument("--debian-ver")
+    st.add_argument("--variant")
+    st.add_argument("--variant-id")
+    st.add_argument("--write", action="store_true")
+    st.add_argument("--bump-changelog", action="store_true")
+    st.add_argument("--keep-build-time", action="store_true", help="不刷新 BUILD_TIME")
+    a = ap.parse_args()
+
+    root = Path(a.root).resolve()
+    configure_paths(a.base_files, a.builder, a.installer, a.desktop_base)
+    if a.cmd == "check":
+        sys.exit(cmd_check(root, a.json))
+    if a.cmd == "sync":
+        sys.exit(cmd_sync(root, a.write, a.json, stamp=a.stamp))
+    sys.exit(cmd_set(root, a))
+
+
+if __name__ == "__main__":
+    main()

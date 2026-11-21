@@ -1,0 +1,32 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:		live-tools
+# Required-Start:	$syslog bootmisc
+# Required-Stop:
+# Should-Start:		$local_fs
+# Should-Stop:		halt reboot
+# Default-Start:	S
+# Default-Stop:		0 6
+# Short-Description:	live-tools - System Support Scripts
+# Description:		live-tools contains additional support scripts for live
+#			systems.
+# X-Start-Before:
+# X-Stop-After:		umountroot
+# X-Interactive:	true
+### END INIT INFO
+
+. /lib/lsb/init-functions
+
+case "${1}" in
+	stop)
+		if [ -e /usr/bin/live-medium-eject ]
+		then
+			/usr/bin/live-medium-eject ${@}
+		fi
+		;;
+
+	start|force-reload|restart)
+
+		;;
+esac

@@ -1,0 +1,38 @@
+#!/bin/sh -e
+
+do_manual_removal=true
+
+# Remove packages as specified in specific package removal list
+for list in /cdrom/live/filesystem.packages-remove; do
+	if [ -e $list ]; then
+		do_manual_removal=
+		do_initrd=true
+
+		for package in $(awk '{ print $1 }' $list); do
+			if [ -f /target/var/lib/dpkg/info/$package.list ]; then
+				packages="$packages $package"
+			fi
+		done
+
+		in-target apt-get --yes purge $packages
+	fi
+done
+
+# Manually removing packages live specific packages:
+# - Debian: live-boot, live-config, debian-installer-launcher
+# - Ubuntu: casper
+
+if [ $do_manual_removal ]; then
+	for package in live-boot live-boot-initramfs-tools live-config live-config-runit live-config-systemd live-config-sysvinit live-config-upstart debian-installer-launcher casper calamares-settings-debian; do
+		if [ -f /target/var/lib/dpkg/info/$package.list ]; then
+			in-target apt-get --yes purge $package
+			do_initrd=true
+		fi
+	done
+fi
+
+if [ $do_initrd ]; then
+	in-target update-initramfs -k all -u
+fi
+
+in-target apt-get --yes autoremove

@@ -1,0 +1,95 @@
+#!/bin/sh
+
+# live-tools(7) - System Support Scripts
+# Copyright (C) 2016-2020 The Debian Live team
+# Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+#
+# This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+# This is free software, and you are welcome to redistribute it
+# under certain conditions; see COPYING for details.
+
+set -e
+
+if [ ! -e /usr/sbin/update-initramfs.orig.initramfs-tools ]
+then
+	echo "E: /usr/sbin/update-initramfs.orig.initramfs-tools - command not found"
+	echo "E: On Debian based systems, update-initramfs from initramfs-tools"
+	echo "E: can be installed with:"
+	echo "E:   apt-get install initramfs-tools"
+
+	exit 1
+fi
+
+# system is a live system and not a system in the process of being built by live-build
+if [ ! -e /.live-build ] && grep -qs "boot=live" /proc/cmdline
+then
+	if grep -qs "\/run\/live\/medium" /proc/mounts
+	then
+		# live system with live media mounted as /run/live/medium
+		_DEVICE="$(awk '/\/run\/live\/medium/ { print $1 }' /proc/mounts)"
+
+		mount -o remount,rw ${_DEVICE} > /dev/null 2>&1 || true
+
+		if touch /run/live/medium/.test > /dev/null 2>&1
+		then
+			_READ_WRITE="true"
+
+			rm -f /run/live/medium/.test
+		else
+			_READ_WRITE="false"
+		fi
+	else
+		# live system without live media mounted as /run/live/medium
+		echo "I: update-initramfs is disabled (live system is running without media mounted on /run/live/medium)."
+
+		exit 0
+	fi
+else
+	# non-live system
+	/usr/sbin/update-initramfs.orig.initramfs-tools "${@}"
+
+	exit "${?}"
+fi
+
+case "${_READ_WRITE}" in
+	true)
+		# Updating initramfs
+		/usr/sbin/update-initramfs.orig.initramfs-tools "${@}"
+
+		if [ "$(ls /boot/vmlinuz-* | wc -l)" -gt 1 ]
+		then
+			_NUMBER="1"
+
+			for _VMLINUZ in /boot/vmlinuz-*
+			do
+				_VERSION="$(basename ${_VMLINUZ} | sed -e 's|vmlinuz-||')"
+
+				cp /boot/vmlinuz-${_VERSION} /run/live/medium/live/vmlinuz${_NUMBER}.new
+				if [ -e /boot/initrd.img-${_VERSION} ]; then
+					cp /boot/initrd.img-${_VERSION} /run/live/medium/live/initrd${_NUMBER}.img.new
+				fi
+
+				_NUMBER="$((${_NUMBER} + 1))"
+			done
+		else
+			_VMLINUZ=$(echo /boot/vmlinuz-*)
+			_VERSION="$(basename ${_VMLINUZ} | sed -e 's|vmlinuz-||')"
+			cp $_VMLINUZ /run/live/medium/live/vmlinuz.new
+			if [ -e /boot/initrd.img-${_VERSION} ]; then
+				cp /boot/initrd.img-${_VERSION} /run/live/medium/live/initrd.img.new
+			fi
+
+		fi
+		for f in /run/live/medium/live/vmlinuz*.new \
+		         /run/live/medium/live/initrd*.new; do
+			if [ -e $f ]; then
+				mv $f ${f%.new}
+			fi
+		done
+		;;
+
+	false)
+		echo "I: update-initramfs is disabled (live system is running on read-only media)."
+		exit 0
+		;;
+esac

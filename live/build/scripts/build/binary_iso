@@ -1,0 +1,240 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Build iso binary image"
+USAGE="${PROGRAM} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+case "${LB_IMAGE_TYPE}" in
+	iso)
+		IMAGE="${LB_IMAGE_NAME}-${LB_ARCHITECTURE}.iso"
+		;;
+
+	iso-hybrid)
+		IMAGE="${LB_IMAGE_NAME}-${LB_ARCHITECTURE}.hybrid.iso"
+		;;
+
+	*)
+		exit 0
+		;;
+esac
+
+Echo_message "Begin building binary iso image..."
+
+# Requiring stage file
+Require_stagefiles config bootstrap
+
+# Checking stage file
+Check_stagefile
+
+# Acquire lock file
+Acquire_lockfile
+
+# Checking depends
+Check_package chroot /usr/bin/xorriso xorriso
+Check_package chroot /usr/lib/ISOLINUX/isohdpfx.bin isolinux
+if [ "${LB_BOOTLOADER_BIOS}" = "grub-pc" ]
+then
+	Check_package chroot /usr/lib/grub/i386-pc/boot_hybrid.img grub-pc-bin
+fi
+if [ "${LB_INITRAMFS}" = "dracut-live" ]
+then
+	Check_package chroot /usr/bin/implantisomd5 isomd5sum
+fi
+
+# Restoring cache
+Restore_package_cache binary
+
+# Installing depends
+Install_packages
+
+# Remove old iso image
+if [ -f ${IMAGE} ]
+then
+	rm -f ${IMAGE}
+fi
+
+# Handle xorriso generic options
+XORRISO_OPTIONS="-R -r -J -joliet-long -l -cache-inodes -iso-level 3"
+
+# Handle xorriso live-build specific options
+if [ "${LB_IMAGE_TYPE}" = "iso-hybrid" ] && [ -n "${LB_BOOTLOADER_BIOS}" ];
+then
+	if [ "${LB_BOOTLOADER_BIOS}" = "syslinux" ]
+	then
+	XORRISO_OPTIONS="${XORRISO_OPTIONS} -isohybrid-mbr /usr/lib/ISOLINUX/isohdpfx.bin -partition_offset 16"
+	elif [ "${LB_BOOTLOADER_BIOS}" = "grub-pc" ]
+	then
+		XORRISO_OPTIONS="${XORRISO_OPTIONS} --grub2-boot-info --grub2-mbr /usr/lib/grub/i386-pc/boot_hybrid.img" 
+		XORRISO_OPTIONS="${XORRISO_OPTIONS} -efi-boot-part --efi-boot-image"
+	else
+		Echo_error "iso-hybrid images not supported with ${LB_BOOTLOADER_BIOS} as BIOS bootloader"
+		exit 1
+	fi
+fi
+
+if [ "${_QUIET}" = "true" ]
+then
+	XORRISO_OPTIONS="${XORRISO_OPTIONS} -quiet"
+fi
+
+if [ "${_VERBOSE}" = "true" ]
+then
+	XORRISO_OPTIONS="${XORRISO_OPTIONS} -v"
+fi
+
+if [ -n "${LB_ISO_APPLICATION}" ] && [ "${LB_ISO_APPLICATION}" != "none" ]
+then
+	XORRISO_OPTIONS="${XORRISO_OPTIONS} -A \"${LB_ISO_APPLICATION}\""
+fi
+
+if [ -n "${LB_ISO_PREPARER}" ] && [ "${LB_ISO_PREPARER}" != "none" ]
+then
+	LB_ISO_PREPARER="$(echo "${LB_ISO_PREPARER}" | sed "s|@LB_VERSION@|${VERSION}|")"
+	XORRISO_OPTIONS="${XORRISO_OPTIONS} -p \"${LB_ISO_PREPARER}\""
+fi
+
+if [ -n "${LB_ISO_PUBLISHER}" ] && [ "${LB_ISO_PUBLISHER}" != "none" ]
+then
+	XORRISO_OPTIONS="${XORRISO_OPTIONS} -publisher \"${LB_ISO_PUBLISHER}\""
+fi
+
+if [ -n "${LB_ISO_VOLUME}" ] && [ "${LB_ISO_VOLUME}" != "none" ]
+then
+	LB_ISO_VOLUME="$(echo "${LB_ISO_VOLUME}" | sed "s|@ISOVOLUME_TS@|$(date $DATE_UTC_OPTION -d@${SOURCE_DATE_EPOCH} +%Y%m%d-%H:%M)|")"
+	XORRISO_OPTIONS="${XORRISO_OPTIONS} -V \"${LB_ISO_VOLUME}\""
+fi
+
+# Set an explicit modification date
+XORRISO_OPTIONS="${XORRISO_OPTIONS} --modification-date=$(date --utc -d@${SOURCE_DATE_EPOCH} +%Y%m%d%H%M%S00)"
+
+# Enable BIOS bootloader selection
+case "${LB_BOOTLOADER_BIOS}" in
+	grub-legacy)
+		XORRISO_OPTIONS="${XORRISO_OPTIONS} -no-emul-boot -boot-load-size 4 -boot-info-table"
+		XORRISO_OPTIONS="${XORRISO_OPTIONS} -b boot/grub/stage2_eltorito"
+		XORRISO_EXCLUDE="boot/grub/stage2_eltorito"
+		;;
+
+	grub-pc)
+		XORRISO_OPTIONS="${XORRISO_OPTIONS} -no-emul-boot -boot-load-size 4 -boot-info-table"
+		XORRISO_OPTIONS="${XORRISO_OPTIONS} -b boot/grub/grub_eltorito"
+		XORRISO_EXCLUDE="boot/grub/grub_eltorito"
+		;;
+
+	syslinux)
+		XORRISO_OPTIONS="${XORRISO_OPTIONS} -b isolinux/isolinux.bin -c isolinux/boot.cat"
+		XORRISO_OPTIONS="${XORRISO_OPTIONS} -no-emul-boot -boot-load-size 4 -boot-info-table"
+		XORRISO_EXCLUDE="isolinux/isolinux.bin"
+		;;
+
+	"")
+		;;
+
+	*)
+		Echo_error "Unhandled BIOS bootloader selection"
+		exit 1
+		;;
+esac
+
+# If both BIOS and EFI bootloaders are in play, we need to tell mkisosfs to add
+# an additional eltorito entry.
+if [ -n "${LB_BOOTLOADER_BIOS}" ] && [ -n "${LB_BOOTLOADER_EFI}" ]; then
+	XORRISO_OPTIONS="${XORRISO_OPTIONS} -eltorito-alt-boot"
+fi
+
+# Enable EFI bootloader selection
+case "${LB_BOOTLOADER_EFI}" in
+	grub-efi)
+		if [ -e binary/boot/grub/efi.img ]; then
+			XORRISO_OPTIONS="${XORRISO_OPTIONS} -e boot/grub/efi.img -no-emul-boot"
+			XORRISO_OPTIONS="${XORRISO_OPTIONS} -isohybrid-gpt-basdat -isohybrid-apm-hfsplus"
+		else
+			Echo_message "No EFI boot code to include in the ISO"
+		fi
+		;;
+
+	"")
+		;;
+
+	*)
+		Echo_error "Unhandled EFI bootloader selection"
+		exit 1
+		;;
+esac
+
+#if [ "${LB_DEBIAN_INSTALLER}" != "live" ]
+#then
+#	XORRISO_OPTIONS="${XORRISO_OPTIONS} -m ${XORRISO_EXCLUDE}"
+#fi
+
+cat > binary.sh << EOF
+#!/bin/sh
+xorriso -as mkisofs ${XORRISO_OPTIONS} -o ${IMAGE} binary
+EOF
+
+# retain the xorriso command used to create the image in the image itself
+mkdir -p binary/.disk
+cat <<-EOF >binary/.disk/mkisofs
+xorriso -as mkisofs ${XORRISO_OPTIONS} -o ${IMAGE} binary
+EOF
+# Set the timestamp
+find binary/.disk -newermt "$(date -d@${SOURCE_DATE_EPOCH} '+%Y-%m-%d %H:%M:%S')" -printf "%y %p\n" -exec touch '{}' -d@${SOURCE_DATE_EPOCH} ';' >> binary.modified_timestamps
+
+case "${LB_BUILD_WITH_CHROOT}" in
+	true)
+		# Moving image
+		mv binary.sh chroot
+		mv binary chroot
+
+		Chroot chroot "sh binary.sh"
+
+		# Move image
+		mv chroot/binary chroot/${IMAGE} ./
+		rm -f chroot/binary.sh
+		;;
+
+	false)
+		sh binary.sh
+		rm -f binary.sh
+		;;
+esac
+
+# Handle checksumming for dracut-live
+if [ "${LB_CHECKSUMS}" = "md5" ] && [ "${LB_INITRAMFS}" = "dracut-live" ]
+then
+	rm -f chroot/${IMAGE}
+	mv ${IMAGE} chroot/${IMAGE}
+	Echo_message "Embedding md5sum into ISO for dracut verification"
+	Chroot chroot "implantisomd5 ${IMAGE}"
+	mv chroot/${IMAGE} ${IMAGE}
+fi
+
+# Set the timestamp of the image
+touch -d@${SOURCE_DATE_EPOCH} ${IMAGE}
+echo "f ${IMAGE}" >> binary.modified_timestamps
+
+# Saving cache
+Save_package_cache binary
+
+# Removing depends
+Remove_packages
+
+# Creating stage file
+Create_stagefile

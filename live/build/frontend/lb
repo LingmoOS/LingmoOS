@@ -1,0 +1,81 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -n "${LIVE_BUILD}" ] && [ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+PROGRAM="${FRONTEND}"
+DESCRIPTION="Utility to build live systems"
+USAGE="lb {clean|config|build}"
+
+# This bits of code relies on the fact that we only accept
+# options without values before the real command.
+GLOBAL_ARGS=""
+while true; do
+	case $1 in
+		-*)
+			GLOBAL_ARGS="${GLOBAL_ARGS:+$GLOBAL_ARGS }$1"
+			shift
+			;;
+		*)
+			break
+			;;
+	esac
+done
+Arguments $GLOBAL_ARGS
+
+if [ $# = 0 ]; then
+	Echo_error "Missing sub-command"
+	Usage --fail
+fi
+
+COMMAND="${1}"
+shift
+
+if [ -x "${LIVE_BUILD}/scripts/build/${COMMAND}" ]; then
+	# User has live-build copied locally in the system
+	SCRIPT="${LIVE_BUILD}/scripts/build/${COMMAND}"
+elif [ -x "local/live-build/scripts/build/${COMMAND}" ]; then
+	# User has live-build copied locally in the config
+	SCRIPT="local/live-build/scripts/build/${COMMAND}";
+elif [ -x /usr/lib/live/build/${COMMAND} ]; then
+	# User has live-build installed in the system
+	SCRIPT=/usr/lib/live/build/"${COMMAND}"
+else
+	Echo_error "Unknown command: ${COMMAND}"
+	exit 1
+fi
+
+if [ "${COMMAND}" != "config" ]; then
+	# Checking user account
+	if [ "$(id -u)" -ne "0" ]; then
+		Echo_error "Root privileges needed!"
+		exit 1
+	fi
+fi
+
+ENV=""
+for _FILE in config/environment config/environment.binary; do
+	if [ -e "${_FILE}" ]; then
+		ENV="${ENV} $(grep -v '^#' ${_FILE})"
+	fi
+done
+
+_CMD_LABEL="lb ${COMMAND}"
+if [ "${_COLOR_OUT}" = "true" ]; then
+	_CMD_LABEL="${CYAN}${_CMD_LABEL}${NO_COLOR}"
+fi
+Echo "[%s] ${_CMD_LABEL} %s" "$(date +'%F %T')" "$(echo ${GLOBAL_ARGS} ${@})"
+
+exec /usr/bin/env ${ENV} "${SCRIPT}" ${GLOBAL_ARGS} "${@}"

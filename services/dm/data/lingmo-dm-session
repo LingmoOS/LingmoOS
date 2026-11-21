@@ -1,0 +1,18 @@
+#!/bin/sh
+# Runs the session through the login shell so profiles apply (sddm's wayland-session).
+
+case $SHELL in
+  */bash|*/zsh)
+    exec "$SHELL" --login -c 'exec "$@"' - "$@"
+    ;;
+  */fish)
+    [ -f /etc/profile ] && . /etc/profile
+    [ -f "$HOME/.profile" ] && . "$HOME/.profile"
+    exec "$SHELL" --login -c 'exec $argv' "$@"
+    ;;
+  *)
+    [ -f /etc/profile ] && . /etc/profile
+    [ -f "$HOME/.profile" ] && . "$HOME/.profile"
+    exec "$@"
+    ;;
+esac

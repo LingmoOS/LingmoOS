@@ -1,0 +1,40 @@
+#!/usr/bin/python3
+"""Mount temporary installation media in the target and remove it reliably."""
+from pathlib import Path
+import os
+import subprocess
+import sys
+
+MEDIUM_PATHS = ("/run/live/medium", "/run/initramfs/live")
+
+
+def configure(value, unmount=False, run=subprocess.run):
+    root = Path(value).resolve(strict=True)
+    if root == Path("/") or not (root/"etc").is_dir():
+        raise ValueError("Refusing invalid installation root")
+    source = root/"etc/apt/sources.list.d/LINGMO_INSTALLER.list"
+    if not source.resolve().is_relative_to(root): raise ValueError("Source path escapes target")
+    if unmount:
+        # Never update APT here: other copied Live sources are cleaned by
+        # sources-final next; offline cleanup must not depend on a network.
+        for medium in MEDIUM_PATHS:
+            target = root/medium.lstrip("/")
+            if not target.resolve().is_relative_to(root): raise ValueError("Mount path escapes target")
+            if os.path.ismount(target): run(["umount", str(target)], check=True)
+        source.unlink(missing_ok=True)
+        return
+    medium = next((p for p in MEDIUM_PATHS if os.path.ismount(p)), None)
+    if medium is None: raise RuntimeError("Installation medium is not mounted")
+    target = root/medium.lstrip("/")
+    if not target.resolve().is_relative_to(root): raise ValueError("Mount path escapes target")
+    target.mkdir(parents=True, exist_ok=True)
+    run(["mount", "--bind", medium, str(target)], check=True)
+    source.parent.mkdir(parents=True, exist_ok=True)
+    source.write_text("deb [trusted=yes] file:{} trixie main\n".format(medium))
+    run(["chroot", str(root), "apt-get", "-o", "Dir::Etc::sourcelist=sources.list.d/LINGMO_INSTALLER.list",
+         "-o", "Dir::Etc::sourceparts=-", "-o", "APT::Get::List-Cleanup=0", "update"], check=True)
+
+
+if __name__ == "__main__":
+    if len(sys.argv) not in (2,3): raise SystemExit("usage: calamares-sources-media TARGET_ROOT [-u]")
+    configure(sys.argv[1], len(sys.argv)==3 and sys.argv[2]=="-u")

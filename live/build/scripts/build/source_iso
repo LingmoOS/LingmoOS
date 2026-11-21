@@ -1,0 +1,119 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Build iso source image"
+USAGE="${PROGRAM} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+if [ "${LB_SOURCE}" != "true" ]
+then
+	exit 0
+fi
+
+case "${LB_SOURCE_IMAGES}" in
+	iso*)
+		;;
+
+	*)
+		exit 0
+		;;
+esac
+
+Echo_message "Begin building source iso image..."
+
+# Requiring stage file
+Require_stagefiles config source_debian
+
+# Checking stage file
+Check_stagefile
+
+# Acquire lock file
+Acquire_lockfile
+
+# Checking depends
+Check_package chroot /usr/bin/xorriso xorriso
+
+# Installing depends
+Install_packages
+
+# Remove old iso image
+if [ -f ${LB_IMAGE_NAME}-source.iso ]
+then
+	rm -f ${LB_IMAGE_NAME}-source.iso
+fi
+
+# Handle xorriso generic options
+XORRISO_OPTIONS="-as mkisofs -r -J -joliet-long -l -cache-inodes"
+
+# Handle xorriso live-build specific options
+if [ "${_QUIET}" = "true" ]
+then
+	XORRISO_OPTIONS="${XORRISO_OPTIONS} -quiet"
+fi
+
+if [ "${_VERBOSE}" = "true" ]
+then
+	XORRISO_OPTIONS="${XORRISO_OPTIONS} -v"
+fi
+
+if [ -n "${LB_ISO_APPLICATION}" ] && [ "${LB_ISO_APPLICATION}" != "none" ]
+then
+	XORRISO_OPTIONS="${XORRISO_OPTIONS} -A \"${LB_ISO_APPLICATION}\""
+fi
+
+if [ -n "${LB_ISO_PREPARER}" ] && [ "${LB_ISO_PREPARER}" != "none" ]
+then
+	LB_ISO_PREPARER="$(echo "${LB_ISO_PREPARER}" | sed "s|@LB_VERSION@|${VERSION}|")"
+	XORRISO_OPTIONS="${XORRISO_OPTIONS} -p \"${LB_ISO_PREPARER}\""
+fi
+
+if [ -n "${LB_ISO_PUBLISHER}" ] && [ "${LB_ISO_PUBLISHER}" != "none" ]
+then
+	XORRISO_OPTIONS="${XORRISO_OPTIONS} -publisher \"${LB_ISO_PUBLISHER}\""
+fi
+
+if [ -n "${LB_ISO_VOLUME}" ] && [ "${LB_ISO_VOLUME}" != "none" ]
+then
+	LB_ISO_VOLUME="$(echo "${LB_ISO_VOLUME}" | sed "s|@ISOVOLUME_TS@|$(date $DATE_UTC_OPTION -d@${SOURCE_DATE_EPOCH} +%Y%m%d-%H:%M)|")"
+	XORRISO_OPTIONS="${XORRISO_OPTIONS} -V \"${LB_ISO_VOLUME}\""
+fi
+
+# Set an explicit modification date
+XORRISO_OPTIONS="${XORRISO_OPTIONS} --modification-date=$(date --utc -d@${SOURCE_DATE_EPOCH} +%Y%m%d%H%M%S00)"
+
+# Moving image
+mv source chroot
+
+cat > chroot/source.sh << EOF
+#!/bin/sh
+xorriso ${XORRISO_OPTIONS} -o source.iso source
+EOF
+
+Chroot chroot "sh source.sh"
+
+# Move image
+mv chroot/source ./
+mv chroot/source.iso ${LB_IMAGE_NAME}-source.iso
+rm -f chroot/source.sh
+
+# Removing depends
+Remove_packages
+
+# Creating stage file
+Create_stagefile

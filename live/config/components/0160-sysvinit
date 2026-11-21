@@ -1,0 +1,79 @@
+#!/bin/sh
+
+. /usr/lib/live/config.sh
+
+## live-config(7) - System Configuration Components
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+#set -e
+
+Cmdline ()
+{
+	# Reading kernel command line
+	for _PARAMETER in ${LIVE_CONFIG_CMDLINE}
+	do
+		case "${_PARAMETER}" in
+			live-config.noautologin|noautologin)
+				LIVE_CONFIG_NOAUTOLOGIN="true"
+				;;
+
+			live-config.nottyautologin|nottyautologin)
+				LIVE_CONFIG_NOTTYAUTOLOGIN="true"
+				;;
+
+			live-config.username=*|username=*)
+				LIVE_USERNAME="${_PARAMETER#*username=}"
+				;;
+		esac
+	done
+}
+
+Init ()
+{
+	# Disables both console and graphical autologin.
+	case "${LIVE_CONFIG_NOAUTOLOGIN}" in
+		true)
+			exit 0
+			;;
+	esac
+
+	# Disables console autologin, no matter what mechanism
+	case "${LIVE_CONFIG_NOTTYAUTOLOGIN}" in
+		true)
+			exit 0
+			;;
+	esac
+
+	# Checking if package is installed or already configured
+	if ! pkg_is_installed "sysvinit" || \
+	   component_was_executed "sysvinit"
+	then
+		exit 0
+	fi
+
+	echo -n " sysvinit"
+}
+
+Config ()
+{
+	# Configure autologin
+	if [ -n "${LIVE_USERNAME}" ]
+	then
+		sed -i -e "s|^\([^:]*:[^:]*:[^:]*\):.*getty.*\<\(ttyS\?[0-9]*\).*$|\1:/bin/login -f ${LIVE_USERNAME} </dev/\2 >/dev/\2 2>\&1|" /etc/inittab
+
+		init q
+	fi
+
+	# Creating state file
+	touch /var/lib/live/config/sysvinit
+}
+
+Cmdline
+Init
+Config

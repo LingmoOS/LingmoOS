@@ -1,0 +1,105 @@
+#!/bin/sh
+
+. /usr/lib/live/config.sh
+
+## live-config(7) - System Configuration Components
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+#set -e
+
+Cmdline ()
+{
+	# Reading kernel command line
+	for _PARAMETER in ${LIVE_CONFIG_CMDLINE}
+	do
+		case "${_PARAMETER}" in
+			live-config.noroot|noroot)
+				LIVE_CONFIG_NOROOT="true"
+				;;
+
+			live-config.username=*|username=*)
+				LIVE_USERNAME="${_PARAMETER#*username=}"
+				;;
+		esac
+	done
+}
+
+Init ()
+{
+	# Disable root access, no matter what mechanism
+	case "${LIVE_CONFIG_NOROOT}" in
+		true)
+			exit 0
+			;;
+	esac
+
+	# Checking if package is installed or already configured
+	if ! pkg_is_installed "sudo" || \
+	   component_was_executed "sudo"
+	then
+		exit 0
+	fi
+
+	echo -n " sudo"
+
+}
+
+Config ()
+{
+	# Skip sudo configuration if username is root
+	case "${LIVE_USERNAME}" in
+		root)
+			exit 0
+			;;
+	esac
+
+	# Checking if package is already configured differently
+	if grep -qs "^${LIVE_USERNAME}" /etc/sudoers.d/live
+	then
+		exit 0
+	fi
+
+	echo "${LIVE_USERNAME} ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers.d/live
+	chmod 0440 /etc/sudoers.d/live
+
+	# Add the user to the sudo group even if it's not required for
+	# the benefit of applications that rely on the group membership
+	# to decide whether the user has admin rights
+	usermod -a -G sudo ${LIVE_USERNAME}
+
+	sudo -u "${LIVE_USERNAME}" sh -c "echo 'SU_TO_ROOT_SU=sudo' >> /home/${LIVE_USERNAME}/.su-to-rootrc"
+
+	if [ -x /usr/bin/gconftool-2 ]
+	then
+		sudo -u "${LIVE_USERNAME}" gconftool-2 -s -t bool /apps/gksu/sudo-mode true
+		sudo -u "${LIVE_USERNAME}" gconftool-2 -s -t bool /apps/gksu/display-no-pass-info false
+	fi
+
+	sudo -u "${LIVE_USERNAME}" sh -c "umask 0077 && mkdir -p /home/${LIVE_USERNAME}/.kde/share/config && cat > /home/${LIVE_USERNAME}/.kde/share/config/kdesurc" << EOF
+[super-user-command]
+super-user-command=sudo
+EOF
+
+	if [ -e /usr/share/apps/konsole/sumc.desktop ]
+	then
+		sudo -u "${LIVE_USERNAME}" sh -c "umask 0077 && mkdir -p /home/${LIVE_USERNAME}/.kde/share/apps/konsole && sed -e's/Exec=su.*$/Exec=sudo mc -c/' /usr/share/apps/konsole/sumc.desktop > /home/${LIVE_USERNAME}/.kde/share/apps/konsole/sumc.desktop"
+	fi
+
+	if [ -e /usr/share/apps/konsole/su.desktop ]
+	then
+		sudo -u "${LIVE_USERNAME}" sh -c "umask 0077 && mkdir -p /home/${LIVE_USERNAME}/.kde/share/apps/konsole && sed -e's/Exec=su.*$/Exec=sudo -i/' /usr/share/apps/konsole/su.desktop > /home/${LIVE_USERNAME}/.kde/share/apps/konsole/su.desktop"
+	fi
+
+	# Creating state file
+	touch /var/lib/live/config/sudo
+}
+
+Cmdline
+Init
+Config

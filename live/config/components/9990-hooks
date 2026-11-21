@@ -1,0 +1,88 @@
+#!/bin/sh
+
+. /usr/lib/live/config.sh
+
+## live-config(7) - System Configuration Components
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+. /lib/live/setup-network.sh
+
+#set -e
+
+Cmdline ()
+{
+	# Reading kernel command line
+	for _PARAMETER in ${LIVE_CONFIG_CMDLINE}
+	do
+		case "${_PARAMETER}" in
+			live-config.hooks=*|hooks=*)
+				LIVE_HOOKS="${_PARAMETER#*hooks=}"
+				;;
+		esac
+	done
+}
+
+Init ()
+{
+	if [ -z "${LIVE_HOOKS}" ]
+	then
+		exit 0
+	fi
+
+	echo -n " hooks"
+}
+
+Config ()
+{
+	for _HOOK in $(echo ${LIVE_HOOKS} | sed -e 's/|/ /g')
+	do
+		case "${_HOOK}" in
+			filesystem)
+				if ls /usr/lib/live/config-hooks/* 2>&1
+				then
+					_HOOKS="${_HOOKS} $(for _FILE in /usr/lib/live/config-hooks/*; do echo file://${_FILE}; done)"
+				fi
+				;;
+
+			medium)
+				if ls /lib/live/mount/medium/live/config-hooks/* 2>&1
+				then
+					_HOOKS="${_HOOKS} $(for _FILE in /lib/live/mount/medium/live/config-hooks/*; do echo file://${_FILE}; done)"
+				fi
+				;;
+
+			*)
+				_HOOKS="${_HOOKS} ${_HOOK}"
+				;;
+		esac
+	done
+
+	for _HOOK in ${_HOOKS}
+	do
+		_TMPFILE="$(mktemp -t live-config.XXXXXXXX)"
+
+		if echo "${_HOOK}" | grep -qs file://
+		then
+			# local file
+			cp $(echo ${_HOOK} | sed 's|file://||') "${_TMPFILE}"
+		else
+			# remote file
+			Setup_network
+
+			wget --quiet "${_HOOK}" -O "${_TMPFILE}"
+		fi
+
+		chmod 0755 "${_TMPFILE}"
+		"${_TMPFILE}"
+		rm -f "${_TMPFILE}"
+	done
+}
+
+Cmdline
+Init
+Config

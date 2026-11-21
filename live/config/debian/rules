@@ -1,0 +1,30 @@
+#!/usr/bin/make -f
+
+# Don't build live-config-sysvinit on Ubuntu since Ubuntu doesn't offer sysvinit
+ifeq (yes,$(shell dpkg-vendor --derives-from Ubuntu && echo yes))
+SUPPORT_SYSVINIT := -Nlive-config-sysvinit
+endif
+
+%:
+	dh $@ $(SUPPORT_SYSVINIT)
+
+override_dh_auto_install:
+	dh_auto_install -- DESTDIR=debian/tmp
+
+	# live-config-sysvinit
+	mkdir -p debian/live-config-sysvinit/usr/lib/live/config
+	mv debian/tmp/usr/lib/live/config/*-sysvinit debian/live-config-sysvinit/usr/lib/live/config
+	mv debian/tmp/usr/lib/live/config/*-sysv-rc debian/live-config-sysvinit/usr/lib/live/config
+
+	# Using user-setup instead of live-debconfig
+	rm -f debian/tmp/live/config/*live-debconfig*
+
+	# Removing unused files
+	rm -f debian/tmp/usr/share/doc/live-config/COPYING
+	frontend/live-config-update debian/tmp
+
+override_dh_compress:
+	dh_compress -Xusr/share/doc/live-config/examples
+
+override_dh_installinit:
+	dh_installinit -p live-config-sysvinit --no-stop-on-upgrade --no-start --update-rcd-params='start 00 S .' --name live-config --onlyscripts

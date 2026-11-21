@@ -1,0 +1,142 @@
+lingmo-installer-config (5.0.15+lingmo5u3) unstable; urgency=medium
+
+  * Require only nonempty passwords and disable the first-boot OOBE service.
+  * Clean Live markers and all local APT sources using the explicit target root.
+  * Add installed-system cleanup and login regression tests.
+
+ -- Lingmo OS Team <team@lingmo.org>  Mon, 09 Nov 2026 12:00:00 +0800
+
+lingmo-installer-config (5.0.15+lingmo5u2) unstable; urgency=medium
+
+  * Enable timezone and user creation pages with target configuration jobs.
+  * Configure Lingmo DM and document the installer-to-OOBE account handoff.
+
+ -- Lingmo OS Team <team@lingmo.org>  Sun, 08 Nov 2026 12:00:00 +0800
+
+lingmo-installer-config (5.0.15+lingmo5u1) unstable; urgency=medium
+
+  * branding/lingmo: complete input widget and progress bar styling:
+    - QLineEdit/QPlainTextEdit/QTextEdit: min-height 36px, 8px radius,
+      1.5px blue focus ring matching LingmoSDK TextField.
+    - QComboBox: same field style, custom drop-down arrow, popup list
+      with 10px radius, hover and selected states in accent blue.
+    - QSpinBox/QDoubleSpinBox: styled up/down buttons with hover tint.
+    - QProgressBar (#exec-progress): 8px pill track, accent blue fill
+      with subtle gradient, text hidden; generic bars 6px pill.
+
+ -- Lingmo OS Team <team@lingmo.org>  Mon, 02 Nov 2026 17:30:00 +0800
+
+lingmo-installer-config (5.0.14+lingmo5u1) unstable; urgency=medium
+
+  * branding/lingmo: add stylesheet.qss to style QPushButton, QLineEdit,
+    QComboBox, QCheckBox, QScrollBar and the sidebar to match LingmoSDK's
+    visual language (rounded 10px corners, #3385FF accent, consistent
+    hover/pressed states).
+  * branding/lingmo: change accent colour from #D35400 (orange) to #3385FF
+    (LingmoOS blue) in branding.desc so the sidebar current-step highlight
+    matches the rest of the desktop.
+
+ -- Lingmo OS Team <team@lingmo.org>  Mon, 02 Nov 2026 17:00:00 +0800
+
+lingmo-installer-config (5.0.13.lingmo5u1) unstable; urgency=medium
+
+  * 修复安装时 dpkg-unsafe-io 步骤失败。
+    helpers/ 下的脚本在仓库里没有可执行位，经 debian/install 装到
+    /usr/share/calamares/helpers/ 后仍是 0644，Calamares 调用时报
+    Permission denied（退出码 126），安装中止。现为这些脚本补上 0755。
+
+ -- Lingmo OS Team <team@lingmo.org>  Mon, 19 Oct 2026 12:44:33 +0800
+
+lingmo-installer-config (5.0.12.lingmo5u1) unstable; urgency=medium
+
+  * 删除 shellprocess 模块，修复安装必然失败的问题。
+    该模块的脚本用了 shell 局部变量 $MNT / $FULL_SFS，而 Calamares 会先把
+    $NAME 当作 Calamares 变量展开，展开失败即报
+    “The commands use variables that are not defined. Missing variables are:
+    MNT,FULL_SFS,...”，安装直接终止；该展开发生在脚本执行之前，脚本里的
+    条件判断挡不住，因此普通安装同样失败。
+    该段代码本身也已失效：分层 ISO 的介质目录里没有 full.squashfs（全仓无任何
+    产出者），EXTRA_PKGS 与 /tmp/.full-install 也都没有消费者；分层内容本就由
+    unpackfs 全部解包进目标系统。
+  * unpackfs.conf 补充注释：optional 只用于四个附加层，基础层缺失会明确报错。
+
+ -- Lingmo OS Team <team@lingmo.org>  Sun, 18 Oct 2026 14:31:12 +0800
+
+lingmo-installer-config (5.0.11.lingmo5u1) unstable; urgency=medium
+
+  * Calamares branding：sidebar 恢复为 none（安装器不使用侧栏）。
+    上一版为对齐上游键集临时改成 widget，实际不需要侧栏。
+
+ -- Lingmo OS Team <team@lingmo.org>  Sat, 17 Oct 2026 14:11:29 +0800
+
+lingmo-installer-config (5.0.10.lingmo5u1) unstable; urgency=medium
+
+  * Calamares branding：branding.desc 键结构对齐上游 3.3.x
+    补齐缺失的 welcomeStyleCalamares / welcomeExpandingLogo /
+    windowExpanding / windowSize / windowPlacement / style 与 images.productLogo，
+    sidebar 改为 widget，slideshowAPI 由 -1 改为 2。
+    原文件缺少上述键，Calamares 启动时报
+    FATAL in "/etc/calamares/branding/lingmo/branding.desc": invalid node。
+  * donateUrl 由不存在的 /zh/donate/ 改为 /zh-cn/donate。
+
+ -- Lingmo OS Team <team@lingmo.org>  Sat, 17 Oct 2026 14:10:23 +0800
+
+lingmo-installer-config (5.0.9.lingmo5u1) unstable; urgency=medium
+
+  * Calamares unpackfs：给附加型层加 optional: true
+    firmware / apps / vendor / device 缺失时自动跳过（不使装机失败）；
+    system / kernel / desktop / lingmo / misc 仍为必需（缺失即为安装错误）。
+
+ -- Lingmo OS Team <team@lingmo.org>  Sat, 17 Oct 2026 00:36:08 +0800
+
+lingmo-installer-config (5.0.8.lingmo5u1) unstable; urgency=medium
+
+  * Calamares unpackfs：层从 6 个细分为 9 个
+    system / firmware / kernel / desktop / lingmo / apps / vendor / device / misc
+    （与 lingmo-builder 的 layer-images.conf 及钩子 ORDER 保持一致）
+
+ -- Lingmo OS Team <team@lingmo.org>  Sat, 17 Oct 2026 00:30:31 +0800
+
+lingmo-installer-config (5.0.7.lingmo5u1) unstable; urgency=medium
+
+  * Calamares unpackfs：改为多层安装（core.lm 下的 6 个 *.img）
+    原来指向 live/filesystem.squashfs（既路径过期、也无法配合分层根文件系统）
+
+ -- Lingmo OS Team <team@lingmo.org>  Sat, 17 Oct 2026 00:26:20 +0800
+
+lingmo-installer-config (5.0.6.lingmo5u1) unstable; urgency=medium
+
+  * Calamares shellprocess：介质目录名 live → core.lm
+    （与 lingmo-builder 的 LB_LIVE_DIR 保持一致；Calamares 不展开 shell 变量，故用字面量）
+
+ -- Lingmo OS Team <team@lingmo.org>  Fri, 16 Oct 2026 23:29:26 +0800
+
+lingmo-installer-config (5.0.5.lingmo5u1) unstable; urgency=medium
+
+  * New release for Lingmo OS.
+
+ -- Lingmo OS Team <team@lingmo.org>  Wed, 14 Oct 2026 14:00:00 +0800
+
+lingmo-installer-config (5.0.4.lingmo5u1) unstable; urgency=medium
+
+  * New release for Lingmo OS.
+
+ -- Lingmo OS Team <team@lingmo.org>  Tue, 13 Oct 2026 18:00:00 +0800
+
+lingmo-installer-config (5.0.2.lingmo.1) unstable; urgency=medium
+
+  * New release for Lingmo OS.
+
+ -- Lingmo OS Team <team@lingmo.org>  Wed, 08 Jul 2026 12:28:00 +0800
+
+lingmo-installer-config (5.0.1.lingmo.1) unstable; urgency=medium
+
+  * New release for Lingmo OS.
+
+ -- Lingmo OS Team <team@lingmo.org>  Sun, 28 Jun 2026 12:42:00 +0800
+
+lingmo-installer-config (5.0.0.lingmo.2) unstable; urgency=medium
+
+  * New release for Lingmo OS.
+
+ -- Lingmo OS Team <team@lingmo.org>  Sat, 27 Jun 2026 14:25:00 +0800

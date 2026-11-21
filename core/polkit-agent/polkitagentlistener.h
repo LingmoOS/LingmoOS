@@ -1,78 +1,91 @@
-/*
- * Copyright (C) 2023-2024 LingmoOS Team.
- *
- * Author:     revenmartin <revenmartin@gmail.com>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+// SPDX-FileCopyrightText: 2026 Reion Wong <reionwong@gmail.com>
+// SPDX-FileCopyrightText: 2026 LingmoOS Contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 #ifndef POLKITAGENTLISTENER_H
 #define POLKITAGENTLISTENER_H
 
-#include <QObject>
-#include <QString>
-#include <QPointer>
+#include <deque>
+#include <map>
+#include <memory>
+#include <string>
+#include <tuple>
+#include <vector>
 
-#include <PolkitQt1/Identity>
-#include <PolkitQt1/Details>
-#include <PolkitQt1/Agent/Listener>
-#include <PolkitQt1/Agent/Session>
+#include "base/dbus.h"
 
 class Dialog;
-class PolKitAgentListener : public PolkitQt1::Agent::Listener
+class AuthSession;
+
+// org.freedesktop.PolicyKit1.AuthenticationAgent for the session: one dialog
+// at a time, answered through polkit's helper.
+class PolKitAgentListener
 {
-    Q_OBJECT
-
 public:
-    explicit PolKitAgentListener(QObject *parent = nullptr);
+    // a(sa{sv}): each identity's kind and details.
+    using Identity = std::tuple<std::string, Lingmo::Base::DBus::VariantMap>;
 
-public slots:
-    void initiateAuthentication(const QString &actionId,
-                                const QString &message,
-                                const QString &iconName,
-                                const PolkitQt1::Details &details,
-                                const QString &cookie,
-                                const PolkitQt1::Identity::List &identities,
-                                PolkitQt1::Agent::AsyncResult *result);
+    explicit PolKitAgentListener(Lingmo::Base::DBus::Connection *bus);
+    ~PolKitAgentListener();
 
-    bool initiateAuthenticationFinish() { return true; }
-    void cancelAuthentication() {}
+    PolKitAgentListener(const PolKitAgentListener &) = delete;
+    PolKitAgentListener &operator=(const PolKitAgentListener &) = delete;
 
-    void request(const QString &request, bool echo);
-    void completed(bool gainedAuthorization);
+    bool registerAgent(const std::string &objectPath);
+
+    // The open dialog, for tests.
+    Dialog *dialog() const { return m_dialog.get(); }
 
 private:
-    void tryAgain();
-    void finishObtainPrivilege();
+    enum Outcome {
+        Completed,
+        Dismissed,
+        Withdrawn,
+    };
 
-private slots:
+    struct Request {
+        std::string message;
+        std::string cookie;
+        std::string user;
+        Lingmo::Base::DBus::MethodCall call;
+    };
+
+    void beginAuthentication(Lingmo::Base::DBus::MethodCall &call);
+    void cancelAuthentication(const std::string &cookie);
+
+    bool sendRegistration();
+    void onPolkitOwnerChanged(const std::string &oldOwner, const std::string &newOwner);
+    void dropRequests();
+
+    void startNext();
+    void startSession();
+    void releaseSession();
+    void releaseDialog();
+    void finishCurrent(Outcome outcome);
+    void reply(Request &request, Outcome outcome);
+
+    void onRequest(const std::string &prompt, bool echo);
+    void onNotice(const std::string &text, bool error);
+    void onCompleted(bool gainedAuthorization);
     void onDialogAccepted();
-    void onDialogCanceled();
 
-private:
-    QPointer<Dialog> m_dialog;
-    QPointer<PolkitQt1::Agent::Session> m_session;
-    PolkitQt1::Identity::List m_identities;
-    PolkitQt1::Agent::AsyncResult *m_result;
-    PolkitQt1::Identity m_selectedUser;
-    QString m_cookie;
+    Lingmo::Base::DBus::Connection *m_bus;
+    std::string m_objectPath;
+    std::unique_ptr<Lingmo::Base::DBus::Object> m_object;
+    Lingmo::Base::DBus::Match m_ownerChanged;
 
-    bool m_inProgress;
-    bool m_gainedAuthorization;
-    bool m_wasCancelled;
+    // polkitd sends requests concurrently; the first one owns the dialog.
+    std::deque<Request> m_queue;
 
-    int m_numTries;
+    std::unique_ptr<Dialog> m_dialog;
+    std::unique_ptr<AuthSession> m_session;
+
+    // A response typed before PAM asked for one.
+    std::string m_response;
+    bool m_hasResponse = false;
+    bool m_requestPending = false;
+
+    int m_numTries = 0;
 };
 
 #endif // POLKITAGENTLISTENER_H

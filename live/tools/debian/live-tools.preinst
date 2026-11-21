@@ -1,0 +1,24 @@
+#!/bin/sh
+
+set -e
+
+case "${1}" in
+	install|upgrade)
+		# initramfs-tools: update-initramfs
+		dpkg-divert --package live-tools --quiet --add --rename --divert /usr/sbin/update-initramfs.orig.initramfs-tools /usr/sbin/update-initramfs
+		dpkg-divert --package live-tools --quiet --add --rename --divert /usr/share/man/man8/update-initramfs.orig.initramfs-tools.8.gz /usr/share/man/man8/update-initramfs.8.gz
+		;;
+
+	abort-upgrade)
+
+		;;
+
+	*)
+		echo "preinst called with unknown argument \`$1'" >&2
+		exit 1
+		;;
+esac
+
+#DEBHELPER#
+
+exit 0

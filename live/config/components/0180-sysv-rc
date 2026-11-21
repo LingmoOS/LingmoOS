@@ -1,0 +1,58 @@
+#!/bin/sh
+
+. /usr/lib/live/config.sh
+
+## live-config(7) - System Configuration Components
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+#set -e
+
+Cmdline ()
+{
+	# Reading kernel command line
+	for _PARAMETER in ${LIVE_CONFIG_CMDLINE}
+	do
+		case "${_PARAMETER}" in
+			live-config.sysv-rc=*|sysv-rc=*)
+				LIVE_SYSV_RC="${_PARAMETER#*sysv-rc=}"
+				;;
+		esac
+	done
+}
+
+Init ()
+{
+	# Checking if package is installed or already configured
+	if ! pkg_is_installed "sysv-rc" || \
+	   component_was_executed "sysv-rc"
+	then
+		exit 0
+	fi
+
+	echo -n " sysv-rc"
+}
+
+Config ()
+{
+	if [ -n "${LIVE_SYSV_RC}" ]
+	then
+		for _SERVICE in $(echo ${LIVE_SYSV_RC} | sed -e 's|,| |g')
+		do
+			update-rc.d -f ${_SERVICE} remove | \
+			grep -v "update-rc.d: using dependency based boot sequencing" || true
+		done
+	fi
+
+	# Creating state file
+	touch /var/lib/live/config/sysv-rc
+}
+
+Cmdline
+Init
+Config

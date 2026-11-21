@@ -1,0 +1,99 @@
+#!/bin/sh
+
+. /usr/lib/live/config.sh
+
+## live-config(7) - System Configuration Components
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+#set -e
+
+Cmdline ()
+{
+	# Reading kernel command line
+	for _PARAMETER in ${LIVE_CONFIG_CMDLINE}
+	do
+		case "${_PARAMETER}" in
+			live-config.keyboard-layouts=*|keyboard-layouts=*)
+				LIVE_KEYBOARD_LAYOUTS="${_PARAMETER#*keyboard-layouts=}"
+				;;
+
+			live-config.username=*|username=*)
+				LIVE_USERNAME="${_PARAMETER#*username=}"
+				;;
+		esac
+	done
+}
+
+Init ()
+{
+	# Checking if package is installed or already configured
+	if [ ! -e /usr/bin/kwriteconfig ] || \
+	   component_was_executed "kde-services"
+	then
+		exit 0
+	fi
+
+	echo -n " kde-services"
+}
+
+Config ()
+{
+	# Enabling keyboard selector
+	if echo "${LIVE_KEYBOARD_LAYOUTS}" | grep -qs ','
+	then
+		if [ ! -e "/home/${LIVE_USERNAME}/.kde/share/config/kxkbrc" ]
+		then
+			mkdir -p "/home/${LIVE_USERNAME}/.kde/share/config/"
+
+cat > "/home/${LIVE_USERNAME}/.kde/share/config/kxkbrc" << EOF
+[Layout]
+DisplayNames=${LIVE_KEYBOARD_LAYOUTS}
+IndicatorOnly=false
+LayoutList=${LIVE_KEYBOARD_LAYOUTS}
+ShowFlag=false
+SwitchMode=Global
+Use=true
+EOF
+
+			chown ${LIVE_USERNAME}:${LIVE_USERNAME} "/home/${LIVE_USERNAME}/.kde" -R
+		fi
+	fi
+
+	# Disable addressbook migrator
+	sudo -u "${LIVE_USERNAME}" kwriteconfig --file kres-migratorrc --group Migration --key Enabled --type bool false
+
+	# Disable korganizer reminder daemon
+	sudo -u "${LIVE_USERNAME}" kwriteconfig --file korgacrc --group "General" --key "Autostart" --type bool false
+	sudo -u "${LIVE_USERNAME}" kwriteconfig --file korgacrc --group "General" --key "Enabled" --type bool false
+
+	# Disable nepomuk
+	sudo -u "${LIVE_USERNAME}" kwriteconfig --file nepomukserverrc --group "Basic Settings" --key "Start Nepomuk" --type bool false
+
+	# Disbable nepomuk krunner plugin (depends on nepomuk)
+	#sudo -u "${LIVE_USERNAME}" kwriteconfig --file krunnerrc --group "Plugins" --key "nepomuksearchEnabled" --type bool false
+
+	# Disable freespace notifier
+	sudo -u "${LIVE_USERNAME}" kwriteconfig --file kdedrc --group Module-freespacenotifier --key autoload --type bool false
+
+	# Disable searching contacts through krunner (depends on akonadi)
+	sudo -u "${LIVE_USERNAME}" kwriteconfig --file krunnerrc --group "Plugins" --key "kabccontactsEnabled" --type bool false
+
+	# Disable searching calendar events through krunner (depends on akonadi)
+	sudo -u "${LIVE_USERNAME}" kwriteconfig --file krunnerrc --group "Plugins" --key "org.kde.events_runnerEnabled" --type bool false
+
+	# should enable kxkb in ~/.kde/share/config/kxkbrc
+	# if multiple layouts are specified. gnome does it per default.
+
+	# Creating state file
+	touch /var/lib/live/config/kde-services
+}
+
+Cmdline
+Init
+Config

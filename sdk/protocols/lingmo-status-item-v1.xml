@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<protocol name="lingmo_status_item_v1">
+  <interface name="lingmo_status_item_manager_v1" version="1">
+    <description summary="items an application draws in the status bar">
+      A status item is a surface of the client's that the status bar shows
+      among its items, at the bar's height and any width the client draws:
+      an icon, a short text, a date, or an icon and a text. Pointer and touch
+      input reach the surface as they reach any other; the client decides
+      what a press does, typically opening a popup with the primary button
+      and a menu with the secondary one.
+
+      Popups hang from an item through get_popup, so they are placed against
+      it exactly and dismissed as any xdg_popup is. Popups never appear in the
+      dock or the window switcher.
+    </description>
+    <enum name="error">
+      <entry name="role" value="0" summary="the surface already has another role"/>
+    </enum>
+    <request name="destroy" type="destructor">
+      <description summary="destroy the manager">
+        Items made with it stay.
+      </description>
+    </request>
+    <request name="get_status_item">
+      <description summary="make a surface a status item">
+        Gives the surface the status item role. The compositor answers with
+        appearance, highlight and configure events once the status bar can
+        show the item; until the client acknowledges the first configure and
+        commits a buffer, the item has no place in the bar. A surface that
+        already has a role is the role error.
+      </description>
+      <arg name="id" type="new_id" interface="lingmo_status_item_v1"/>
+      <arg name="surface" type="object" interface="wl_surface"/>
+    </request>
+  </interface>
+
+  <interface name="lingmo_status_item_v1" version="1">
+    <description summary="one item in the status bar">
+      The item's width is the width of its surface's content, in surface
+      coordinates, as wp_viewporter or the buffer scale give it; its height is
+      the one the last configure asked for. The surface is drawn at the scale
+      of the output the bar is on, which wp_fractional_scale_v1 and
+      wl_surface.preferred_buffer_scale report as for any surface.
+
+      Items stand in the bar in the order they were made, the newest
+      leftmost. An item with an identifier takes the place that the last item
+      of the same application with the same identifier had when it was
+      destroyed, for the rest of the session. A surface without a buffer, or
+      wider than the configure allows, has no place in the bar.
+
+      The bar draws its highlight plate behind the item while the client asks
+      for it and while one of the item's grabbing popups is open.
+
+      Destroying the item takes it out of the bar and dismisses its popups;
+      the surface keeps the role and cannot become anything else.
+    </description>
+    <enum name="error">
+      <entry name="unconfigured_buffer" value="0" summary="a buffer was committed before the first configure was acknowledged"/>
+      <entry name="invalid_serial" value="1" summary="the serial was never sent or was already acknowledged"/>
+      <entry name="invalid_popup" value="2" summary="the popup has a parent already"/>
+      <entry name="invalid_value" value="3" summary="a value is out of range"/>
+    </enum>
+    <enum name="appearance">
+      <description summary="what the bar looks like behind its items">
+        The bar has no background of its own: its items are dark over a light
+        desktop and light over a dark one.
+      </description>
+      <entry name="light" value="0" summary="a light bar: dark contents"/>
+      <entry name="dark" value="1" summary="a dark bar: light contents"/>
+    </enum>
+    <request name="destroy" type="destructor">
+      <description summary="take the item out of the bar"/>
+    </request>
+    <request name="ack_configure">
+      <description summary="acknowledge a configure">
+        The next commit is drawn for the configure with this serial, and for
+        the ones before it.
+      </description>
+      <arg name="serial" type="uint"/>
+    </request>
+    <request name="set_identifier">
+      <description summary="name the item within its application">
+        A name that stays the same each time the application makes this item,
+        so the item comes back to its place in the bar. Applies at once. An
+        empty identifier is the default and remembers nothing.
+      </description>
+      <arg name="identifier" type="string"/>
+    </request>
+    <request name="set_highlight">
+      <description summary="ask for the bar's highlight behind the item">
+        A value of 1 shows the bar's highlight plate behind the item, as while
+        a popup or menu of the item is open; 0 takes it away unless a grabbing
+        popup of the item is open. 0 is the default; any other value is the
+        invalid_value error. Applies at once.
+      </description>
+      <arg name="highlighted" type="uint"/>
+    </request>
+    <request name="get_popup">
+      <description summary="hang a popup from the item">
+        Makes the item the parent of a popup made by xdg_surface.get_popup
+        with a null parent. The positioner given there is read now, with its
+        anchor rectangle in the item's surface coordinates: an anchor
+        rectangle covering the item with bottom anchor and gravity hangs the
+        popup centred under it. The popup is placed inside the work area of
+        the bar's output and dismissed as any xdg_popup; while one of its
+        popups has a grab, a press on the item itself reaches the client and
+        does not dismiss it.
+
+        Must come before the popup's first commit. A popup that already has a
+        parent is the invalid_popup error. While the item has no place in the
+        bar, the popup is dismissed at once with xdg_popup.popup_done.
+      </description>
+      <arg name="popup" type="object" interface="xdg_popup"/>
+    </request>
+    <event name="configure">
+      <description summary="the size the bar has for the item">
+        The item is drawn this tall, in surface coordinates, and at most
+        max_width wide. The client acknowledges the configure before the
+        commit that answers it. Sent when the bar first has a place for the
+        item and whenever the bar's height or the room it has changes.
+      </description>
+      <arg name="serial" type="uint"/>
+      <arg name="height" type="int"/>
+      <arg name="max_width" type="int"/>
+    </event>
+    <event name="appearance">
+      <description summary="the bar's look behind the item">
+        Sent before the first configure and whenever it changes. foreground
+        is the colour the bar draws its own text and symbols in, as
+        0xAARRGGBB with straight alpha: the colour to tint single-colour
+        artwork with.
+      </description>
+      <arg name="appearance" type="uint" enum="appearance"/>
+      <arg name="foreground" type="uint"/>
+    </event>
+    <event name="highlight">
+      <description summary="whether the bar shows its highlight behind the item">
+        Sent before the first configure and whenever it changes.
+      </description>
+      <arg name="highlighted" type="uint"/>
+    </event>
+    <event name="placed">
+      <description summary="where the item is on the screen">
+        The item's rectangle in the compositor's global logical coordinates,
+        sent whenever it moves or changes size, with width and height 0 when
+        the item has no place in the bar. A window that cannot be a popup of
+        the item can open next to it with
+        lingmo_window_hints_v1.set_placement_anchor.
+      </description>
+      <arg name="x" type="int"/>
+      <arg name="y" type="int"/>
+      <arg name="width" type="int"/>
+      <arg name="height" type="int"/>
+    </event>
+  </interface>
+</protocol>

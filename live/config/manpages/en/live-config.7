@@ -1,0 +1,283 @@
+.\" live-config(7) - System Configuration Components
+.\" Copyright (C) 2016-2020 The Debian Live team
+.\" Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+.\"
+.\" This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+.\" This is free software, and you are welcome to redistribute it
+.\" under certain conditions; see COPYING for details.
+.\"
+.\"
+.TH LIVE\-CONFIG 7 2015\-09\-23 5.0~a5-1 "Debian Live Project"
+
+.SH NAME
+\fBlive\-config\fR \- System Configuration Components
+
+.SH DESCRIPTION
+\fBlive\-config\fR contains the components that configure a live system during the boot process (late userspace).
+
+.SH CONFIGURATION
+\fBlive\-config\fR can be configured through boot parameters or configuration files. If both mechanisms are used for a certain option, the boot parameters take precedence over the configuration files. When using persistency, \fBlive\-config\fR components are only run once.
+.PP
+If \fIlive\-build\fR(7) is used to build the live system, the live\-config parameters used by default can be set through the \-\-bootappend\-live option, see \fIlb_config\fR(1) manual page.
+
+.SS Boot Parameters (components)
+\fBlive\-config\fR is only activated if 'boot=live' is used as a boot parameter. Additionally, \fBlive\-config\fR needs to be told which components to run through the 'live\-config.components' parameter or which components to not run through the 'live\-config.nocomponents' parameter. If both 'live\-config.components' and 'live\-config.nocomponents' are used, or, if either one is specified multiple times, always the later one takes precedence over the previous one(s).
+
+.IP "\fBlive\-config.components\fR | \fBcomponents\fR" 4
+All components are run. This is what live images use by default.
+.IP "\fBlive\-config.components\fR=\fICOMPONENT1\fR,\fICOMPONENT2\fR, ... \fICOMPONENTn\fR | \fBcomponents\fR=\fICOMPONENT1\fR,\fICOMPONENT2\fR, ... \fICOMPONENTn\fR" 4
+Only the specified components are run. Note that the order matters, e.g. 'live\-config.components=sudo,user\-setup' would not work since the user needs to be added before it can be configured for sudo. Look at the filenames of the components in /usr/lib/live/config for their ordering number.
+.IP "\fBlive\-config.nocomponents\fR | \fBnocomponents\fR" 4
+No component is run. This is the same as not using any of 'live\-config.components' or 'live\-config.nocomponents'.
+.IP "\fBlive\-config.nocomponents\fR=\fICOMPONENT1\fR,\fICOMPONENT2\fR, ... \fICOMPONENTn\fR | \fBnocomponents\fR=\fICOMPONENT1\fR,\fICOMPONENT2\fR, ... \fICOMPONENTn\fR" 4
+All components are run, except the specified ones.
+
+.SS Boot Parameters (options)
+Some individual components can change their behaviour upon a boot parameter.
+
+.IP "\fBlive\-config.debconf\-preseed\fR=filesystem|medium|\fIURL1\fR|\fIURL2\fR| ... |\fIURLn\fR | \fBdebconf\-preseed\fR=medium|filesystem|\fIURL1\fR|\fIURL2\fR| ... |\fIURLn\fR" 4
+Allows one to fetch and apply one or more debconf preseed files to be applied to the debconf database. Note that the URLs must be fetchable by wget (http, ftp or file://).
+.br
+If the file is placed on the live medium, it can be fetched with file:///lib/live/mount/medium/\fIFILE\fR, or with file:///\fIFILE\fR if it is in the root filesystem of the live system itself.
+.br
+All preseed files in /usr/lib/live/config\-preseed/ in the root filesystem of the live system can be automatically enabled with the keyword 'filesystem'.
+.br
+All preseed files in /live/config\-preseed/ of the live medium can be automatically enabled with the keyword 'medium'.
+.br
+If several mechanisms are combined, then filesystem preseed files are applied first, then medium preseed files, and last the network preseed files.
+.IP "\fBlive\-config.hostname\fR=\fIHOSTNAME\fR | \fBhostname\fR=\fIHOSTNAME\fR" 4
+Allows one to set the hostname of the system. The default is 'debian'.
+.IP "\fBlive\-config.username\fR=\fIUSERNAME\fR | \fBusername\fR=\fIUSERNAME\fR" 4
+Allows one to set the username that gets created for autologin. The default is 'user'.
+.IP "\fBlive\-config.user\-default\-groups\fR=\fIGROUP1\fR,\fIGROUP2\fR ... \fIGROUPn\fR | \fBuser\-default\-groups\fR=\fIGROUP1\fR,\fIGROUP2\fR ... \fIGROUPn\fR" 4
+Allows one to set the default groups of the users that gets created for autologin is member of. The default is 'audio cdrom dip floppy video plugdev netdev powerdev scanner bluetooth'.
+.IP "\fBlive\-config.user\-fullname\fR=""\fIUSER FULLNAME\fR"" | \fBuser\-fullname\fR=""\fIUSER FULLNAME\fR""" 4
+Allows one to set the fullname of the users that gets created for autologin. On Debian the default is 'Debian Live user'.
+.IP "\fBlive\-config.locales\fR=\fILOCALE1\fR,\fILOCALE2\fR ... \fILOCALEn\fR | \fBlocales\fR=\fILOCALE1\fR,\fILOCALE2\fR ... \fILOCALEn\fR" 4
+Allows one to set the locale of the system, e.g. 'de_CH.UTF\-8'. The default is 'en_US.UTF\-8'. In case the selected locale is not already available on the system, it is automatically generated on the fly.
+.IP "\fBlive\-config.timezone\fR=\fITIMEZONE\fR | \fBtimezone\fR=\fITIMEZONE\fR" 4
+Allows one to set the timezone of the system, e.g. 'Europe/Zurich'. The default is 'UTC'.
+.IP "\fBlive\-config.keyboard\-model\fR=\fIKEYBOARD_MODEL\fR | \fBkeyboard\-model\fR=\fIKEYBOARD_MODEL\fR" 4
+Allows one to change the keyboard model. There is no default value set.
+.IP "\fBlive\-config.keyboard\-layouts\fR=\fIKEYBOARD_LAYOUT1\fR,\fIKEYBOARD_LAYOUT2\fR ... \fIKEYBOARD_LAYOUTn\fR | \fBkeyboard\-layouts\fR=\fIKEYBOARD_LAYOUT1\fR,\fIKEYBOARD_LAYOUT2\fR ... \fIKEYBOARD_LAYOUTn\fR" 4
+Allows one to change the keyboard layouts. If more than one is specified, the tools of the desktop environment will allow one to switch it under X11. There is no default value set.
+.IP "\fBlive\-config.keyboard\-variants\fR=\fIKEYBOARD_VARIANT1\fR,\fIKEYBOARD_VARIANT2\fR ... \fIKEYBOARD_VARIANTn\fR | \fBkeyboard\-variants\fR=\fIKEYBOARD_VARIANT1\fR,\fIKEYBOARD_VARIANT2\fR ... \fIKEYBOARD_VARIANTn\fR" 4
+Allows one to change the keyboard variants. If more than one is specified, the same number of values as keyboard\-layouts values should be specified as they will be matched one\-to\-one in the order specified. Blank values are allowed. The tools of the desktop environment will allow one to switch between each layout and variant pair under X11. There is no default value set.
+.IP "\fBlive\-config.keyboard\-options\fR=\fIKEYBOARD_OPTIONS\fR | \fBkeyboard\-options\fR=\fIKEYBOARD_OPTIONS\fR" 4
+Allows one to change the keyboard options. There is no default value set.
+.IP "\fBlive\-config.sysv-rc\fR=\fISERVICE1\fR,\fISERVICE2\fR ... \fISERVICEn\fR | \fBsysv-rc\fR=\fISERVICE1\fR,\fISERVICE2\fR ... \fISERVICEn\fR" 4
+Allows one to disable sysv services through update-rc.d.
+.IP "\fBlive\-config.utc\fR=\fByes\fR|no | \fButc\fR=\fByes\fR|no" 4
+Allows one to change if the system is assuming that the hardware clock is set to UTC or not. The default is 'yes'.
+.IP "\fBlive\-config.x\-session\-manager=\fIX_SESSION_MANAGER\fR | \fBx\-session\-manager\fR=\fIX_SESSION_MANAGER\fR" 4
+Allows one to set the x\-session\-manager through update\-alternatives.
+.IP "\fBlive\-config.xorg\-driver\fR=\fIXORG_DRIVER\fR | \fBxorg\-driver\fR=\fIXORG_DRIVER\fR" 4
+Allows one to set xorg driver instead of autodetecting it. If a PCI ID is specified in /usr/share/live/config/xserver-xorg/\fIDRIVER\fR.ids within the live system, the \fIDRIVER\fR is enforced for these devices. If both a boot parameter and an override are found, the boot parameter takes precedence.
+.IP "\fBlive\-config.xorg\-resolution\fR=\fIXORG_RESOLUTION\fR | \fBxorg\-resolution\fR=\fIXORG_RESOLUTION\fR" 4
+Allows one to set xorg resolution instead of autodetecting it, e.g. 1024x768.
+.IP "\fBlive\-config.wlan\-driver\fR=\fIWLAN_DRIVER\fR | \fBwlan\-driver\fR=\fIWLAN_DRIVER\fR" 4
+Allows one to set WLAN driver instead of autodetecting it. If a PCI ID is specified in /usr/share/live/config/broadcom-sta/\fIDRIVER\fR.ids within the live system, the \fIDRIVER\fR is enforced for these devices. If both a boot parameter and an override are found, the boot parameter takes precedence.
+.IP "\fBlive\-config.hooks\fR=filesystem|medium|\fIURL1\fR|\fIURL2\fR| ... |\fIURLn\fR | \fBhooks\fR=medium|filesystem|\fIURL1\fR|\fIURL2\fR| ... |\fIURLn\fR" 4
+Allows one to fetch and execute one or more arbitrary files. Note that the URLs must be fetchable by wget (http, ftp or file://), the files are executed in /tmp of the running live system, and that the files needs their dependencies, if any, already installed, e.g. if a python script should be executed the system needs python installed. Some hooks for some common use-cases are available at /usr/share/doc/live-config/examples/hooks/.
+.br
+If the file is placed on the live medium, it can be fetched with file:///lib/live/mount/medium/\fIFILE\fR, or with file:///\fIFILE\fR if it is in the root filesystem of the live system itself.
+.br
+All hooks in /usr/lib/live/config\-hooks/ in the root filesystem of the live system can be automatically enabled with the keyword 'filesystem'.
+.br
+All hooks in /live/config\-hooks/ of the live medium can be automatically enabled with the keyword 'medium'.
+.br
+If several mechanisms are combined, then filesystem hooks are executed first, then medium hooks, and last the network hooks.
+
+.SS Boot Parameters (shortcuts)
+For some common use cases where it would require to combine several individual parameters, \fBlive\-config\fR provides shortcuts. This allows both to have full granularity over all the options, as well keep things simple.
+
+.IP "\fBlive\-config.noroot\fR | \fBnoroot\fR" 4
+Disables sudo and policykit, the user cannot gain root privileges on the system.
+.IP "\fBlive\-config.noautologin\fR | \fBnoautologin\fR" 4
+Disables both the automatic console login and the graphical autologin.
+.IP "\fBlive\-config.nottyautologin\fR | \fBnottyautologin\fR" 4
+Disables the automatic login on the console, not affecting the graphical autologin.
+.IP "\fBlive\-config.nox11autologin\fR | \fBnox11autologin\fR" 4
+Disables the automatic login with any display manager, not affecting tty autologin.
+
+.SS Boot Parameters (special options)
+For special use cases there are some special boot parameters.
+
+.IP "\fBlive\-config.debug\fR | \fBdebug\fR" 4
+Enables debug output in live\-config.
+
+.SS Configuration Files
+\fBlive\-config\fR can be configured (but not activated) through configuration files. Everything but the shortcuts that can be configured with a boot parameter can also alternatively be configured through one or more files. If configuration files are used, the 'boot=live' parameter is still required to activate \fBlive\-config\fR.
+.PP
+\fBNote:\fR If configuration files are used, either (preferably) all boot parameters should be put into the \fBLIVE_CONFIG_CMDLINE\fR variable, or individual variables can be set. If individual variables are used, the user is required to ensure that all the necessary variables are set to create a valid configuration.
+.PP
+Configuration files can be placed either in the root filesystem itself (/etc/live/config.conf, /etc/live/config.conf.d/*.conf), or on the live media (live/config.conf, live/config.conf.d/*.conf). If both places are used for a certain option, the ones from the live media take precedence over the ones from the root filesystem.
+.PP
+Although the configuration files placed in the configuration directories do not require a particular name, it is suggested for consistency reasons to either use 'vendor.conf' or 'project.conf' as a naming scheme (whereas 'vendor' or 'project' is replaced with the actual name, resulting in a filename like 'progress\-linux.conf').
+.PP
+The actual content of the configuration files consists of one or more of the following variables.
+
+.IP "\fBLIVE_CONFIG_CMDLINE\fR=\fIPARAMETER1\fR \fIPARAMETER2\fR ... \fIPARAMETERn\fR" 4
+This variable corresponds to the bootloader command line.
+.IP "\fBLIVE_CONFIG_COMPONENTS\fR=\fICOMPONENT1\fR,\fICOMPONENT2\fR, ... \fICOMPONENTn\fR" 4
+This variable corresponds to the '\fBlive\-config.components\fR=\fICOMPONENT1\fR,\fICOMPONENT2\fR, ... \fICOMPONENTn\fR' parameter.
+.IP "\fBLIVE_CONFIG_NOCOMPONENTS\fR=\fICOMPONENT1\fR,\fICOMPONENT2\fR, ... \fICOMPONENTn\fR" 4
+This variable corresponds to the '\fBlive\-config.nocomponents\fR=\fICOMPONENT1\fR,\fICOMPONENT2\fR, ... \fICOMPONENTn\fR' parameter.
+.IP "\fBLIVE_DEBCONF_PRESEED\fR=filesystem|medium|\fIURL1\fR|\fIURL2\fR| ... |\fIURLn\fR" 4
+This variable corresponds to the '\fBlive\-config.debconf\-preseed\fR=filesystem|medium|\fIURL1\fR|\fIURL2\fR| ... |\fIURLn\fR' parameter.
+.IP "\fBLIVE_HOSTNAME\fR=\fIHOSTNAME\fR" 4
+This variable corresponds to the '\fBlive\-config.hostname\fR=\fIHOSTNAME\fR' parameter.
+.IP "\fBLIVE_USERNAME\fR=\fIUSERNAME\fR" 4
+This variable corresponds to the '\fBlive\-config.username\fR=\fIUSERNAME\fR' parameter.
+.IP "\fBLIVE_USER_DEFAULT_GROUPS\fR=\fIGROUP1\fR,\fIGROUP2\fR ... \fIGROUPn\fR" 4
+This variable corresponds to the '\fBlive\-config.user\-default\-groups\fR="\fIGROUP1\fR,\fIGROUP2\fR ... \fIGROUPn\fR"' parameter.
+.IP "\fBLIVE_USER_FULLNAME\fR=""\fIUSER FULLNAME\fR""" 4
+This variable corresponds to the '\fBlive\-config.user\-fullname\fR="\fIUSER FULLNAME\fR"' parameter.
+.IP "\fBLIVE_LOCALES\fR=\fILOCALE1\fR,\fILOCALE2\fR ... \fILOCALEn\fR" 4
+This variable corresponds to the '\fBlive\-config.locales\fR=\fILOCALE1\fR,\fILOCALE2\fR ... \fILOCALEn\fR' parameter.
+.IP "\fBLIVE_TIMEZONE\fR=\fITIMEZONE\fR" 4
+This variable corresponds to the '\fBlive\-config.timezone\fR=\fITIMEZONE\fR' parameter.
+.IP "\fBLIVE_KEYBOARD_MODEL\fR=\fIKEYBOARD_MODEL\fR" 4
+This variable corresponds to the '\fBlive\-config.keyboard\-model\fR=\fIKEYBOARD_MODEL\fR' parameter.
+.IP "\fBLIVE_KEYBOARD_LAYOUTS\fR=\fIKEYBOARD_LAYOUT1\fR,\fIKEYBOARD_LAYOUT2\fR ... \fIKEYBOARD_LAYOUTn\fR" 4
+This variable corresponds to the '\fBlive\-config.keyboard\-layouts\fR=\fIKEYBOARD_LAYOUT1\fR,\fIKEYBOARD_LAYOUT2\fR ... \fIKEYBOARD_LAYOUTn\fR' parameter.
+.IP "\fBLIVE_KEYBOARD_VARIANTS\fR=\fIKEYBOARD_VARIANT1\fR,\fIKEYBOARD_VARIANT2\fR ... \fIKEYBOARD_VARIANTn\fR" 4
+This variable corresponds to the '\fBlive\-config.keyboard\-variants\fR=\fIKEYBOARD_VARIANT1\fR,\fIKEYBOARD_VARIANT2\fR ... \fIKEYBOARD_VARIANTn\fR' parameter.
+.IP "\fBLIVE_KEYBOARD_OPTIONS\fR=\fIKEYBOARD_OPTIONS\fR" 4
+This variable corresponds to the '\fBlive\-config.keyboard\-options\fR=\fIKEYBOARD_OPTIONS\fR' parameter.
+.IP "\fBLIVE_SYSV_RC\fR=\fISERVICE1\fR,\fISERVICE2\fR ... \fISERVICEn\fR" 4
+This variable corresponds to the '\fBlive\-config.sysv-rc\fR=\fISERVICE1\fR,\fISERVICE2\fR ... \fISERVICEn\fR' parameter.
+.IP "\fBLIVE_UTC\fR=\fByes\fR|no" 4
+This variable corresponds to the '\fBlive\-config.utc\fR=\fByes\fR|no' parameter.
+.IP "\fBLIVE_X_SESSION_MANAGER\fR=\fIX_SESSION_MANAGER\fR" 4
+This variable corresponds to the '\fBlive\-config.x\-session\-manager\fR=\fIX_SESSION_MANAGER\fR' parameter.
+.IP "\fBLIVE_XORG_DRIVER\fR=\fIXORG_DRIVER\fR" 4
+This variable corresponds to the '\fBlive\-config.xorg\-driver\fR=\fIXORG_DRIVER\fR' parameter.
+.IP "\fBLIVE_XORG_RESOLUTION\fR=\fIXORG_RESOLUTION\fR" 4
+This variable corresponds to the '\fBlive\-config.xorg\-resolution\fR=\fIXORG_RESOLUTION\fR' parameter.
+.IP "\fBLIVE_WLAN_DRIVER\fR=\fIWLAN_DRIVER\fR" 4
+This variable corresponds to the '\fBlive\-config.wlan\-driver\fR=\fIWLAN_DRIVER\fR' parameter.
+.IP "\fBLIVE_HOOKS\fR=filesystem|medium|\fIURL1\fR|\fIURL2\fR| ... |\fIURLn\fR" 4
+This variable corresponds to the '\fBlive\-config.hooks\fR=filesystem|medium|\fIURL1\fR|\fIURL2\fR| ... |\fIURLn\fR' parameter.
+.IP "\fBLIVE_CONFIG_DEBUG\fR=true|false" 4
+This variable corresponds to the '\fBlive\-config.debug\fR' parameter.
+
+.SH CUSTOMIZATION
+\fBlive\-config\fR can be easily customized for downstream projects or local usage.
+
+.SS Adding new config components
+Downstream projects can put their components into /usr/lib/live/config and do not need to do anything else, the components will be called automatically during boot.
+.PP
+The components are best put into an own debian package. A sample package containing an example component can be found in /usr/share/doc/live\-config/examples.
+
+.SS Removing existing config components
+It is not really possible to remove components itself in a sane way yet without requiring either to ship a locally modified \fBlive\-config\fR package or using dpkg-divert. However, the same can be achieved by disabling the respective components through the live\-config.nocomponents mechanism, see above. To avoid to always need specifying disabled components through the boot parameter, a configuration file should be used, see above.
+.PP
+The configuration files for the live system itself are best put into an own debian package. A sample package containing an example configuration can be found in /usr/share/doc/live\-config/examples.
+
+.SH COMPONENTS
+\fBlive\-config\fR currently features the following components in /usr/lib/live/config.
+
+.IP "\fBdebconf\fR" 4
+allows one to apply arbitrary preseed files placed on the live media or an http/ftp server.
+.IP "\fBhostname\fR" 4
+configures /etc/hostname and /etc/hosts.
+.IP "\fBuser\-setup\fR" 4
+adds a live user account.
+.IP "\fBsudo\fR" 4
+grants sudo privileges to the live user.
+.IP "\fBlocales\fR" 4
+configures locales.
+.IP "\fBlocales\-all\fR" 4
+configures locales\-all.
+.IP "\fBtzdata\fR" 4
+configures /etc/timezone.
+.IP "\fBgdm3\fR" 4
+configures autologin in gdm3.
+.IP "\fBkdm\fR" 4
+configures autologin in kdm.
+.IP "\fBlightdm\fR" 4
+configures autologin in lightdm.
+.IP "\fBlxdm\fR" 4
+configures autologin in lxdm.
+.IP "\fBnodm\fR" 4
+configures autologin in nodm.
+.IP "\fBslim\fR" 4
+configures autologin in slim.
+.IP "\fBxinit\fR" 4
+configures autologin with xinit.
+.IP "\fBkeyboard\-configuration\fR" 4
+configures the keyboard.
+.IP "\fBsystemd\fR" 4
+configures systemd autologin.
+.IP "\fBsysvinit\fR" 4
+configures sysvinit.
+.IP "\fBsysv-rc\fR" 4
+configures sysv-rc by disabling listed services.
+.IP "\fBlogin\fR" 4
+disables lastlog.
+.IP "\fBapport\fR" 4
+disables apport.
+.IP "\fBgnome\-panel\-data\fR" 4
+disables lock button for the screen.
+.IP "\fBgnome\-power\-manager\fR" 4
+disables hibernation.
+.IP "\fBgnome\-screensaver\fR" 4
+disables the screensaver locking the screen.
+.IP "\fBkaboom\fR" 4
+disables KDE migration wizard (squeeze and newer).
+.IP "\fBkde\-services\fR" 4
+disables some unwanted KDE services (squeeze and newer).
+.IP "\fBpolicykit\fR" 4
+grant user privilegies through policykit.
+.IP "\fBssl\-cert\fR" 4
+regenerating ssl snake\-oil certificates.
+.IP "\fBanacron\fR" 4
+disables anacron.
+.IP "\fButil-linux\fR" 4
+disables util-linux' hwclock.
+.IP "\fBlogin\fR" 4
+disables lastlog.
+.IP "\fBxserver\-xorg\fR" 4
+configures xserver\-xorg.
+.IP "\fBbroadcom\-sta\fR" 4
+configures broadcom\-sta WLAN drivers.
+.IP "\fBopenssh-server\fR" 4
+recreates openssh-server host keys.
+.IP "\fBxfce4\-panel\fR" 4
+configures xfce4\-panel to default settings.
+.IP "\fBxscreensaver\fR" 4
+disables the screensaver locking the screen.
+.IP "\fBhooks\fR" 4
+allows one to run arbitrary commands from a file placed on the live media or an http/ftp server.
+
+.SH FILES
+.IP "\fB/etc/live/config.conf\fR" 4
+.IP "\fB/etc/live/config.conf.d/*.conf\fR" 4
+.IP "\fBlive/config.conf\fR" 4
+.IP "\fBlive/config.conf.d/*.conf\fR" 4
+.IP "\fB/lib/live/config.sh\fR" 4
+.IP "\fB/lib/live/config/\fR" 4
+.IP "\fB/var/lib/live/config/\fR" 4
+.IP "\fB/var/log/live/config.log\fR" 4
+.PP
+.IP "\fB/live/config\-hooks/*\fR" 4
+.IP "\fBlive/config\-hooks/*\fR" 4
+.IP "\fB/live/config\-preseed/*\fR" 4
+.IP "\fBlive/config\-preseed/* \fR" 4
+
+.SH SEE ALSO
+\fIlive\-boot\fR(7)
+.PP
+\fIlive\-build\fR(7)
+.PP
+\fIlive\-tools\fR(7)
+
+.SH HOMEPAGE
+More information about live\-config and the Debian Live project can be found on the homepage at <\fIhttps://wiki.debian.org/DebianLive\fR> and in the manual at <\fIhttps://live-team.pages.debian.net/live-manual/\fR>.
+
+.SH BUGS
+Bugs can be reported by submitting a bugreport for the live\-config package in the Bug Tracking System at <\fIhttp://bugs.debian.org/\fR> or by writing a mail to the Debian Live mailing list at <\fIdebian\-live@lists.debian.org\fR>.
+
+.SH AUTHOR
+live\-config was originally written by Daniel Baumann <\fImail@daniel-baumann.ch\fR>. Since 2016 development has been continued by the Debian Live team.

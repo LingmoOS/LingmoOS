@@ -1,1 +1,0 @@
-# User configurable main windows.

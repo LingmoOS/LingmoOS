@@ -1,0 +1,40 @@
+#!/bin/sh
+
+. /usr/lib/live/config.sh
+
+## live-config(7) - System Configuration Components
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+#set -e
+
+Init ()
+{
+	# Checking if package is installed
+	if ! pkg_is_installed "ssl-cert" || \
+	   component_was_executed "ssl-cert"
+	then
+		exit 0
+	fi
+
+	echo -n " ssl-cert"
+}
+
+Config ()
+{
+	if [ ! -e /etc/ssl/certs/ssl-cert-snakeoil.pem ] && [ ! -e /etc/ssl/private/ssl-cert-snakeoil.key ]
+	then
+		make-ssl-cert generate-default-snakeoil --force-overwrite
+	fi
+
+	# Creating state file
+	touch /var/lib/live/config/ssl-cert
+}
+
+Init
+Config

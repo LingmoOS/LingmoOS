@@ -1,0 +1,97 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Queue install of package lists into chroot"
+USAGE="${PROGRAM} {install|live} [--force]"
+
+_PASS="${1}"
+shift
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+Echo_message "Begin queueing installation of package lists (${_PASS} pass)..."
+
+# Requiring stage file
+Require_stagefiles config bootstrap
+
+# Set non-default stage file name
+# Setting to default name with appended action name
+STAGE_FILE="$(Stagefile_name "${_PASS}")"
+
+# Checking stage file
+Check_stagefile "${STAGE_FILE}"
+
+# Acquire lock file
+Acquire_lockfile
+
+# Handling local package lists
+if ! ( ls config/package-lists/*.list > /dev/null 2>&1 || \
+   ls config/package-lists/*.list.chroot > /dev/null 2>&1 || \
+   ls config/package-lists/*.list.chroot_${_PASS} > /dev/null 2>&1 )
+then
+	exit 0
+fi
+
+# Checking depends
+Check_package chroot /usr/bin/grep-aptavail dctrl-tools
+
+# Restoring cache
+Restore_package_cache chroot
+
+# Installing depends
+Install_packages
+
+if [ -e "${LIVE_BUILD}/share/bin/Packages" ]
+then
+	cp "${LIVE_BUILD}/share/bin/Packages" chroot/bin
+else
+	cp /usr/share/live/build/bin/Packages chroot/bin
+fi
+
+for LIST in config/package-lists/*.list \
+	     config/package-lists/*.list.chroot \
+	     config/package-lists/*.list.chroot_${_PASS}
+do
+	if [ -e "${LIST}" ]
+	then
+		# Generating package list
+		Expand_packagelist "$(basename ${LIST})" "config/package-lists" \
+			| grep -v '^#' >> chroot/root/packages.chroot || true
+	fi
+done
+
+# Discover unique package architectures in fully-expanded package list
+for _PACKAGE_ARCHITECTURE in $(Discover_package_architectures "chroot/root/packages.chroot")
+do
+	# If this is a foreign architecture, append to packages.foreign-architectures
+	if [ "${_PACKAGE_ARCHITECTURE}" != "${LB_ARCHITECTURE}" ]
+	then
+		Echo_message "Accepting foreign architecture: ${_PACKAGE_ARCHITECTURE}, live image architecture is: ${LB_ARCHITECTURE}"
+		echo "${_PACKAGE_ARCHITECTURE}" >> chroot/root/packages.foreign-architectures
+	fi
+done
+
+rm -f chroot/bin/Packages
+
+Remove_packages
+
+# Saving cache
+Save_package_cache chroot
+
+# Creating stage file
+Create_stagefile "${STAGE_FILE}"

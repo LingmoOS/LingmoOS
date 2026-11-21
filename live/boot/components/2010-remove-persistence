@@ -1,0 +1,31 @@
+#!/bin/sh
+
+#set -e
+
+Remove_persistence ()
+{
+	for _PARAMETER in ${LIVE_BOOT_CMDLINE}
+	do
+		case "${_PARAMETER}" in
+			live-boot.persistence-remove=*|persistence-remove=*)
+				LIVE_PERSISTENCE_REMOVE="${_PARAMETER#*persistence-remove=}"
+				;;
+
+			live-boot.persistence-remove|persistence-remove)
+				LIVE_PERSISTENCE_REMOVE="true"
+				;;
+		esac
+	done
+
+	case "${LIVE_PERSISTENCE_REMOVE}" in
+		true)
+			;;
+
+		*)
+			return 0
+			;;
+	esac
+
+	# Remove persistence
+	cd /run/live/overlay && find . -not -name 'persistence.conf' | xargs rm -rf
+}

@@ -1,0 +1,14 @@
+---
+include:
+  - https://salsa.debian.org/salsa-ci-team/pipeline/raw/master/recipes/debian.yml
+
+variables:
+  RELEASE: 'trixie'
+  SALSA_CI_IMAGES_LINTIAN: ${SALSA_CI_IMAGES}/lintian:stable
+  SALSA_CI_LINTIAN_SUPPRESS_TAGS: "bad-distribution-in-changes-file"
+  # The following jobs all run on unstable, and cannot work because they expect
+  # overrides, compiler flags, dependencies, etc to work as in unstable, but this
+  # is a stable branch
+  SALSA_CI_DISABLE_BLHC: 1
+  SALSA_CI_DISABLE_REPROTEST: 1
+  SALSA_CI_DISABLE_PIUPARTS: 1

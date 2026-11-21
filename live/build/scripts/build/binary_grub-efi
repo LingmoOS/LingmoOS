@@ -1,0 +1,338 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2016 Adrian Gibanel Lopez <adrian15sgd@gmail.com>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Prepares and installs Grub based EFI support into binary"
+USAGE="${PROGRAM} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+if [ "${LB_BOOTLOADER_EFI}" != "grub-efi" ]; then
+	exit 0
+fi
+
+if In_list "${LB_IMAGE_TYPE}" hdd netboot; then
+	exit 0
+fi
+
+Echo_message "Begin preparing Grub based EFI support..."
+
+# NOTE: We rely on `binary_grub_cfg` to generate grub.cfg and other configuration files!
+
+# Requiring stage file
+Require_stagefiles config bootstrap
+
+# Checking stage file
+Check_stagefile
+
+# Acquire lock file
+Acquire_lockfile
+
+# Checking depends
+case "${LB_ARCHITECTURE}" in
+	amd64|i386)
+		Check_package chroot /usr/lib/grub/x86_64-efi/configfile.mod grub-efi-amd64-bin
+		Check_package chroot /usr/lib/grub/i386-efi/configfile.mod grub-efi-ia32-bin
+		;;
+	arm64)
+		Check_package chroot /usr/lib/grub/arm64-efi/configfile.mod grub-efi-arm64-bin
+		;;
+	armhf)
+		Check_package chroot /usr/lib/grub/arm-efi/configfile.mod grub-efi-arm-bin
+		;;
+esac
+Check_package chroot /usr/bin/grub-mkimage grub-common
+Check_package chroot /usr/bin/mcopy mtools
+Check_package chroot /sbin/mkfs.msdos dosfstools
+
+# Check UEFI Secure Boot setting and depends
+# By default (auto) do a best-effort build: if the signed binaries are available use
+# them, but don't fail if they are not, just print a warning.
+case "${LB_ARCHITECTURE}" in
+	amd64)
+		_SB_EFI_PLATFORM="x86_64"
+		_SB_EFI_NAME="x64"
+		_SB_EFI_DEB="amd64"
+		;;
+	i386)
+		_SB_EFI_PLATFORM="i386"
+		_SB_EFI_NAME="ia32"
+		_SB_EFI_DEB="ia32"
+		;;
+	arm64)
+		_SB_EFI_PLATFORM="arm64"
+		_SB_EFI_NAME="aa64"
+		_SB_EFI_DEB="arm64"
+		;;
+	armhf)
+		_SB_EFI_PLATFORM="arm"
+		_SB_EFI_NAME="arm"
+		_SB_EFI_DEB="arm"
+		;;
+esac
+
+# Restoring cache
+Restore_package_cache binary
+
+# Installing depends
+Install_packages
+
+case "${LB_UEFI_SECURE_BOOT}" in
+	auto)
+		# Try to install the shim and signed grub package separately,
+		# as the grub-efi-*-signed package might be uninstallable (e.g. due to binNMUs)
+		# Uses the (intentionally) undocumented _LB_PACKAGES variable
+		echo "!!! The following error/warning messages can be ignored !!!"
+		set +e
+		_LB_PACKAGES="shim-signed"
+		Install_packages
+		_LB_PACKAGES="grub-efi-${_SB_EFI_DEB}-signed"
+		Install_packages
+		set -e
+		# Use Check_installed, as Check_package will error out immediately
+		Check_installed chroot /usr/lib/grub/${_SB_EFI_PLATFORM}-efi-signed/gcd${_SB_EFI_NAME}.efi.signed \
+			grub-efi-${_SB_EFI_DEB}-signed
+		_GRUB_INSTALL_STATUS="${INSTALL_STATUS}"
+		Check_installed chroot /usr/lib/shim/shim${_SB_EFI_NAME}.efi.signed \
+			shim-signed
+		echo "!!! The above error/warning messages can be ignored !!!"
+
+		if [ "${INSTALL_STATUS}" -ne 0 ]
+		then
+			Echo_warning "UEFI Secure Boot disabled due to missing Shim."
+		elif [ "${_GRUB_INSTALL_STATUS}" -ne 0 ]
+		then
+			# Each user needs to enroll the hash for grub*.efi in their UEFI setup
+			Echo_warning "Limited UEFI Secure Boot support enabled: only the Shim is available."
+		else
+			Echo_message "UEFI Secure Boot support enabled."
+		fi
+		;;
+	enable)
+		Check_package chroot /usr/lib/grub/${_SB_EFI_PLATFORM}-efi-signed/gcd${_SB_EFI_NAME}.efi.signed \
+			grub-efi-${_SB_EFI_DEB}-signed
+		Check_package chroot /usr/lib/shim/shim${_SB_EFI_NAME}.efi.signed \
+			shim-signed
+		Install_packages
+		Echo_message "UEFI Secure Boot support enabled."
+		;;
+	disable)
+		Echo_message "UEFI Secure Boot support disabled."
+		;;
+esac
+
+# Cleanup files that we generate
+rm -rf binary/boot/efi.img binary/boot/grub/i386-efi/ binary/boot/grub/x86_64-efi binary/boot/grub/arm64-efi binary/boot/grub/arm-efi
+
+# This is workaround till both efi-image and grub-cpmodules are put into a binary package
+case "${LB_BUILD_WITH_CHROOT}" in
+	true)
+		if [ ! -e "${LIVE_BUILD}" ] ; then
+			LIVE_BUILD_PATH="/usr/lib/live/build"
+		else
+			LIVE_BUILD_PATH="${LIVE_BUILD}/scripts/build"
+		fi
+		mkdir -p chroot/${LIVE_BUILD_PATH}
+		cp "${LIVE_BUILD_PATH}/efi-image" "chroot/${LIVE_BUILD_PATH}"
+		cp "${LIVE_BUILD_PATH}/grub-cpmodules" "chroot/${LIVE_BUILD_PATH}"
+
+		_CHROOT_DIR=""
+		;;
+
+	false)
+		_CHROOT_DIR="chroot"
+		;;
+esac
+#####
+cat >binary.sh <<END
+#!/bin/sh
+
+set -e
+
+gen_efi_boot_img(){
+	local platform="\$1"
+	local efi_name="\$2"
+	local netboot_prefix="\$3"
+	local outdir="grub-efi-temp-\${platform}"
+	"\${LIVE_BUILD_PATH}/efi-image" "${_CHROOT_DIR}/\$outdir" "\$platform" "\$efi_name" "\$netboot_prefix"
+	mkdir -p ${_CHROOT_DIR}/grub-efi-temp/EFI/boot
+	mcopy -m -n -i ${_CHROOT_DIR}/\$outdir/efi.img '::efi/boot/boot*.efi' ${_CHROOT_DIR}/grub-efi-temp/EFI/boot
+	cp -a "${_CHROOT_DIR}"/\$outdir/* "${_CHROOT_DIR}/grub-efi-temp/"
+
+	# Secure Boot support:
+	# - create the EFI directory in the ESP with uppercase letters to make
+	#   certain firmwares (eg: TianoCore) happy
+	# - use shim as the boot<arch>.efi that gets loaded first by the firmware
+	# - drop a grub.cfg (same reason as below) in the cfg directory as configured
+	#   by the signed grub efi binary creation. This is set dynamically when grub2 is
+	#   built with the ouput of dpkg-vendor, and can be overridden by the builder, so
+	#   we do the same here in live-build.
+	# - the source paths are taken from shim-signed:
+	#    https://packages.debian.org/sid/amd64/shim-signed/filelist
+	#   and grub-efi-amd64-signed, currently in Ubuntu:
+	#    https://packages.ubuntu.com/xenial/amd64/grub-efi-amd64-signed/filelist
+	#    https://packages.ubuntu.com/bionic/arm64/grub-efi-arm64-signed/filelist
+	#   E.g., gcdx64.efi.signed is the boot loader for removable device, like CD or
+	#   USB flash drive, while grubx64.efi.signed is for hard drive.
+	#   Therefore here gcdx64.efi.signed is used for amd64 and gcdaa64.efi.signed is
+	#   for arm64.
+	# - Ubuntu's shim binary is in the alternatives system so it could be a symlink,
+	#   so ensure we dereference it and copy the actual file
+	if [ -r ${_CHROOT_DIR}/usr/lib/grub/\$platform-signed/gcd\$efi_name.efi.signed -a \
+			-r ${_CHROOT_DIR}/usr/lib/shim/shim\$efi_name.efi.signed -a \
+			"${LB_UEFI_SECURE_BOOT}" != "disable" ]; then
+		cp -a ${_CHROOT_DIR}/usr/lib/grub/\$platform-signed/gcd\$efi_name.efi.signed \
+			${_CHROOT_DIR}/grub-efi-temp/EFI/boot/grub\$efi_name.efi
+		cp -a --dereference ${_CHROOT_DIR}/usr/lib/shim/shim\$efi_name.efi.signed \
+			${_CHROOT_DIR}/grub-efi-temp/EFI/boot/boot\$efi_name.efi
+	elif [ ! -r ${_CHROOT_DIR}/usr/lib/grub/\$platform-signed/gcd\$efi_name.efi.signed -a \
+			-r ${_CHROOT_DIR}/usr/lib/shim/shim\$efi_name.efi.signed -a \
+			"${LB_UEFI_SECURE_BOOT}" = "auto" ]; then
+		# Allow a shim-only scenario
+		cp -a --dereference ${_CHROOT_DIR}/usr/lib/shim/shim\$efi_name.efi.signed \
+			${_CHROOT_DIR}/grub-efi-temp/EFI/boot/boot\$efi_name.efi
+		cp -a ${_CHROOT_DIR}/usr/lib/grub/\$platform/monolithic/gcd\$efi_name.efi \
+			${_CHROOT_DIR}/grub-efi-temp/EFI/boot/grub\$efi_name.efi
+		# Needed to allow the user to enroll the hash of grub*.efi
+		cp -a ${_CHROOT_DIR}/usr/lib/shim/mm\$efi_name.efi.signed \
+			${_CHROOT_DIR}/grub-efi-temp/EFI/boot/mm\$efi_name.efi
+	fi
+}
+
+PRE_EFI_IMAGE_PATH="${PATH}"
+if [ ! -e "${LIVE_BUILD}" ] ; then
+	LIVE_BUILD_PATH="/usr/lib/live/build"
+else
+	LIVE_BUILD_PATH="${LIVE_BUILD}/scripts/build"
+fi
+
+PATH="${PATH}:\${LIVE_BUILD_PATH}" # Make sure grub-cpmodules is used as if it was installed in the system
+
+case "${LB_ARCHITECTURE}" in
+	amd64)
+		gen_efi_boot_img "x86_64-efi" "x64" "debian-live/amd64"
+		if [ -r ${_CHROOT_DIR}/usr/lib/grub/\$platform-signed/gcd\$efi_name.efi.signed ]; then
+			# When a signed grub is available, add 32-bit UEFI support too
+			gen_efi_boot_img "i386-efi" "ia32" "debian-live/i386"
+		fi
+		PATH="\${PRE_EFI_IMAGE_PATH}"
+		;;
+	i386)
+		gen_efi_boot_img "i386-efi" "ia32" "debian-live/i386"
+		PATH="\${PRE_EFI_IMAGE_PATH}"
+		;;
+	arm64)
+		gen_efi_boot_img "arm64-efi" "aa64" "debian-live/arm64"
+		PATH="\${PRE_EFI_IMAGE_PATH}"
+		;;
+	armhf)
+		gen_efi_boot_img "arm-efi" "arm" "debian-live/arm"
+		PATH="\${PRE_EFI_IMAGE_PATH}"
+		;;
+esac
+
+
+# On some platforms the EFI grub image will be loaded, so grub's root
+# variable will be set to the EFI partition. This means that grub will
+# look in that partition for a grub.cfg file, and even if it finds it
+# it will not be able to find the vmlinuz and initrd.
+# Drop a minimal grub.cfg in the EFI partition that sets the root and prefix
+# to whatever partition holds the /.disk/info file, and load the grub
+# config from that same partition.
+mkdir -p ${_CHROOT_DIR}/grub-efi-temp-cfg
+cat >${_CHROOT_DIR}/grub-efi-temp-cfg/grub.cfg <<EOF
+search --set=root --file /.disk/info
+set prefix=(\\\$root)/boot/grub
+configfile (\\\$root)/boot/grub/grub.cfg
+EOF
+# Set the timestamp within the efi.img file
+touch ${_CHROOT_DIR}/grub-efi-temp-cfg/grub.cfg -d@${SOURCE_DATE_EPOCH}
+
+# The code below is adapted from tools/boot/jessie/boot-x86
+# in debian-cd
+
+# Stuff the EFI boot files into a FAT filesystem, making it as
+# small as possible.  24KiB headroom seems to be enough;
+# (x+31)/32*32 rounds up to multiple of 32.
+# This is the same as in efi-image, but we need to redo it here in
+# the case of a multi-arch amd64/i386 image
+
+size=0
+for file in ${_CHROOT_DIR}/grub-efi-temp/EFI/boot/*.efi \
+		${_CHROOT_DIR}/grub-efi-temp-cfg/grub.cfg; do
+	size=\$((\$size + \$(stat -c %s "\$file")))
+done
+
+# directories: EFI EFI/boot boot boot/grub
+size=\$((\$size + 4096 * 4))
+
+blocks=\$(((\$size / 1024 + 55) / 32 * 32 ))
+
+rm -f ${_CHROOT_DIR}/grub-efi-temp/boot/grub/efi.img
+# The VOLID must be (truncated to) a 32bit hexadecimal number
+mkfs.msdos -C "${_CHROOT_DIR}/grub-efi-temp/boot/grub/efi.img" \$blocks -i $(printf "%08x" $((${SOURCE_DATE_EPOCH}%4294967296))) >/dev/null
+mmd -i "${_CHROOT_DIR}/grub-efi-temp/boot/grub/efi.img" ::EFI
+mmd -i "${_CHROOT_DIR}/grub-efi-temp/boot/grub/efi.img" ::EFI/boot
+mcopy -m -o -i "${_CHROOT_DIR}/grub-efi-temp/boot/grub/efi.img" ${_CHROOT_DIR}/grub-efi-temp/EFI/boot/*.efi \
+	"::EFI/boot"
+
+mmd -i "${_CHROOT_DIR}/grub-efi-temp/boot/grub/efi.img" ::boot
+mmd -i "${_CHROOT_DIR}/grub-efi-temp/boot/grub/efi.img" ::boot/grub
+mcopy -m -o -i "${_CHROOT_DIR}/grub-efi-temp/boot/grub/efi.img" ${_CHROOT_DIR}/grub-efi-temp-cfg/grub.cfg \
+	"::boot/grub"
+END
+
+case "${LB_BUILD_WITH_CHROOT}" in
+	true)
+		mv binary.sh chroot/
+		Chroot chroot "sh binary.sh"
+		rm -f chroot/binary.sh
+
+		# Saving cache
+		Save_package_cache binary
+
+		# Removing depends. Some bootloader packages are marked as Protected/Important
+		# in Ubuntu, so temporarily add an apt flag to allow them to be removed
+		PRE_APT_OPTIONS="${APT_OPTIONS}"
+		APT_OPTIONS="${APT_OPTIONS} --allow-remove-essential"
+		Remove_packages
+		APT_OPTIONS="${PRE_APT_OPTIONS}"
+		;;
+
+	false)
+		sh binary.sh
+		rm -f binary.sh
+		;;
+esac
+
+# Remove unnecessary files
+rm -f chroot/grub-efi-temp/bootnetia32.efi
+rm -f chroot/grub-efi-temp/bootnetx64.efi
+rm -f chroot/grub-efi-temp/bootnetaa64.efi
+rm -f chroot/grub-efi-temp/bootnetarm.efi
+
+mkdir -p binary
+cp -a chroot/grub-efi-temp/* binary/
+rm -rf chroot/grub-efi-temp-x86_64-efi
+rm -rf chroot/grub-efi-temp-i386-efi
+rm -rf chroot/grub-efi-temp-arm64-efi
+rm -rf chroot/grub-efi-temp-arm-efi
+rm -rf chroot/grub-efi-temp-cfg
+rm -rf chroot/grub-efi-temp
+
+# Creating stage file
+Create_stagefile

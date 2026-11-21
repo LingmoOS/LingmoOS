@@ -1,0 +1,511 @@
+// SPDX-FileCopyrightText: 2026 Reion Wong <reionwong@gmail.com>
+// SPDX-FileCopyrightText: 2026 LingmoOS Contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+#include <cmath>
+#include <vector>
+
+#include "include/core/SkCanvas.h"
+#include "include/core/SkMatrix.h"
+#include "include/core/SkSurface.h"
+
+#include "ui/application.h"
+#include "ui/bitmap.h"
+#include "ui/layer.h"
+#include "ui/painter.h"
+#include "ui/text_context.h"
+#include "ui/theme.h"
+#include "ui/view.h"
+#include "ui/window.h"
+
+namespace Lingmo::ui {
+
+// Frames whose damage is kept for buffer age; older buffers repaint whole.
+static constexpr size_t kDamageHistory = 4;
+// Past this many rects a region clips as its bounds, which is cheaper to draw.
+static constexpr int kMaximumDamageRects = 16;
+
+static SkIRect intersection(const SkIRect& a, const SkIRect& b)
+{
+    SkIRect result;
+    return result.intersect(a, b) ? result : SkIRect::MakeEmpty();
+}
+
+// Repaints the target inside the clip; `paint` culls by the region it gets.
+// The GPU clips. The raster backend antialiases edges a clip crosses
+// differently, so it paints unclipped aside and copies the clip in, to
+// match full repaints. The scratch reaches only as far as the clip, from the
+// origin: shaders evaluated at other coordinates differ by a level.
+template<typename Paint>
+static void repaint(SkCanvas* target, const SkRegion& clip, const Paint& paint)
+{
+    if (clip.isEmpty())
+        return;
+    if (target->recordingContext()) {
+        target->save();
+        target->clipRegion(clip);
+        paint(target);
+        target->restore();
+        return;
+    }
+    const SkIRect bounds = clip.getBounds();
+    const SkSurfaceProps properties = target->getBaseProps();
+    const sk_sp<SkSurface> scratch = SkSurfaces::Raster(
+        target->imageInfo().makeWH(bounds.right(), bounds.bottom()), &properties);
+    if (!scratch)
+        return;
+    paint(scratch->getCanvas());
+    SkPaint copy;
+    copy.setBlendMode(SkBlendMode::kSrc);
+    target->save();
+    target->clipRegion(clip);
+    target->drawImage(scratch->makeImageSnapshot(), 0, 0, SkSamplingOptions(), &copy);
+    target->restore();
+}
+
+static SkIRect toSkIRect(const Rect& rect)
+{
+    return SkIRect::MakeXYWH(rect.x, rect.y, rect.width, rect.height);
+}
+
+// The device pixels a logical rect touches, and one more for antialiasing.
+static SkIRect deviceBounds(const RectF& rect, double scale)
+{
+    return SkIRect::MakeLTRB(int(std::floor(rect.x * scale)) - 1, int(std::floor(rect.y * scale)) - 1,
+                             int(std::ceil(rect.right() * scale)) + 1,
+                             int(std::ceil(rect.bottom() * scale)) + 1);
+}
+
+// As Painter::clip() rounds it.
+static SkIRect clipBounds(const View* view, PointF position, double scale)
+{
+    const RectF& geometry = view->geometry();
+    return SkIRect::MakeLTRB(int(std::lround(position.x * scale)), int(std::lround(position.y * scale)),
+                             int(std::lround((position.x + geometry.width) * scale)),
+                             int(std::lround((position.y + geometry.height) * scale)));
+}
+
+static SkMatrix layerMatrix(const View* view, PointF position, double scale)
+{
+    const Transform& transform = view->transform();
+    // Whole device pixels, so a texture at rest lands on the pixels it was drawn for.
+    const double dx = std::round(transform.translation.x * scale);
+    const double dy = std::round(transform.translation.y * scale);
+    // Exact, where going through the centre in floats could land a hair short.
+    if (transform.scale == 1)
+        return SkMatrix::Translate(SkScalar(dx), SkScalar(dy));
+    const RectF& geometry = view->geometry();
+    const double centreX = (position.x + geometry.width / 2) * scale;
+    const double centreY = (position.y + geometry.height / 2) * scale;
+    SkMatrix matrix = SkMatrix::Translate(SkScalar(centreX + dx), SkScalar(centreY + dy));
+    matrix.preScale(SkScalar(transform.scale), SkScalar(transform.scale));
+    matrix.preTranslate(SkScalar(-centreX), SkScalar(-centreY));
+    return matrix;
+}
+
+SkIRect Window::subtreeRect(const View* view, PointF origin, bool painted) const
+{
+    if (!view->m_visible || view->m_opacity <= 0)
+        return SkIRect::MakeEmpty();
+    const PointF position = origin + view->m_geometry.topLeft();
+    const RectF visual = view->visualRect();
+    SkIRect rect = deviceBounds({position.x + visual.x, position.y + visual.y, visual.width, visual.height},
+                                m_scale);
+    for (const auto& child : view->m_children)
+        rect.join(placedRect(child.get(), position, painted));
+    if (view->m_clipsChildren)
+        rect = intersection(rect, clipBounds(view, position, m_scale));
+    return rect;
+}
+
+SkIRect Window::placedRect(const View* view, PointF origin, bool painted) const
+{
+    const SkIRect rect = subtreeRect(view, origin, painted);
+    if (rect.isEmpty() || !view->isComposited(painted))
+        return rect;
+    return mapThroughTransform(view, rect, origin + view->m_geometry.topLeft());
+}
+
+SkIRect Window::mapThroughTransform(const View* view, const SkIRect& rect, PointF position) const
+{
+    const SkMatrix matrix = layerMatrix(view, position, m_scale);
+    if (view->m_transform.scale == 1)
+        return rect.makeOffset(int(matrix.getTranslateX()), int(matrix.getTranslateY()));
+    // Filtering reaches a pixel beyond the scaled edge.
+    return matrix.mapRect(SkRect::Make(rect)).roundOut().makeOutset(1, 1);
+}
+
+void Window::addDamage(const View* view, SkIRect rect, bool painted)
+{
+    // The ancestors with their untransformed positions, nearest first.
+    std::vector<std::pair<const View*, PointF>> ancestors;
+    for (const View* ancestor = view->m_parent; ancestor; ancestor = ancestor->m_parent)
+        ancestors.emplace_back(ancestor, PointF());
+    PointF origin;
+    for (auto it = ancestors.rbegin(); it != ancestors.rend(); ++it) {
+        origin += it->first->m_geometry.topLeft();
+        it->second = origin;
+    }
+
+    // Unclipped, through the transforms up to the subtree's own: as the
+    // subtree paints on its own.
+    for (FrameDamage::Watch& watch : m_frameDamage->watches) {
+        SkIRect placed = rect;
+        bool inside = view == watch.subtree;
+        for (const auto& [ancestor, position] : ancestors) {
+            if (inside)
+                break;
+            if (ancestor->isComposited(painted))
+                placed = mapThroughTransform(ancestor, placed, position);
+            inside = ancestor == watch.subtree;
+        }
+        if (inside && SkIRect::Intersects(placed, watch.rect))
+            ++watch.changes;
+    }
+
+    for (const auto& [ancestor, position] : ancestors) {
+        if (!ancestor->m_visible || ancestor->m_opacity <= 0)
+            return;
+        if (ancestor->m_clipsChildren)
+            rect = intersection(rect, clipBounds(ancestor, position, m_scale));
+        if (rect.isEmpty())
+            return;
+        if (ancestor->isComposited(painted)) {
+            if (ancestor->m_layer)
+                ancestor->m_layer->damage.op(rect, SkRegion::kUnion_Op);
+            rect = mapThroughTransform(ancestor, rect, position);
+        }
+    }
+    const SkIRect window = SkIRect::MakeWH(int(std::lround(m_size.width * m_scale)),
+                                           int(std::lround(m_size.height * m_scale)));
+    m_frameDamage->pending.op(intersection(rect, window), SkRegion::kUnion_Op);
+}
+
+void Window::damageNow(const View* view)
+{
+    PointF origin;
+    for (const View* ancestor = view->m_parent; ancestor; ancestor = ancestor->m_parent)
+        origin += ancestor->m_geometry.topLeft();
+    addDamage(view, placedRect(view, origin, true), true);
+}
+
+void Window::damageRect(const View* view, const RectF& rect)
+{
+    PointF origin;
+    for (const View* ancestor = view->m_parent; ancestor; ancestor = ancestor->m_parent)
+        origin += ancestor->m_geometry.topLeft();
+    const PointF position = origin + view->m_geometry.topLeft();
+    SkIRect device = SkRect::MakeXYWH(SkScalar((position.x + rect.x) * m_scale), SkScalar((position.y + rect.y) * m_scale),
+                                      SkScalar(rect.width * m_scale), SkScalar(rect.height * m_scale))
+                             .roundOut();
+    if (view->isComposited(true))
+        device = mapThroughTransform(view, device, position);
+    addDamage(view, device, true);
+}
+
+void Window::collectDamage(View* view, PointF origin)
+{
+    // A hidden view stays dirty and is damaged once shown.
+    if (!view->m_visible)
+        return;
+    if (view->m_dirty || view->m_compositeDirty) {
+        if (view->m_dirty && view->m_layer)
+            view->m_layer->repaintAll = true;
+        addDamage(view, placedRect(view, origin, false), false);
+        view->m_dirty = false;
+        view->m_compositeDirty = false;
+    }
+    const PointF position = origin + view->m_geometry.topLeft();
+    for (const auto& child : view->m_children)
+        collectDamage(child.get(), position);
+}
+
+void Window::damageWhole()
+{
+    m_frameDamage->full = true;
+    for (FrameDamage::Watch& watch : m_frameDamage->watches)
+        ++watch.changes;
+}
+
+uint64_t Window::watchDamage(const View* watcher, const View* subtree, const SkIRect& rect)
+{
+    for (FrameDamage::Watch& watch : m_frameDamage->watches) {
+        if (watch.watcher != watcher)
+            continue;
+        if (watch.subtree != subtree) {
+            watch.subtree = subtree;
+            ++watch.changes;
+        }
+        watch.rect = rect;
+        return watch.changes;
+    }
+    m_frameDamage->watches.push_back({watcher, subtree, rect});
+    return 0;
+}
+
+void Window::unwatchDamage(const View* watcher)
+{
+    std::erase_if(m_frameDamage->watches, [watcher](const FrameDamage::Watch& watch) {
+        return watch.watcher == watcher;
+    });
+}
+
+void Window::damageAll()
+{
+    damageWhole();
+    const auto markLayers = [](const auto& self, View* view) -> void {
+        if (view->m_layer)
+            view->m_layer->repaintAll = true;
+        for (const auto& child : view->m_children)
+            self(self, child.get());
+    };
+    if (m_contentView)
+        markLayers(markLayers, m_contentView.get());
+    if (m_overlay)
+        markLayers(markLayers, m_overlay.get());
+    if (m_toolTip)
+        markLayers(markLayers, m_toolTip.get());
+    scheduleFrame();
+}
+
+void Window::updateLayers(View* view, PointF origin, SkCanvas* target, const SkIRect* visible)
+{
+    if (!view->m_visible || view->m_opacity <= 0)
+        return;
+    // Inner textures first: an outer one draws them.
+    const PointF position = origin + view->m_geometry.topLeft();
+    SkIRect inside;
+    const SkIRect* childVisible = nullptr;
+    if (visible && !view->needsLayer()) {
+        inside = *visible;
+        if (view->m_clipsChildren)
+            inside = intersection(inside, clipBounds(view, position, m_scale));
+        childVisible = &inside;
+    }
+    for (const auto& child : view->m_children)
+        updateLayers(child.get(), position, target, childVisible);
+    if (!view->needsLayer()) {
+        view->m_layer.reset();
+        return;
+    }
+
+    if (!view->m_layer)
+        view->m_layer = std::make_unique<Layer>();
+    Layer& layer = *view->m_layer;
+    const SkIRect bounds = subtreeRect(view, origin, false);
+    if (bounds.isEmpty()) {
+        layer.surface.reset();
+        layer.bounds = bounds;
+        return;
+    }
+    // Clipped away whole, as rows scrolled out of a list: painting it would
+    // show nothing. The texture is kept for when it comes back, but drawn
+    // nowhere meanwhile.
+    if (visible && !SkIRect::Intersects(mapThroughTransform(view, bounds, position), *visible)) {
+        layer.bounds = SkIRect::MakeEmpty();
+        return;
+    }
+    if (!layer.surface || layer.surface->width() != bounds.width() || layer.surface->height() != bounds.height()
+        || layer.surface->recordingContext() != target->recordingContext()) {
+        // A transparent texture needs greyscale text.
+        const SkSurfaceProps properties = Application::instance()->text().surfaceProps(false);
+        const SkImageInfo info = target->imageInfo()
+                                     .makeWH(bounds.width(), bounds.height())
+                                     .makeAlphaType(kPremul_SkAlphaType);
+        layer.surface = target->makeSurface(info, &properties);
+        layer.repaintAll = true;
+        if (!layer.surface)
+            return;
+    }
+    if (bounds != layer.bounds) {
+        layer.bounds = bounds;
+        layer.repaintAll = true;
+    }
+    if (layer.repaintAll) {
+        layer.damage.setRect(bounds);
+        layer.repaintAll = false;
+    } else {
+        layer.damage.op(bounds, SkRegion::kIntersect_Op);
+    }
+    if (layer.damage.isEmpty())
+        return;
+
+    SkRegion clip = layer.damage;
+    clip.translate(-bounds.x(), -bounds.y());
+    repaint(layer.surface->getCanvas(), clip, [&](SkCanvas* canvas) {
+        canvas->clear(SK_ColorTRANSPARENT);
+        canvas->save();
+        canvas->translate(SkScalar(-bounds.x()), SkScalar(-bounds.y()));
+        Painter painter(canvas, m_scale);
+        painter.translate(origin);
+        view->paintContent(painter, &layer.damage);
+        canvas->restore();
+    });
+    layer.damage.setEmpty();
+}
+
+void View::paintFlat(View* view, Painter& painter)
+{
+    if (!view->isVisible() || view->opacity() <= 0)
+        return;
+    painter.save();
+    painter.multiplyOpacity(view->opacity());
+    painter.translate(view->geometry().topLeft());
+    if (view->clipsChildren())
+        painter.clip(view->localRect());
+    view->paint(painter);
+    for (const auto& child : view->children())
+        paintFlat(child.get(), painter);
+    painter.restore();
+}
+
+Bitmap View::grab(double scale)
+{
+    if (scale <= 0)
+        scale = window() ? window()->scale() : 1.0;
+    const int width = int(std::ceil(m_geometry.width * scale));
+    const int height = int(std::ceil(m_geometry.height * scale));
+    Bitmap bitmap(width, height, Bitmap::Format::Argb32Premultiplied);
+    if (bitmap.isNull())
+        return bitmap;
+    const SkImageInfo info = SkImageInfo::MakeN32Premul(width, height);
+    const SkSurfaceProps properties = Application::instance()->text().surfaceProps(false);
+    const sk_sp<SkSurface> surface = SkSurfaces::WrapPixels(info, bitmap.bits(), bitmap.stride(), &properties);
+    if (!surface)
+        return {};
+    surface->getCanvas()->clear(SK_ColorTRANSPARENT);
+    Painter painter(surface->getCanvas(), scale);
+    painter.translate({-m_geometry.x, -m_geometry.y});
+    paintFlat(this, painter);
+    return bitmap;
+}
+
+void View::paintTree(Painter& painter, const SkRegion* region)
+{
+    if (!m_visible || m_opacity <= 0)
+        return;
+    if (!m_layer) {
+        painter.save();
+        painter.multiplyOpacity(m_opacity);
+        paintContent(painter, region);
+        painter.restore();
+        return;
+    }
+
+    if (!m_layer->surface || m_layer->bounds.isEmpty())
+        return;
+    const double scale = painter.scale();
+    const PointF position = painter.offset() + m_geometry.topLeft();
+    const SkMatrix matrix = layerMatrix(this, position, scale);
+    const SkIRect& bounds = m_layer->bounds;
+    if (region && !region->intersects(matrix.mapRect(SkRect::Make(bounds)).roundOut().makeOutset(1, 1)))
+        return;
+    SkCanvas* canvas = painter.canvas();
+    SkPaint paint;
+    paint.setAlphaf(float(painter.opacity() * m_opacity));
+    canvas->save();
+    canvas->concat(matrix);
+    // At rest the texture lands pixel for pixel; scaled, it filters.
+    const SkSamplingOptions sampling = m_transform.scale == 1 ? SkSamplingOptions()
+                                                              : SkSamplingOptions(SkFilterMode::kLinear);
+    canvas->drawImage(m_layer->surface->makeImageSnapshot(), SkScalar(bounds.x()), SkScalar(bounds.y()),
+                      sampling, &paint);
+    canvas->restore();
+}
+
+void View::paintContent(Painter& painter, const SkRegion* region)
+{
+    painter.save();
+    painter.translate(m_geometry.topLeft());
+    if (m_clipsChildren) {
+        if (region && !region->intersects(toSkIRect(painter.deviceRect(localRect())))) {
+            painter.restore();
+            return;
+        }
+        if (m_childClipRadius > 0)
+            painter.clipRoundedRect(localRect(), m_childClipRadius);
+        else
+            painter.clip(localRect());
+    }
+    if (!region || region->intersects(toSkIRect(painter.deviceRect(visualRect())).makeOutset(1, 1)))
+        paint(painter);
+    for (const auto& child : m_children)
+        child->paintTree(painter, region);
+    painter.restore();
+}
+
+void Window::paintContent(SkCanvas* canvas, const SkRegion* region)
+{
+    const SkIRect window = SkIRect::MakeWH(canvas->imageInfo().width(), canvas->imageInfo().height());
+    updateLayers(m_contentView.get(), {}, canvas, &window);
+    if (m_overlay)
+        updateLayers(m_overlay.get(), {}, canvas, &window);
+    if (m_toolTip)
+        updateLayers(m_toolTip.get(), {}, canvas, &window);
+
+    const auto paintInside = [&](SkCanvas* target) {
+        target->clear(backgroundColor().argb());
+        Painter painter(target, m_scale);
+        m_contentView->paintTree(painter, region);
+        if (m_overlay)
+            m_overlay->paintTree(painter, region);
+        if (m_toolTip)
+            m_toolTip->paintTree(painter, region);
+    };
+    if (region)
+        repaint(canvas, *region, paintInside);
+    else
+        paintInside(canvas);
+}
+
+void Window::applyTextTarget() const
+{
+    Application* application = Application::instance();
+    application->text().setTranslucentSubpixel(m_translucentSubpixel);
+    // Embedded windows already draw into canvases without a pixel geometry
+    // when they are not opaque.
+    application->text().setTransparentWindow(m_backgroundColor && backgroundColor().a == 0
+                                             && application->platform() != Application::Platform::Embedded);
+}
+
+std::vector<Rect> Window::paintFrame(SkCanvas* canvas, int bufferAge)
+{
+    applyTextTarget();
+    FrameDamage& damage = *m_frameDamage;
+    const SkIRect window = SkIRect::MakeWH(canvas->imageInfo().width(), canvas->imageInfo().height());
+    if (damage.full)
+        damage.pending.setRect(window);
+    if (damage.pending.computeRegionComplexity() > kMaximumDamageRects)
+        damage.pending.setRect(damage.pending.getBounds());
+
+    // The buffer shows the frame `bufferAge` frames back: repaint what
+    // changed since then too.
+    SkRegion repaint = damage.pending;
+    if (bufferAge <= 0 || size_t(bufferAge) > damage.history.size() + 1) {
+        repaint.setRect(window);
+    } else {
+        for (int i = 0; i < bufferAge - 1; ++i)
+            repaint.op(damage.history[size_t(i)], SkRegion::kUnion_Op);
+    }
+    if (repaint.computeRegionComplexity() > kMaximumDamageRects)
+        repaint.setRect(repaint.getBounds());
+    paintContent(canvas, &repaint);
+
+    std::vector<Rect> rects;
+    for (SkRegion::Iterator it(damage.pending); !it.done(); it.next()) {
+        const SkIRect& rect = it.rect();
+        rects.push_back({rect.x(), rect.y(), rect.width(), rect.height()});
+    }
+    // An unchanged frame still commits, for the frame callback; one pixel
+    // says nothing else moved.
+    if (rects.empty())
+        rects.push_back({0, 0, 1, 1});
+    damage.history.push_front(damage.pending);
+    if (damage.history.size() > kDamageHistory)
+        damage.history.pop_back();
+    damage.pending.setEmpty();
+    damage.full = false;
+    return rects;
+}
+
+} // namespace Lingmo::ui

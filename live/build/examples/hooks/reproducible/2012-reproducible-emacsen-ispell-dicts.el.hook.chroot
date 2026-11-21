@@ -1,0 +1,25 @@
+#!/bin/sh
+set -e
+
+# update-dictcommon-aspell creates a file with content depending on PERL_HASH_SEED
+# A bug report with patch is available at https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1090981
+# This script duplicates that patch
+
+# Don't run if the file is not present
+if [ ! -e /usr/share/perl5/Debian/DictionariesCommon.pm ];
+then
+  exit 0
+fi
+
+# If DictionariesCommon.pm already contains a sort statement at line 656, there is no need to patch the file
+if sed -e '656p;d' /usr/share/perl5/Debian/DictionariesCommon.pm | grep -q "foreach my \$k (sort keys"
+then
+  exit 0
+fi
+
+# Patch the Perl script (at line 656)
+sed -i -e '656s/keys/sort keys/' /usr/share/perl5/Debian/DictionariesCommon.pm
+
+update-dictcommon-aspell
+
+echo "P: $(basename $0) Reproducible hook has been applied"

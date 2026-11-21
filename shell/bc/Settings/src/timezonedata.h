@@ -1,4 +1,0 @@
-#ifndef TIMEZONEDATA_H
-#define TIMEZONEDATA_H
-
-#endif // TIMEZONEDATA_H

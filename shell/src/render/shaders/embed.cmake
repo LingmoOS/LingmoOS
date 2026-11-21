@@ -1,0 +1,6 @@
+file(WRITE "${OUTPUT}" "#pragma once\n\nnamespace Lingmo::Render::shaders {\n")
+foreach(name IN LISTS SHADERS)
+    file(READ "${SOURCE_DIR}/${name}.glsl" source)
+    file(APPEND "${OUTPUT}" "inline constexpr char ${name}[] = R\"GLSL(${source})GLSL\";\n")
+endforeach()
+file(APPEND "${OUTPUT}" "}\n")

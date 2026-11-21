@@ -1,3 +1,0 @@
-#pragma once
-
-#define KFONTINST_LIBEXEC_DIR "${CMAKE_INSTALL_FULL_LIBEXECDIR}"

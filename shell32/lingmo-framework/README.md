@@ -1,1 +1,0 @@
-# Lingmo library and runtime components based upon KF5 and Qt 5.

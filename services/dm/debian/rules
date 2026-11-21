@@ -1,0 +1,9 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+# Installing must not take over tty1, and upgrading must not stop the running
+# sessions; the user enables the display manager with systemctl.
+override_dh_installsystemd:
+	dh_installsystemd --no-enable --no-start --no-stop-on-upgrade

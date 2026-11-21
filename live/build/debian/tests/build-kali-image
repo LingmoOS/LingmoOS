@@ -1,0 +1,21 @@
+#!/bin/bash
+
+set -eu
+set -o pipefail
+
+# Ensure Kali's keyring archive is installed and is always up to date
+echo "Acquire::Retries 5;" > /etc/apt/apt.conf.d/live-build-ci
+curl https://archive.kali.org/archive-key.asc > /etc/apt/trusted.gpg.d/kali.asc
+mkdir -p /etc/apt/sources.list.d
+echo "deb http://http.kali.org/kali kali-rolling main" > /etc/apt/sources.list.d/kali.list
+apt-get update
+apt-get install -y kali-archive-keyring
+rm -f /etc/apt/trusted.gpg.d/kali.asc /etc/apt/sources.list.d/kali.list /etc/apt/apt.conf.d/live-build-ci
+apt-get update
+
+cd "${AUTOPKGTEST_TMP}"
+git clone --depth 1 --no-tags https://gitlab.com/kalilinux/build-scripts/live-build-config.git
+cd live-build-config
+./build.sh --verbose
+ls -l
+ls -l images

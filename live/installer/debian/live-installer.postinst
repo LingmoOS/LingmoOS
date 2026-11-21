@@ -1,0 +1,191 @@
+#!/bin/sh -e
+
+. /usr/share/debconf/confmodule
+db_capb backup
+
+. /usr/lib/base-installer/library.sh
+
+# Architecture and OS detection
+ARCH=`udpkg --print-architecture`
+OS=`udpkg --print-os`
+# Files that must not be overwritten by copy of live system
+FILES_TO_PRESERVE="/etc/fstab /etc/crypttab"
+# Files that must be dropped from the copy of the live system
+FILES_TO_DROP="/etc/default/locale"
+
+NEWLINE="
+"
+
+db_input low live-installer/mode || true
+db_go || exit 10 # back to menu
+db_get live-installer/mode
+mode="$RET"
+
+install_live_system () {
+	# Look at
+	PLACES=""
+	PLACE_FOUND=0
+
+	# Load filesystem support
+	for script in $(ls /lib/live-installer/*); do
+		. $script
+	done
+
+	# XXX: To be dropped in jessie when a fixed partman-target is made
+	# available.
+	# Drop /var/lock and /var/run directories created by
+	# partman-target so that the tar call that follows can install
+	# symlinks there.
+	rmdir /target/var/lock /target/var/run 2>/dev/null || true
+
+	# Backup files that should not be overwritten by the copy
+	for f in $FILES_TO_PRESERVE; do
+	    if [ -e /target$f ] && [ ! -e /target/${f}.live-installer ]; then
+		mv /target$f /target${f}.live-installer
+	    fi
+	done
+
+	for place in $PLACES; do
+		[ ! -e $place ] && continue
+
+		SUPPORT=$(echo $place | sed 's,.*\.\(.*\)$,\1,g')
+		info "Using $SUPPORT support for $place"
+
+		PLACE_FOUND=1
+
+		eval ${SUPPORT}_prepare
+		STEPS=$(eval ${SUPPORT}_count)
+
+		db_progress INFO live-installer/progress/copying
+
+		COUNT=0
+		OLD_IFS=$IFS
+		mkdir -p /target
+		exec 4>&0
+		tar c . | \
+		(chdir /target && tar xv) | \
+		(
+			while read line; do
+				COUNT=$(($COUNT + 1))
+				CURRENT=$(($COUNT * 100 / $STEPS))
+
+				[ x$CURRENT = x$LAST_UPDATE ] && continue
+
+				LAST_UPDATE=$CURRENT
+				db_progress STEP 1 <&4
+			done
+			if [ $COUNT -lt $STEPS ]; then
+				error "The tar process copying the live system failed (only $COUNT out of $STEPS files have been copied, last file was $line)."
+				chdir /
+				eval ${SUPPORT}_teardown
+				exit 1
+			fi
+		)
+		exec 0>&4
+		IFS=$OLD_IFS
+		getfattr --dump --no-dereference --match=- --recursive . | \
+			(cd /target && setfattr --no-dereference --restore=-) \
+			|| true
+
+		chdir /
+		eval ${SUPPORT}_teardown
+	done
+
+	# Restore important configuration files
+	for f in $FILES_TO_PRESERVE; do
+		if [ -e /target${f}.live-installer ]; then
+			mv /target${f}.live-installer /target$f
+		fi
+	done
+
+	# Drop unwanted files
+	for f in $FILES_TO_DROP; do
+		if [ -e /target$f ]; then
+			rm -f /target$f
+		fi
+	done
+
+	if [ ${PLACE_FOUND} -eq 0 ]; then
+		error "Could not find any live images"
+		exit 1
+	fi
+
+	# if we're dumping it, we need to set the boot mode
+	if [ "$mode" = live ]; then
+		# which initramfs hook to use
+		if [ -d /cdrom/casper ]; then
+			hook="casper"
+		else
+			hook="live plainroot"
+		fi
+
+		kopts=
+		if db_get debian-installer/add-kernel-opts && [ "$RET" ]; then
+			kopts="$RET"
+			# remove any existing boot= option
+			kopts="$(echo "$kopts" | sed -r "s/(^| )boot=[^ ]*//")"
+		fi
+		db_set debian-installer/add-kernel-opts \
+			"${kopts:+$kopts }boot=$hook"
+
+		# skip the hooks
+		return
+	fi
+
+	# run the scripts found in hook directory after copying the system
+	partsdir="/usr/lib/live-installer.d"
+	if [ -d "$partsdir" ]; then
+		for script in $(ls "$partsdir"/*); do
+			base=$(basename $script | sed 's/[0-9]*//')
+			if ! db_progress INFO live-installer/progress/$base; then
+				db_subst live-installer/progress/fallback SCRIPT "$base"
+				db_progress INFO live-installer/progress/fallback
+			fi
+
+			if [ -x "$script" ] ; then
+				# be careful to preserve exit code
+				if log-output -t live-installer "$script"; then
+					:
+				else
+					warning "$script returned error code $?"
+				fi
+			else
+				error "Unable to execute $script"
+			fi
+		done
+	fi
+
+	# handle package install lists from live-media
+	for list in /cdrom/live/filesystem.packages-install; do
+		if [ -e $list ]; then
+			# queueing packages for base-installers install_extra()
+			awk '{ print $1 }' $list >> /var/lib/apt-install/queue
+		fi
+	done
+}
+
+waypoint 1	check_target
+waypoint 1	get_mirror_info
+waypoint 100	install_live_system
+waypoint 1	pre_install_hooks
+#waypoint 1	setup_dev
+waypoint 1	configure_apt_preferences
+waypoint 1	configure_apt
+waypoint 3	apt_update
+waypoint 5	post_install_hooks
+#waypoint 1	pick_kernel
+#waypoint 20	install_linux
+waypoint 10	install_extra
+waypoint 0	final_apt_preferences
+waypoint 0	cleanup
+
+run_waypoints live-installer/progress/installing
+
+# mount /dev and /proc on target otherwise grub-installer will fail
+mount -o bind /dev /target/dev
+
+if [ ! -e /target/proc/version ]; then
+	mount -o bind /proc /target/proc
+fi
+
+exit 0

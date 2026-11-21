@@ -1,0 +1,57 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Include local preseed in installer"
+USAGE="${PROGRAM} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+# Check d-i configuration
+case "${LB_DEBIAN_INSTALLER}" in
+	none)
+		exit 0
+		;;
+esac
+
+Echo_message "Begin including local preseeds..."
+
+# Checking stage file
+Check_stagefile
+
+# Acquire lock file
+Acquire_lockfile
+
+if ls config/preseed/*.cfg > /dev/null 2>&1 || \
+   ls config/preseed/*.cfg.installer > /dev/null 2>&1 || \
+   ls chroot/chroot/root/packages.installer > /dev/null 2>&1
+then
+	_DIRECTORY="binary/install"
+
+	rm -f "${_DIRECTORY}/preseed.cfg"
+
+	for _FILE in config/preseed/*.cfg config/preseed/*.cfg.installer chroot/chroot/root/packages.installer
+	do
+		if [ -e "${_FILE}" ]
+		then
+			cat "${_FILE}" >> "${_DIRECTORY}/preseed.cfg"
+		fi
+	done
+fi
+
+# Creating stage file
+Create_stagefile

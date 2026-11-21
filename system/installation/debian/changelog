@@ -1,0 +1,97 @@
+lingmo-installer (5.0.9+lingmo5u1) unstable; urgency=medium
+
+  * Route first boot through lingmo-initial-setup.
+
+ -- Lingmo OS Team <team@lingmo.org>  Sat, 15 Nov 2026 13:00:00 +0800
+
+lingmo-installer (5.0.8.lingmo.4) unstable; urgency=medium
+
+  * Start the installed Wayland session directly and honor automatic login.
+  * Route the first installed session through Lingmo Aurora OOBE.
+
+ -- Lingmo OS Team <team@lingmo.org>  Mon, 09 Nov 2026 12:00:00 +0800
+
+lingmo-installer (5.0.8.lingmo.2) unstable; urgency=medium
+
+  * Record the installed account and login preference for first-boot setup.
+
+ -- Lingmo OS Team <team@lingmo.org>  Sun, 08 Nov 2026 12:00:00 +0800
+
+lingmo-installer (5.0.8.lingmo.1) unstable; urgency=medium
+
+  * installer: add users page and lingmo-dm display manager support.
+  * settings.conf: enable users module in show and exec sequences so the
+    installer collects username and password during installation.
+  * displaymanager/main.py: add DMlingmodm class that writes
+    /etc/lingmo-dm.conf with Session=lingmo-initial-setup for first-boot autologin.
+    OOBE switches it to lingmo-wayland on completion.
+  * displaymanager/displaymanager.conf: add lingmo-dm as first entry in
+    displaymanagers list so it takes priority when installed.
+  * users.conf: switch sudoersGroup wheel→sudo (Debian standard), replace
+    defaultGroups with Debian standard groups (sudo, audio, video, cdrom,
+    dip, plugdev, netdev, bluetooth), disable root password and reuse.
+    Comment out autologinGroup (not needed on Debian with lingmo-dm).
+
+ -- Lingmo OS Team <team@lingmo.org>  Thu, 05 Nov 2026 08:00:00 +0800
+
+lingmo-installer (5.0.7.lingmo.1) unstable; urgency=medium
+
+  * 安装器背景跟随窗口尺寸，修复改分辨率后底部露白。
+    背景与遮罩此前按 desktopSize() 固定几何，窗口尺寸与之不同时覆盖不全；
+    现改为按 rect() 设置几何，并在 resizeEvent 中同步，pixmap 用
+    setScaledContents 拉伸，不在 resize 时重建。
+
+ -- Lingmo OS Team <team@lingmo.org>  Mon, 19 Oct 2026 12:53:21 +0800
+
+lingmo-installer (5.0.6.lingmo.1) unstable; urgency=medium
+
+  * Bound the installer card on both ends. The width was min(60% of the screen,
+    screen-100) with no upper limit, so a 4K screen produced a 2304px wide card,
+    and the height used qBound(480, content, 78% of the screen), whose lower
+    bound wins on short or HiDPI-scaled screens (1024x600, or 911x512 logical at
+    150%) and leaves the card covering 93-94% of the screen with the navigation
+    bar at risk of falling off the bottom.
+  * cardWidth() clamps to [720, min(1100, screen-80)] and cardMaxHeight() to 86%
+    of the screen; the height lower bound is now min(480, maxH) so it can never
+    exceed the upper bound. ensureSize() uses the same limit, so both code paths
+    agree.
+  * desktopSize() now uses availableGeometry() instead of geometry() so panels
+    and docks are not covered.
+
+ -- Lingmo OS Team <team@lingmo.org>  Wed, 14 Oct 2026 23:40:08 +0800
+
+lingmo-installer (5.0.5.lingmo.1) unstable; urgency=medium
+
+  * New release for Lingmo OS.
+
+ -- Lingmo OS Team <team@lingmo.org>  Mon, 29 Jun 2026 22:08:00 +0800
+
+lingmo-installer (5.0.4.lingmo.1) unstable; urgency=medium
+
+  * New release for Lingmo OS.
+
+ -- Lingmo OS Team <team@lingmo.org>  Sun, 28 Jun 2026 14:00:00 +0800
+
+lingmo-installer (5.0.3.lingmo.1) unstable; urgency=medium
+
+  * New release for Lingmo OS.
+
+ -- Lingmo OS Team <team@lingmo.org>  Sun, 27 Jun 2026 13:30:00 +0800
+
+lingmo-installer (5.0.2.lingmo.1) unstable; urgency=medium
+
+  * New release for Lingmo OS.
+
+ -- Lingmo OS Team <team@lingmo.org>  Sun, 27 Jun 2026 12:42:00 +0800
+
+lingmo-installer (5.0.1.lingmo.1) unstable; urgency=medium
+
+  * New release for Lingmo OS.
+
+ -- Lingmo OS Team <team@lingmo.org>  Sat, 27 Jun 2026 18:18:00 +0800
+
+lingmo-installer (5.0.0.lingmo.1) unstable; urgency=medium
+
+  * New release for Lingmo OS.
+
+ -- Lingmo OS Team <team@lingmo.org>  Sat, 27 Jun 2026 14:21:00 +0800

@@ -1,401 +1,323 @@
-/*
- * Copyright (C) 2023-2024 LingmoOS Team.
- *
- * Author:     revenmartin <revenmartin@gmail.com>
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- */
+// SPDX-FileCopyrightText: 2026 Reion Wong <reionwong@gmail.com>
+// SPDX-FileCopyrightText: 2026 LingmoOS Contributors
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 #include "application.h"
-#include "sessionadaptor.h"
 
-// Qt
-#include <QCommandLineOption>
-#include <QDBusConnection>
-#include <QStandardPaths>
-#include <QSettings>
-#include <QProcess>
-#include <QDebug>
-#include <QDir>
+#include "base/command_line.h"
+#include "base/i18n.h"
+#include "base/locale.h"
+#include "base/paths.h"
+#include "base/process.h"
+#include "base/session_language.h"
+#include "base/strings.h"
+#include "common/environment.h"
+#include "common/language_environment.h"
+#include "logs.h"
+#include "power.h"
 
-#include <QDBusConnectionInterface>
-#include <QDBusServiceWatcher>
-
-// STL
+#include <filesystem>
 #include <optional>
 
-std::optional<QStringList> getSystemdEnvironment()
+#include <cerrno>
+#include <csignal>
+#include <cstdlib>
+#include <sys/epoll.h>
+#include <sys/socket.h>
+#include <unistd.h>
+
+namespace base = Lingmo::Base;
+namespace dbus = Lingmo::Base::DBus;
+using namespace std::chrono_literals;
+
+static std::optional<QStringList> getSystemdEnvironment()
 {
-    QStringList list;
-    auto msg = QDBusMessage::createMethodCall(QStringLiteral("org.freedesktop.systemd1"),
-                                              QStringLiteral("/org/freedesktop/systemd1"),
-                                              QStringLiteral("org.freedesktop.DBus.Properties"),
-                                              QStringLiteral("Get"));
-    msg << QStringLiteral("org.freedesktop.systemd1.Manager") << QStringLiteral("Environment");
-    auto reply = QDBusConnection::sessionBus().call(msg);
-    if (reply.type() == QDBusMessage::ErrorMessage) {
+    dbus::Proxy manager(dbus::Connection::session(),
+                        "org.freedesktop.systemd1",
+                        "/org/freedesktop/systemd1",
+                        "org.freedesktop.systemd1.Manager");
+    const auto environment = manager.property<std::vector<std::string>>("Environment");
+    if (!environment)
         return std::nullopt;
-    }
-
-    // Make sure the returned type is correct.
-    auto arguments = reply.arguments();
-    if (arguments.isEmpty() || arguments[0].userType() != qMetaTypeId<QDBusVariant>()) {
-        return std::nullopt;
-    }
-    auto variant = qdbus_cast<QVariant>(arguments[0]);
-    if (variant.type() != QVariant::StringList) {
-        return std::nullopt;
-    }
-
-    return variant.toStringList();
+    return toQStringList(*environment);
 }
 
-bool isShellVariable(const QByteArray &name)
+static bool isShellVariable(const QString &name)
 {
-    return name == "_" || name.startsWith("SHLVL");
+    return name == QLatin1String("_") || name.startsWith(QLatin1String("SHLVL"));
 }
 
-bool isSessionVariable(const QByteArray &name)
+static bool isSessionVariable(const QString &name)
 {
-    // Check is variable is specific to session.
-    return name == "DISPLAY" || name == "XAUTHORITY" || //
-        name == "WAYLAND_DISPLAY" || name == "WAYLAND_SOCKET" || //
-        name.startsWith("XDG_");
+    return name == QLatin1String("DISPLAY")
+        || name == QLatin1String("XAUTHORITY")
+        || name == QLatin1String("WAYLAND_DISPLAY")
+        || name == QLatin1String("WAYLAND_SOCKET")
+        || name.startsWith(QLatin1String("XDG_"));
 }
 
-void setEnvironmentVariable(const QByteArray &name, const QByteArray &value)
+static bool isInputMethodModuleVariable(const QString &name)
 {
-    if (qgetenv(name) != value) {
-        qputenv(name, value);
-    }
+    return name == QLatin1String("GTK_IM_MODULE")
+        || name == QLatin1String("QT_IM_MODULE");
 }
 
-Application::Application(int &argc, char **argv)
-    : QApplication(argc, argv)
-    , m_processManager(new ProcessManager(this))
-    , m_networkProxyManager(new NetworkProxyManager)
-    , m_wayland(false)
+static bool isEmptyVariable(const char *name)
 {
-    new SessionAdaptor(this);
+    const char *value = std::getenv(name);
+    return !value || !*value;
+}
 
-    // connect to D-Bus and register as an object:
-    QDBusConnection::sessionBus().registerService(QStringLiteral("com.lingmo.Session"));
-    QDBusConnection::sessionBus().registerObject(QStringLiteral("/Session"), this);
+static void setEnvironmentVariable(const QString &name, const QString &value)
+{
+    const char *current = std::getenv(name.toLocal8Bit().constData());
+    if (!current || value != QLatin1String(current))
+        setenv(name.toLocal8Bit().constData(), value.toLocal8Bit().constData(), 1);
+}
 
-    QCommandLineParser parser;
-    parser.setApplicationDescription(QStringLiteral("Lingmo Session"));
+static int s_terminationSocket[2] = {-1, -1};
+
+static void onTerminationSignal(int)
+{
+    const int savedErrno = errno;
+    const char byte = 1;
+    [[maybe_unused]] const ssize_t written = ::write(s_terminationSocket[1], &byte, 1);
+    errno = savedErrno;
+}
+
+namespace Lingmo {
+
+SessionApplication::SessionApplication(int argc, char **argv, base::EventLoop &loop)
+    : m_loop(loop)
+    , m_processManager(std::make_unique<SessionProcessManager>())
+{
+    endSessionOnTerminationSignals();
+    exportSession();
+
+    base::CommandLineParser parser;
+    parser.setApplicationDescription("Lingmo Session");
     parser.addHelpOption();
-
-    QCommandLineOption waylandOption(QStringList() << "w" << "wayland" << "Wayland Mode");
-    parser.addOption(waylandOption);
-    parser.process(*this);
-
-    m_wayland = parser.isSet(waylandOption);
+    parser.process(argc, argv);
 
     createConfigDirectory();
-    initKWinConfig();
     initLanguage();
-    initScreenScaleFactors();
-    initXResource();
-
     initEnvironments();
 
-    if (!syncDBusEnvironment()) {
-        // Startup error
-        qDebug() << "Could not sync environment to dbus.";
-        qApp->exit(1);
-    }
+    if (!syncDBusEnvironment())
+        LM_WARNING(sessionLog()) << "Could not sync environment to dbus.";
 
-    // We import systemd environment after we sync the dbus environment here.
-    // Otherwise it may leads to some unwanted order of applying environment
-    // variables (e.g. LANG and LC_*)
-    // ref plasma
-    importSystemdEnvrionment();
+    // Import systemd's environment only after ours reached D-Bus; the other
+    // order applies LANG and LC_* in the wrong order.
+    unsetenv("LC_ALL");
+    importSystemdEnvironment();
 
-    qunsetenv("XCURSOR_THEME");
-    qunsetenv("XCURSOR_SIZE");
-    qunsetenv("SESSION_MANAGER");
+    // The language the session runs in is known only now.
+    base::Locale::setProcessLocale();
+    Lingmo::I18n::setDomain("lingmo-core");
 
-    m_networkProxyManager->update();
-
-    QTimer::singleShot(50, this, &Application::updateUserDirs);
-
-    // Launch Lingmo and user defined processes !
-    QTimer::singleShot(100, m_processManager, &ProcessManager::start);
-}
-
-bool Application::wayland() const
-{
-    return m_wayland;
-}
-
-void Application::launch(const QString &exec, const QStringList &args)
-{
-    QProcess process;
-    process.setProgram(exec);
-    process.setProcessEnvironment(QProcessEnvironment::systemEnvironment());
-    process.setArguments(args);
-    process.startDetached();
-}
-
-void Application::launch(const QString &exec, const QString &workingDir, const QStringList &args)
-{
-    QProcess process;
-    process.setProgram(exec);
-    process.setProcessEnvironment(QProcessEnvironment::systemEnvironment());
-    process.setWorkingDirectory(workingDir);
-    process.setArguments(args);
-    process.startDetached();
-}
-
-void Application::initEnvironments()
-{
-    // Set defaults
-    if (qEnvironmentVariableIsEmpty("XDG_DATA_HOME"))
-        qputenv("XDG_DATA_HOME", QDir::home().absoluteFilePath(QStringLiteral(".local/share")).toLocal8Bit());
-    if (qEnvironmentVariableIsEmpty("XDG_DESKTOP_DIR"))
-        qputenv("XDG_DESKTOP_DIR", QDir::home().absoluteFilePath(QStringLiteral("/Desktop")).toLocal8Bit());
-    if (qEnvironmentVariableIsEmpty("XDG_CONFIG_HOME"))
-        qputenv("XDG_CONFIG_HOME", QDir::home().absoluteFilePath(QStringLiteral(".config")).toLocal8Bit());
-    if (qEnvironmentVariableIsEmpty("XDG_CACHE_HOME"))
-        qputenv("XDG_CACHE_HOME", QDir::home().absoluteFilePath(QStringLiteral(".cache")).toLocal8Bit());
-    if (qEnvironmentVariableIsEmpty("XDG_DATA_DIRS"))
-        qputenv("XDG_DATA_DIRS", "/usr/local/share/:/usr/share/");
-    if (qEnvironmentVariableIsEmpty("XDG_CONFIG_DIRS"))
-        qputenv("XDG_CONFIG_DIRS", "/etc/xdg");
-
-    // Environment
-    qputenv("DESKTOP_SESSION", "Lingmo");
-    qputenv("XDG_CURRENT_DESKTOP", "Lingmo");
-    qputenv("XDG_SESSION_DESKTOP", "Lingmo");
-
-    // Qt
-    qputenv("QT_QPA_PLATFORMTHEME", "lingmo");
-    qputenv("QT_PLATFORM_PLUGIN", "lingmo");
-    
-    // ref: https://stackoverflow.com/questions/34399993/qml-performance-issue-when-updating-an-item-in-presence-of-many-non-overlapping
-    qputenv("QT_QPA_UPDATE_IDLE_TIME", "10");
-
-    qputenv("QT_AUTO_SCREEN_SCALE_FACTOR", "0");
-
-    // IM Config
-    // qputenv("GTK_IM_MODULE", "fcitx5");
-    // qputenv("QT4_IM_MODULE", "fcitx5");
-    // qputenv("QT_IM_MODULE", "fcitx5");
-    // qputenv("CLUTTER_IM_MODULE", "fcitx5");
-    // qputenv("XMODIFIERS", "@im=fcitx");
-}
-
-void Application::initLanguage()
-{
-    QSettings settings(QSettings::UserScope, "lingmoos", "language");
-    QString value = settings.value("language", "").toString();
-
-    // Init Language
-    if (value.isEmpty()) {
-        QFile file("/etc/locale.gen");
-        if (file.open(QIODevice::ReadOnly)) {
-            QStringList lines = QString(file.readAll()).split('\n');
-
-            for (const QString &line : lines) {
-                if (line.startsWith('#'))
-                    continue;
-
-                if (line.trimmed().isEmpty())
-                    continue;
-
-                value = line.split(' ').first().split('.').first();
-            }
-        }
-    }
-
-    if (value.isEmpty())
-        value = "en_US";
-
-    settings.setValue("language", value);
-
-    QString str = QString("%1.UTF-8").arg(value);
-
-    const auto lcValues = {
-        "LANG", "LC_NUMERIC", "LC_TIME", "LC_MONETARY", "LC_MEASUREMENT", "LC_COLLATE", "LC_CTYPE"
+    m_startTimer.setSingleShot(true);
+    m_startTimer.onTimeout = [this] {
+        m_processManager->start();
     };
-
-    for (auto lc : lcValues) {
-        const QString value = str;
-        if (!value.isEmpty()) {
-            qputenv(lc, value.toUtf8());
-        }
-    }
-
-    if (!value.isEmpty()) {
-        qputenv("LANGUAGE", value.toUtf8());
-    }
+    m_startTimer.start(100ms);
 }
 
-void Application::initScreenScaleFactors()
+SessionApplication::~SessionApplication()
 {
-    QSettings settings(QSettings::UserScope, "lingmoos", "theme");
-    qreal scaleFactor = settings.value("PixelRatio", 1.0).toReal();
+    // Deleted here, while the loop still exists, the process manager stops
+    // what it started and removes its Xwayland readiness directory.
+    m_processManager.reset();
+    if (m_terminationWatch)
+        m_loop.unwatch(m_terminationWatch);
+}
 
-    qputenv("QT_SCREEN_SCALE_FACTORS", QByteArray::number(scaleFactor));
+void SessionApplication::reboot()
+{
+    m_processManager->endAfterApplications(SessionProcessManager::Ending::Restart, [this] {
+        const bool rebooting = Power::reboot();
+        if (rebooting)
+            m_loop.quit(0);
+        return rebooting;
+    });
+}
 
-    // for Gtk
-    if (qFloor(scaleFactor) > 1) {
-        qputenv("GDK_SCALE", QByteArray::number(scaleFactor, 'g', 0));
-        qputenv("GDK_DPI_SCALE", QByteArray::number(1.0 / scaleFactor, 'g', 3));
-    } else {
-        qputenv("GDK_SCALE", QByteArray::number(qFloor(scaleFactor), 'g', 0));
-        qputenv("GDK_DPI_SCALE", QByteArray::number(qFloor(scaleFactor), 'g', 0));
+void SessionApplication::powerOff()
+{
+    m_processManager->endAfterApplications(SessionProcessManager::Ending::Shutdown, [this] {
+        const bool poweringOff = Power::powerOff();
+        if (poweringOff)
+            m_loop.quit(0);
+        return poweringOff;
+    });
+}
+
+bool SessionApplication::suspend()
+{
+    return Power::suspend();
+}
+
+void SessionApplication::exportSession()
+{
+    dbus::Connection *bus = dbus::Connection::session(&m_loop);
+    if (!bus)
+        return;
+
+    m_sessionObject = std::make_unique<dbus::Object>(
+        bus, "/org/lingmo/Session", "org.lingmo.Session");
+    m_sessionObject->addMethod("logout",             [this] { logout(); });
+    m_sessionObject->addMethod("reboot",             [this] { reboot(); });
+    m_sessionObject->addMethod("powerOff",           [this] { powerOff(); });
+    m_sessionObject->addMethod("suspend",            [this] { return suspend(); }, {{}, {"result"}});
+    m_sessionObject->addMethod("startDesktopProcess",[this] { startDesktopProcess(); });
+    m_sessionObject->publish();
+    bus->requestName("org.lingmo.Session");
+    m_language = std::make_unique<base::SessionLanguage>(bus);
+}
+
+void SessionApplication::endSessionOnTerminationSignals()
+{
+    // lingmo-dm and systemd end a session with SIGTERM; dying of it would leave
+    // the compositor and services holding the Wayland socket against the next login.
+    // A handler, unlike signalfd's blocked mask, is not inherited by child processes.
+    if (::socketpair(AF_UNIX, SOCK_STREAM | SOCK_CLOEXEC | SOCK_NONBLOCK, 0,
+                     s_terminationSocket) != 0) {
+        LM_WARNING(sessionLog()) << "Cannot handle termination signals";
+        return;
     }
+    m_terminationWatch = m_loop.watch(s_terminationSocket[0], EPOLLIN, [this](uint32_t) {
+        m_loop.unwatch(m_terminationWatch);
+        m_terminationWatch = 0;
+        m_processManager->endSession();
+    });
+    struct sigaction action = {};
+    action.sa_handler = onTerminationSignal;
+    sigemptyset(&action.sa_mask);
+    action.sa_flags = SA_RESTART;
+    for (const int number : {SIGTERM, SIGINT, SIGHUP})
+        ::sigaction(number, &action, nullptr);
 }
 
-void Application::initXResource()
+void SessionApplication::initEnvironments()
 {
-    QSettings settings(QSettings::UserScope, "lingmoos", "theme");
-    qreal scaleFactor = settings.value("PixelRatio", 1.0).toReal();
-    int fontDpi = 96 * scaleFactor;
-    QString cursorTheme = settings.value("CursorTheme", "default").toString();
-    int cursorSize = settings.value("CursorSize", 24).toInt() * scaleFactor;
-    int xftAntialias = settings.value("XftAntialias", 1).toBool();
-    QString xftHintStyle = settings.value("XftHintStyle", "hintslight").toString();
+    const QString home = QString::fromStdString(base::paths::home());
 
-    const QString datas = QString("Xft.dpi: %1\n"
-                                  "Xcursor.theme: %2\n"
-                                  "Xcursor.size: %3\n"
-                                  "Xft.antialias: %4\n"
-                                  "Xft.hintstyle: %5\n"
-                                  "Xft.rgba: rgb")
-                          .arg(fontDpi)
-                          .arg(cursorTheme)
-                          .arg(cursorSize)
-                          .arg(xftAntialias)
-                          .arg(xftHintStyle);
+    if (isEmptyVariable("XDG_DATA_HOME"))
+        setenv("XDG_DATA_HOME", (home + "/.local/share").toLocal8Bit().constData(), 1);
+    if (isEmptyVariable("XDG_DESKTOP_DIR"))
+        setenv("XDG_DESKTOP_DIR", (home + "/Desktop").toLocal8Bit().constData(), 1);
+    if (isEmptyVariable("XDG_CONFIG_HOME"))
+        setenv("XDG_CONFIG_HOME", (home + "/.config").toLocal8Bit().constData(), 1);
+    if (isEmptyVariable("XDG_CACHE_HOME"))
+        setenv("XDG_CACHE_HOME", (home + "/.cache").toLocal8Bit().constData(), 1);
+    if (isEmptyVariable("XDG_DATA_DIRS"))
+        setenv("XDG_DATA_DIRS", "/usr/local/share/:/usr/share/", 1);
+    if (isEmptyVariable("XDG_CONFIG_DIRS"))
+        setenv("XDG_CONFIG_DIRS", "/etc/xdg", 1);
 
-    QProcess p;
-    p.start(QStringLiteral("xrdb"), {QStringLiteral("-quiet"), QStringLiteral("-merge"), QStringLiteral("-nocpp")});
-    p.setProcessChannelMode(QProcess::ForwardedChannels);
-    p.write(datas.toLatin1());
-    p.closeWriteChannel();
-    p.waitForFinished(-1);
+    setenv("DESKTOP_SESSION",    "Lingmo", 1);
+    setenv("XDG_CURRENT_DESKTOP","Lingmo", 1);
+    setenv("XDG_SESSION_DESKTOP","Lingmo", 1);
 
-    // For lingmo-wine
-    qputenv("LINGMO_FONT_DPI", QByteArray::number(fontDpi));
+    // GLib plain-text backend: lingmo-services writes GTK appearance keys into
+    // ~/.config/glib-2.0/settings/keyfile, so no dconf daemon is needed.
+    setenv("GSETTINGS_BACKEND", "keyfile", 1);
 
-    // Init cursor
-    runSync("cupdatecursor", {cursorTheme, QString::number(cursorSize)});
-    // qputenv("XCURSOR_THEME", cursorTheme.toLatin1());
-    // qputenv("XCURSOR_SIZE", QByteArray::number(cursorSize * scaleFactor));
+    // A list, not one name: Qt tries Wayland first, and an application whose
+    // Qt has no Wayland plugin, or that cannot reach the compositor (a root
+    // program under pkexec), starts on XWayland instead of failing to find a
+    // platform. Qt reads the names in order.
+    setenv("QT_QPA_PLATFORM",    "wayland;xcb", 1);
+    // GTK picks Wayland by itself in a Wayland session, and X11 elsewhere; a
+    // forced backend leaves GTK applications without a choice.
+    if (isEmptyVariable("WAYLAND_DISPLAY"))
+        setenv("WAYLAND_DISPLAY", "lingmo-0", 1);
+    setenv("QT_QPA_PLATFORMTHEME", "lingmo", 1);
+
+    // Reduce QML repaint latency on Wayland.
+    setenv("QT_QPA_UPDATE_IDLE_TIME", "10", 1);
+
+    // im-config's /etc/profile.d script exports these for Wayland sessions;
+    // they would bypass the compositor's text-input protocols.
+    // XMODIFIERS stays for Xwayland clients.
+    unsetenv("GTK_IM_MODULE");
+    unsetenv("QT_IM_MODULE");
 }
 
-void Application::initKWinConfig()
+void SessionApplication::initLanguage()
 {
-    QSettings settings(QStandardPaths::writableLocation(QStandardPaths::ConfigLocation) + "/kwinrc",
-                       QSettings::IniFormat);
-
-    settings.beginGroup("Effect-Blur");
-    settings.setValue("BlurStrength", 10);
-    settings.setValue("NoiseStrength", 0);
-    settings.endGroup();
-
-    settings.beginGroup("Windows");
-    settings.setValue("FocusStealingPreventionLevel", 0);
-    settings.setValue("HideUtilityWindowsForInactive", false);
-    settings.setValue("BorderlessMaximizedWindows", false);
-    settings.setValue("Placement", "Centered");
-    settings.endGroup();
-
-    settings.beginGroup("org.kde.kdecoration2");
-    settings.setValue("BorderSize", "Huge");
-    settings.setValue("ButtonsOnLeft", "");
-    settings.setValue("ButtonsOnRight", "HIAX");
-    settings.setValue("library", "org.lingmo.decoration");
-    settings.setValue("theme", "");
-    settings.endGroup();
+    Lingmo::Core::Environment environment = Lingmo::Core::processEnvironment();
+    Lingmo::Core::language::apply(environment);
+    for (const auto &[name, value] : environment) {
+        if (name == "LANG" || name == "LANGUAGE" || name.starts_with("LC_"))
+            setenv(name.c_str(), value.c_str(), 1);
+    }
+    setenv("LC_ALL", "", 1);
 }
 
-bool Application::syncDBusEnvironment()
+bool SessionApplication::syncDBusEnvironment()
 {
     int exitCode = 0;
 
-    // At this point all environment variables are set, let's send it to the DBus session server to update the activation environment
-    if (!QStandardPaths::findExecutable(QStringLiteral("dbus-update-activation-environment")).isEmpty()) {
-        exitCode = runSync(QStringLiteral("dbus-update-activation-environment"), { QStringLiteral("--systemd"), QStringLiteral("--all") });
-    }
+    if (!base::paths::findExecutable("dbus-update-activation-environment").empty())
+        exitCode = runSync("dbus-update-activation-environment",
+                           {"--systemd", "--all"});
+
+    const QString systemctl = QString::fromStdString(
+        base::paths::findExecutable("systemctl"));
+    if (!systemctl.isEmpty())
+        runSync(systemctl, {"--user", "unset-environment",
+                            "GTK_IM_MODULE", "QT_IM_MODULE", "LC_ALL"});
 
     return exitCode == 0;
 }
 
-// Import systemd user environment.
-// Systemd read ~/.config/environment.d which applies to all systemd user unit.
-// But it won't work if lingmoDE is not started by systemd.
-void Application::importSystemdEnvrionment()
+// Import systemd user environment (~/.config/environment.d).
+// Has no effect when Lingmo is not started by systemd.
+void SessionApplication::importSystemdEnvironment()
 {
-    auto environment = getSystemdEnvironment();
-    if (!environment) {
+    const auto environment = getSystemdEnvironment();
+    if (!environment)
         return;
-    }
 
-    for (auto &envString : environment.value()) {
-        const auto env = envString.toLocal8Bit();
-        const int idx = env.indexOf('=');
-        if (Q_UNLIKELY(idx <= 0)) {
+    for (const QString &env : *environment) {
+        const int idx = env.indexOf(QLatin1Char('='));
+        if (idx <= 0)
             continue;
-        }
-
-        const auto name = env.left(idx);
-        if (isShellVariable(name) || isSessionVariable(name)) {
+        const QString name  = env.left(idx);
+        const QString value = env.mid(idx + 1);
+        if (isShellVariable(name) || isSessionVariable(name)
+            || isInputMethodModuleVariable(name) || name == QLatin1String("LC_ALL"))
             continue;
-        }
-        setEnvironmentVariable(name, env.mid(idx + 1));
+        setEnvironmentVariable(name, value);
     }
 }
 
-void Application::createConfigDirectory()
+void SessionApplication::createConfigDirectory()
 {
-    const QString configDir = QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation);
-
-    if (!QDir().mkpath(configDir))
-        qDebug() << "Could not create config directory XDG_CONFIG_HOME: " << configDir;
+    const QString configDir = QString::fromStdString(base::paths::configHome());
+    std::error_code error;
+    std::filesystem::create_directories(configDir.toStdString(), error);
+    if (!std::filesystem::is_directory(configDir.toStdString(), error))
+        LM_WARNING(sessionLog()) << "Could not create XDG_CONFIG_HOME:" << configDir;
 }
 
-void Application::updateUserDirs()
+int SessionApplication::runSync(const QString &program, const QStringList &args)
 {
-    // bool isLingmoOS = QFile::exists("/etc/lingmoos");
+    base::Process p(&m_loop);
+    p.setOutputForwarded(true);
+    int exitCode = 0;
+    p.onFinished = [&exitCode](int code, bool) { exitCode = code; };
 
-    // if (!isLingmoOS)
-    //     return;
-
-    // QProcess p;
-    // p.setEnvironment(QStringList() << "LC_ALL=C");
-    // p.start("xdg-user-dirs-update", QStringList() << "--force");
-    // p.waitForFinished(-1);
-}
-
-int Application::runSync(const QString &program, const QStringList &args, const QStringList &env)
-{
-    QProcess p;
-
-    if (!env.isEmpty())
-        p.setEnvironment(QProcess::systemEnvironment() << env);
-
-    p.setProcessChannelMode(QProcess::ForwardedChannels);
-    p.start(program, args);
-    p.waitForFinished(-1);
-
-    if (p.exitCode()) {
-        qWarning() << program << args << "exited with code" << p.exitCode();
+    if (!p.start(program.toStdString(), toStdStrings(args))) {
+        LM_WARNING(sessionLog()) << program << "could not be started";
+        return 255;
     }
+    p.waitForFinished(std::chrono::hours(24));
 
-    return p.exitCode();
+    if (exitCode)
+        LM_WARNING(sessionLog()) << program << args.join(QLatin1Char(' '))
+                                 << "exited with code" << exitCode;
+    return exitCode;
 }
+
+} // namespace Lingmo

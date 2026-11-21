@@ -1,39 +1,26 @@
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.22)
 project(core)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-set(CMAKE_AUTOUIC ON)
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake/)
-
-set(QT Core Gui Widgets Quick QuickControls2 DBus Xml X11Extras LinguistTools)
-find_package(Qt5 REQUIRED ${QT})
-# find_package(LingmoUI REQUIRED)
 find_package(PkgConfig REQUIRED)
+find_package(LingmoSDK REQUIRED)
 
 include(GNUInstallDirs)
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
-add_subdirectory(polkit-agent)
-add_subdirectory(screen-brightness)
+add_subdirectory(common)
+add_subdirectory(appruntime)
+add_subdirectory(locales)
+add_subdirectory(privacy)
 add_subdirectory(session)
-add_subdirectory(settings-daemon)
-add_subdirectory(shutdown-ui)
-add_subdirectory(xembed-sni-proxy)
-add_subdirectory(powerman)
-add_subdirectory(cpufreq)
-add_subdirectory(cupdatecursor)
-add_subdirectory(gmenuproxy)
-add_subdirectory(notificationd)
-add_subdirectory(sddm-helper)
-add_subdirectory(clipboard)
-add_subdirectory(chotkeys)
+add_subdirectory(screenrecorder)
+add_subdirectory(polkit-agent)
+add_subdirectory(lingmo-services)
 
-install(FILES lingmo DESTINATION /etc/ COMPONENT Runtime)
-install(FILES Desktop/Lingmo DESTINATION /etc/Desktop/ COMPONENT Runtime)
-install(FILES wallpaper-color-pick/lingmo-wallpaper-color-pick DESTINATION "/usr/bin/")
+lingmo_add_translations(lingmo-core SOURCES lingmo-services session polkit-agent
+                          DESKTOP_FILES session/lingmo-wayland.desktop)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/lingmo-wayland.desktop DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/wayland-sessions/)

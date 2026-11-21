@@ -1,0 +1,87 @@
+#!/bin/sh
+
+. /usr/lib/live/config.sh
+
+## live-config(7) - System Configuration Components
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+#set -e
+
+Cmdline ()
+{
+	# Reading kernel command line
+	for _PARAMETER in ${LIVE_CONFIG_CMDLINE}
+	do
+		case "${_PARAMETER}" in
+			live-config.noautologin|noautologin)
+				LIVE_CONFIG_NOAUTOLOGIN="true"
+				;;
+
+			live-config.nox11autologin|nox11autologin)
+				LIVE_CONFIG_NOX11AUTOLOGIN="true"
+				;;
+
+			live-config.username=*|username=*)
+				LIVE_USERNAME="${_PARAMETER#*username=}"
+				;;
+		esac
+	done
+}
+
+Init ()
+{
+	# Disables both console and graphical autologin.
+	case "${LIVE_CONFIG_NOAUTOLOGIN}" in
+		true)
+			exit 0
+			;;
+	esac
+
+	# Disables graphical autologin, no matter what mechanism
+	case "${LIVE_CONFIG_NOX11AUTOLOGIN}" in
+		true)
+			exit 0
+			;;
+	esac
+
+	# Checking if package is installed or already configured
+	if ! pkg_is_installed "nodm" || \
+	   component_was_executed "nodm"
+	then
+		exit 0
+	fi
+
+	echo -n " nodm"
+}
+
+Config ()
+{
+	# autologin
+	sed -i -r -e "s|^NODM_ENABLED=.*\$|NODM_ENABLED=true|" \
+		  -e "s|^NODM_USER=.*\$|NODM_USER=${LIVE_USERNAME}|" \
+	/etc/default/nodm
+
+cat > /tmp/live-config.cfg << EOF
+nodm nodm/enabled boolean true
+nodm nodm/user string ${LIVE_USERNAME}
+EOF
+
+	debconf-set-selections < /tmp/live-config.cfg
+	rm -f /tmp/live-config.cfg
+
+	# Avoid xinit
+	touch /var/lib/live/config/xinit
+
+	# Creating state file
+	touch /var/lib/live/config/nodm
+}
+
+Cmdline
+Init
+Config

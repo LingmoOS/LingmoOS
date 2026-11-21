@@ -1,0 +1,99 @@
+#!/usr/bin/python3
+"""Finalize only the explicitly supplied installation root, never the Live host."""
+from pathlib import Path
+import re
+import sys
+
+
+def target_root(value):
+    root = Path(value).resolve(strict=True)
+    if root == Path("/") or not (root / "etc").is_dir():
+        raise ValueError("Refusing invalid installation root")
+    return root
+
+
+def target_path(root, relative):
+    path = root / relative
+    if not path.resolve().is_relative_to(root):
+        raise ValueError("Target path escapes installation root: " + str(path))
+    return path
+
+
+def local_uri(uri):
+    return uri.lower().startswith(("file:", "cdrom:"))
+
+
+def clean_list(text):
+    result = []
+    for line in text.splitlines(keepends=True):
+        match = re.match(r"^\s*deb(?:-src)?\s+(?:\[[^]]*\]\s*)?(\S+)", line)
+        if not match or not local_uri(match[1]):
+            result.append(line)
+    return "".join(result)
+
+
+def clean_deb822(text):
+    result = []
+    for paragraph in re.split(r"\n\s*\n", text.strip()):
+        lines = paragraph.splitlines()
+        start = next((i for i, line in enumerate(lines) if line.lower().startswith("uris:")), None)
+        if start is None:
+            if paragraph: result.append(paragraph)
+            continue
+        end = start + 1
+        while end < len(lines) and lines[end].startswith((" ", "\t")):
+            end += 1
+        uris = (lines[start].split(":", 1)[1] + " " + " ".join(lines[start+1:end])).split()
+        remote = [uri for uri in uris if not local_uri(uri)]
+        if remote:
+            result.append("\n".join(lines[:start] + ["URIs: " + " ".join(remote)] + lines[end:]))
+    return "\n\n".join(result) + ("\n" if result else "")
+
+
+def finalize(value):
+    root = target_root(value)
+    # Replace the live base list but preserve independently configured remote
+    # repositories (Lingmo/OBS and their signing keys) in sources.list.d.
+    main = target_path(root, "etc/apt/sources.list")
+    main.parent.mkdir(parents=True, exist_ok=True)
+    main.write_text("""# Debian base repositories for the installed system.
+deb https://mirrors.ustc.edu.cn/debian trixie main non-free-firmware
+deb https://mirrors.ustc.edu.cn/debian trixie-updates main non-free-firmware
+deb https://mirrors.ustc.edu.cn/debian-security trixie-security main non-free-firmware
+deb https://mirrors.ustc.edu.cn/debian trixie-backports main non-free-firmware
+""")
+    directory = target_path(root, "etc/apt/sources.list.d")
+    if directory.exists():
+        for path in sorted(directory.iterdir()):
+            if path.suffix not in (".list", ".sources"): continue
+            path = target_path(root, path.relative_to(root))
+            old = path.read_text()
+            new = clean_deb822(old) if path.suffix == ".sources" else clean_list(old)
+            if new != old:
+                if not new.strip(): path.unlink()
+                else: path.write_text(new)
+    # Debian bash prepends this marker to the prompt as '(live)'. It is not
+    # the installed hostname and must not be copied out of the Live root.
+    marker = target_path(root, "etc/debian_chroot")
+    if marker.exists(): marker.unlink()
+    for relative in ("etc/xdg/autostart/lingmo-live-installer.desktop",
+                     "usr/bin/lingmo-live-installer", "etc/lingmo-oobe-account.conf",
+                     "etc/xdg/autostart/oobe.desktop", "etc/polkit-1/rules.d/10-lingmo-oobe.rules"):
+        path = target_path(root, relative)
+        if path.is_file(): path.unlink()
+    home = target_path(root, "home")
+    if home.exists():
+        for directory in home.glob("*/.config/autostart"):
+            for name in ("install-lingmo.desktop", "lingmo-live-installer.desktop", "lingmo-installer-config.desktop"):
+                path = target_path(root, directory.relative_to(root) / name)
+                if path.is_file(): path.unlink()
+    # Remove only firstboot.service enablement, not unrelated system services.
+    units = target_path(root, "etc/systemd/system")
+    if units.exists():
+        for path in units.glob("*.wants/firstboot.service"):
+            if path.is_symlink(): path.unlink()
+
+
+if __name__ == "__main__":
+    if len(sys.argv) != 2: raise SystemExit("usage: calamares-sources-final TARGET_ROOT")
+    finalize(sys.argv[1])

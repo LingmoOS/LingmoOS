@@ -1,0 +1,105 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Install queued packages into chroot"
+USAGE="${PROGRAM} {install|live} [--force]"
+
+_PASS="${1}"
+shift
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+Echo_message "Begin installing packages (${_PASS} pass)..."
+
+# Requiring stage file
+Require_stagefiles config bootstrap
+
+# Set non-default stage file name
+# Setting to default name with appended action name
+STAGE_FILE="$(Stagefile_name "${_PASS}")"
+
+# Checking stage file
+Check_stagefile "${STAGE_FILE}"
+
+# Acquire lock file
+Acquire_lockfile
+
+# Check for packages specified with foreign architecture
+_FOREIGN_ARCHITECTURES_FILE="chroot/root/packages.foreign-architectures"
+if [ -e "${_FOREIGN_ARCHITECTURES_FILE}" ] && [ -s "${_FOREIGN_ARCHITECTURES_FILE}" ]
+then
+	_APT_ARCHITECTURES_ADDED="0"
+
+	# Check if version of dpkg in chroot supports multiarch
+	if Chroot chroot dpkg --print-foreign-architectures > /dev/null 2>&1
+	then
+		# Add foregin architectures
+		while read _ARCHITECTURES_LINE
+		do
+			Echo_message "Adding foreign architecture ${_ARCHITECTURES_LINE} to dpkg"
+			Chroot chroot dpkg --add-architecture ${_ARCHITECTURES_LINE}
+
+			_APT_ARCHITECTURES_ADDED="1"
+		done < "${_FOREIGN_ARCHITECTURES_FILE}"
+
+		# Tidy up
+		rm -f "${_FOREIGN_ARCHITECTURES_FILE}"
+	else
+		Echo_error "Version of dpkg in chroot does not support foreign architectures."
+	fi
+
+	# Update apt if foreign architectures were added
+	if [ "${_APT_ARCHITECTURES_ADDED}" -ne "0" ]
+	then
+		Echo_message "Added foreign architectures, updating apt..."
+		Apt chroot update
+	fi
+fi
+
+if [ -e chroot/root/packages.chroot ] && [ -s chroot/root/packages.chroot ]
+then
+	# Restoring cache
+	Restore_package_cache chroot
+
+	if [ "${LB_INITRAMFS}" = "dracut-live" ]; then
+		# Install each package separately, because the list contains conflicts
+		_INSTALL_ONE_BY_ONE="--max-args 1"
+	else
+		_INSTALL_ONE_BY_ONE=""
+	fi
+	# Installing packages
+	case "${LB_APT}" in
+		apt|apt-get)
+			Chroot chroot "xargs ${_INSTALL_ONE_BY_ONE} --arg-file=/root/packages.chroot apt-get ${APT_OPTIONS} install"
+			;;
+
+		aptitude)
+			Chroot chroot "xargs ${_INSTALL_ONE_BY_ONE} --arg-file=/root/packages.chroot aptitude ${APTITUDE_OPTIONS} install"
+			;;
+	esac
+
+	# Tidying up
+	rm -f chroot/root/packages.chroot
+
+	# Saving cache
+	Save_package_cache chroot
+
+fi
+
+# Creating stage file
+Create_stagefile "${STAGE_FILE}"

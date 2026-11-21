@@ -1,0 +1,49 @@
+name: Upload to OBS
+
+permissions: write-all
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - "v*.*.*"
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  debian:
+    name: Debian Testing
+    runs-on: ubuntu-latest
+    container: docker.io/library/debian:testing
+    steps:
+      - name: Install Dependencies
+        run: |
+          apt-get update
+          apt-get install -y sudo git ca-certificates
+          apt-get install -y equivs curl git devscripts debhelper lintian build-essential automake autotools-dev cmake g++
+      
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      # - name: Install build dependencies
+      #   run: mk-build-deps -i -t "apt-get --yes" -r
+
+      - name: Build source package
+        run: |
+          dpkg-buildpackage -S -us -uc -d
+      
+      - name: Collect files
+        run: |
+          mkdir -p src-tar-output
+          mv ../*.dsc ../*.tar.* src-tar-output/
+
+      - name: Upload
+        uses: LingmoOS/action-upload-to-obs@0.0.4
+        with:
+          remove-old-sources: true
+          obs-package-name: 'lingmo-installer-config'
+          obs-project-name: 'home:LingmoOS'
+          obs-user-name: ${{ secrets.OBS_USERNAME }}
+          obs-password: ${{ secrets.OBS_TOKEN }}
+          obs-instance-url: 'https://api.opensuse.org'
+          local-package-dir: './src-tar-output'

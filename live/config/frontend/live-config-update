@@ -1,0 +1,75 @@
+#!/bin/sh
+
+## live-config(7) - System Configuration Components
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+_DIRECTORY="${1:-/}"
+
+if [ ! -e "${_DIRECTORY}" ]
+then
+	echo "E: cannot access ${_DIRECTORY}: No such directory."
+	exit 1
+fi
+
+_DISTRIBUTION="${2:-$(lsb_release -is | tr [A-Z] [a-z] | sed -e 's| |-|g')}"
+_RELEASE="${3:-$(lsb_release -cs | tr [A-Z] [a-z])}"
+
+if ( [ -z "${_DISTRIBUTION}" ] || [ -z "${_RELEASE}" ] ) && [ ! -x "$(which lsb_release 2>/dev/null)" ]
+then
+	echo "E: lsb_release: command not found."
+	echo "I: lsb_release can be obtained from:"
+	echo "I:   http://www.linux-foundation.org/en/LSB"
+	echo "I: On Debian based systems, lsb_release can be installed with:"
+	echo "I:   sudo apt-get install lsb-release"
+	exit 1
+fi
+
+case "${_DISTRIBUTION}" in
+	debian)
+		NOCOMPONENT="apport"
+
+		LIVE_HOSTNAME="debian"
+		LIVE_USERNAME="user"
+		LIVE_USER_FULLNAME="Debian Live user"
+		LIVE_USER_DEFAULT_GROUPS="audio cdrom dip floppy video plugdev netdev powerdev scanner bluetooth debian-tor"
+
+		PROC_OPTIONS="onodev,noexec,nosuid"
+		;;
+
+	progress-linux)
+		NOCOMPONENT="apport"
+
+		LIVE_HOSTNAME="system"
+		LIVE_USERNAME="user"
+		LIVE_USER_FULLNAME="Live user"
+		LIVE_USER_DEFAULT_GROUPS="audio cdrom dip floppy video plugdev netdev powerdev scanner bluetooth debian-tor sudo"
+
+		PROC_OPTIONS="onodev,noexec,nosuid,hidepid=2"
+		;;
+esac
+
+echo "Removing unused components for ${_DISTRIBUTION} (${_RELEASE})..."
+
+for NOCOMPONENT in ${NOCOMPONENT}
+do
+	if ls "${_DIRECTORY}"/lib/live/config/*-"${NOCOMPONENT}" > /dev/null 2>&1
+	then
+		rm -f "${_DIRECTORY}"/lib/live/config/*-"${NOCOMPONENT}"
+	fi
+done
+
+echo  "Setting specific defaults for ${_DISTRIBUTION} (${_RELEASE})..."
+
+sed -i  -e "s|^LIVE_HOSTNAME=.*$|LIVE_HOSTNAME=\"${LIVE_HOSTNAME}\"|" \
+	-e "s|^LIVE_USERNAME=.*$|LIVE_USERNAME=\"${LIVE_USERNAME}\"|" \
+	-e "s|^LIVE_USER_FULLNAME=.*$|LIVE_USER_FULLNAME=\"${LIVE_USER_FULLNAME}\"|" \
+	-e "s|^PROC_OPTIONS=.*$|PROC_OPTIONS=\"${PROC_OPTIONS}\"|" \
+"${_DIRECTORY}/usr/bin/live-config"

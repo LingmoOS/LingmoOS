@@ -1,0 +1,81 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Execute local preseed in chroot"
+USAGE="${PROGRAM} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+Echo_message "Begin executing local preseeds..."
+
+# Requiring stage file
+Require_stagefiles config bootstrap
+
+# Checking stage file
+Check_stagefile
+
+# Acquire lock file
+Acquire_lockfile
+
+if ls config/preseed/*.cfg > /dev/null 2>&1 || \
+   ls config/preseed/*.cfg.chroot > /dev/null 2>&1 || \
+   ls chroot/root/packages.chroot.cfg > /dev/null 2>&1
+then
+	# Check dependency
+	Check_package chroot /usr/bin/debconf-set-selections debconf
+
+	# Install dependency
+	Install_packages
+
+	for PRESEED in config/preseed/*.cfg config/preseed/*.cfg.chroot chroot/root/packages.chroot.cfg
+	do
+		if [ -e "${PRESEED}" ]
+		then
+			# Copying local preseed
+			cp "${PRESEED}" chroot/root/preseed
+
+			Chroot chroot "debconf-set-selections /root/preseed"
+
+			# Removing local preseed file
+			rm -f chroot/root/preseed
+
+			# After preseeding debconf, reconfigure packages that have already
+			# been installed in the debootstrap phase.
+			# Strip comments and empty lines and take first column (pkg name).
+			sed -e 's/[[:space:]]*#.*//' -e '/^[[:space:]]*$/d' \
+				-e 's/[[:space:]].*//g' "${PRESEED}" | \
+				while read PKG
+			do
+				# Don't know the filename, but we want to query only dpkg
+				Check_installed chroot "placeholder" "${PKG}"
+				if [ ${INSTALL_STATUS} -eq 0 ]
+				then
+					Chroot chroot "dpkg-reconfigure ${PKG}"
+				fi
+			done
+		fi
+	done
+
+	rm -f chroot/root/packages.chroot.cfg
+
+	# Remove dependency
+	Remove_packages
+fi
+
+# Creating stage file
+Create_stagefile

@@ -1,0 +1,2276 @@
+live-config (11.0.5+lingmo1) unstable; urgency=medium
+
+  * Lingmo fork 起点：内容与 Debian trixie 的 11.0.5 一致，
+    仅加入 Lingmo 的 OBS 上传 CI。
+
+ -- Lingmo OS Team <team@lingmo.org>  Fri, 16 Oct 2026 22:23:09 +0800
+
+live-config (11.0.5) unstable; urgency=medium
+
+  * d/control: bump Standards-Version to 4.7.0, no changes
+  * Drop obsolete Lintian override
+  * Update Lintian overrides syntax
+  * Install files to /usr/
+  * Set Rules-Requires-Root: no
+  * Add myself to Uploaders
+
+ -- Luca Boccassi <bluca@debian.org>  Sat, 25 May 2024 18:35:12 +0100
+
+live-config (11.0.4) unstable; urgency=medium
+
+  [ Jonathan Carter ]
+  * Add changelog entries for Roland's recent changes
+
+  [ Roland Clobus]
+  * Update the polkit configuration to polkitd (Closes: #1037295)
+  * Add lintian overrides
+
+ -- Jonathan Carter <jcc@debian.org>  Mon, 10 Jul 2023 20:43:26 +0200
+
+live-config (11.0.3) unstable; urgency=medium
+
+  * Integrate patch to fix kde plasma desktop auto-login,
+    thanks Leszek Lesner (Closes: #990390)
+
+ -- Jonathan Carter <jcc@debian.org>  Mon, 28 Jun 2021 11:43:41 +0200
+
+live-config (11.0.2) unstable; urgency=medium
+
+  [ Raphaël Hertzog ]
+  * Drop Iain R. Learmonth from Uploaders on his request (Closes: #970287)
+  * Drop undesired leading 'o' in mount options
+  * Use dpkq-query instead of looking into /var/lib/dpkg/info/
+    (Closes: #944980)
+  * Revert "Drop the xfce4-panel hook, no longer needed."
+  * Add user to the sudo group for better integration
+  * Update the example to avoid direct access to dpkg's database
+  * Update my email in the Uploaders field
+  * Update the lintian override for a renamed tag
+  * Bump Standards-Version to 4.5.1
+  * Extend lintian override for live-config-systemd
+
+  [ Unit 193 ]
+  * Disable the xfce4-panel component if >= 4.16 is installed.
+
+ -- Raphaël Hertzog <raphael@offensive-security.com>  Fri, 08 Jan 2021 14:46:43 +0100
+
+live-config (11.0.1) unstable; urgency=medium
+
+  * Bump version number to same version of Debian development release
+  * Document changes made in git that are not represented in changelog:
+    - Document home page in debian/control
+    - Use secure copyright file specification URI
+    - Bump debhelper from 11 to 12
+    - Set debhelper-compat version in Build-Depends
+    - Update copyright headers and URLs
+    - Fix package descriptions to reflect team name
+
+ -- Jonathan Carter <jcc@debian.org>  Wed, 08 Apr 2020 11:10:48 +0200
+
+live-config (5.20190519) unstable; urgency=medium
+
+  * Downgrade compat back to 11, re-add debian/compat
+
+ -- Jonathan Carter <jcc@debian.org>  Sun, 19 May 2019 10:56:46 +0200
+
+live-config (5.20190507) unstable; urgency=medium
+
+  * Disable systemd NSS module during live-config. Closes: #928840
+
+ -- Raphaël Hertzog <hertzog@debian.org>  Mon, 13 May 2019 11:29:40 +0200
+
+live-config (5.20190312) unstable; urgency=medium
+
+  * Update compat to debhelper-compat (= 12)
+    - Use dh_missing instead of 'dh_install --fail-missing'
+    - Rename no-restart-on-upgrade to no-stop-on-upgrade
+  * Upgrade standards version to 4.3.0
+  * Add self to uploaders
+  * Integrate patch to select desktop environments for SDDM
+    (Closes: #921921)
+
+ -- Jonathan Carter <jcc@debian.org>  Mon, 11 Mar 2019 12:15:09 +0000
+
+live-config (5.20180224) unstable; urgency=medium
+
+  [ Steve McIntyre ]
+  * Repo moved to salsa
+
+  [ Ronny Standtke ]
+  * Fix a race condition between live-config and systemd-tmpfiles-setup
+    (Closes: #886009)
+
+  [ Raphaël Hertzog ]
+  * Minor packaging updates
+    * Switch to debhelper compat level 11.
+    * Bump Standards-Version to 4.1.3.
+  * Adjust rules and build-depends for debhelper 11
+  * Add lintian overrides for expected weirdness of init script and systemd unit
+  * Fix spelling errors in the live-config manual page
+
+ -- Raphaël Hertzog <hertzog@debian.org>  Sat, 24 Feb 2018 11:54:36 +0100
+
+live-config (5.20170914) unstable; urgency=medium
+
+  [ Алексей Шилин ]
+  * Add components/0085-sddm to configure autologin for KDE / Plasma live
+    images. Closes: #865382.
+
+  [ Raphaël Hertzog ]
+  * Setting of keyboard configuration broke now that udev starts before
+    live-config so we force a reload of the configuration for the input
+    sub-system with udevadm. cf. https://bugs.kali.org/view.php?id=4239
+
+ -- Raphaël Hertzog <hertzog@debian.org>  Thu, 14 Sep 2017 14:50:48 +0200
+
+live-config (5.20170829) unstable; urgency=medium
+
+  * Export LANG environment variable to systemd.
+  * Merge locales-all component into the locales one. It was not doing
+    anything useful on its own and it was buggy (was always setting LANG="" in
+    /etc/profile.d/zz-live-config_locales-all.sh). This bug was breaking
+    the locale in GNOME Wayland sessions whereas Xorg sessions were rescued
+    by the fact that /etc/gdm3/Xsession overrides LANG with the content of
+    GDM_LANG.
+  * Bump Standards-Version to 4.1.0.
+  * Bump debhelper compat level to 10.
+
+ -- Raphaël Hertzog <hertzog@debian.org>  Tue, 29 Aug 2017 12:01:10 +0200
+
+live-config (5.20170623) unstable; urgency=medium
+
+  * Drop "Before=udev.service" in live-config-systemd.service as it
+    breaks the boot process when you have multiple partitions mounted
+    as part of local-fs.target. Closes: #827665, #855085
+  * Move Setup_network definition to a shared file and include it
+    where it is needed. Closes: #858013
+
+ -- Raphaël Hertzog <hertzog@debian.org>  Fri, 23 Jun 2017 14:15:17 +0200
+
+live-config (5.20170316) unstable; urgency=medium
+
+  * Call "setupcon -k" ourselves to make the new keyboard configuration
+    active. Closes: #854004
+  * Add myself in Uploaders.
+
+ -- Raphaël Hertzog <hertzog@debian.org>  Thu, 16 Mar 2017 15:44:22 +0100
+
+live-config (5.20170112) unstable; urgency=medium
+
+  * Team upload.
+  * Don't force the vboxvideo Xorg driver when virtualbox-guest-x11 is
+    installed. It's harmful when we use the kernel driver. Closes: #831384
+    Thanks to intrigeri and Rohan Garg.
+  * Use dbus-run-session instead of dbus-launch to run gsettings. Thanks
+    to Simon McVittie for the report. Closes: #836102
+  * Support xorg-driver=noproprietary to not override Xorg's auto-detection
+    of the driver (live-config does that by default for cards supported by the
+    fglrx/nvidia drivers if they are installed). Thanks to Wolfgang Scheicher
+    for the initial patch. Closes: #808732
+
+ -- Raphaël Hertzog <hertzog@debian.org>  Thu, 12 Jan 2017 18:11:22 +0100
+
+live-config (5.20160608) unstable; urgency=medium
+
+  * Team upload.
+  * Replace components/0170-systemd with a systemd generator so that
+    we don't reload systemd in the middle of the boot sequence. This
+    really fixes the boot delay experienced with systemd 230.
+  * Improve ordering of live-config.service so that it runs after the
+    local filesystems have been mounted.
+  * Rely on dh_systemd_enable to enable the service instead of shipping
+    a basic.target.wants/live-config.service symlink in the package.
+
+ -- Raphaël Hertzog <hertzog@debian.org>  Wed, 08 Jun 2016 12:38:58 +0200
+
+live-config (5.20160607) unstable; urgency=medium
+
+  * Team upload.
+  * No longer manually start the getty@* services. There is systemd-logind
+    already taking care of this at runtime when the user switches to the
+    corresponding VT. Furthermore systemd-logind is smarter since it will
+    avoid running it on an already used VT (such as vt1 which is nowadays
+    used by gdm3). This also gets rid of the undesirable boot delay that
+    was likely introduced by one of the above conflicts.
+  * Make live-config-systemd the default backend.
+  * Properly handle hwclock set to local time. Closes: #824197
+    Thanks to Tom Jampen <tom@cryptography.ch> for the patch.
+  * Fix timezone configuration by dropping /etc/localtime so that
+    tzdata config script is forced to recreate it from /etc/timezone.
+    Closes: #816201 Thanks to Gregory DAVID <groolot@groolot.net> for
+    the analysis.
+  * Also look for live/config.conf in /lib/live/mount/persistence/*/
+    Closes: #817831 Thanks to Gregory DAVID <groolot@groolot.net>
+    for the patch.
+  * Automatically export variables set in live-config configuration
+    files so that components inherit from them. Closes: #799359
+    Thanks to Lukas Schwaighofer <lukas@schwaighofer.name> for the patch.
+  * Drop override and options for XZ compression, it has been the default for
+    a while.
+  * Bump Standards-Version to 3.9.8.
+
+ -- Raphaël Hertzog <hertzog@debian.org>  Tue, 07 Jun 2016 16:30:13 +0200
+
+live-config (5.20151121) unstable; urgency=medium
+
+  [ Iain R. Learmonth ]
+
+  * debian/source/format:
+   - Changed to "3.0 (native)"
+  * debian/control:
+   - Added myself to uploaders
+   - Updated Vcs-* fields
+   - Updated Homepage field
+
+  [ Raphaël Hertzog ]
+
+  * Added --no-block to systemd script (Closes: #802223)
+
+  [ trebmuh ]
+
+  * Updated French translation of man pages
+
+  [ Daniel Reichelt ]
+
+  * Fixed hook for disabling display managers
+  * Fixed naming of config snippets in manpages
+
+ -- Iain R. Learmonth <irl@debian.org>  Sat, 21 Nov 2015 17:59:07 +0000
+
+live-config (5.0~a5-2) unstable; urgency=low
+
+  * Removing myself from uploaders, lost trust in Debian (#804315).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 20 Nov 2015 13:04:24 +0100
+
+live-config (5.0~a5-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Dropping baudrate from agetty call in systemd component to use the
+    same options as the normal system does.
+  * Renumbering systemd and sysv-rc components.
+  * Don't clear the terminal in systemd component if live-config.debug
+    boot parameter is used.
+  * Adding systemd component in manpage.
+
+  [ Carlos Zuferri ]
+  * Updating Spanish translation of manpage.
+  * Updating French translation of manpage.
+  * Updating Italian translation of manpage.
+
+  [ victory ]
+  * Sync Japanese translation.
+  * Updating copyright notices for 2015.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 23 Aug 2015 10:59:56 +0200
+
+live-config (5.0~a4-1) unstable; urgency=low
+
+  * Wrap and sort debian control file.
+  * Using the common and intuitive way of live/config.conf.d/*.conf as
+    includes for config snippets consistently (Closes: #791670).
+  * Adding slightly adjusted systemd component from Daniel Gollub
+    <dgollub@brocade.com>.
+  * Removing generated live-config_autoconfig.conf files from systemd
+    component in postrm script.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 20 Aug 2015 11:41:02 +0200
+
+live-config (5.0~a3-1) unstable; urgency=low
+
+  * Making noroot bootparameter selfcontained within components.
+  * Making noautologin bootparameter selfcontained within components.
+  * Making nox11autologin bootparameter selfcontained within components.
+  * Making nottyautologin bootparameter selfcontained within components.
+  * Fixing kdm component to be selfcontained.
+  * Fixing sysvinit component to be selfcontained.
+  * Removing hack to configure sysvinit to not mount /tmp as tmpfs, this
+    is done at build time now through live-build.
+  * Also recreating ed25519 hostkeys in openssh-server component, now that
+    we only support jessie and newer here.
+  * Dropping obsolete ubuntu support, no special treatment necessary
+    anymore.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 04 May 2015 20:06:12 +0200
+
+live-config (5.0~a2-1) unstable; urgency=low
+
+  * Updating year to 2015.
+  * Updating live-config version to 5 in live-config-foobar example
+    packaging.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 26 Apr 2015 20:32:07 +0200
+
+live-config (5.0~a1-1) experimental; urgency=low
+
+  * Dropping debian-installer-launcher component, not needed for current
+    desktops anymore.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 25 Jan 2015 10:17:56 +0100
+
+live-config (4.0.4-1) unstable; urgency=low
+
+  * Adding dbus to recommends for systemd backend.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 04 Jan 2015 21:55:44 +0100
+
+live-config (4.0.3-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Temporarily running components without set -e.
+
+  [ victory ]
+  * [man:ja] Fix a typo in po header.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 10 Dec 2014 10:23:01 +0100
+
+live-config (4.0.2-1) unstable; urgency=low
+
+  * Updating to standards version 3.9.6.
+  * Dropping update-notifier component, not needed anymore (Closes:
+    #764773).
+  * Dropping incomplete German manpage translations.
+  * Dropping incomplete Brazilian Portuguese manpage translations.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sat, 25 Oct 2014 14:46:58 +0200
+
+live-config (4.0.1-1) unstable; urgency=low
+
+  [ Joerg Schirottke ]
+  * KDM: fix nox11autologin logic
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 12 Sep 2014 14:14:03 +0200
+
+live-config (4.0.0-1) unstable; urgency=low
+
+  * Correcting inverted logic when enabling/disabling broadcom-sta.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 27 Aug 2014 19:33:39 +0200
+
+live-config (4.0~alpha35-1) unstable; urgency=low
+
+  * Updating sysvinit component to leave serial tty in inittab intact,
+    thanks to Niels Laukens <niels@dest-unreach.be> (Closes: #754274).
+  * Correcting execution of hooks (Closes: #752118).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 24 Aug 2014 17:40:09 +0200
+
+live-config (4.0~alpha34-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Dropping console-tools from recommends.
+  * Adding initial broadcom-sta component based on the same logic we
+    already do for nvidia/fglrx handling (Closes: #749109).
+
+  [ Carlos Zuferri ]
+  * Removing obsolete flag '--no-backups' from po4a options.
+  * Adding '--package-version' to po4a options.
+  * Adding .po integrity check target to manpages/Makefile.
+
+  [ Daniel Baumann ]
+  * Making wheezy-compatible alternative recommends to iproute2 (Closes:
+    #753708).
+  * Making weezy-compatible alternative depends on sysvinit (Closes:
+    #756043).
+
+  [ victory ]
+  * Sync Japanese translation of live-config man page.
+  * Unfuzzy some strings in the translations of live-config man page.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 24 Aug 2014 09:53:28 +0200
+
+live-config (4.0~alpha33-1) unstable; urgency=low
+
+  * Correcting syntax error in 'already configured' test of the kde-
+    services component, thanks to Antony Messerli <amesserl@rackspace.com>
+    (Closes: #745861).
+  * Disbaling ssh password authentication by default (Closes: #741678).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 27 Apr 2014 12:13:54 +0200
+
+live-config (4.0~alpha32-1) unstable; urgency=low
+
+  * Building with dh --parallel.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 31 Mar 2014 21:53:17 +0200
+
+live-config (4.0~alpha31-1) experimental; urgency=low
+
+  [ victory ]
+  * Improve English sentenses; add a definite article, fix an indefinite
+    article, verb, and typo-like disorder.
+  * Sync/unfuzzzy translations for 2eeb5f1.
+  * [live-config] Adding initial Japanese manpage translation.
+  * [config:man:ja] Unfuzzy 1 string.
+
+  [ Daniel Baumann ]
+  * Removing superfluous quote in LIVE_CONFIG_DEBUG manpage entry.
+  * Checking for /usr/bin/kwriteconfig instead of /usr/share/kde4 in kde-
+    services component, thanks to Cavit Vural <cavit.vural@adak.com.tr>.
+  * Manually configuring /etc/timezone too to workaround #510908.
+  * Let tzdata debconf values be automatically taken from /etc/timezone
+    (Closes: #738118).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sat, 08 Feb 2014 17:17:22 +0100
+
+live-config (4.0~alpha30-1) experimental; urgency=low
+
+  [ Diederik de Haas ]
+  * Fixed the file parameter for disabling the freespacenotifier to
+    kdedrc.
+
+  [ Daniel Baumann ]
+  * Updating to standards version 3.9.5.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 04 Nov 2013 07:53:01 +0100
+
+live-config (4.0~alpha29-1) experimental; urgency=low
+
+  [ Daniel Baumann ]
+  * Rewrapping control file.
+
+  [ Diederik de Haas ]
+  * Changed disabling of freespacenotifier from global to (user) local.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 16 Oct 2013 09:18:16 +0200
+
+live-config (4.0~alpha28-1) experimental; urgency=low
+
+  [ skizzhg ]
+  * Italian translation update.
+
+  [ Daniel Baumann ]
+  * Updating package descriptions.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 15 Oct 2013 09:20:32 +0200
+
+live-config (4.0~a27-1) experimental; urgency=low
+
+  * Updating /etc/hosts handling to also update existing but incomplete
+    hosts files.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 10 Sep 2013 09:30:51 +0200
+
+live-config (4.0~a26-1) experimental; urgency=low
+
+  * Setting default hostname for progress-linux to system.
+  * Adding xscreensaver component to disable locking during live session.
+  * Using gsettings within one-time dbus session call (Closes: #706587).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 09 Sep 2013 20:56:10 +0200
+
+live-config (4.0~a25-1) experimental; urgency=low
+
+  [ Daniel Baumann ]
+  * Moving middleend to components within source tree for constency with
+    jargon used in the manpages.
+  * Adding reference to live-build in manpage when talking about
+    lb_config.
+  * Removing cosmetically superfluous comma in assembling of nocomponents
+    when noroot is used.
+
+  [ chals ]
+  * Updating Spanish translation of live-config man page.
+  * Fixing typo 'build'.
+  * Adding '.components' to man page.
+  * Updating translation files from the English sources.
+  * Updating Spanish translation of live-config man page.
+  * Updating French translation of live-config man page.
+
+  [ Daniel Baumann ]
+  * Building with dh-systemd.
+  * Improve boot order in systemd service file before getting a final
+    (upstream) solution, thanks to Michael Stapelberg
+    <stapelberg@debian.org>.
+  * Removing squeeze-only ifupdown initscript callings.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 05 Sep 2013 11:21:14 +0200
+
+live-config (4.0~a24-1) experimental; urgency=low
+
+  [ chals ]
+  * Fixing typo in live-config.7 manpage.
+  * Spreading typo fix to translation files.
+  * Updating Spanish translation of man page.
+  * Updating French translation of man page.
+  * Fixing accentuation error in the Spanish translation of the man page.
+  * Fixing spacing error in the Spanish translation of the man page.
+
+  [ Daniel Baumann ]
+  * Marking some internal variables explictly internal again.
+  * Making dpkg-divert calls more robust.
+  * Unifying usage of debconf temporary files.
+  * Unifying usage of debconf temporary files.
+  * Unifying usage of debconf preseeding.
+  * Moving logfile pipe to /tmp.
+  * Moving script to eject live media to live-tools.
+  * Reorganizing backend in source tree.
+  * Reorganizing frontend in source tree.
+  * Reorganizing middleend in source tree.
+  * Making middleend standalone.
+  * Updating frontend calls in backends.
+  * Refactoring cmdline parsing within middleend components.
+  * Exporting shared variables in live-config.
+  * Updating manpage to speak about components rather than scripts, live-
+    config is language independent now.
+  * Transitioning from scripts to components when refering to middleend.
+  * Renaming live-config|config to live-config.components|components and
+    live-noconfig|noconfig to live-config.nocomponents|nocomponents in
+    preparation for custom persistence for live-config components.
+  * Updating manpage to reflect changed activation boot parameters.
+  * Adding user-setup component back for legacy support until live-
+    debconfig is ready for prime time in debian-live.
+  * Updating frontend calls in rules.
+  * Updating paths in live-config-update.
+  * Installing live-config to /bin instead of /sbin.
+  * Correcting cosmetic typo in live-config-update status message.
+  * Updating example package for live-config-foobar.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 24 Jun 2013 20:40:15 +0200
+
+live-config (4.0~a23-1) experimental; urgency=low
+
+  * Readding accidentally dropped ssl-cert script.
+  * Only recreating ssl-cert-snakeoil in ssl-cert script if it's not
+    already existing.
+  * Correcting typo when cleaning out config scripts in initial variable
+    assembling.
+  * Correcting debug variable assignment.
+  * Adding LIVE_CONFIG_CMDLINE variable in manpage.
+  * Using 'correspond' rather than 'equal' when talking about variables
+    and parameter relation in manpage to avoid misunderstandings from
+    people taking 'equal' too strict.
+  * Adding LIVE_CONFIG_DEBUG variable in manpage.
+  * Setting default LIVE_CONFIG_SCRIPTS before parsing cmdline and
+    conffiles.
+  * Demoting LIVE_CONFIG_SCRIPTS to an internal variable again, there is
+    no need to set it manually anymore in any circumstance.
+  * Adding note to manpage about users responsibility to ensure correct
+    set of variables when assigning individual variables in configuration
+    files.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 24 Jun 2013 13:48:53 +0200
+
+live-config (4.0~a22-1) experimental; urgency=low
+
+  [ chals ]
+  * Updating dates in live-config man pages.
+  * Updating French translation of man page.
+  * Updating Spanish translation of man page.
+
+  [ Daniel Baumann ]
+  * Dropping support for upstart, nobody stepped up maintaining this.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 27 May 2013 16:56:08 +0200
+
+live-config (4.0~a21-1) experimental; urgency=low
+
+  * Correcting spelling typo in manpage about disabling sudo and policykit
+    scripts.
+  * Updating German manpage translations.
+  * Reading configuration files before cmdline options.
+  * Declaring LIVE_CONFIG_CMDLINE an exported variable and make it usable
+    through configuration files.
+  * Running sysvinit script even when noautologin is used, but run
+    enabling of autologins only when no noautologin is not set.
+  * Updating configuration filename example to more current real-world
+    example name.
+  * Spelling out 'conf.d directories' as 'configuration directories' in
+    manpage to avoid wrong assumptions of a /etc/live/config.d directory
+    (where it's /etc/live/config instead).
+  * Making shortcut option variables exported too.
+  * Making check for noautologin in sysvinit script also work with only
+    tty autologin disabled.
+  * Correcting variable typo in debconf script.
+  * Dropping pre-wheezy gdm script.
+  * Renumbering scripts.
+  * Running kdm script even when noautologin is used, but run enabling of
+    autologin only when noautologin is not set.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 08 May 2013 09:21:23 +0200
+
+live-config (4.0~a20-1) experimental; urgency=low
+
+  [ Daniel Baumann ]
+  * Dropping accidentally left-over gnome2 screensaver deactivation.
+  * Adding updated Brazilian-Portuguese manpage translation from Tiago.
+
+  [ chals ]
+  * Updating dates in the man pages.
+  * Updating Spanish translation of the man page.
+  * Updating French translation of the man page.
+
+  [ Daniel Baumann ]
+  * Loading fglrx module with --ignore-install like the nvidia ones too.
+  * Making module loading for fglrx and nvidia not fail.
+  * Correcting name for ssl-cert script (Closes: #706933).
+  * Adding 3.0.22-1 and 3.0.23-1 changelog entries.
+  * Replacing expr usage in initscript for eject boot media with something
+    less error prone.
+  * Don't error out if file is not installed in initscript for eject boot
+    media (Closes: #706679).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 06 May 2013 20:52:42 +0200
+
+live-config (4.0~a19-1) experimental; urgency=low
+
+  [ Daniel Baumann ]
+  * Debranding package for derivatives.
+  * Correcting spelling typo in noroot variable name, thanks to Chris
+    Malton <chrism@cmalton.me.uk> (Closes: #703108).
+
+  [ Jun Nogata ]
+  * Updating gnome-screensaver locking for gnome3 (Closes: #703972).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 01 Apr 2013 08:32:26 +0200
+
+live-config (4.0~a18-1) experimental; urgency=low
+
+  * Removing all references to my old email address.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 10 Mar 2013 22:24:53 +0100
+
+live-config (4.0~a17-1) experimental; urgency=low
+
+  * Correcting some spelling typos, thanks to Adam D. Barratt <adam@adam-
+    barratt.org.uk>.
+  * Updating default hostname on progress-linux systems.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 10 Mar 2013 19:12:23 +0100
+
+live-config (4.0~a16-1) experimental; urgency=low
+
+  * Skipping sudo script if username is root (Closes: #701788).
+  * Replacing systemctl call with manual symlink, which is error prone
+    wrt/ changes in systemd or the service file but doesn't require up and
+    running systemd (Closes: #700597).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 01 Mar 2013 10:36:37 +0100
+
+live-config (4.0~a15-1) experimental; urgency=low
+
+  * Calling systemctl with --quiet.
+  * Adding 3.0.21-1 changelog entries.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 15 Feb 2013 09:36:18 +0100
+
+live-config (4.0~a14-1) experimental; urgency=low
+
+  * Correcting systemctl call for system to enable live-config.service.
+  * Apparently lightdm doesn't do autologin with a non-zero autologin-
+    user-timeout.
+  * Adding 3.0.20-1 changelog entries.
+  * Removing experimental status for live-config-systemd, basics are
+    working properly now.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 14 Feb 2013 13:16:11 +0100
+
+live-config (4.0~a13-1) experimental; urgency=low
+
+  [ Daniel Baumann ]
+  * Moving log redirection to earlier point in time to capture the
+    initialization of live-config in the logfile too.
+  * Protecting hostname setting to avoid leaving live-config completely if
+    user sets an invalid hostname.
+  * Only support hostname variables when iproute is available.
+  * Making link/inet/inet6 variables in hostnames actually working.
+  * Using internal variable for /bin/ip separator when using variables in
+    hostname to allow local customizations.
+  * Moving ip separator variable to the beginning in order to overwrite it
+    through /etc/live/config, even if it's only use no separator at all.
+  * Dropping dpkg compression level.
+  * Correcting locales-all script to only write the default locale out in
+    case more than one has been specified.
+  * Edit existing LANG setting on Progress Linux in /etc/profile rather
+    than adding a new /etc/profile.d file.
+  * Using consistent naming scheme for automatic generated live-config
+    configuration files.
+  * Correct editing of /etc/profile for LANG in locales-all script on
+    Progress Linux systems.
+
+  [ Richard Nelson ]
+  * Adding script for initial xfce4-panel configuration.
+
+  [ Daniel Baumann ]
+  * Only running xfce4-panel configuration if the default configuration
+    file hasn't been installed already by other means (e.g. includes).
+
+  [ Richard Nelson ]
+  * Adding entry for xfce4-panel in manpages.
+
+  [ Daniel Baumann ]
+  * Updating German manpage translation.
+
+  [ chals ]
+  * Updating French manpage translation.
+  * Updating Spanish manpage translation.
+
+  [ skizzhg ]
+  * Updating Italian translation.
+
+  [ Daniel Baumann ]
+  * Enabling systemd job on installation of live-config-systemd.
+  * Dropping pre-wheezy conflicts/replaces on live-config.
+  * Adding 3.0.19-1 changelog entries.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sat, 09 Feb 2013 07:47:25 +0100
+
+live-config (4.0~a12-1) experimental; urgency=low
+
+  [ Daniel Baumann ]
+  * Adding support for variables (ip and mac addresses) in hostname
+    script.
+
+  [ Ben Armstrong ]
+  * Fixing illegal redirect to named pipe with equivalent that works.
+
+  [ Daniel Baumann ]
+  * Removing bashism in exec call for logfile pipe, thanks to
+    Алексей Шилин <rootlexx@mail.ru>.
+  * Adding 3.0.18-1 changelog entries.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 06 Jan 2013 23:23:17 +0100
+
+live-config (4.0~a11-1) experimental; urgency=low
+
+  * Updating manpage year handling for 2013.
+  * Using fifo instead of pipe to catch logs from scripts (Closes:
+    #697320).
+  * Adding 3.0.17-1 changelog entries.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 04 Jan 2013 10:02:53 +0100
+
+live-config (4.0~a10-1) experimental; urgency=low
+
+  * Removing pre-wheezy workaround for shadow when /etc/passwd- is
+    missing.
+  * Replacing user-setup with live-debconfigs passwd script.
+  * Updating year in all copyright notices.
+  * Only set vboxvideo driver automatically in xserver-xorg script for
+    virtualbox systems if virtualbox-guest-x11 is installed, thanks to
+    Eugenio Paolantonio <me@medesimo.eu> (Closes: #697146).
+  * Adding 3.0.16-1 changelog entries.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 02 Jan 2013 12:23:35 +0100
+
+live-config (4.0~a9-1) experimental; urgency=low
+
+  * Adding support for virtualbox in xserver-xorg script.
+  * Updating boot parameter handling to work as advertised in the manpage
+    when specifing multiple and conflicting options.
+  * Adding console-tools to recommends.
+  * Correcting already-run checks to be after parameter handling in
+    hostname and hooks script.
+  * Removing module-init-tools script, not needed anymore.
+  * Renumbering scripts.
+  * Using automatic driver selection based on pci-ids in xserver-xorg
+    script only when lspci is available.
+  * Correcting spelling typo in bug script.
+  * Updating UTC handling for wheezy.
+  * Moving utc handling from tzdata to util-linux script where it original
+    belongs to.
+  * Adding missing entry for x-session-manager in variable list in live-
+    config manpage.
+  * Replacing some if conditionals with case for consistency.
+  * Adding 3.0.15-1 changelog entries.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 17 Dec 2012 21:26:30 +0100
+
+live-config (4.0~a8-1) experimental; urgency=low
+
+  * Adding 3.0.13 changelog entries.
+  * Correcting wrong order of boot parameter parsing.
+  * Adding support for automatic fglrx driver selection in xserver-xorg
+    script.
+  * Updating comments in xserver-xorg script.
+  * Removing pre-wheezy guards in xserver-xorg script.
+  * Defering module loading for fglrx and nvidia to a later point in time
+    within xserver-xorg script to make it also work when being specified
+    through boot parameter.
+  * Passing all arguments to main function within live-config entry point.
+  * Renaming internal network function for consistency.
+  * Updating comment about processing command line.
+  * Correcting spelling typo in comment.
+  * Correcting typo in debug variable check.
+  * Adding local-options for dpkg-source in live-config-foobar example
+    package too.
+  * Adding 3.0.14 changelog entries.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 06 Dec 2012 20:07:36 +0100
+
+live-config (4.0~a7-1) experimental; urgency=low
+
+  [ Ben Armstrong ]
+  * Fixing typo in examples/hooks/cat: test for q to quit, thanks to
+    Thanatermesis <thanatermesis@gmail.com>.
+
+  [ Daniel Baumann ]
+  * Allowing to overwrite xorg-driver based on pci-ids automatically via
+    pci-id files in /usr/share/live/config/xserver-xorg.
+  * Fixing roff formating typo in manpage.
+  * Updating manpage for xserver-xorg pci-id based overrides.
+  * Updating German manpage translation.
+  * Correcting unconditional precedence of pci-id based overrides over
+    automatic nvidia configuration in xserver-xorg script.
+
+  [ chals ]
+  * Updating Spanish translation of manpage.
+  * Updating French translation of manpage.
+
+  [ Daniel Baumann ]
+  * Allowing xorg.conf overrides in /usr/share/live/config/xserver-xorg
+    files.
+  * Removing note about apport script being ubuntu only in live-config
+    manpages.
+  * For completeness reasons, also mentioning dpkg-divert in live-config
+    manpage about removing scripts.
+  * Using consistent spelling to match parameter name for the noroot
+    variable.
+  * Assigning internal variables for shortcut options to be reused by
+    local scripts.
+
+  [ chals ]
+  * Updating the Spanish translation of man page.
+  * Updating the French translation of man page.
+
+  [ Daniel Baumann ]
+  * Adding updated Italian manpage translations from skizzhg
+    <skizzhg@gmx.com>.
+  * Updating systemd service file to make it actually work.
+  * Updating systemd service file installation location.
+  * Correcting spelling typo in comment on top-level Makefile on
+    uninstalling backends.
+  * Updating packaging for moved systemd service file location.
+  * Adding dpkg-source local options.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 30 Nov 2012 14:37:20 +0100
+
+live-config (4.0~a6-1) experimental; urgency=low
+
+  * Allowing to overwrite distribution detection in live-config-update
+    with parameters.
+  * Adding 3.0.12 changelog entries.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 13 Nov 2012 14:58:48 +0100
+
+live-config (4.0~a5-1) experimental; urgency=low
+
+  * Enforcing NoLogo option when using nvidia driver in xserver-xorg
+    script.
+  * Adding 3.0.10 changelog entries.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 09 Nov 2012 20:32:47 +0100
+
+live-config (4.0~a4-1) experimental; urgency=low
+
+  * Correcting update-alternatives when handling nvidia automatically in
+    xserver-xorg script.
+  * Correcting nvidia module name for debian systems in xserver-xorg
+    script.
+  * Harmonizing po file headers.
+  * Adding 3.0.9 changelog entries.
+  * Adding 3.0.10 changelog entries.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 08 Nov 2012 11:03:11 +0100
+
+live-config (4.0~a3-1) experimental; urgency=low
+
+  * Updating to standards version 3.9.4.
+  * Adding 3.0.8 changelog entries.
+  * Updating file paths for /lib/live/mount. See
+    http://lists.debian.org/debian-live/2012/10/msg00021.html for more
+    information.
+  * Renaming /lib/live/mount/image to /lib/live/mount/medium. See
+    http://lists.debian.org/debian-live/2012/10/msg00023.html for more
+    information.
+  * Updating package descriptions.
+  * Shortening default user fullname on progress.
+  * Updating name of the admin group in policykit script, thanks to
+    Андрій Шинкарчук <andriy.shynkarchuk@nuos.edu.ua>.
+  * Updating embedded live-config-foobar example packaging.
+  * Making sure that when enforcing nvidia driver, the respective
+    alternatives are set in xserver-xorg script.
+  * Making sure that when nvidia driver is installed but a non-nvidia
+    driver was enfored, the respective alternatives are set in xserver-
+    xorg-script.
+  * Switching to xz compression in live-config-foobar example packaging.
+  * If no driver was specified and one of the nvidia drivers is
+    installed, prefer the newest available nvidia driver over nouveau in
+    xserver-xorg script.
+  * Updating lsb_release calls for newer progress-linux.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 07 Nov 2012 14:52:24 +0100
+
+live-config (4.0~a2-1) experimental; urgency=low
+
+  * Moving remaining stuff from /live to /lib/live to avoid further
+    namespace pollution.
+  * Moving hooks and preseed inclusion to their final place within the
+    filesystems.
+  * Adding 3.0.7 changelog entries.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 27 Sep 2012 13:13:43 +0200
+
+live-config (4.0~a1-1) experimental; urgency=low
+
+  * Dropping specifics for squeeze based distributions in live-config-
+    update.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 26 Sep 2012 15:05:07 +0200
+
+live-config (3.0.23-1) unstable; urgency=low
+
+  * Loading fglrx module with --ignore-install like the nvidia ones too.
+  * Making module loading for fglrx and nvidia not fail.
+
+ -- Daniel Baumann <daniel@debian.org>  Thu, 25 Apr 2013 19:18:33 +0200
+
+live-config (3.0.22-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Adding conflicts/replaces for squeeze upgrade (Closes: #704562).
+  * Skipping sudo script if username is root (Closes: #701788).
+  * Replacing systemctl call with manual symlink, which is error prone
+    wrt/ changes in systemd or the service file but doesn't require up and
+    running systemd (Closes: #700597).
+  * Correcting some spelling typos, thanks to Adam D. Barratt <adam@adam-
+    barratt.org.uk>.
+  * Correcting spelling typo in noroot variable name, thanks to Chris
+    Malton <chrism@cmalton.me.uk> (Closes: #703108).
+
+  [ Jun Nogata ]
+  * Updating gnome-screensaver locking for gnome3 (Closes: #703972).
+
+  [ Daniel Baumann ]
+  * Issueing gnome-screensaver disabling differently depending on wheezy
+    or squeeze.
+  * Adding updated Brazilian Portuguese manpage translations from Tiago
+    Bortoletto Vaz <tiago@debian.org>.
+
+ -- Daniel Baumann <daniel@debian.org>  Wed, 03 Apr 2013 17:47:25 +0200
+
+live-config (3.0.21-1) unstable; urgency=low
+
+  * Calling systemctl with --quiet.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 15 Feb 2013 09:32:13 +0100
+
+live-config (3.0.20-1) unstable; urgency=low
+
+  * Correcting systemctl call for system to enable live-config.service.
+  * Apparently lightdm doesn't do autologin with a non-zero autologin-
+    user-timeout.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 14 Feb 2013 13:11:33 +0100
+
+live-config (3.0.19-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Moving log redirection to earlier point in time to capture the
+    initialization of live-config in the logfile too.
+  * Protecting hostname setting to avoid leaving live-config completely if
+    user sets an invalid hostname.
+  * Only support hostname variables when iproute is available.
+  * Making link/inet/inet6 variables in hostnames actually working.
+  * Using internal variable for /bin/ip separator when using variables in
+    hostname to allow local customizations.
+  * Moving ip separator variable to the beginning in order to overwrite it
+    through /etc/live/config, even if it's only use no separator at all.
+  * Dropping dpkg compression level.
+  * Correcting locales-all script to only write the default locale out in
+    case more than one has been specified.
+  * Edit existing LANG setting on Progress Linux in /etc/profile rather
+    than adding a new /etc/profile.d file.
+  * Using consistent naming scheme for automatic generated live-config
+    configuration files.
+  * Correct editing of /etc/profile for LANG in locales-all script on
+    Progress Linux systems.
+
+  [ Richard Nelson ]
+  * Adding script for initial xfce4-panel configuration.
+
+  [ Daniel Baumann ]
+  * Only running xfce4-panel configuration if the default configuration
+    file hasn't been installed already by other means (e.g. includes).
+
+  [ Richard Nelson ]
+  * Adding entry for xfce4-panel in manpages.
+
+  [ Daniel Baumann ]
+  * Updating German manpage translation.
+
+  [ chals ]
+  * Updating French manpage translation.
+  * Updating Spanish manpage translation.
+
+  [ skizzhg ]
+  * Updating Italian translation.
+
+  [ Daniel Baumann ]
+  * Enabling systemd job on installation of live-config-systemd.
+  * Dropping pre-wheezy conflicts/replaces on live-config.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sat, 09 Feb 2013 07:41:29 +0100
+
+live-config (3.0.18-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Adding support for variables (ip and mac addresses) in hostname
+    script.
+
+  [ Ben Armstrong ]
+  * Fixing illegal redirect to named pipe with equivalent that works.
+
+  [ Daniel Baumann ]
+  * Removing bashism in exec call for logfile pipe, thanks to
+    Алексей Шилин <rootlexx@mail.ru>.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 06 Jan 2013 20:17:48 +0100
+
+live-config (3.0.17-1) unstable; urgency=low
+
+  * Updating manpage year handling for 2013.
+  * Using fifo instead of pipe to catch logs from scripts (Closes:
+    #697320).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 04 Jan 2013 09:57:16 +0100
+
+live-config (3.0.16-1) unstable; urgency=low
+
+  * Correcting spelling typo in manpage.
+  * Updating year in all copyright notices.
+  * Only set vboxvideo driver automatically in xserver-xorg script for
+    virtualbox systems if virtualbox-guest-x11 is installed, thanks to
+    Eugenio Paolantonio <me@medesimo.eu> (Closes: #697146).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 02 Jan 2013 12:13:55 +0100
+
+live-config (3.0.15-1) unstable; urgency=low
+
+  * Adding support for virtualbox in xserver-xorg script.
+  * Updating boot parameter handling to work as advertised in the manpage
+    when specifing multiple and conflicting options.
+  * Adding console-tools to recommends.
+  * Correcting already-run checks to be after parameter handling in
+    hostname and hooks script.
+  * Disabling module-init-tools on wheezy and newer systems.
+  * Using automatic driver selection based on pci-ids in xserver-xorg
+    script only when lspci is available.
+  * Correcting spelling typo in bug script.
+  * Updating UTC handling for wheezy.
+  * Moving utc handling from tzdata to util-linux script where it original
+    belongs to.
+  * Adding missing entry for x-session-manager in variable list in live-
+    config manpage.
+  * Replacing some if conditionals with case for consistency.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 17 Dec 2012 21:22:00 +0100
+
+live-config (3.0.14-1) unstable; urgency=low
+
+  * Correcting wrong order of boot parameter parsing.
+  * Adding support for automatic fglrx driver selection in xserver-xorg
+    script.
+  * Updating comments in xserver-xorg script.
+  * Defering module loading for fglrx and nvidia to a later point in time
+    within xserver-xorg script to make it also work when being specified
+    through boot parameter.
+  * Removing superfluous comments about wheezy in xserver-xorg script.
+  * Passing all arguments to main function within live-config entry point.
+  * Renaming internal network function for consistency.
+  * Updating comment about processing command line.
+  * Correcting spelling typo in comment.
+  * Correcting typo in debug variable check.
+  * Adding local-options for dpkg-source in live-config-foobar example
+    package too.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 06 Dec 2012 20:02:25 +0100
+
+live-config (3.0.13-1) unstable; urgency=low
+
+  [ Ben Armstrong ]
+  * Fixing typo in examples/hooks/cat: test for q to quit, thanks to
+    Thanatermesis <thanatermesis@gmail.com>.
+
+  [ Daniel Baumann ]
+  * Allowing to overwrite xorg-driver based on pci-ids automatically via
+    pci-id files in /usr/share/live/config/xserver-xorg.
+  * Fixing roff formating typo in manpage.
+  * Updating manpage for xserver-xorg pci-id based overrides.
+  * Updating German manpage translation.
+  * Correcting unconditional precedence of pci-id based overrides over
+    automatic nvidia configuration in xserver-xorg script.
+
+  [ chals ]
+  * Updating Spanish translation of manpage.
+  * Updating French translation of manpage.
+
+  [ Daniel Baumann ]
+  * Allowing xorg.conf overrides in /usr/share/live/config/xserver-xorg
+    files.
+  * Removing note about apport script being ubuntu only in live-config
+    manpages.
+  * For completeness reasons, also mentioning dpkg-divert in live-config
+    manpage about removing scripts.
+  * Using consistent spelling to match parameter name for the noroot
+    variable.
+  * Assigning internal variables for shortcut options to be reused by
+    local scripts.
+
+  [ chals ]
+  * Updating the Spanish translation of man page.
+  * Updating the French translation of man page.
+
+  [ Daniel Baumann ]
+  * Adding updated Italian manpage translations from skizzhg
+    <skizzhg@gmx.com>.
+  * Updating systemd service file to make it actually work.
+  * Updating systemd service file installation location.
+  * Correcting spelling typo in comment on top-level Makefile on
+    uninstalling backends.
+  * Updating packaging for moved systemd service file location.
+  * Adding dpkg-source local options.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 30 Nov 2012 14:34:45 +0100
+
+live-config (3.0.12-1) unstable; urgency=low
+
+  * Allowing to overwrite distribution detection in live-config-update
+    with parameters.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 13 Nov 2012 14:53:00 +0100
+
+live-config (3.0.11-1) unstable; urgency=low
+
+  * Enforcing NoLogo option when using nvidia driver in xserver-xorg
+    script.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 09 Nov 2012 20:29:06 +0100
+
+live-config (3.0.10-1) unstable; urgency=low
+
+  * Correcting update-alternatives when handling nvidia automatically in
+    xserver-xorg script.
+  * Correcting nvidia module name for debian systems in xserver-xorg
+    script.
+  * Harmonizing po file headers.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 08 Nov 2012 11:00:49 +0100
+
+live-config (3.0.9-1) unstable; urgency=low
+
+  * Updating file paths for /lib/live/mount.
+  * Renaming /lib/live/mount/image to /lib/live/mount/medium.
+  * Updating package descriptions.
+  * Shortening default user fullname on progress.
+  * Updating name of the admin group in policykit script, thanks to
+    Андрій Шинкарчук <andriy.shynkarchuk@nuos.edu.ua>.
+  * Updating embedded live-config-foobar example packaging.
+  * Making sure that when enforcing nvidia driver, the respective
+    alternatives are set in xserver-xorg script.
+  * Making sure that when nvidia driver is installed but a non-nvidia
+    driver was enfored, the respective alternatives are set in xserver-
+    xorg-script.
+  * Switching to xz compression in live-config-foobar example packaging.
+  * If no driver was specified and one of the nvidia drivers is
+    installed, prefer the newest available nvidia driver over nouveau in
+    xserver-xorg script.
+  * Updating lsb_release calls for newer progress-linux.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 07 Nov 2012 14:45:22 +0100
+
+live-config (3.0.8-1) unstable; urgency=low
+
+  * Updating to standards version 3.9.4.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 30 Sep 2012 17:23:39 +0200
+
+live-config (3.0.7-1) unstable; urgency=low
+
+  * Moving remaining stuff from /live to /lib/live to avoid further
+    namespace pollution.
+  * Moving hooks and preseed inclusion to their final place within the
+    filesystems.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 27 Sep 2012 12:57:32 +0200
+
+live-config (3.0.6-1) unstable; urgency=low
+
+  * Synchronise gdm and gdm3 scripts.
+  * Remounting any persistence devices read-only on shutdown (Closes:
+    #688784).
+  * Flushing filesystem buffers on shutdown.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 26 Sep 2012 14:26:00 +0200
+
+live-config (3.0.5-1) unstable; urgency=low
+
+  * Skipping gdm script inclusion on newer debian and progress releases
+    than squeeze.
+  * Mounting /proc initally on progress with hidepid option.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 24 Sep 2012 09:58:10 +0200
+
+live-config (3.0.4-1) unstable; urgency=low
+
+  * Using /etc/live/config/* instead of /etc/live/config.d/*.conf and
+    /live/image/live/config/* instead of
+    /live/image/live/config.d/*.conf for consistency reasons.
+  * Removing leftover from live-debconfig in postrm.
+  * Recreating /etc/live/config in postinst.
+  * Removing /etc/live/config if empty on purge in postrm.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 24 Aug 2012 11:46:09 +0200
+
+live-config (3.0.3-1) unstable; urgency=low
+
+  * Correcting some spelling typos in script comments.
+  * Using consistent line breaks in alternative conditionals.
+  * Removing note about only supporting kde in kde-services script,
+    there's no older kde version supported anyway.
+  * Don't show flags in KDE (kxkbrc) too as we already do with GNOME by
+    default for better cultural correctness.
+  * Improving comment about shadow workaround in user-setup script.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 14 Aug 2012 12:55:07 +0200
+
+live-config (3.0.2-1) unstable; urgency=low
+
+  * Removing live-debconfig leftovers.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 14 Aug 2012 11:10:05 +0200
+
+live-config (3.0.1-1) unstable; urgency=low
+
+  * Correcting typo in keyboard-configuration recommends.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 10 Aug 2012 22:36:51 +0200
+
+live-config (3.0.0-1) unstable; urgency=low
+
+  * Adding updated Italian manpage translation from skizzhg
+    <skizzhg@gmx.com>.
+  * Shortening filename for xorg.conf.d file.
+  * Ensure that /etc/X11/xorg.conf.d exists before writing the
+    configuration file.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 03 Aug 2012 18:29:55 +0200
+
+live-config (3.0~b2-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Simplyfing find_iso eject check in boot initscript.
+  * Removing special hack for some arm boards in boot initscript.
+  * Moving initramfs-tools scripts content to live-tools.
+  * Harmonizing GPL boilerplate texts.
+  * Renumbering scripts to reflect initramfs-tools script removal.
+
+  [ chals ]
+  * Dealing with two easy-to-fix fuzzy strings in pt_BR on a best effort
+    basis.
+
+  [ Ben Armstrong ]
+  * Clarifying that keyboard variants and layouts are matched.
+  * Clarifying further that matching is one-to-one in order and blank
+    values allowed.
+
+  [ Daniel Baumann ]
+  * Updating keyboard variant description in manpages a bit further.
+  * Adding updated Brazilian Portuguese manpage translations from Tiago
+    Bortoletto Vaz <tiago@debian.org>.
+
+  [ chals ]
+  * Completing the French and Spanish translations of the man page.
+
+  [ Daniel Baumann ]
+  * Adding recommends to keyboard-configuration.
+  * Adding recommends to locales and locales-all.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 29 Jul 2012 02:16:23 +0200
+
+live-config (3.0~b1-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Correcting wrong preseed fieldname in keyboard-configuration for
+    optionscode.
+  * Sorting keyboard-configuration handling alphabetically.
+  * Correcting wrong variable to make language assignments in locales
+    script actually work.
+  * Simplifying writing /etc/default/locale in locales script.
+  * Decrufting locales script to handle multiple locales.
+
+  [ Ben Armstrong ]
+  * Fixing two script name message typos.
+
+  [ Daniel Baumann ]
+  * Renaming live-config.keyboard-variant option to live-
+    config.keyboard-variants to indicate that multiple values can be
+    specified at the same time, thanks to Ben Armstrong
+    <synrg@debian.org>.
+
+  [ chals ]
+  * Fixing one 'fuzzy' in the Spanish translation of the man page.
+  * Fixing one 'fuzzy' in the French translation of the man page.
+
+  [ Daniel Baumann ]
+  * Correcting multi-locales assembling in locales script.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 24 Jul 2012 21:45:08 +0200
+
+live-config (3.0~a43-1) unstable; urgency=low
+
+  * Adding /etc/os-release support to hostname debconf script.
+  * Correcting inverted logic when checking for a live system in boot-
+    init.sh.
+  * Removing debconf backend, splitting out into seperate package.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 12 Jul 2012 20:07:19 +0200
+
+live-config (3.0~a42-1) unstable; urgency=low
+
+  * Adding updated Brazilian Portuguese debconf translations from Tiago
+    Bortoletto Vaz <tiago@debian.org> (Closes: #680849).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 09 Jul 2012 17:59:04 +0200
+
+live-config (3.0~a41-1) unstable; urgency=low
+
+  * Removing processing message in openssh-server debconfig script.
+  * Switching to four-digit script numbers to allow more flexibility for
+    custom scripts in-between the stock ones.
+  * Removing exporting for private debconfs systemrc, live-debconfig
+    doesn't get called via a wrapper like it used to be in lxc.
+  * Switching to xz compression in source and binary packages.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 27 Jun 2012 14:23:40 +0200
+
+live-config (3.0~a40-1) unstable; urgency=low
+
+  * Integrating debconf backend into live-config.
+  * Simplyfing eject initscript.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 14 Jun 2012 07:59:31 +0200
+
+live-config (3.0~a39-1) experimental; urgency=low
+
+  * Automatically translate date formats in po files.
+  * Unifying po file headers.
+  * Updating included example packaging for a live-config script.
+  * Passing arguments over to /lib/live scripts even if currently
+    arguments are unused.
+  * Re-arranging initsystem backends in source tree.
+  * Removing snapshot handling from shutdown initscript.
+  * Respecting noeject and cdrom-detect/eject=false as boot parameters
+    for preventing ejection of the live media.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 06 Jun 2012 19:13:19 +0200
+
+live-config (3.0~a38-1) experimental; urgency=low
+
+  [ chals ]
+  * Revising grammar in French translation.
+
+  [ Daniel Baumann ]
+  * Simplyfing reading of configuration files.
+  * Improving on-demand creation of ssh host keys in openssh-server
+    script.
+  * Avoid breaking serial consoles when using upstart, thanks to Trent
+    W. Buck <trentbuck@gmail.com> (Closes: #675308).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 04 Jun 2012 12:46:41 +0200
+
+live-config (3.0~a37-1) experimental; urgency=low
+
+  [ Daniel Baumann ]
+  * Only looking at config.d files if they have the .conf suffix to
+    allow putting other files into these places that do not necessarily
+    need to be used by live-config (e.g. documentation).
+  * Using /var/log/live/config.log instead of /var/log/live-config.log
+    for consistency with the other live packages.
+  * Adding timestamp and script name to logfile when running with debug
+    enabled.
+  * Adding script for applying preseed files to the debconf database.
+  * Renumbering scripts.
+  * Exiting early in hooks script if no hooks were specified.
+  * Extending debconf script to take more than one preseed file and
+    support all three location types (filesyste, media, network).
+  * Renaming /live/cow to /live/overlay in anticipation of overlayfs.
+  * Using 'persistence' (noun) rather than 'persistent'
+    (adjective/adverb) everywhere.
+  * Making extraction of the manpage section in manpages/Makefile work
+    with multiple dots in the filename.
+
+  [ chals ]
+  * Updating Spanish translation of man page.
+  * Updating French translation of man page.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 09 Apr 2012 19:02:26 +0200
+
+live-config (3.0~a36-1) experimental; urgency=low
+
+  * Adding live-boot initscript.
+  * Replacing type with which in order to check for archdetect in boot
+    initscript, using type is a possible bashism.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 06 Apr 2012 10:12:57 +0200
+
+live-config (3.0~a35-1) unstable; urgency=low
+
+  * Disabling tmpfs on /tmp in sysvinit script (Closes: #658996).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 03 Apr 2012 09:09:30 +0200
+
+live-config (3.0~a34-1) unstable; urgency=low
+
+  * Removing runit backend, focusing in supporting the main init systems
+    only (systemd, sysvinit, upstart), for the time being at least.
+  * Mounting /proc if necessary (Closes: #666866).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 03 Apr 2012 08:50:38 +0200
+
+live-config (3.0~a33-1) unstable; urgency=low
+
+  * Making sure live-config gets started before mountkernfs in order to
+    prevent a race condition with /tmp (Closes: #653673).
+  * Also creating ecdsa host keys in openssh-server script on wheezy.
+  * Redirecting startx output in xinit script to /dev/null when booting
+    with quiet.
+  * Simplifing live-config-update script.
+  * Adding default user groups in live-config-update for ubuntu.
+  * Updating copyright file machine-readable format version 1.0.
+  * Updating to standards version 3.9.3.
+  * Updating packaging files for included live-config-foobar example
+    package.
+  * Adding copyright header to remaining files.
+  * Adding source lintian-overrides.
+  * Updating Brazilian Portuguese manpage translation.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 18 Mar 2012 14:25:20 +0100
+
+live-config (3.0~a32-1) unstable; urgency=low
+
+  [ chals ]
+  * Updating Spanish translationof man page.
+  * Updating French translation of man page.
+
+  [ Daniel Baumann ]
+  * Adding updated Italian manpage translation from skizzhg
+    <skizzhg@gmx.com>.
+  * Updating to debhelper version 9.
+  * Flipping accidentally wrong squeeze with wheezy defaults for default
+    user groups.
+  * Adjust formating of groups in user-setup script.
+  * Switching to use /debconf.live as a temporary debconf location for
+    user-setup script, rather than /tmp/debconf.live, as /tmp is not
+    already there in wheezy and newer when live-config is executed.
+  * Updating year to 2012 in copyright notices.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 06 Feb 2012 23:30:30 +0100
+
+live-config (3.0~a31-1) unstable; urgency=low
+
+  [ chals ]
+  * Fixing fuzzy in es po.
+  * Updating French translation.
+
+  [ Daniel Baumann ]
+  * Sorting overrides in rules alphabetically.
+  * Making user default groups configurable.
+  * Make sure user is not in sudo group if sudo is disabled.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 04 Dec 2011 10:19:19 +0100
+
+live-config (3.0~a30-1) unstable; urgency=low
+
+  * Adding required parsing for the respective boot parameters in all
+    config scripts so that every script is self-contained (Closes:
+    #646824).
+  * Adding forgotten underline prefix to show that the service variable
+    in sysv-rc script is a local variable.
+  * Moving comment about mingetty to the actual executed code for
+    consistency.
+  * Sorting parameter handling alphabetically in each script.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 28 Oct 2011 12:29:13 +0200
+
+live-config (3.0~a29-1) unstable; urgency=low
+
+  * Using compression level 9 also for binary packages.
+  * Adding example in live-config manpage for a suitable resolution when
+    using xorg-resolution parameter.
+  * Using compression level 9 also for binary packages in live-config
+    example package.
+  * Adding configuration script for locales-all.
+  * Renumbering scripts.
+  * Removing superfluous empty line in user-setup script.
+  * Adding forgotten parsing of cmdline in sudo script to respect
+    username boot parameter (Closes: #646824).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 27 Oct 2011 21:42:35 +0200
+
+live-config (3.0~a28-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Setting suitable debconf settings during live-config runtime.
+  * Saving output of live-config to /var/log/live-config.log.
+
+  [ chals ]
+  * Updating live-config man page, Spanish translation.
+
+  [ Daniel Baumann ]
+  * Running rebuild target in manpages.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sat, 08 Oct 2011 11:04:37 +0200
+
+live-config (3.0~a27-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Silencing rmdir calls in makefile.
+  * Coding style improvement for if statments in config.sh.
+
+  [ Stanislav Bogatyrev ]
+  * Check file existence during _SCRIPTS list construction and make sure
+    the resulting list has only unique items (Closes: #642396).
+
+  [ Daniel Baumann ]
+  * Using sort -u instead of sort and uniq when sorting scripts.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 23 Sep 2011 20:40:09 +0200
+
+live-config (3.0~a26-1) unstable; urgency=low
+
+  * Clarify in live-config manpage that the content of the configuration
+    files is supposed to consist of variables, thanks to Ed Dixon
+    <eddixonnm@gmail.com> for bringing it up.
+  * Improving spelling in live-config manpage.
+  * Lowering display-manager timeouts for a users automatic re-login
+    from 10s to 5s.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 24 Aug 2011 19:28:43 +0200
+
+live-config (3.0~a25-1) unstable; urgency=low
+
+  * Adding support for automatic login with lightdm.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 22 Aug 2011 15:47:16 +0200
+
+live-config (3.0~a24-1) unstable; urgency=low
+
+  [ Reinhard Tartler ]
+  * Starting live-config upstart-job on filesystem event.
+
+  [ Daniel Baumann ]
+  * Only updating /etc/locale.gen in locales script if existing, thanks
+    to Reinhard Tartler <siretart@tauware.de>.
+
+  [ Reinhard Tartler ]
+  * Reloading tty jobs gracefully in upstart config script.
+
+  [ Daniel Baumann ]
+  * Updating section for live-config-doc.
+  * Upgrading systemd from suggests to depends on systemd backend,
+    thanks to Michael Dorrington <michael.dorrington@gmail.com>.
+
+  [ Ben Armstrong ]
+  * Cross-referencing lb_config --bootappend-live.
+
+  [ Daniel Baumann ]
+  * Correcting bootappend-live reference in live-config manpage.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 04 Aug 2011 21:23:53 +0200
+
+live-config (3.0~a23-1) unstable; urgency=low
+
+  * Making references to debian more distribution neutral.
+  * Splitting out documentation so that it can be accesses separately
+    from the initsystem code.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 13 Jul 2011 10:36:29 +0200
+
+live-config (3.0~a22-1) unstable; urgency=low
+
+  [ Rui Miguel P. Bernardo ]
+  * Fix non 0 exit status of grep -v ini sysv-rc (Closes: #630329).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 13 Jun 2011 09:17:11 +0200
+
+live-config (3.0~a21-1) unstable; urgency=low
+
+  * Removing accidentally twice included English files when installing
+    manpages.
+  * Update wording in live-config-foobar example readme file.
+  * Using project email in upstart job.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sat, 11 Jun 2011 11:18:42 +0200
+
+live-config (3.0~a20-1) unstable; urgency=low
+
+  * Updating initscripts to not fail when package is removed (Closes:
+    #628131).
+  * Updating examples README.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sat, 28 May 2011 08:12:45 +0200
+
+live-config (3.0~a19-1) unstable; urgency=low
+
+  * Updating script selection for progress.
+  * Updating to standards version 3.9.2.
+  * Adding updated Spanish manpage translation from Carlos Zuferri chals
+    <chals@altorricon.com> and José Luis Zabalza <jlz.3008@gmail.com>.
+  * Correcting top-level makefile to automatically get all the supported
+    languages, rather than defining a static list.
+  * Making copyright file distribution neutral.
+  * Starting comments in rules with upper-case for consistency.
+  * Making manpages distribution neutral.
+  * Making copyright file of example package distribution neutral.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 18 May 2011 19:14:52 +0200
+
+live-config (3.0~a18-1) unstable; urgency=low
+
+  * Renumbering upstart script.
+  * Fixing various things in upstart script.
+  * Updating xserver-xorg script for setting the driver selection
+    (Closes: #618316).
+  * Correcting wrong path for resolution handling in xserver-xorg script
+    (Closes: #618394).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 25 Mar 2011 12:40:52 +0100
+
+live-config (3.0~a17-1) unstable; urgency=low
+
+  * Adding old 2.x changelog entries in debian changelog.
+  * Silencing and protecting rmdir call for temporary files in live-
+    config postrm (Closes: #617790).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 11 Mar 2011 17:11:35 +0100
+
+live-config (3.0~a16-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Adding Spanish manpage translation from Carlos Zuferri chals
+    <chals@altorricon.com>.
+
+  [ Marco Amadori ]
+  * Enable autologin for upstart backend.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 09 Mar 2011 20:18:41 +0100
+
+live-config (3.0~a15-1) experimental; urgency=low
+
+  [ Richard Nelson ]
+  * To use network based hooks with live-config.hooks=, also call
+    ethdevice= with the device you want to use for network access and we
+    will force it up.
+
+  [ Daniel Baumann ]
+  * Removing header in copyright file.
+  * Don't hard-depend on test target in Makefile.
+  * Using dh auto magic in override, rather than manual make call.
+  * Passing destdir manually to dh_auto_install in rules.
+  * Making plugins self-contained.
+  * Adding dpkg-source option file for example package.
+  * Updating example package to debhelper version 8.
+  * Making example package a native package in order to not confuse
+    users about generating an upstream tarball first.
+  * Using /etc/sudoers.d/live instead of /etc/sudoers in sudo config
+    script.
+  * Using new cmdline variable in example script, rather than accessing
+    /proc/cmdline.
+  * Avoid twice accessing /proc/cmdline in main script.
+  * Adding postrm script that cleans up live-config modifications if
+    persistent pre-configuration at build time was used and the system
+    is intended to be installed with live-installer.
+  * Avoid double-whitespace in /etc/sudoers.d/live.
+  * Removing /var/lib/live when purging live-config.
+  * Using cmdline variable rather than parsing /proc/cmdline in when
+    handing boot parameters in example script.
+  * Renaming zz-xinit.sh to zz-live.sh in xinit script for consistency.
+  * Updating postrm to remove xinit script in /etc/profile.d on purge.
+  * Adding support for progress.
+  * Setting distribution specific defaults in config.sh with update-
+    live-config.sh at build-time.
+  * Tightening grep call for live user in /etc/passwd to not fail with
+    false-positives.
+  * Correcting permission of /etc/sudoers.d/live.
+  * Renaming update-live-config to live-config-update for consistency.
+  * Silencing grep call for /etc/sudoers.d/live.
+  * Updating year in copyright.
+  * Updating year in manpage, examples and script files.
+  * Correcting hostname typo in manpages.
+  * Adding Italian manpage translation from skizzhg <skizzhg@gmx.com>.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 25 Jan 2011 08:55:27 +0100
+
+live-config (3.0~a14-1) experimental; urgency=low
+
+  [ Nick Niktaris ]
+  * Also depend on xdg-user-dirs in KDE4 specifics of debian-installer-
+    launcher script.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 06 Dec 2010 11:34:34 +0100
+
+live-config (3.0~a13-1) experimental; urgency=low
+
+  [ Daniel Baumann ]
+  * Improving French translation for openssh-server script.
+  * Adding dpkg source options file.
+
+  [ Steven Shiau ]
+  * Adding missing argument in ssh_keygen calls in openssh-server
+    script.
+
+  [ Daniel Baumann ]
+  * Correct debian-installer-launcher script for KDE4, thanks to Nick
+    Niktaris <niktaris@knoppel.org>.
+  * Removing my previously wrongly dublicated chown call in debian-
+    installer-launcher script.
+  * Correcting install call for kde desktop file in debian-installer-
+    launcher script.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 29 Nov 2010 23:25:49 +0100
+
+live-config (3.0~a12-1) experimental; urgency=low
+
+  * Adding openssh-server config script to regenerate ssh keys on boot.
+  * Correcting typo in openssh-server script.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 22 Nov 2010 23:03:28 +0100
+
+live-config (3.0~a11-1) experimental; urgency=low
+
+  * Disabling xinit hack when using persistency and another display
+    manager has been configured (Closes: #601235).
+  * Removing deep link to bug page in the manual, since we don't have
+    stable references yet.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 28 Oct 2010 10:09:58 +0200
+
+live-config (3.0~a10-1) experimental; urgency=low
+
+  * Don't compress example files in /usr/share/doc.
+  * Updating gdm3 check to make autologin work again with gdm3 2.30.5-4.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 21 Oct 2010 11:16:32 +0200
+
+live-config (3.0~a9-1) experimental; urgency=low
+
+  [ Daniel Baumann ]
+  * Removing TODO file, merged into http://live.debian.net/devel/live-
+    config/todo/.
+  * Using medium as keyword instead of media in hook script, as
+    documented in the manpage (Closes: #598375).
+  * Correctly prepending local hooks with file:// prefix (Closes:
+    #598375).
+
+  [ Scott Barker ]
+  * Fixing typo in config.d files parsing from live media (Closes:
+    #598536).
+
+  [ Daniel Baumann ]
+  * Updating to debhelper version 8.
+  * Correcting another typo in hooks config script regarding the loop
+    variable.
+  * Simplyfing and silencing switch between local and remote files in
+    hooks script.
+  * Simplyfing sed call when using local hook scripts.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sat, 02 Oct 2010 10:40:58 +0200
+
+live-config (3.0~a8-1) experimental; urgency=low
+
+  * Correcting typo in persistent file of apport and ureadahead scripts.
+  * Also allowing short names for live-config and live-noconfig
+    parameters.
+  * Correcting accidentally reverted change of live user uid from 999 to
+    1000.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 26 Sep 2010 09:11:32 +0200
+
+live-config (3.0~a7-1) experimental; urgency=low
+
+  * Applying patch from Jonathan Riddell <jriddell@ubuntu.com> to
+    disable some new akonadi services in kde-services script.
+  * Adding xinit config script.
+  * Adding xinit script in manpages.
+  * Renumbering config scripts for xinit.
+  * Renaming xinit.sh to zz-xinit.sh in /etc/profile.d to ensure it is
+    run last.
+  * Removing legacy support for lenny in xinit script.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 15 Sep 2010 12:15:01 +0200
+
+live-config (3.0~a6-1) experimental; urgency=low
+
+  * Disabling kaboom in user context.
+  * Using double-hashes as meta-comment sign.
+  * Updating standards version of example package to 3.9.1.
+  * Switching example package to source format 3.0 (quilt).
+  * Updating uinstall targets in makefile.
+  * Correcting wrong spelling of debconf frontend in xserver-xorg
+    script.
+  * Updating /etc/hosts handling in hostname config script for squeeze.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 06 Sep 2010 15:07:48 +0200
+
+live-config (3.0~a5-1) experimental; urgency=low
+
+  * Using config.d instead of config.conf.d as directory name for custom
+    configuration files.
+  * Updating live-installer-launcher script for debian-installer-
+    launcher rename.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 02 Sep 2010 22:39:22 +0200
+
+live-config (3.0~a4-1) experimental; urgency=low
+
+  * Updating live-build reference in live-config manpage.
+  * Adding reference to live-tools in live-config manpage.
+  * Renumbering config scripts.
+  * Adding live-tools to recommends.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 02 Sep 2010 18:32:30 +0200
+
+live-config (3.0~a3-1) experimental; urgency=low
+
+  * Downgrading runit-run depends to suggests as asked by release team.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sat, 21 Aug 2010 23:36:08 +0200
+
+live-config (3.0~a2-1) experimental; urgency=low
+
+  [ Daniel Baumann ]
+  * Only run x-session-manager parts when x-session-manager is set.
+
+  [ intrigeri ]
+  * Removing spurious copy/pasted line in xserver-xorg script.
+
+  [ Daniel Baumann ]
+  * Using dpkg-reconfigure instead of dexconf in xserver-xorg script
+    (Closes: #592510).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sat, 14 Aug 2010 19:25:00 +0200
+
+live-config (3.0~a1-1) experimental; urgency=low
+
+  * Switching to source format 3.0 (quilt).
+  * Removing live-initramfs symlinks.
+  * Removing lenny support.
+  * Renumbering config scripts.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 10 Aug 2010 01:00:23 +0200
+
+live-config (2.0.15-1) unstable; urgency=low
+
+  * Removing systemd support for 2.0 branch (Closes: #608326).
+  * Tightening grep call for live user in /etc/passwd to not fail with
+    false-positives.
+  * Removing headers in copyright file.
+  * Updating year in copyright.
+  * Updating year in manpage, examples and script files.
+  * Correcting hostname typo in manpages.
+  * Adding Italian manpage translation from skizzhg <skizzhg@gmx.com>.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 25 Jan 2011 08:16:12 +0100
+
+live-config (2.0.14-1) unstable; urgency=medium
+
+  [ Nick Niktaris ]
+  * Also depend on xdg-user-dirs in KDE4 specifics of debian-installer-
+    launcher script.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 06 Dec 2010 11:30:53 +0100
+
+live-config (2.0.13-1) unstable; urgency=medium
+
+  [ Steven Shiau ]
+  * Adding missing argument in ssh_keygen calls in openssh-server
+    script.
+
+  [ Daniel Baumann ]
+  * Correct debian-installer-launcher script for KDE4, thanks to Nick
+    Niktaris <niktaris@knoppel.org>.
+  * Removing my previously wrongly dublicated chown call in debian-
+    installer-launcher script.
+  * Correcting install call for kde desktop file in debian-installer-
+    launcher script.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 29 Nov 2010 23:23:12 +0100
+
+live-config (2.0.12-1) unstable; urgency=medium
+
+  * Adding openssh-server config script to regenerate ssh keys on boot.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 22 Nov 2010 23:00:11 +0100
+
+live-config (2.0.11-1) unstable; urgency=medium
+
+  * Removing deep link to bug page in the manual, since we don't have
+    stable references yet.
+  * Correcting email address in previous changelog entry.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 28 Oct 2010 10:05:52 +0200
+
+live-config (2.0.10-1) unstable; urgency=medium
+
+  * Disabling xinit hack when using persistency and another display
+    manager has been configured (Closes: #601235).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 27 Oct 2010 21:20:45 +0200
+
+live-config (2.0.9-1) unstable; urgency=medium
+
+  * Don't compress example files in /usr/share/doc.
+  * Updating gdm3 check to make autologin work again with gdm3 2.30.5-4.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 21 Oct 2010 11:12:37 +0200
+
+live-config (2.0.8-1) unstable; urgency=medium
+
+  [ Daniel Baumann ]
+  * Adding forgotten config= shortcut in argument parsing.
+  * Using medium as keyword instead of media in hook script, as
+    documented in the manpage (Closes: #598375).
+  * Correctly prepending local hooks with file:// prefix (Closes:
+    #598375).
+
+  [ Scott Barker ]
+  * Fixing typo in config.d files parsing from live media (Closes:
+    #598536).
+
+  [ Daniel Baumann ]
+  * Correcting another typo in hooks config script regarding the loop
+    variable.
+  * Simplyfing and silencing switch between local and remote files in
+    hooks script.
+  * Simplyfing sed call when using local hook scripts.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sat, 02 Oct 2010 10:12:13 +0200
+
+live-config (2.0.7-1) unstable; urgency=medium
+
+  [ Daniel Baumann ]
+  * Correcting typo in persistent file of apport and ureadahead scripts.
+  * Also allowing short names for live-config and live-noconfig
+    parameters.
+  * Correcting accidentally reverted change of live user uid from 999 to
+    1000.
+
+  [ intrigeri ]
+  * Correcting typo in console-common script.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 26 Sep 2010 09:01:09 +0200
+
+live-config (2.0.6-1) unstable; urgency=low
+
+  * Applying patch from Jonathan Riddell <jriddell@ubuntu.com> to
+    disable some new akonadi services in kde-services script.
+  * Adding xinit config script.
+  * Adding xinit script in manpages.
+  * Renumbering config scripts for xinit.
+  * Renaming xinit.sh to zz-xinit.sh in /etc/profile.d to ensure it is
+    run last.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 15 Sep 2010 12:07:37 +0200
+
+live-config (2.0.5-1) unstable; urgency=low
+
+  * Disabling kaboom in user context.
+  * Using double-hashes as meta-comment sign.
+  * Updating standards version of example package to 3.9.1.
+  * Updating uinstall targets in makefile.
+  * Correcting wrong spelling of debconf frontend in xserver-xorg
+    script.
+  * Updating /etc/hosts handling in hostname config script for squeeze.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 06 Sep 2010 15:04:05 +0200
+
+live-config (2.0.4-1) unstable; urgency=low
+
+  * Using config.d instead of config.conf.d as directory name for custom
+    configuration files.
+  * Updating live-installer-launcher script for debian-installer-
+    launcher rename.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 02 Sep 2010 22:33:04 +0200
+
+live-config (2.0.3-1) unstable; urgency=low
+
+  * Updating live-build reference in live-config manpage.
+  * Renumbering config scripts.
+  * Rewriting TODO file.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 02 Sep 2010 18:35:50 +0200
+
+live-config (2.0.2-1) unstable; urgency=low
+
+  * Downgrading runit-run depends to suggests as asked by release team.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sat, 21 Aug 2010 23:41:45 +0200
+
+live-config (2.0.1-1) unstable; urgency=low
+
+  [ Daniel Baumann ]
+  * Only run x-session-manager parts when x-session-manager is set.
+
+  [ intrigeri ]
+  * Removing spurious copy/pasted line in xserver-xorg script.
+
+  [ Daniel Baumann ]
+  * Using dpkg-reconfigure instead of dexconf in xserver-xorg script
+    (Closes: #592510).
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sat, 14 Aug 2010 20:06:21 +0200
+
+live-config (2.0.0-1) unstable; urgency=low
+
+  * Improving grammar in the last changelog entry.
+  * Correcting spelling typo in manpage, thanks to Tassia Camoes Araujo
+    <tassia@gmail.com>.
+  * Updating TODO file.
+  * Updating French manpage translation, thanks to Thierry Lépicier
+    <thierry.lepicier@free.fr>.
+  * Updating TODO file.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 10 Aug 2010 00:03:20 +0200
+
+live-config (2.0~a17-1) unstable; urgency=low
+
+  * Split out runit backend to own package.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 29 Jul 2010 17:01:05 +0200
+
+live-config (2.0~a16-1) unstable; urgency=high
+
+  * Adding workaround for bug in install calls wrt/ permissions of
+    intermediate directories.
+  * Simplyfing tzdata script.
+  * Adding manpage symlinks in transitional package.
+  * Adding option to set x-session-manager in preparation for multi-
+    desktop images.
+  * Correcting install location for scripts in example package.
+  * Simplyfing scripts definition in makefile.
+  * Adding updated French manpage translation from Thierry Lépicier
+    <thierry.lepicier@free.fr>.
+  * Don't fail in Makefile when there's no checkbashism (Closes:
+    #590407).
+  * Adding alternative depends to runit-run on live-config-sysvinit,
+    thanks to Daniel Kahn Gillmor <dkg@fifthhorseman.net>.
+  * Updating package to standards version 3.9.1.
+  * Adding Brazilian Portuguese manpage translation from Tassia Camoes
+    Araujo <tassia@gmail.com>.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 28 Jul 2010 05:47:03 +0200
+
+live-config (2.0~a15-1) unstable; urgency=low
+
+  * Correcting typo in update-live-config script.
+  * Also including bin directory in test target of makefile.
+  * Updating TODO file.
+  * Adding ureadahead script (ubuntu only).
+  * Removing debian specific scripts when being used on ubuntu.
+  * Updating TODO file.
+  * Improving and updating French manpage translation.
+  * Improving backend dependencies.
+  * Adding example hooks.
+  * Correcting manpage syntax regarding multiple locales.
+  * Adding filesystem and media options to hook script to automatically
+    execute hooks in default locations.
+  * Allowing to combine different hook methods at the same time.
+  * Preconfiguring kxkb to show kde keyboard selector when using
+    multiple layouts.
+  * Ensuring that kde configuration is owned by the live user.
+  * Updating kxkbrc default values.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sat, 17 Jul 2010 00:40:49 +0200
+
+live-config (2.0~a14-1) unstable; urgency=low
+
+  * Prefixing local variables in update-live-config script.
+  * Adding check for lsb_release in update-live-config script.
+  * Updating example package to standards 3.9.0.
+  * Adding README for example debian package.
+  * Adding note about live-config in copyright file of live-config-
+    foobar example package.
+  * Regenerating manpages po files.
+  * Enabling short options (foo instead of live-config.foo).
+  * Updating manpages to reflect that the gdm script was reenabled for
+    squeeze and newer.
+  * Updating manpages to reflect that short options are enabled now.
+  * Using two hashes for license headers.
+  * Prefixing some forgotten internal variables.
+  * Adding live-config.noautologin parameter to disable both console and
+    graphical autologin.
+  * Updating manpages to reflect addition of live-config.noautologin
+    parameter.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 16 Jul 2010 01:44:26 +0200
+
+live-config (2.0~a13-1) unstable; urgency=low
+
+  * Because lxde still uses gdm instead of gdm3 on squeeze, also
+    including gdm config scripts when building on squeeze and newer.
+  * Improving test targets in Makefile a bit.
+  * Improving clean target in manpages Makefile a bit.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 15 Jul 2010 19:25:37 +0200
+
+live-config (2.0~a12-1) unstable; urgency=low
+
+  * Factoring out common function to start network.
+  * Updating replacement update-initramfs cope with files being in /boot
+    rather than root.
+  * Updating package to standards version 3.9.0.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 07 Jul 2010 20:20:02 +0200
+
+live-config (2.0~a11-1) unstable; urgency=low
+
+  * Correcting spelling mistake in changelog.
+  * Degrading systemd depends to suggests for the time that systemd
+    resides in experimental only.
+  * Adding initial French manpage translation from Thierry Lépicier
+    <thierry.lepicier@free.fr>.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 20 Jun 2010 19:18:11 +0200
+
+live-config (2.0~a10-1) unstable; urgency=low
+
+  * Adding commentary description in systemd service file.
+  * Adding commentary description in sysvinit script file.
+  * Also moving sysv-rc script to sysvinit backend package.
+  * Renaming live-config.keyboard-layout parameter to live-
+    config.keyboard-layouts for consistency.
+  * Correcting typo in sysv-rc script.
+  * Updating TODO file.
+  * Export network status in hook script.
+  * Sorting dh_installinit calls in rules file.
+  * Adding debug boot option.
+  * Automatically determine on which distribution the package is built
+    through lsb_release and removing unnecessary config scripts from the
+    resulting package.
+  * Moving build-depends on lsb-release to build-depends-indep.
+  * Adding depends to systemd now that it passed the NEW queue.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 17 Jun 2010 21:47:33 +0200
+
+live-config (2.0~a9-1) unstable; urgency=low
+
+  * Adding slim config script.
+  * Adding sysv-rc script, thanks to Michal Suchanek
+    <hramrach@centrum.cz> for the idea.
+  * Correcting nodm script.
+  * Adding initial upstart backend.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Fri, 11 Jun 2010 18:36:11 +0200
+
+live-config (2.0~a8-1) unstable; urgency=low
+
+  * Renaming noxautologin parameter to nox11autologin for consistency.
+  * Renaming foobar example configuration file to foobar.conf for
+    consistency.
+  * Removing some confusing code from example script.
+  * Using example script with proper order number.
+  * Adding reference to http://live.debian.net/other/hooks/ in manpage.
+  * Improving live-config.hooks description in manpage.
+  * Updating manpage to reflect that there can be more than one keyboard
+    layout specified at the time.
+  * Adding comment about enabling kxkb in kde-services config script.
+  * Moving sysvinit config script to live-config-sysvinit package.
+  * Adding initial systemd backend.
+  * Documenting 'regressions' in TOOD file.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 10 Jun 2010 12:40:26 +0200
+
+live-config (2.0~a7-1) unstable; urgency=low
+
+  * Updating TODO file.
+  * Adding xserver-xorg script.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 08 Jun 2010 20:22:20 +0200
+
+live-config (2.0~a6-1) unstable; urgency=low
+
+  * Moving customization example in an own directory within the example
+    directory.
+  * Adding sample configuration file to customization examples package.
+  * Adding note about customization in manpage.
+  * Updating TODO file.
+  * Updating update-version script.
+  * Updating TODO file.
+  * Adding keyboard configuration scripts.
+  * Correcting dash escaping in manpage.
+  * Renaming hook script to hooks for consistency.
+  * Renaming noxlogin parameter to noxautologin for consistency.
+  * Adding sysvinit script for terminal autologin.
+  * Adding anacron script.
+  * Adding util-linux script.
+  * Adding login script.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Tue, 08 Jun 2010 06:02:06 +0200
+
+live-config (2.0~a5-1) unstable; urgency=low
+
+  * Adding boot parameter handling in example script.
+  * Adding copyright notices in end-user files.
+  * Further generalizing example script and packaging for users own
+    customized scripts.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sat, 05 Jun 2010 14:08:58 +0200
+
+live-config (2.0~a4-1) unstable; urgency=low
+
+  * Adding shortcut parameter to disable automatic graphical login, no
+    matter which display manager would be used.
+  * Adding quotes in manpage for live-config.user-fullname.
+  * Documenting usable variables in configuration files in the manpage.
+  * Updating manpage to reflect that multiple hooks are supported at the
+    same time.
+  * Correcting typo in configuration files section of manpage.
+  * Running checkbashisms with -f and -x in Makefile.
+  * Correcting outdated check on /etc/init.d/live-config-sysvinit in
+    hook config script.
+  * Adding checks to ensure that scripts are not re-run with
+    persistency.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Wed, 02 Jun 2010 22:19:18 +0200
+
+live-config (2.0~a3-1) unstable; urgency=low
+
+  * Removing fixme note about configuration filename.
+  * Adding note about a logfile to todo.
+  * Adding reference to locales script in manpages.
+  * Adding live-noconfig option to exclude specific scripts from being
+    run (Closes: #583533).
+  * Reordering parameters to match ordering of scripts.
+  * Allow to use live-noconfig for excluding scripts without the need of
+    specifying live-config too.
+  * Updating German manpage translation.
+  * Using UTF-8 and umlauts in German manpage translation.
+  * Adding shortcut parameter to disable root privileges, no matter what
+    mechanism would be used.
+  * Replacing reference to live-initramfs with live-boot in manpage.
+  * Setting default user fullname to 'Debian Live user'.
+  * Adding wget to suggests.
+  * Adding script options in manpages.
+  * Improving wording in boot parameter (scripts) section of manpage.
+  * Improving German manpages translation.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Sun, 30 May 2010 09:35:32 +0200
+
+live-config (2.0~a2-1) unstable; urgency=low
+
+  * Additionally supporting configuration directories for configuration
+    files to ease customization.
+  * Correcting install command for manpages in Makefile.
+  * Simplyfing makefile a bit.
+  * Adding locales config script.
+  * Renumbering config scripts.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Thu, 27 May 2010 22:37:06 +0200
+
+live-config (2.0~a1-1) experimental; urgency=low
+
+  * Initial release.
+
+ -- Daniel Baumann <mail@daniel-baumann.ch>  Mon, 24 May 2010 09:14:49 +0200

@@ -1,9 +1,0 @@
-# KConfigWidgets
-
-Widgets for configuration dialogs
-
-## Introduction
-
-KConfigWidgets provides easy-to-use classes to create configuration dialogs, as
-well as a set of widgets which uses KConfig to store their settings.
-

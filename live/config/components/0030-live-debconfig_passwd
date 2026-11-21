@@ -1,0 +1,103 @@
+#!/bin/sh
+
+. /usr/lib/live/config.sh
+
+## live-config(7) - System Configuration Components
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+#set -e
+
+Cmdline ()
+{
+	# Reading kernel command line
+	for _PARAMETER in ${LIVE_CONFIG_CMDLINE}
+	do
+		case "${_PARAMETER}" in
+			live-config.user-default-groups=*|user-default-groups=*)
+				LIVE_USER_DEFAULT_GROUPS="${_PARAMETER#*user-default-groups=}"
+				;;
+
+			live-config.user-fullname=*|user-fullname=*)
+				LIVE_USER_FULLNAME="${_PARAMETER#*user-fullname=}"
+				;;
+
+			live-config.username=*|username=*)
+				LIVE_USERNAME="${_PARAMETER#*username=}"
+				;;
+		esac
+	done
+}
+
+Init ()
+{
+	# Checking if package is installed or already configured
+	if ! pkg_is_installed "live-debconfig" || \
+	   component_was_executed "live-debconfig_passwd"
+	then
+		exit 0
+	fi
+
+	echo -n " live-debconfig (passwd)"
+}
+
+Config ()
+{
+	# Checking if package is already configured differently
+	if grep -q "^${LIVE_USERNAME}:" /etc/passwd
+	then
+		exit 0
+	fi
+
+	# Adjust formating of groups
+	if [ -n "${LIVE_USER_DEFAULT_GROUPS}" ]
+	then
+		LIVE_USER_DEFAULT_GROUPS="$(echo ${LIVE_USER_DEFAULT_GROUPS} | sed -e 's|,| |g')"
+	fi
+
+	# Make sure user is not in sudo group if sudo is disabled
+	case "${LIVE_CONFIG_NOROOT}" in
+		true)
+			LIVE_USER_DEFAULT_GROUPS="$(echo ${LIVE_USER_DEFAULT_GROUPS} | sed -e 's|sudo||')"
+			;;
+	esac
+
+	# Default password is: live
+	# passwords can be generated with 'echo "live" | mkpasswd -s',
+	# a blank password is 'U6aMy0wojraho'.
+	_PASSWORD="8Ab05sVQ4LLps"
+
+cat > /tmp/live-config.cfg << EOF
+live-debconfig live-debconfig/passwd/shadow boolean on
+#live-debconfig live-debconfig/passwd/root-password password 
+#live-debconfig live-debconfig/passwd/root-password-again password 
+live-debconfig live-debconfig/passwd/root-password-crypted string *
+live-debconfig live-debconfig/passwd/user-name string ${LIVE_USERNAME}
+live-debconfig live-debconfig/passwd/user-fullname string ${LIVE_USER_FULLNAME}
+#live-debconfig live-debconfig/passwd/user-password password 
+#live-debconfig live-debconfig/passwd/user-password-again password 
+live-debconfig live-debconfig/passwd/user-password-crypted string ${_PASSWORD}
+live-debconfig live-debconfig/passwd/user-home string /home/user
+live-debconfig live-debconfig/passwd/user-uid string 1000
+live-debconfig live-debconfig/passwd/user-gid string 1000
+live-debconfig live-debconfig/passwd/user-default-groups string ${LIVE_USER_DEFAULT_GROUPS}
+live-debconfig live-debconfig/passwd/user-system-user boolean false
+EOF
+
+	live-debconfig-set-selections /tmp/live-config.cfg
+	rm -f /tmp/live-config.cfg
+
+	live-debconfig --debconfig=passwd
+
+	# Creating state file
+	touch /var/lib/live/config/live-debconfig_passwd
+}
+
+Cmdline
+Init
+Config

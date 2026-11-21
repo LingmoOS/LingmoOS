@@ -1,0 +1,82 @@
+#!/bin/sh
+
+. /usr/lib/live/config.sh
+
+## live-config(7) - System Configuration Components
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+#set -e
+
+Cmdline ()
+{
+	# Reading kernel command line
+	for _PARAMETER in ${LIVE_CONFIG_CMDLINE}
+	do
+		case "${_PARAMETER}" in
+			live-config.locales=*|locales=*)
+				LIVE_LOCALES="${_PARAMETER#*locales=}"
+				;;
+		esac
+	done
+}
+
+Init ()
+{
+	# Checking if a locale package is installed
+	if ! pkg_is_installed "locales" && \
+	   ! pkg_is_installed "locales-all"
+	then
+		exit 0
+	fi
+	# Checking if the locale has already been configured
+	if component_was_executed "locales"
+	then
+		exit 0
+	fi
+
+	echo -n " locales"
+}
+
+Config ()
+{
+	if echo "${LIVE_LOCALES}" | grep -qs ","
+	then
+		# multiple locales specified
+		_LOCALE="$(echo ${LIVE_LOCALES} | sed -e 's|,.*||')"
+		_LOCALES="$(echo ${LIVE_LOCALES} | sed -e "s|^${_LOCALE},||" -e 's|,| |g')"
+	else
+		# one or no locale specified
+		_LOCALE="${LIVE_LOCALES:-en_US.UTF-8}"
+		_LOCALES=""
+	fi
+
+	echo "LANG=${_LOCALE}" > /etc/default/locale
+	if which systemctl >/dev/null 2>/dev/null; then
+	    systemctl set-environment "LANG=${_LOCALE}"
+	fi
+
+	if [ -e /etc/locale.gen ]
+	then
+		for _LOCALE in ${_LOCALE} ${_LOCALES}
+		do
+			_CHARSET="$(echo ${_LOCALE} | awk -F. '{ print $2 }')"
+
+			sed -i -e "s|# ${_LOCALE} ${_CHARSET}|${_LOCALE} ${_CHARSET}|" /etc/locale.gen
+		done
+	fi
+
+	locale-gen --keep-existing > /dev/null 2>&1
+
+	# Creating state file
+	touch /var/lib/live/config/locales
+}
+
+Cmdline
+Init
+Config

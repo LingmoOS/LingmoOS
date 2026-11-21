@@ -1,0 +1,19 @@
+// Copyright 2019 The Chromium Authors
+// Use of this source code is governed by a BSD-style license that can be
+// found in the LICENSE.chromium file.
+//
+// Upstream: chromium/src/components/exo/wayland/wl_subcompositor.h
+// Revision: 7acd40ddefff49c9d36144999aafdbb674dbd07a
+//
+// Adapted for Lingmo: integrates the upstream behavior with native
+// compositor types and ownership.
+
+#pragma once
+
+struct wl_display;
+struct wl_global;
+
+namespace Lingmo::Wayland {
+
+wl_global* createSubcompositorGlobal(wl_display* display);
+}

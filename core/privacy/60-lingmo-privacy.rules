@@ -1,0 +1,5 @@
+# A camera turned off stays off when plugged in or at boot: its USB video interfaces lose their driver.
+ACTION=="add", SUBSYSTEM=="usb", ENV{DEVTYPE}=="usb_interface", ATTR{bInterfaceClass}=="0e", TEST=="/var/lib/lingmo-privacy/camera-off", ATTR{authorized}="0"
+
+# Microphone locks die with the service that holds them, so a new sound card starts it.
+ACTION=="add", SUBSYSTEM=="sound", KERNEL=="controlC[0-9]*", TEST=="/var/lib/lingmo-privacy/microphone-off", TAG+="systemd", ENV{SYSTEMD_WANTS}+="lingmo-privacy.service"

@@ -1,0 +1,172 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Debian sources"
+USAGE="${PROGRAM} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+if [ "${LB_SOURCE}" != "true" ]
+then
+	exit 0
+fi
+
+Echo_message "Begin downloading sources..."
+
+# Requiring stage file
+Require_stagefiles config bootstrap
+
+# Checking stage file
+Check_stagefile
+
+# Acquire lock file
+Acquire_lockfile
+
+# Remove old sources
+if [ -d source/debian ]
+then
+	rm -rf source/debian
+fi
+
+# Download sources
+
+cat >> chroot/source-selection.sh << EOF
+#!/bin/sh
+dpkg-query -W -f='\${source:Package}=\${source:Version}\n' | sort -u > source-selection.txt
+EOF
+
+Chroot chroot "sh source-selection.sh"
+rm -f chroot/source-selection.sh
+mv chroot/source-selection.txt ./
+
+if [ -n "${LB_BOOTLOADER_BIOS}" ]; then
+	echo "${LB_BOOTLOADER_BIOS}" >> source-selection.txt
+fi
+if [ -n "${LB_BOOTLOADER_EFI}" ]; then
+	echo "${LB_BOOTLOADER_EFI}" >> source-selection.txt
+fi
+
+echo "live-build" >> source-selection.txt
+
+case "${LB_BINARY_IMAGES}" in
+	iso*)
+		echo "xorriso" >> source-selection.txt
+		;;
+
+	hdd*)
+		echo "parted" >> source-selection.txt
+		;;
+esac
+
+case "${LB_CHROOT_FILESYSTEM}" in
+	squashfs)
+		echo "squashfs-tools" >> source-selection.txt
+		;;
+esac
+
+case "${LB_BINARY_FILESYSTEM}" in
+	fat*)
+		echo "dosfstools" >> source-selection.txt
+		;;
+
+	ntfs)
+		echo "ntfs-3g" >> source-selection.txt
+		;;
+esac
+
+case "${LB_ARCHITECTURE}" in
+	amd64|i386)
+		echo "mtools" >> source-selection.txt
+
+		if [ "${LB_MEMTEST}" != "none" ]; then
+			echo "${LB_MEMTEST}" >> source-selection.txt
+		fi
+		;;
+esac
+
+# Make a clean directory to download the packages to.
+# We need to set the ownership to user `_apt` to give write access to the apt user,
+# otherwise we get a lot of warnings from apt about downloading as root.
+mkdir -p chroot/source.pkgs
+Chroot chroot "chown _apt:root source.pkgs"
+
+cat > chroot/missing-source.txt << EOF
+This file contains the list of binary packages that are installed on the "live"
+system (to which this source disc is a companion) for which a corresponding
+source package is not included on this disc. This may be because the binary
+package does not have a corresponding source package, or because the version of
+the source package available was not the same as that of the binary.
+
+EOF
+
+cat > chroot/source-download.sh << EOF
+#!/bin/sh
+cd source.pkgs
+PACKAGE="\${1}"
+if ! apt-get ${APT_OPTIONS} --only-source --download-only source \${PACKAGE}
+then
+	dpkg -l \${PACKAGE} | tail -n1 >> ../missing-source.txt
+	touch ../missing-source-some
+fi
+EOF
+
+while read -r PACKAGE
+do
+	Chroot chroot "sh source-download.sh ${PACKAGE}" || true
+done < source-selection.txt
+rm -f source-selection.txt
+rm -f chroot/source-download.sh
+
+if [ -e chroot/missing-source-some ]
+then
+	mv chroot/missing-source.txt source/missing-source.txt
+	rm -f chroot/missing-source-some
+else
+	rm -f chroot/missing-source.txt
+fi
+
+# Sort sources
+for DSC in chroot/source.pkgs/*.dsc
+do
+	SOURCE="$(sed -n 's|^Source: ||p' ${DSC} 2>/dev/null || :)"
+	# The sed may fail if multiple dsc files exist for same source, as the
+	# first one to match will have already been moved.
+	[ -n "$SOURCE" ] || continue
+
+	case "${SOURCE}" in
+		lib?*)
+			LETTER="$(echo ${SOURCE} | sed 's|\(....\).*|\1|')"
+			;;
+
+		*)
+			LETTER="$(echo ${SOURCE} | sed 's|\(.\).*|\1|')"
+			;;
+	esac
+
+	# Install directory
+	mkdir -p source/debian/"${LETTER}"/"${SOURCE}"
+
+	# Move files
+	mv chroot/source.pkgs/"${SOURCE}"_* source/debian/"${LETTER}"/"${SOURCE}"
+done
+
+rmdir --ignore-fail-on-non-empty chroot/source.pkgs
+
+# Creating stage file
+Create_stagefile
+Create_stagefile "source"

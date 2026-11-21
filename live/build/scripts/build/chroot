@@ -1,0 +1,66 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Customize the Debian system"
+USAGE="${PROGRAM} [--force]"
+
+# Automatically populating config tree
+Auto_build_config
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+# Setting up cleanup function
+Setup_clean_exit
+
+# Restoring cached live OS chroot from cache
+lb chroot_cache restore "${@}"
+
+# Configuring chroot
+lb chroot_prep install all mode-archives-chroot "${@}"
+
+# Customizing chroot
+lb chroot_linux-image "${@}"
+lb chroot_firmware "${@}"
+lb chroot_preseed "${@}"
+lb chroot_includes_before_packages "${@}"
+
+for _PASS in install live; do
+	lb chroot_package-lists ${_PASS} "${@}"
+	lb chroot_install-packages ${_PASS} "${@}"
+
+	if [ "${_PASS}" = install ]; then
+		Chroot chroot "dpkg-query -W" > chroot.packages.install
+	fi
+done
+
+lb chroot_includes_after_packages "${@}"
+lb chroot_hooks "${@}"
+lb chroot_hacks "${@}"
+lb chroot_interactive "${@}"
+
+Chroot chroot "dpkg-query -W" > chroot.packages.live
+
+# Deconfiguring chroot
+lb chroot_prep remove all mode-archives-chroot "${@}"
+
+# Saving live OS chroot to cache
+lb chroot_cache save "${@}"
+
+Chroot chroot "ls -lR" > chroot.files
+
+Echo_message "Chroot stage completed"

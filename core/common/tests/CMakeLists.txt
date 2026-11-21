@@ -1,0 +1,22 @@
+cmake_minimum_required(VERSION 3.22)
+project(lingmo-common-tests LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+find_package(LingmoSDK REQUIRED)
+find_package(GTest REQUIRED)
+find_package(PkgConfig REQUIRED)
+enable_testing()
+
+add_subdirectory(.. ${CMAKE_CURRENT_BINARY_DIR}/common)
+add_executable(common-test common_test.cpp)
+target_link_libraries(common-test PRIVATE lingmo-core-common GTest::gtest_main)
+add_test(NAME common COMMAND common-test)
+
+add_executable(detached-call-test detached_call_test.cpp)
+target_link_libraries(detached-call-test PRIVATE lingmo-core-common GTest::gtest_main)
+find_program(DBUS_RUN_SESSION dbus-run-session REQUIRED)
+add_test(NAME detached-call COMMAND ${DBUS_RUN_SESSION} -- $<TARGET_FILE:detached-call-test>)
+
+add_executable(detached-process-test detached_process_test.cpp)
+target_link_libraries(detached-process-test PRIVATE lingmo-core-common GTest::gtest_main)
+add_test(NAME detached-process COMMAND detached-process-test)

@@ -1,44 +1,41 @@
 project(lingmo-session)
-
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED 17)
-
 set(TARGET lingmo-session)
 
+pkg_check_modules(Systemd REQUIRED IMPORTED_TARGET libsystemd)
+find_package(Qt6 REQUIRED COMPONENTS Core)
+
 set(SOURCES
-        application.cpp
-        main.cpp
-        process.cpp
-        processmanager.cpp
-        networkproxymanager.cpp
-
-        powermanager/power.cpp
-        powermanager/powerproviders.cpp
-
-        daemon-helper.cpp
-        daemon-helper.h
+    application.cpp
+    autostartentries.cpp
+    journalstream.cpp
+    main.cpp
+    processmanager.cpp
+    restartpolicy.cpp
+    compositorprocess.cpp
+    xwaylandenvironment.cpp
+    shellprocess.cpp
+    shellconnection.cpp
+    power.cpp
+    userdirectories.cpp
 )
 
-qt5_add_dbus_adaptor(DBUS_SOURCES
-                     com.lingmo.Session.xml
-                     application.h Application
-                     sessionadaptor SessionAdaptor)
-set_source_files_properties(${DBUS_SOURCES} PROPERTIES SKIP_AUTOGEN ON)
-
-find_package(KF5WindowSystem)
-find_package(Threads)
-
-add_executable(${TARGET} ${SOURCES} ${DBUS_SOURCES})
+add_executable(${TARGET} ${SOURCES})
+# The sources name their Qt objects with QString; qt_interop.h converts at the
+# toolkit's std::string boundary. Force-included so it is in scope everywhere.
+# One token: CMake drops a repeated '-include' option but keeps its argument,
+# which would then be compiled as a second source file.
+target_compile_options(${TARGET} PRIVATE
+    -include${CMAKE_SOURCE_DIR}/qt_interop.h
+)
 target_link_libraries(${TARGET}
-        Qt5::Core
-        Qt5::Gui
-        Qt5::Widgets
-        Qt5::Quick
-        Qt5::DBus
-        Qt5::X11Extras
-        KF5::WindowSystem
-        ${CMAKE_THREAD_LIBS_INIT}
+    lingmo-core-common
+    Lingmo::SDKBase
+    Qt6::Core
+    PkgConfig::Systemd
 )
 
 install(TARGETS ${TARGET} DESTINATION ${CMAKE_INSTALL_BINDIR})
-# install(FILES lingmo-xsession.desktop DESTINATION ${CMAKE_INSTALL_DATAROOTDIR}/xsessions/)
+install(PROGRAMS lingmo-wayland-session DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(FILES document-portal-stop.conf
+    DESTINATION /usr/lib/systemd/user/xdg-document-portal.service.d
+    RENAME lingmo-session.conf)

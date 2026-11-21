@@ -1,0 +1,31 @@
+#!/bin/sh
+
+set -e
+
+case "${1}" in
+	purge)
+		rm -f /etc/sudoers.d/live
+		rm -f /etc/profile.d/zz-live-config_*.sh
+		rm -f /etc/X11/xorg.conf.d/zz-live-config_xserver-xorg.conf
+		rm -f /etc/systemd/system/getty@tty*.service.d/live-config_autologin.conf
+
+		rmdir --ignore-fail-on-non-empty /etc/live/config.conf.d > /dev/null 2>&1 || true
+		rmdir --ignore-fail-on-non-empty /etc/live > /dev/null 2>&1 || true
+
+		rm -rf /var/lib/live/config
+		rmdir --ignore-fail-on-non-empty /var/lib/live > /dev/null 2>&1 || true
+		;;
+
+	remove|upgrade|failed-upgrade|abort-install|abort-upgrade|disappear)
+
+		;;
+
+	*)
+		echo "postrm called with unknown argument \`${1}'" >&2
+		exit 1
+		;;
+esac
+
+#DEBHELPER#
+
+exit 0

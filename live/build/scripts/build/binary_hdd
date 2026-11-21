@@ -1,0 +1,369 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Build binary image"
+USAGE="${PROGRAM} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+if [ "${LB_IMAGE_TYPE}" != "hdd" ]; then
+	exit 0
+fi
+
+Echo_message "Begin building binary hdd image..."
+
+# Requiring stage file
+Require_stagefiles config bootstrap chroot_proc
+
+# Checking stage file
+Check_stagefile
+
+# Acquire lock file
+Acquire_lockfile
+
+# Checking depends
+case "${LB_BINARY_FILESYSTEM}" in
+	fat*)
+		Check_package chroot /sbin/mkdosfs dosfstools
+		;;
+
+	ntfs)
+		Check_package chroot /sbin/mkfs.ntfs ntfs-3g
+		;;
+esac
+
+Check_package chroot /usr/share/doc/mtools mtools
+Check_package chroot /sbin/parted parted
+Check_package host /sbin/fdisk fdisk
+Check_package host /sbin/losetup mount
+
+case "${LB_BOOTLOADER_BIOS}" in
+	grub-legacy)
+		Check_package chroot /usr/sbin/grub grub
+		;;
+
+	syslinux)
+		case ${LB_BINARY_FILESYSTEM} in
+			fat*|ntfs)
+				_BOOTLOADER=syslinux
+				;;
+			ext[234]|btrfs)
+				_BOOTLOADER=extlinux
+				Check_package host /usr/bin/lsattr e2fsprogs
+				;;
+			*)
+				Echo_error "syslinux/extlinux doesn't support ${LB_BINARY_FILESYSTEM}"
+				exit 1
+				;;
+		esac
+		Check_package chroot /usr/bin/${_BOOTLOADER} ${_BOOTLOADER}
+		;;
+esac
+
+# Restoring cache
+Restore_package_cache binary
+
+# Installing depends
+Install_packages
+
+# Remove old binary
+if [ -f ${LB_IMAGE_NAME}.img ]
+then
+	rm -f ${LB_IMAGE_NAME}.img
+fi
+
+case "${LB_BINARY_FILESYSTEM}" in
+	fat*)
+		# If the target does not support hardlinks, tell du to
+		# count them double
+		DU_OPTIONS="--count-links"
+		;;
+
+	*)
+		DU_OPTIONS=""
+		;;
+esac
+
+
+# Enforce fat32 if we find individual files bigger than 2GB
+if [ "${LB_BINARY_FILESYSTEM}" = "fat16" ] && [ -n "$(find binary -size +1999M)" ]
+then
+	Echo_warning "FAT16 doesn't support files larger than 2GB, automatically enforcing FAT32."
+
+	LB_BINARY_FILESYSTEM="fat32"
+	export LB_BINARY_FILESYSTEM
+fi
+
+# Enforce fat32 if we have images in total bigger than 2GB
+if [ "${LB_BINARY_FILESYSTEM}" = "fat16" ] && [ "$(du ${DU_OPTIONS} -s binary | awk '{ print $1 }')" -gt "1900000" ]
+then
+	Echo_warning "FAT16 doesn't support partitions larger than 2GB, automatically enforcing FAT32"
+
+	LB_BINARY_FILESYSTEM="fat32"
+	export LB_BINARY_FILESYSTEM
+fi
+
+# Enforce ntfs if we find individual files bigger than 4GB
+if [ "${LB_BINARY_FILESYSTEM}" = "fat32" ] && [ -n "$(find binary -size +3999M)" ]
+then
+	Echo_warning "FAT32 doesn't support files larger than 4GB, automatically enforcing NTFS."
+
+	LB_BINARY_FILESYSTEM="ntfs"
+	export LB_BINARY_FILESYSTEM
+fi
+
+# Everything which comes here needs to be cleaned up,
+if [ "$LB_HDD_SIZE" = "auto" ];
+then
+	DU_DIM="$(du ${DU_OPTIONS} -ms binary | cut -f1)"
+	REAL_DIM="$(Calculate_partition_size ${DU_DIM} ${LB_BINARY_FILESYSTEM})"
+else
+	REAL_DIM=$LB_HDD_SIZE
+fi
+
+dd if=/dev/zero of=chroot/binary.img bs=1024k count=0 seek=${REAL_DIM}
+FREELO="$(losetup -f)"
+MAKEDEV=false
+if [ ! -b chroot/${FREELO} ]
+then
+	MAKEDEV=true
+
+	mv chroot/dev chroot/dev.tmp
+	# Don't copy mount points (e.g. /dev/shm)
+	find /dev -xdev | cpio -dmpu chroot
+fi
+
+echo "!!! The following error/warning messages can be ignored !!!"
+Losetup $FREELO chroot/binary.img 0
+
+PARTITION_TABLE_TYPE="msdos"
+
+case "${LB_BINARY_FILESYSTEM}" in
+	ext2|ext3|ext4)
+		PARTITION_TYPE="ext2"
+		;;
+
+	fat16|fat32)
+		PARTITION_TYPE="${LB_BINARY_FILESYSTEM}"
+		;;
+
+	ntfs)
+		PARTITION_TYPE="NTFS"
+		;;
+
+	*)
+		Echo_error "Unsupported binary filesystem %s" "${LB_BINARY_FILESYSTEM}"
+		exit 1
+		;;
+esac
+
+case "${LB_BUILD_WITH_CHROOT}" in
+	true)
+		Chroot chroot "parted -s ${FREELO} mklabel ${PARTITION_TABLE_TYPE}" || true
+		if [ "x${LB_HDD_PARTITION_START}" = "x" ];
+		then
+			Chroot chroot "parted -a optimal -s ${FREELO} mkpart primary\
+				${PARTITION_TYPE} 0% 100%" || true
+		else
+			Echo_message "using partition start at ${LB_HDD_PARTITION_START}"
+			Chroot chroot "parted -s ${FREELO} mkpart primary ${PARTITION_TYPE}\
+				${LB_HDD_PARTITION_START} 100%" || true
+		fi
+		Chroot chroot "parted -s ${FREELO} set 1 boot on" || true
+		Chroot chroot "parted -s ${FREELO} set 1 lba off" || true
+
+		if [ "${LB_BOOTLOADER_BIOS}" = "syslinux" ]; then
+			dd if=chroot/usr/lib/$(echo ${_BOOTLOADER} | tr '[a-z]' '[A-Z]')/mbr.bin of=${FREELO} bs=440 count=1
+		fi
+		;;
+
+	false)
+		parted -s ${FREELO} mklabel ${PARTITION_TABLE_TYPE} || true
+		if [ "x${LB_HDD_PARTITION_START}" = "x" ];
+		then
+			parted -a optimal -s ${FREELO} mkpart primary ${PARTITION_TYPE}\
+				0% 100% || true
+		else
+			Echo_message "using partition start at ${LB_HDD_PARTITION_START}"
+			parted -s ${FREELO} mkpart primary ${PARTITION_TYPE}\
+				${LB_HDD_PARTITION_START} 100% || true
+		fi
+		parted -s "${FREELO}" set 1 boot on || true
+		parted -s "${FREELO}" set 1 lba off || true
+
+		if [ "${LB_BOOTLOADER_BIOS}" = "syslinux" ]; then
+			dd if=/usr/lib/$(echo ${_BOOTLOADER} | tr '[a-z]' '[A-Z]')/mbr.bin of=${FREELO} bs=440 count=1
+		fi
+		;;
+esac
+
+Lodetach ${FREELO}
+
+FREELO="$(losetup -f)"
+Losetup $FREELO chroot/binary.img 1
+
+case "${LB_BINARY_FILESYSTEM}" in
+	ext2|ext3|ext4)
+		MKFS="${LB_BINARY_FILESYSTEM}"
+		MKFS_OPTIONS="-L ${LB_HDD_LABEL} -m 0 -O ^64bit"
+		MOUNT_OPTIONS=""
+		;;
+
+	fat16)
+		MKFS="vfat"
+		MKFS_OPTIONS="-F 16 -n ${LB_HDD_LABEL}"
+		MOUNT_OPTIONS=""
+		;;
+
+	fat32)
+		MKFS="vfat"
+		MKFS_OPTIONS="-F 32 -n ${LB_HDD_LABEL}"
+		MOUNT_OPTIONS=""
+		;;
+
+	ntfs)
+		MKFS="ntfs"
+		MKFS_OPTIONS="-L ${LB_HDD_LABEL}"
+		MOUNT_OPTIONS="-t ntfs-3g"
+		;;
+esac
+
+case "${LB_BUILD_WITH_CHROOT}" in
+	true)
+		Chroot chroot "mkfs.${MKFS} ${MKFS_OPTIONS} ${FREELO}"
+		;;
+
+	false)
+		mkfs.${MKFS} ${MKFS_OPTIONS} ${FREELO}
+		;;
+esac
+
+case "${LB_BINARY_FILESYSTEM}" in
+	fat*)
+		CP_OPTIONS="-r -L"
+		;;
+
+	*)
+		CP_OPTIONS="-a"
+		;;
+esac
+
+Echo_message "Copying binary contents into image..."
+
+mkdir -p chroot/binary.tmp
+mount ${MOUNT_OPTIONS} ${FREELO} chroot/binary.tmp
+cp -T ${CP_OPTIONS} binary/ chroot/binary.tmp
+
+FIXME()
+{
+if [ "${LB_BOOTLOADER_BIOS}" = "grub-legacy" ]; then
+
+cat > chroot/grub.sh << EOF
+#!/bin/sh
+cd binary.tmp
+grub --batch << EOM
+find /live/vmlinuz
+EOM
+EOF
+
+	rootpartition="$(Chroot chroot 'sh grub.sh' 2>/dev/null | grep -A 1 'find /live/vmlinuz' | grep -v 'find /live/vmlinuz')"
+	hdddev="$(echo $rootpartition | sed -e 's|,[[:digit:]]||')"
+	echo "Root partition is $rootpartition, device is: $hdddev"
+
+	echo "WAITING..." && read WAIT
+
+#cat > chroot/grub.sh << EOF
+#!/bin/sh
+#grub --batch << EOM
+#root $rootpartition
+#setup $hdddev
+#EOM
+#EOF
+
+#Chroot chroot "sh grub.sh"
+
+	rm -f chroot/grub.sh
+fi
+}
+
+case "${_BOOTLOADER}" in
+	syslinux)
+		_SYSLINUX_INSTALLER="syslinux ${FREELO}"
+		;;
+	extlinux)
+		_SYSLINUX_INSTALLER="extlinux --install /binary.tmp/boot/extlinux"
+		;;
+	*)
+		_SYSLINUX_INSTALLER=""
+		;;
+esac
+
+if [ -n "${_SYSLINUX_INSTALLER}" ]
+then
+	case "${LB_BUILD_WITH_CHROOT}" in
+		true)
+			Chroot chroot "${_SYSLINUX_INSTALLER}"
+			;;
+		false)
+			${_SYSLINUX_INSTALLER}
+			;;
+	esac
+fi
+
+case "${_BOOTLOADER}" in
+	extlinux)
+		if lsattr chroot/binary.tmp/boot/extlinux/ldlinux.sys | cut -f 1 -d " " | grep -q "i"; then
+			# The file ldlinux.sys is marked immutable by extlinux
+			# Set the timestamp
+			chattr -i chroot/binary.tmp/boot/extlinux/ldlinux.sys
+			touch -d@${SOURCE_DATE_EPOCH} chroot/binary.tmp/boot/extlinux/ldlinux.sys
+			chattr +i chroot/binary.tmp/boot/extlinux/ldlinux.sys
+			echo "f chroot/binary.tmp/boot/extlinux/ldlinux.sys" >> binary.modified_timestamps
+		fi
+		;;
+	*)
+		;;
+esac
+
+# Set the timestamp inside the image
+find chroot/binary.tmp -newermt "$(date -d@${SOURCE_DATE_EPOCH} '+%Y-%m-%d %H:%M:%S')" -printf "%y %p\n" -exec touch '{}' -d@${SOURCE_DATE_EPOCH} ';' >> binary.modified_timestamps
+umount chroot/binary.tmp
+rmdir chroot/binary.tmp
+
+Lodetach ${FREELO}
+
+echo "!!! The above error/warning messages can be ignored !!!"
+
+if $MAKEDEV; then
+	rm -rf chroot/dev
+	mv chroot/dev.tmp chroot/dev
+fi
+
+# Set the timestamp of the image
+touch -d@${SOURCE_DATE_EPOCH} chroot/binary.img
+echo "f ${LB_IMAGE_NAME}-${LB_ARCHITECTURE}.img" >> binary.modified_timestamps
+mv chroot/binary.img ${LB_IMAGE_NAME}-${LB_ARCHITECTURE}.img
+
+# Saving cache
+Save_package_cache binary
+
+# Removing depends
+Remove_packages
+
+# Creating stage file
+Create_stagefile

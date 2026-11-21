@@ -1,0 +1,62 @@
+#!/bin/sh
+
+. /usr/lib/live/config.sh
+
+## live-config(7) - System Configuration Components
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+#set -e
+
+Cmdline ()
+{
+	# Reading kernel command line
+	for _PARAMETER in ${LIVE_CONFIG_CMDLINE}
+	do
+		case "${_PARAMETER}" in
+			live-config.timezone=*|timezone=*)
+				LIVE_TIMEZONE="${_PARAMETER#*timezone=}"
+				;;
+		esac
+	done
+}
+
+Init ()
+{
+	# Checking if package is installed or already configured
+	if ! pkg_is_installed "tzdata" || \
+	   component_was_executed "tzdata"
+	then
+		exit 0
+	fi
+
+	echo -n " tzdata"
+}
+
+Config ()
+{
+	if [ -n "${LIVE_TIMEZONE}" ]
+	then
+		_AREA="$(echo ${LIVE_TIMEZONE} | cut -f1 -d '/')"
+		_ZONE="$(echo ${LIVE_TIMEZONE} | cut -f2 -d '/')"
+	else
+		_AREA="Etc"
+		_ZONE="UTC"
+	fi
+
+	echo "${_AREA}/${_ZONE}" > /etc/timezone
+	rm -f /etc/localtime
+	dpkg-reconfigure -f noninteractive -p critical tzdata
+
+	# Creating state file
+	touch /var/lib/live/config/tzdata
+}
+
+Cmdline
+Init
+Config

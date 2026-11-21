@@ -1,0 +1,49 @@
+#!/bin/sh -e
+
+# Debian (live-boot)
+PLACES="$PLACES /cdrom/live/filesystem.ext2 /cdrom/live/filesystem.ext3 /cdrom/live/filesystem.ext4"
+# Ubuntu (casper)
+PLACES="$PLACES /cdrom/casper/filesystem.ext2 /cdrom/casper/filesystem.ext3 /cdrom/casper/filesystem.ext4"
+
+extX_prepare() {
+	ANNA_QUIET=1 anna-install ${1}-modules || true
+
+	if [ -x /sbin/depmod ]; then
+		depmod -a > /dev/null 2>&1 || true
+	fi
+
+	modprobe $1 || true
+
+	mkdir -p /mnt
+	umount /mnt > /dev/null 2>&1 || true
+	if ! mount -t $1 -o loop,ro $place /mnt; then
+		error "$place has failed to be mounted as $1."
+		exit 1
+	fi
+
+	cd /mnt
+}
+
+extX_teardown() {
+	umount -d /mnt > /dev/null 2>&1 || true
+}
+
+extX_count() {
+	echo `print-inodes /mnt`
+}
+
+for fs in ext2 ext3 ext4; do
+	eval "
+	${fs}_prepare() {
+		extX_prepare $fs
+	}
+
+	${fs}_teardown() {
+		extX_teardown
+	}
+
+	${fs}_count() {
+		extX_count
+	}
+"
+done

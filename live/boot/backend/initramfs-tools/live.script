@@ -1,0 +1,59 @@
+# Live system filesystem mounting			-*- shell-script -*-
+
+. /usr/bin/live-boot
+
+live_top()
+{
+	if [ "${live_top_used}" != "yes" ]; then
+		[ "$quiet" != "y" ] && log_begin_msg "Running /scripts/live-top"
+		run_scripts /scripts/live-top
+		[ "$quiet" != "y" ] && log_end_msg
+	fi
+	live_top_used=yes
+}
+
+live_premount()
+{
+	if [ "${live_premount_used}" != "yes" ]; then
+		[ "$quiet" != "y" ] && log_begin_msg "Running /scripts/live-premount"
+		run_scripts /scripts/live-premount
+		[ "$quiet" != "y" ] && log_end_msg
+	fi
+	live_premount_used=yes
+}
+
+live_bottom()
+{
+	if [ "${live_premount_used}" = "yes" ] || [ "${live_top_used}" = "yes" ]; then
+		[ "$quiet" != "y" ] && log_begin_msg "Running /scripts/live-bottom"
+		run_scripts /scripts/live-bottom
+		[ "$quiet" != "y" ] && log_end_msg
+	fi
+	live_premount_used=no
+	live_top_used=no
+}
+
+
+mountroot()
+{
+	# initramfs-tools entry point for live-boot is mountroot(); function
+	Live
+}
+
+mount_top()
+{
+	# Note, also called directly in case it's overridden.
+	live_top
+}
+
+mount_premount()
+{
+	# Note, also called directly in case it's overridden.
+	live_premount
+}
+
+mount_bottom()
+{
+	# Note, also called directly in case it's overridden.
+	live_bottom
+}

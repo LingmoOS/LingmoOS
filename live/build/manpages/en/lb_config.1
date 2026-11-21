@@ -1,0 +1,490 @@
+.TH LIVE\-BUILD 1 2020\-04\-27 1:20191222 "Debian Live Project"
+
+.SH NAME
+\fBlb_config\fR \- Create config directory
+
+.SH SYNOPSIS
+\fBlb config\fR {\fB\-h\fR|\fB\-\-help\fR|\fB\-u\fR|\fB\-\-usage\fR|\fB\-v\fR|\fB\-\-version\fR}
+.PP
+\fBlb config\fR
+.br
+	[\fB\-\-apt\fR apt|apt-get|aptitude]
+.br
+	[\fB\-\-apt\-http\-proxy\fR \fIURL\fR]
+.br
+	[\fB\-\-apt\-indices\fR true|false]
+.br
+	[\fB\-\-apt\-options\fR \fIOPTION\fR|"\fIOPTIONS\fR"]
+.br
+	[\fB\-\-apt\-pipeline\fR \fIDEPTH\fR]
+.br
+	[\fB\-\-apt\-recommends\fR true|false]
+.br
+	[\fB\-\-apt\-secure\fR true|false]
+.br
+	[\fB\-\-apt\-source\-archives\fR true|false]
+.br
+	[\fB\-\-aptitude\-options\fR \fIOPTION\fR|"\fIOPTIONS\fR"]
+.br
+	[\fB\-a\fR|\fB\-\-architecture\fR \fIARCHITECTURE\fR]
+.br
+	[\fB\-\-archive\-areas\fR \fIARCHIVE_AREA\fR|"\fIARCHIVE_AREAS\fR"]
+.br
+	[\fB\-\-backports\fR true|false]
+.br
+	[\fB\-\-binary\-filesystem\fR fat16|fat32|ext2|ext3|ext4|ntfs]
+.br
+	[\fB\-b\fR|\fB\-\-binary\-image\fR iso|iso\-hybrid|netboot|tar|hdd]
+.br
+	[\fB\-\-bootappend\-install\fR \fIPARAMETER\fR|"\fIPARAMETERS\fR"]
+.br
+	[\fB\-\-bootappend\-live\fR \fIPARAMETER\fR|"\fIPARAMETERS\fR"]
+.br
+	[\fB\-\-bootappend\-live\-failsafe\fR \fIPARAMETER\fR|"\fIPARAMETERS\fR"]
+.br
+	[\fB\-\-bootloaders\fR grub-legacy|grub-pc|syslinux|grub-efi|"\fIBOOTLOADERS\fR"]
+.br
+	[\fB\-\-bootstrap\-qemu\-arch\fR \fIARCH\fR]
+.br
+	[\fB\-\-bootstrap\-qemu\-exclude\fR \fIPACKAGE\fR|"\fIPACKAGES\fR"]
+.br
+	[\fB\-\-bootstrap\-qemu\-static\fR \fIPATH\fR]
+.br
+	[\fB\-\-breakpoints\fR]
+.br
+	[\fB\-\-build\-with\-chroot\fR true|false]
+.br
+	[\fB\-\-cache\fR true|false]
+.br
+	[\fB\-\-cache\-indices\fR true|false]
+.br
+	[\fB\-\-cache\-packages\fR true|false]
+.br
+	[\fB\-\-cache\-stages\fR bootstrap|chroot|rootfs|"\fISTAGES\fR"]
+.br
+	[\fB\-\-checksums\fR md5|sha1|sha224|sha256|sha384|sha512|none]
+.br
+	[\fB\-\-chroot\-filesystem\fR ext2|ext3|ext4|squashfs|jffs2|none|plain]
+.br
+	[\fB\-\-chroot\-squashfs\-compression\-level\fR LEVEL]
+.br
+	[\fB\-\-chroot\-squashfs\-compression\-type\fR gzip|lzma|lzo|lz4|xz|zstd]
+.br
+	[\fB\-\-clean\fR]
+.br
+	[\fB\-\-color\fR]
+.br
+	[\fB\-\-compression\fR bzip2|gzip|lzip|xz|none]
+.br
+	[\fB\-c\fR|\fB\-\-conffile\fR \fIFILE\fR]
+.br
+	[\fB\-\-config\fR \fIGIT_URL\fR::\fIGIT_BRANCH\fR]
+.br
+	[\fB\-\-debconf\-frontend\fR dialog|editor|noninteractive|readline]
+.br
+	[\fB\-\-debconf\-priority\fR low|medium|high|critical]
+.br
+	[\fB\-\-debian\-installer\fR cdrom|netinst|netboot|businesscard|live|none]
+.br
+	[\fB\-\-debian\-installer\-distribution\fR daily|git|\fICODENAME\fR]
+.br
+	[\fB\-\-debian\-installer\-gui\fR true|false]
+.br
+	[\fB\-\-debian\-installer\-preseedfile\fR \fIFILE\fR|\fIURL\fR]
+.br
+	[\fB\-\-debootstrap\-options\fR \fIOPTION\fR|"\fIOPTIONS\fR"]
+.br
+	[\fB\-\-debootstrap\-script\fR \fISCRIPT\fR]
+.br
+	[\fB\-\-debug\fR]
+.br
+	[\fB\-d\fR|\fB\-\-distribution\fR \fICODENAME\fR]
+.br
+	[\fB\-\-distribution\-chroot\fR \fICODENAME\fR]
+.br
+	[\fB\-\-distribution\-binary\fR \fICODENAME\fR]
+.br
+	[\fB\-\-dm\-verity\fR]
+.br
+	[\fB\-\-dm\-verity\-fec\fR \fINB_ROOTS\fR]
+.br
+	[\fB\-\-dm\-verity\-sign\fR \fISIGN_SCRIPT\fR]
+.br
+	[\fB\-\-dump\fR]
+.br
+	[\fB\-\-firmware\-binary\fR true|false]
+.br
+	[\fB\-\-firmware\-chroot\fR true|false]
+.br
+	[\fB\-\-force\fR]
+.br
+	[\fB\-\-gzip\-options\fR \fIOPTION\fR|"\fIOPTIONS\fR"]
+.br
+	[\fB\-\-hdd\-label\fR \fILABEL\fR]
+.br
+	[\fB\-\-hdd\-partition\-start\fR \fISTART\fR]
+.br
+	[\fB\-\-hdd\-size\fR \fISIZE\fR]
+.br
+	[\fB\-\-ignore\-system\-defaults\fR]
+.br
+	[\fB\-\-image\-name\fR \fINAME\fR]
+.br
+	[\fB\-\-initramfs\fR none|live\-boot|dracut\-live]
+.br
+	[\fB\-\-initramfs\-compression\fR bzip2|gzip|lzma]
+.br
+	[\fB\-\-initsystem\fR sysvinit|systemd|none]
+.br
+	[\fB\-\-interactive\fR true|shell|x11|xnest|false]
+.br
+	[\fB\-\-iso\-application\fR \fINAME\fR]
+.br
+	[\fB\-\-iso\-preparer\fR \fINAME\fR]
+.br
+	[\fB\-\-iso\-publisher\fR \fINAME\fR]
+.br
+	[\fB\-\-iso\-volume\fR \fINAME\fR]
+.br
+	[\fB\-\-jffs2\-eraseblock\fR \fISIZE\fR]
+.br
+	[\fB\-\-keyring\-packages\fR \fIPACKAGE\fR|"\fIPACKAGES\fR"]
+.br
+	[\fB\-k\fR|\fB\-\-linux\-flavours\fR \fIFLAVOUR\fR|"\fIFLAVOURS\fR"]
+.br
+	[\fB\-\-linux\-packages\fR \fIPACKAGE\fR|"\fIPACKAGES\fR"]
+.br
+	[\fB\-\-loadlin\fR true|false]
+.br
+	[\fB\-\-memtest\fR memtest86+|memtest86|none]
+.br
+	[\fB\-\-mirror\-binary\fR \fIURL\fR]
+.br
+	[\fB\-\-mirror\-binary\-security\fR \fIURL\fR]
+.br
+	[\fB\-\-mirror\-bootstrap\fR \fIURL\fR]
+.br
+	[\fB\-\-mirror\-chroot\fR \fIURL\fR]
+.br
+	[\fB\-\-mirror\-chroot\-security\fR \fIURL\fR]
+.br
+	[\fB\-\-mirror\-debian\-installer\fR \fIURL\fR]
+.br
+	[\fB\-\-mode\fR debian]
+.br
+	[\fB\-\-net\-tarball\fR true|false]
+.br
+	[\fB\-\-no\-color\fR]
+.br
+	[\fB\-\-onie\fR true|false]
+.br
+	[\fB\-\-onie\-kernel\-cmdline\fR \fIOPTION\fR|"\fIOPTIONS\fR"]
+.br
+	[\fB\-\-parent\-archive\-areas\fR \fIARCHIVE_AREA\fR|"\fIARCHIVE_AREAS\fR"]
+.br
+	[\fB\-\-parent\-debian\-installer\-distribution\fR daily|git|\fICODENAME\fR]
+.br
+	[\fB\-\-parent\-distribution\fR \fICODENAME\fR]
+.br
+	[\fB\-\-parent\-distribution\-chroot\fR \fICODENAME\fR]
+.br
+	[\fB\-\-parent\-distribution\-binary\fR \fICODENAME\fR]
+.br
+	[\fB\-\-parent\-mirror\-binary\fR \fIURL\fR]
+.br
+	[\fB\-\-parent\-mirror\-binary\-security\fR \fIURL\fR]
+.br
+	[\fB\-m\fR|\fB\-\-parent\-mirror\-bootstrap\fR \fIURL\fR]
+.br
+	[\fB\-\-parent\-mirror\-chroot\fR \fIURL\fR]
+.br
+	[\fB\-\-parent\-mirror\-chroot\-security\fR \fIURL\fR]
+.br
+	[\fB\-\-parent\-mirror\-debian\-installer\fR \fIURL\fR]
+.br
+	[\fB\-\-quiet\fR]
+.br
+	[\fB\-\-security\fR true|false]
+.br
+	[\fB\-\-source\fR true|false]
+.br
+	[\fB\-s\fR|\fB\-\-source\-images\fR iso|netboot|tar|hdd|"\fIIMAGES\fR"]
+.br
+	[\fB\-\-swap\-file\-path\fR \fIPATH\fR]
+.br
+	[\fB\-\-swap\-file\-size\fR \fIMB\fR]
+.br
+	[\fB\-\-system\fR live|normal]
+.br
+	[\fB\-\-uefi\-secure\-boot\fR auto|enable|disable]
+.br
+	[\fB\-\-updates\fR true|false]
+.br
+	[\fB\-\-utc\-time\fR true|false]
+.br
+	[\fB\-\-validate\fR]
+.br
+	[\fB\-\-verbose\fR]
+.br
+	[\fB\-\-win32\-loader\fR true|false]
+.br
+	[\fB\-\-zsync\fR true|false]
+
+.SH DESCRIPTION
+\fBlb config\fR is a high\-level command (porcelain) of \fIlive\-build\fR(7), the Debian Live tool suite.
+.PP
+\fBlb config\fR populates the configuration directory for live\-build. This directory is named 'config' and is created in the current directory where \fBlb config\fR was executed.
+.PP
+Note: \fBlb config\fR tries to be smart and sets defaults for some options depending upon the settings of others. However, this only typically happens when no existing saved config exists, because values are only automatically set when not already defined (and running \fBlb config\fR involves loading any existing config). This means that when generating a new configuration, you should typically first ensure that any existing saved config files are removed (by deletion of \fBconfig/{binary,bootstrap,chroot,common,source}\fR), before then calling \fBlb config\fR just once with \fBall\fR necessary options specified. Calling it when an existing saved config exists risks ending up with a non\-working configuration, depending on the options changed, since in doing so other options may end up with different values than they otherwise might have had had automatic setting of them not been blocked by an existing saved value. In some cases invalid combinations will be noticed and reported as an error or warning, but this is not always the case and should not be relied upon.
+
+.SH OPTIONS
+In addition to its specific options \fBlb config\fR understands all generic live\-build options. See \fIlive\-build\fR(7) for a complete list of all generic live\-build options.
+.PP
+.IP "\fB\-\-apt\fR apt|apt-get|aptitude" 4
+defines if apt\-get or aptitude is used to install packages when building the image. The default is apt.
+.IP "\fB\-\-apt\-http\-proxy\fR \fIURL\fR" 4
+sets the proxy for HTTP connections. By default, this is empty. It is recommended to use the environment variable \fBhttp_proxy\fR instead.
+.IP "\fB\-\-apt\-indices\fR true|false" 4
+defines if the resulting images should have apt indices or not and defaults to true.
+.IP "\fB\-\-apt\-options\fR \fIOPTION\fR|""\fIOPTIONS\fR""" 4
+defines the default options that will be appended to every apt call that is made inside chroot during the building of the image. By default, this is set to '\-\-yes' to allow non-interactive installation of packages.
+.IP "\fB\-\-apt\-pipeline\fR \fIDEPTH\fR" 4
+sets the depth of the apt/aptitude pipeline. In cases where the remote server is not RFC conforming or buggy (such as Squid 2.0.2) this option can be a value from 0 to 5 indicating how many outstanding requests apt should send. A value of zero MUST be specified if the remote host does not properly linger on TCP connections \- otherwise data corruption will occur. Hosts which require this are in violation of RFC 2068. By default, live\-build does not set this option.
+.IP "\fB\-\-apt\-recommends\fR true|false" 4
+defines if apt should install recommended packages automatically. By default, this is true.
+.IP "\fB\-\-apt\-secure\fR true|false" 4
+defines if apt should check repository signatures. This is true by default.
+.IP "\fB\-\-apt\-source\-archives\fR true|false" 4
+defines if deb-src entries should be included in the resulting live image's apt sources.list or not, defaults to true.
+.IP "\fB\-\-aptitude\-options\fR \fIOPTION\fR|""\fIOPTIONS\fR""" 4
+defines the default options that will be appended to every aptitude call that is made inside chroot during building of the image. By default, this is set to '\-\-assume\-yes' to allow non-interactive installation of packages.
+.IP "\fB\-a\fR|\fB\-\-architecture\fR \fIARCHITECTURE\fR" 4
+defines the architecture of the to be built image. By default, this is set to the host architecture. Note that you cannot crossbuild for another architecture if your host system is not able to execute binaries for the target architecture natively. For example, building amd64 images on i386 and vice versa is possible if you have a 64bit capable i386 processor and the right kernel. But building powerpc images on an i386 system is not possible.
+.IP "\fB\-\-archive\-areas\fR \fIARCHIVE_AREA\fR|""\fIARCHIVE_AREAS\fR""" 4
+defines which package archive areas (a comma or space separated list) of a debian package archive should be used for configured debian package mirrors. By default, this is set to main only. Remember to check the licenses of each package with respect to their redistributability in your juristiction when enabling contrib or non\-free with this mechanism.
+.IP "\fB\-\-backports\fR true|false" 4
+defines if debian backports package archives should be included in the image or not.
+.IP "\fB\-\-binary\-filesystem\fR fat16|fat32|ext2|ext3|ext4|ntfs" 4
+defines the filesystem to be used in the image type. This only has an effect if the selected binary image type lets you choose a filesystem. For example, for the ISO image type the resulting CD/DVD always has the filesystem ISO9660. When building HDD images for USB sticks, multiple filesystem formats are supported, thus this becomes applicable to allow selection. Note that it defaults to 'fat32' on all architectures. Also note that if you choose 'fat16' and your resulting binary image gets bigger than 2GB, the binary filesystem automatically gets switched to 'fat32'.
+.IP "\fB\-b\fR|\fB\-\-binary\-image\fR iso|iso\-hybrid|netboot|tar|hdd" 4
+defines the image type to build. By default, for images using syslinux, this is set to 'iso\-hybrid' to build CD/DVD images that may also be used like HDD images, for non\-syslinux images, it defaults to 'iso'.
+.IP "\fB\-\-bootappend\-install\fR \fIPARAMETER\fR|""\fIPARAMETERS\fR""" 4
+sets boot parameters specific to debian\-installer, if included.
+.IP "\fB\-\-bootappend\-live\fR \fIPARAMETER\fR|""\fIPARAMETERS\fR""" 4
+sets boot parameters specific to debian\-live. A complete list of boot parameters can be found in the \fIlive\-boot\fR(7) and \fIlive\-config\fR(7) manual pages.
+.IP "\fB\-\-bootappend\-live\-failsafe\fR \fIPARAMETER\fR|""\fIPARAMETERS\fR""" 4
+sets boot parameters specific to debian\-live failsafe boot entries. A complete list of boot parameters can be found in the \fIlive\-boot\fR(7) and \fIlive\-config\fR(7) manual pages.
+.IP "\fB\-\-bootloaders\fR grub-legacy|grub-pc|syslinux|grub-efi|""\fIBOOTLOADERS\fR""" 4
+defines which bootloaders to use in the generated image. This only has an effect if the selected binary image type lets you choose the bootloader. For example, if you build an ISO then syslinux (or more precise, isolinux) is always used. Also note that not all combinations of binary image types and bootloaders are supported (\fBlb config\fR will fail to create such an unsupported configuration and will give a explanation about it). For HDD images on amd64 and i386, the default is 'syslinux'. This option supports more than one bootloader to be specified (space or comma separated) in order to allow for both BIOS and EFI bootloaders to be included, though note that only one of each type can be used (i.e. do not try to use two BIOS bootloaders).
+.IP "\fB\-\-bootstrap\-qemu\-arch\fR \fIARCH\fR" 4
+sets the architecture to use for foreign bootstrap. Defaults to empty.
+.IP "\fB\-\-bootstrap\-qemu\-exclude\fR \fIPACKAGE\fR|""\fIPACKAGES\fR""" 4
+sets the packages to exclude during foreign bootstrap. Defaults to empty.
+.IP "\fB\-\-bootstrap\-qemu\-static\fR \fIPATH\fR" 4
+sets the static qemu binary for foreign bootstrap. Defaults to empty.
+.IP "\fB\-\-breakpoints\fR" 4
+inserts pauses during the generation of the image, where breakpoints have been placed, if any (development oriented).
+.IP "\fB\-\-build\-with\-chroot\fR true|false" 4
+defines whether live\-build should use the tools from within the chroot to build the binary image or not by using and including the host system's tools. This is a very dangerous option, using the tools of the host system can lead to tainted and even non-bootable images if the host systems version of the required tools (mainly these are the bootloaders such as syslinux and grub, and the auxiliary tools such as dosfstools, xorriso, squashfs-tools and others) do not \fBexactly\fR match what is present at build-time in the target distribution. Never disable this option unless you are \fBexactly\fR sure what you are doing and have \fBcompletely\fR understood its consequences.
+.IP "\fB\-\-cache\fR true|false" 4
+defines globally if any cache should be used at all. Different caches can be controlled through their own options.
+.IP "\fB\-\-cache\-indices\fR true|false" 4
+defines if downloaded package indices and lists should be cached. This is false by default. Enabling it lets you rebuild an image completely offline, however, you would not get updates anymore then.
+.IP "\fB\-\-cache\-packages\fR true|false" 4
+defines if downloaded packages files should be cached. This is true by default. Disabling it does save space consumption in your build directory, but remember that you will cause much unnecessary traffic if you do a couple of rebuilds. In general you should always leave it true, however, in some particular rare build setups, it can be faster to refetch packages from the network mirror, if using a local one, rather than to utilize the local disk.
+.IP "\fB\-\-cache\-stages\fR bootstrap|chroot|rootfs|""\fISTAGES\fR""" 4
+sets which stages should be cached (a comma or space separated list). By default this is set to 'bootstrap'. As an exception to the normal stage names, 'rootfs' can also be used here which means only cache the generated root filesystem in filesystem.{dir,ext*,squashfs}. This is useful during development if you want to rebuild the binary stage but not regenerate the root filesystem all the time.
+.IP "\fB\-\-checksums\fR md5|sha1|sha224|sha256|sha384|sha512|none" 4
+defines if the binary image should contain a file called XXXsums.txt, where XXX is one of the mentioned checksum types. This file lists all files on the image together with their checksums. This in turn can be used by \fIlive\-boot\fR(7)'s built\-in integrity\-check to verify the medium if specified at boot prompt. In general, this should not be 'none' and is an important feature of live system released to the public. However, during development of very big images it can save some time by not calculating the checksums.
+.IP "\fB\-\-chroot\-filesystem\fR ext2|ext3|ext4|squashfs|jffs2|none|plain" 4
+defines which filesystem type should be used for the root filesystem image. If you use 'none' or 'plain', then no filesystem image is created and the root filesystem content is copied on the binary image filesystem as flat files. Depending on what binary filesystem you have chosen, it may not be possible to build with such a plain root filesystem, e.g. fat16/fat32 will not work as linux does not support running directly on them.
+.IP "\fB\-\-chroot\-squashfs\-compression\-level\fR LEVEL" 4
+defines the compression level that is used for the root filesystem image if squashfs is used. Each compression algorithm supports different levels (or none). You can look them up in the \fImksquashfs\fR help. Defaults to the default setting in \fImksquashfs\fR.
+.IP "\fB\-\-chroot\-squashfs\-compression\-type\fR gzip|lzma|lzo|lz4|xz|zstd" 4
+defines the compression algorithm that is used for the root filesystem image if squashfs is used. Defaults to xz.
+.IP "\fB\-\-clean\fR" 4
+minimizes config directory by automatically removing unused and thus empty subdirectories.
+.IP "\fB\-\-color\fR" 4
+turns on color in the messages.
+.IP "\fB\-\-compression\fR bzip2|gzip|lzip|xz|none" 4
+defines the compression program to be used to compress tarballs. Defaults to none.
+.IP "\fB\-c\fR|\fB\-\-conffile\fR \fIFILE\fR" 4
+defines a user specified alternative configuration file to use in addition to the normally used one in the config directory.
+.IP "\fB\-\-config\fR \fIGIT_URL\fR::\fIGIT_BRANCH\fR" 4
+bootstraps the config tree from a git repository, optionally appended by a Git ID (branch, commit, tag, etc.).
+.IP "\fB\-\-debconf\-frontend\fR dialog|editor|noninteractive|readline" 4
+defines what value the debconf frontend should be set to inside the chroot. Note that setting it to anything but 'noninteractive', which is the default, makes your build asking questions during the build.
+.IP "\fB\-\-debconf\-priority\fR low|medium|high|critical" 4
+defines what value the debconf priority should be set to inside the chroot. By default, it is set to critical, which means that almost no questions are displayed. Note that this only has an effect if you use any debconf frontend different from noninteractive.
+.IP "\fB\-\-debian\-installer\fR cdrom|netinst|netboot|businesscard|live|none" 4
+defines which type, if any, of the debian\-installer should be included in the resulting binary image. By default, no installer is included. All available flavours except live are the identical configurations used on the installer media produced by regular debian\-cd. When live is chosen, the live\-installer udeb is included so that debian\-installer will behave different than usual \- instead of installing the debian system from packages from the medium or the network, it installs the live system to the disk.
+.IP "\fB\-\-debian\-installer\-distribution\fR daily|git|\fICODENAME\fR" 4
+defines the distribution where the debian\-installer files should be taken out from. Normally, this should be set to the same distribution as the live system. However, sometimes, one wants to use a newer or even either the \fIdaily\fR built installer or the installer rebuilt from its \fIgit\fR repository.
+.IP "\fB\-\-debian\-installer\-gui\fR true|false" 4
+defines whether the graphical version of the debian\-installer should be provided alongside the text based one. This defaults to true.
+.IP "\fB\-\-debian\-installer\-preseedfile\fR \fIFILE\fR|\fIURL\fR" 4
+sets the filename or URL for an optionally used and included preseeding file for debian\-installer. If config/binary_debian\-installer/preseed.cfg exists, it will be used by default. 
+.IP "\fB\-\-debootstrap\-options\fR \fIOPTION\fR|""\fIOPTIONS\fR""" 4
+passes the given options to debootstrap when setting up the base system.
+.IP "\fB\-\-debootstrap\-script\fR \fISCRIPT\fR" 4
+tells debootstrap to use an alternate bootstrap script (last parameter to debootstrap).
+.IP "\fB\-\-debug\fR" 4
+turns on debugging informational messages.
+.IP "\fB\-d\fR|\fB\-\-distribution\fR \fICODENAME\fR" 4
+defines the distribution of the resulting live system. This defaults to 'testing'. The value 'sid' can be used for Debian unstable.
+.IP "\fB\-\-distribution\-binary\fR \fICODENAME\fR" 4
+defines the distribution enabled in the resulting live system (defaults to the value set in \fB\-\-distribution\fR)
+.IP "\fB\-\-distribution\-chroot\fR \fICODENAME\fR" 4
+defines the distribution used to build the live system (defaults to the value set in \fB\-\-distribution\fR)
+.IP "\fB\-\-dm\-verity\fR" 4
+Enables dm\-verity support for root file system. Only squashfs, ext2, ext3 and ext4 are supported. For more information see \fIlive\-boot\fR(7).
+.IP "\fB\-\-dm\-verity\-fec\fR \fINB_ROOTS\fR" 4
+Enables forward error correction for dm-verity. \fINB_ROOTS\fR is the number of error correction roots thas should be used. The value can be between 2 and 24. Android uses 2 by default.
+.IP "\fB\-\-dm\-verity\-sign\fR \fISIGN_SCRIPT\fR" 4
+Sign root hash of dm-verity device. Script takes two arguments: the root hash and a file to output the signature to.
+.IP "\fB\-\-dump\fR" 4
+prepares a report of the currently present live system configuration and the version of live\-build used. This is useful to provide if you submit bug reports, helping to provide basic useful information required for us to locate and replicate an error.
+.IP "\fB\-\-firmware\-binary\fR true|false" 4
+includes firmware packages in debian-installer. Defaults to true.
+.IP "\fB\-\-firmware\-chroot\fR true|false" 4
+includes firmware packages in the live image. Defaults to true. Beware that some firmware packages are non-free and will only be included if the non-free archive area is included in \fB\-\-archive\-areas\fR (and \fB\-\-parent\-archive\-areas\fR). This is particularly relevant if you want working wifi for instance.
+.IP "\fB\-\-force\fR" 4
+forces re\-execution of already run stages. Use only if you know what you are doing. It is generally safer to use \fBlb clean\fR to clean up before re\-executing \fBlb build\fR.
+.IP "\fB\-\-gzip\-options\fR \fIOPTION\fR|""\fIOPTIONS\fR""" 4
+defines the default options that will be appended to (almost) every gzip call during the building of the image. By default, this is set to '\-\-best' to use highest (but slowest) compression. Dynamically, if the host system supports it, also '\-\-rsyncable' is added.
+.IP "\fB\-\-hdd\-label\fR \fILABEL\fR" 4
+defines the label for the HDD target. Defaults to 'DEBIAN_LIVE'.
+.IP "\fB\-\-hdd\-partition\-start\fR \fISTART\fR" 4
+sets the start of the partition for the HDD target for BIOSes that expect a specific boot partition start (e.g. "63s"). If empty, use optimal layout. Defaults to empty.
+.IP "\fB\-\-hdd\-size\fR \fISIZE\fR" 4
+defines the size for the HDD target. The unit is MiB. Defaults to 'auto', which generates the smallest possible image.
+.IP "\fB\-\-ignore\-system\-defaults\fR" 4
+\fBlb config\fR by default reads system defaults from \fI/etc/live/build.conf\fR and \fI/etc/live/build/*\fR when generating a new live system config directory. This is useful if you want to set global settings, such as mirror locations, and don't want to specify them all of the time. This option allows you to ignore such global settings.
+.IP "\fB\-\-image\-name\fR \fINAME\fR" 4
+sets the base name of the image. Defaults to live-image.
+.IP "\fB\-\-initramfs\fR none|live\-boot|dracut\-live" 4
+sets the name of the package that contains the live system specific initramfs modification and defaults to live\-boot. Using 'none' is useful if the resulting system image should not be a live image (experimental). Note that dracut requires the CD label in the kernel command line, so you might want to set \fB\-\-iso\-volume\fR explicitly.
+.IP "\fB\-\-initramfs\-compression\fR bzip2|gzip|lzma" 4
+defines the compression program to be used to compress the initramfs. Defaults to 'gzip'.
+.IP "\fB\-\-initsystem\fR sysvinit|systemd|none" 4
+defines the init system. Defaults to 'systemd'.
+.IP "\fB\-\-interactive\fR true|shell|x11|xnest|false" 4
+defines if after the chroot stage and before the beginning of the binary stage, an interactive shell login should be spawned in the chroot in order to allow you to do manual customizations, or as an alternative to 'true' and 'false' a specific shell to use (note that 'true' corresponds to a value of 'shell'). Once you close the shell with logout or exit, the build will continue as usual. Note that it's strongly discouraged to use this for anything else than testing. Modifications that should be present in all builds of a live system should be properly made through hooks. Everything else destroys the beauty of being able to completely automate the build process and making it non-interactive. By default, this is of course 'false'.
+.IP "\fB\-\-iso\-application\fR \fINAME\fR" 4
+sets the APPLICATION field in the header of a resulting CD/DVD image and defaults to "Debian Live".
+.IP "\fB\-\-iso\-preparer\fR \fINAME\fR" 4
+sets the PREPARER field in the header of a resulting CD/DVD image. By default this is set to "live\-build \fIVERSION\fR; https://salsa.debian.org/live-team/live-build", where VERSION is expanded to the version of live\-build that was used to build the image.
+.IP "\fB\-\-iso\-publisher\fR \fINAME\fR" 4
+sets the PUBLISHED field in the header of a resulting CD/DVD image. By default, this is set to 'Debian Live project; https://wiki.debian.org/DebianLive; debian\-live@lists.debian.org'. Remember to change this to the appropriate value when distributing custom and unofficial images.
+.IP "\fB\-\-iso\-volume\fR \fINAME\fR" 4
+sets the VOLUME field in the header of a resulting CD/DVD and defaults to 'Debian (\fIDISTRIBUTION\fR) (\fIDATE\fR)' where DISTRIBUTION is replaced with the distribution name, and DATE with the current date and time of the generation.
+.IP "\fB\-\-jffs2\-eraseblock\fR \fISIZE\fR" 4
+sets the eraseblock size for a JFFS2 (Second Journaling Flash File System) filesystem. The default is 64 KiB. If you use an erase block size different than the erase block size of the target MTD device, JFFS2 may not perform optimally. If the SIZE specified is below 4096, the units are assumed to be KiB.
+.IP "\fB\-\-keyring\-packages\fR \fIPACKAGE\fR|""\fIPACKAGES\fR""" 4
+sets the keyring package or additional keyring packages (a space separated list). By default this is set to 'debian\-archive\-keyring'.
+.IP "\fB\-k\fR|\fB\-\-linux\-flavours\fR \fIFLAVOUR\fR|""\fIFLAVOURS\fR""" 4
+sets the kernel flavours to be installed (a space separated list). Note that in case you specify more than one the first will be configured as the default kernel that gets booted. Optionally you can use an architecture qualifier, e.g. amd64:amd64. Given an i386 system you can enable amd64 foreign architecture thanks to the commands: "dpkg \-\-add\-architecture amd64 ; apt\-get update". This enables you to use "686 amd64:amd64" as a linux flavour. The amd64 kernel will be installed alongside the i386's 686 kernel.
+.IP "\fB\-\-linux\-packages\fR \fIPACKAGE\fR|""\fIPACKAGES\fR""" 4
+defines a space separated list of partial kernel package names. For each name given and for each flavour in \fBLB_LINUX_FLAVOURS_WITH_ARCH\fR (\fB\-\-linux-flavours\fR), '\-FLAVOUR' will be appended to the name to get the names of kernel packages to be included. By default this is 'linux\-image'. So for instance if this is set to "linux\-image linux\-headers" and \fBLB_LINUX_FLAVOURS_WITH_ARCH\fR is "i386 amd64:amd64" then you will get the four packages "linux\-image\-i386", "linux\-image\-amd64:amd64", "linux\-headers\-i386" and "linux\-headers\-amd64:amd64". You can specify "none" to disable the kernel installation step.
+.IP "\fB\-\-loadlin\fR true|false" 4
+sets loadlin. Defaults to false, except when the debian-installer is included for x86_64 or i386.
+.IP "\fB\-\-memtest\fR memtest86+|memtest86|none" 4
+defines if memtest, memtest86+ or no memory tester at all should be included (available as a bootloader menu entry). This is only available on amd64 and i386 and defaults to memtest86+.
+.IP "\fB\-\-mirror\-binary\fR \fIURL\fR" 4
+sets the location of the derivative package mirror that should end up configured in the final image and which is the one a user would see and use. This has not necessarily to be the same that is used to build the image, e.g. if you use a local mirror but want to have an official mirror in the image. This defaults to 'http://deb.debian.org/debian/'.
+.IP "\fB\-\-mirror\-binary\-security\fR \fIURL\fR" 4
+sets the location of the derivatives security package mirror that should end up configured in the final image. This defaults to 'http://security.debian.org/'.
+.IP "\fB\-\-mirror\-bootstrap\fR \fIURL\fR" 4
+sets the location of the debian package mirror that should be used to bootstrap the derivative from. This defaults to 'http://deb.debian.org/debian/'.
+.IP "\fB\-\-mirror\-chroot\fR \fIURL\fR" 4
+sets the location of the debian package mirror that will be used to fetch the packages of the derivative in order to build the live system. By default, this is set to the value of \fB\-\-mirror\-bootstrap\fR.
+.IP "\fB\-\-mirror\-chroot\-security\fR \fIURL\fR" 4
+sets the location of the debian security package mirror that will be used to fetch the packages of the derivative in order to build the live system. By default, this points to 'http://security.debian.org/'.
+.IP "\fB\-\-mirror\-debian\-installer\fR \fIURL\fR" 4
+sets the location of the mirror that will be used to fetch the debian installer images of the derivative. By default, this points to the same mirror used to build the live system, i.e. the value of \fB\-\-mirror\-chroot\fR.
+.IP "\fB\-\-mode\fR debian" 4
+defines a global mode to load project specific defaults. By default this is set to debian.
+.IP "\fB\-\-net\-tarball\fR true|false" 4
+defines if a compressed tarball should be created. If disabled, the plain binary directory is considered the output. Default is true.
+.IP "\fB\-\-no\-color\fR" 4
+turns off color in the messages.
+.IP "\fB\-\-onie\fR true|false" 4
+defines if an ONIE.bin image is generated. ONIE binaries can be loaded by supported systems, and will in turn boot the live image. Note that ISO or hybrid-iso are the only formats supported. For more information visit <\fIhttp://onie.org/\fR>. Default is false.
+.IP "\fB\-\-onie\-kernel\-cmdline\fR \fIOPTION\fR|""\fIOPTIONS\fR""" 4
+defines additional kernel command line options that the ONIE system will use when booting the image. Default is empty string.
+.IP "\fB\-\-parent\-archive\-areas\fR \fIARCHIVE_AREA\fR|""\fIARCHIVE_AREAS\fR""" 4
+defines the archive areas for derivatives of the resulting live system (a comma or space separated list).
+.IP "\fB\-\-parent\-debian\-installer\-distribution\fR daily|git|\fICODENAME\fR" 4
+defines the parent debian\-installer distribution for derivatives of the resulting live system.
+.IP "\fB\-\-parent\-distribution\fR \fICODENAME\fR" 4
+defines the parent distribution for derivatives of the resulting live system.
+.IP "\fB\-\-parent\-distribution\-binary\fR \fICODENAME\fR" 4
+defines the derivative's parent distribution enabled in the resulting live system.
+.IP "\fB\-\-parent\-distribution\-chroot\fR \fICODENAME\fR" 4
+defines the derivative's parent distribution used to build the live system.
+.IP "\fB\-\-parent\-mirror\-binary\fR \fIURL\fR" 4
+sets the location of the debian package mirror that should end up configured in the final image and which is the one a user would see and use. This has not necessarily to be the same that is used to build the image, e.g. if you use a local mirror but want to have an official mirror in the image. This defaults to the value of \fB\-\-mirror\-binary\fR.
+.IP "\fB\-\-parent\-mirror\-binary\-security\fR \fIURL\fR" 4
+sets the location of the debian security package mirror that should end up configured in the final image. This defaults to the value of \fB\-\-mirror\-binary\-security\fR.
+.IP "\-m|\fB\-\-parent\-mirror\-bootstrap\fR \fIURL\fR" 4
+sets the location of the debian package mirror that should be used to bootstrap from. This defaults to the value of \fB\-\-mirror\-bootstrap\fR.
+.IP "\fB\-\-parent\-mirror\-chroot\fR \fIURL\fR" 4
+sets the location of the debian package mirror that will be used to fetch the packages in order to build the live system. This defaults to the value of \fB\-\-parent\-mirror\-bootstrap\fR.
+.IP "\fB\-\-parent\-mirror\-chroot\-security\fR \fIURL\fR" 4
+sets the location of the debian security package mirror that will be used to fetch the packages in order to build the live system. This defaults to the value of \fB\-\-mirror\-chroot\-security\fR.
+.IP "\fB\-\-parent\-mirror\-debian\-installer\fR \fIURL\fR" 4
+sets the location of the mirror that will be used to fetch the debian installer images. This defaults to the value of \fB\-\-parent\-mirror\-chroot\fR.
+.IP "\fB\-\-quiet\fR" 4
+reduces the verbosity of messages output by \fBlb build\fR.
+.IP "\fB\-\-security\fR true|false" 4
+defines if the security repositories specified in the security mirror options should be used or not.
+.IP "\fB\-\-source\fR true|false" 4
+defines if a corresponding source image to the binary image should be built. By default this is false because most people do not require this and it involves downloading quite a few source packages. However, if you distribute your live image to others, you should make sure you build it with a source image alongside to help enable you to comply with licensing terms.
+.IP "\fB\-s\fR|\fB\-\-source\-images\fR iso|netboot|tar|hdd" 4
+defines the image type for the source image. Default is tar. More than one can be specified (a comma or space separated list).
+.IP "\fB\-\-swap\-file\-path\fR \fIPATH\fR" 4
+defines the path to a swap file to create in the binary image. Default is not to create a swap file.
+.IP "\fB\-\-swap\-file\-size\fR \fIMB\fR" 4
+defines what size in megabytes the swap file should be, if one is to be created. Default is 512MB.
+.IP "\fB\-\-system\fR live|normal" 4
+defines if the resulting system image should be a live system or a normal, non-live system. Defaults to live.
+.IP "\fB\-\-uefi\-secure\-boot\fR auto|enable|disable" 4
+enables or disables Secure Boot support when using grub-efi, by installing signed shim and grub-efi packages. By default, this is set to auto, which means if the packages are available they will be installed, but if not only a warning will be printed and the normal non-signed grub-efi will be used.
+.IP "\fB\-\-updates\fR true|false" 4
+defines if debian updates package archives should be included in the image or not.
+.IP "\fB\-\-utc\-time\fR true|false" 4
+defines if timestamps should be UTC. Default is false, unless SOURCE_DATE_EPOCH is set. Note, this does not affect the build log which remains local time.
+.IP "\fB\-\-validate\fR" 4
+requests that the config be validated only, not changed, thus after the validation check the script ends rather than writing an updated config. Please note that at the time of writing, many options do not have corresponding validation checks.
+.IP "\fB\-\-verbose\fR" 4
+increases the verbosity of messages output by \fBlb build\fR.
+.IP "\fB\-\-win32\-loader\fR true|false" 4
+defines if win32\-loader should be included in the binary image or not.
+.IP "\fB\-\-zsync\fR true|false" 4
+defines whether a file for distributing the image in \fIzsync\fR(1) format will be generated. Defaults to false.
+
+.SH ENVIRONMENT
+Currently, command line switches can also be specified through the corresponding environment variable. However, this generally should not be relied upon, as it is an implementation detail that is subject to change in future releases. For options applying directly to live\-build, environment variables are named LB_FOO, meaning, e.g. \fB\-\-apt\-http\-proxy\fR becomes \fBLB_APT_HTTP_PROXY\fR (the exception being internal options such as \fB\-\-debug\fR). For options passed to another program, as in APT_OPTIONS or GZIP_OPTIONS, no LB_ prefix is used.
+
+.SH FILES
+.IP "\fBauto/config\fR" 4
+.IP "\fB/etc/live/build.conf, /etc/live/build/*\fR" 4
+An optional, global configuration file for \fBlb config\fR variables. It is useful to specify a few system wide defaults, like \fBLB_PARENT_MIRROR_BOOTSTRAP\fR. This feature can be disabled by using the \fB\-\-ignore\-system\-defaults\fR option.
+
+.SH SEE ALSO
+\fIlive\-build\fR(7)
+.PP
+\fIlive\-boot\fR(7)
+.PP
+\fIlive\-config\fR(7)
+.PP
+This program is a part of live\-build.
+
+.SH HOMEPAGE
+More information about live\-build and the Debian Live project can be found on the homepage at <\fIhttps://wiki.debian.org/DebianLive\fR>.
+
+.SH BUGS
+Bugs can be reported by submitting a bug report for the live\-build package in the Bug Tracking System at <\fIhttp://bugs.debian.org/\fR> or by writing a mail to the Debian Live mailing list at <\fIdebian-live@lists.debian.org\fR>.
+
+.SH AUTHOR
+live\-build was originally written by Daniel Baumann <\fImail@daniel-baumann.ch\fR>. Since 2016 development has been continued by the Debian Live team.

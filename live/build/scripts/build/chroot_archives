@@ -1,0 +1,517 @@
+#!/bin/sh
+
+## live-build(7) - System Build Scripts
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+set -e
+
+# Including common functions
+[ -e "${LIVE_BUILD}/scripts/build.sh" ] && . "${LIVE_BUILD}/scripts/build.sh" || . /usr/lib/live/build.sh
+
+# Setting static variables
+DESCRIPTION="Manage /etc/apt/sources.list"
+USAGE="${PROGRAM} {source|binary|chroot} {install|remove} [--force]"
+
+# Processing arguments and configuration files
+Init_config_data "${@}"
+
+_PASS="${1}"
+_ACTION="${2}"
+shift 2
+
+if ! In_list "${_PASS}" "binary" "chroot" "source"; then
+	Echo_error "Invalid pass parameter: '${_PASS}'"
+	Usage --fail
+fi
+
+# Requiring stage file
+Require_stagefiles config bootstrap
+
+case "${_ACTION}" in
+	install)
+		Echo_message "Configuring file /etc/apt/sources.list"
+
+		# Checking stage file
+		Check_stagefile
+
+		# Acquire lock file
+		Acquire_lockfile
+
+		# Restoring cache
+		Restore_package_cache chroot
+
+		# Mount local repository
+		Chroot_try_bind_path chroot "${LB_PARENT_MIRROR_CHROOT}"
+		Chroot_try_bind_path chroot "${LB_MIRROR_CHROOT}"
+
+
+		# Configure custom sources.list
+		Create_apt_sources_list chroot "${_PASS}"
+
+		# Adding local apt sources (chroot)
+		for FILE in config/archives/*.list config/archives/*.list.chroot
+		do
+			if [ -e "${FILE}" ]
+			then
+				sed -e "s|@DISTRIBUTION@|${LB_DISTRIBUTION_CHROOT}|g" \
+				    -e "s|@PARENT_DISTRIBUTION@|${LB_PARENT_DISTRIBUTION_CHROOT}|g" \
+				    -e "s|@ARCHIVE_AREAS@|${LB_ARCHIVE_AREAS}|g" \
+				    -e "s|@PARENT_ARCHIVE_AREAS@|${LB_PARENT_ARCHIVE_AREAS}|g" \
+				"${FILE}" > "chroot/etc/apt/sources.list.d/$(basename ${FILE} .chroot)"
+				Chroot_try_bind_path_from_list chroot ${FILE}
+
+				if [ "${_PASS}" != "source" ] && [ "${LB_APT_SOURCE_ARCHIVES}" = "false" ]
+				then
+					# Disable source archives
+					sed -i "s/^deb-src/#deb-src/g" "chroot/etc/apt/sources.list.d/$(basename ${FILE} .chroot)"
+				fi
+			fi
+		done
+
+		# Adding local apt configuration (chroot)
+		for FILE in config/archives/*.conf config/archives/*.conf.chroot
+		do
+			if [ -e "${FILE}" ]
+			then
+				cp ${FILE} chroot/etc/apt/apt.conf.d/$(basename ${FILE} .chroot)
+			fi
+		done
+
+		# Adding local apt preferences (chroot)
+		for FILE in config/archives/*.pref config/archives/*.pref.chroot
+		do
+			if [ -e "${FILE}" ]
+			then
+				cp ${FILE} chroot/etc/apt/preferences.d/$(basename ${FILE} .chroot)
+			fi
+		done
+
+		# Adding local apt auth (chroot)
+		# Note: .conf is assumed to be apt.conf, so use new suffix .auth
+		for FILE in config/archives/*.auth
+		do
+			if [ -e "${FILE}" ]
+			then
+				cp ${FILE} chroot/etc/apt/auth.conf.d/$(basename ${FILE} .auth).conf
+			fi
+		done
+
+		# Adding local apt auth (chroot)
+		# Note: .conf is assumed to be apt.conf, so use new suffix .auth
+		for FILE in config/archives/*.auth.chroot
+		do
+			if [ -e "${FILE}" ]
+			then
+				cp ${FILE} chroot/etc/apt/auth.conf.d/$(basename ${FILE} .auth.chroot).conf
+			fi
+		done
+
+		# Check local archive keys (chroot)
+		if Find_files config/archives/*.key || \
+		   Find_files config/archives/*.key.chroot
+		then
+			for FILE in config/archives/*.key \
+					config/archives/*.key.chroot
+			do
+				if [ -e "${FILE}" ]
+				then
+					if grep -q "PGP PUBLIC KEY BLOCK" "${FILE}"
+					then
+						cp ${FILE} chroot/etc/apt/trusted.gpg.d/$(basename ${FILE}).asc
+					else
+						cp ${FILE} chroot/etc/apt/trusted.gpg.d/$(basename ${FILE}).gpg
+					fi
+				fi
+			done
+		fi
+
+		# Configure local package repository
+		if Find_files config/packages.chroot/*.deb || Find_files config/packages/*.deb
+		then
+			rm -rf chroot/packages
+			mkdir -p chroot/packages
+
+			if [ "$(stat --printf %d config/packages.chroot/)" = "$(stat --printf %d chroot/packages/)" ] ||
+			   [ "$(stat --printf %d config/packages/)" = "$(stat --printf %d chroot/packages/)" ]
+			then
+				CP_OPTIONS="-l"
+			fi
+
+			# Copy packages
+			if Find_files config/packages.chroot/*_"${LB_ARCHITECTURE}".deb || Find_files config/packages/*_"${LB_ARCHITECTURE}".deb
+			then
+				for FILE in config/packages.chroot/*_"${LB_ARCHITECTURE}".deb config/packages/*_"${LB_ARCHITECTURE}".deb
+				do
+					if [ -L "${FILE}" ]
+					then
+						cp -L "${FILE}" chroot/packages
+					elif [ -e "${FILE}" ]
+					then
+						cp ${CP_OPTIONS} "${FILE}" chroot/packages
+					fi
+				done
+			fi
+
+			if Find_files config/packages.chroot/*_all.deb || Find_files config/packages/*_all.deb
+			then
+				for FILE in config/packages.chroot/*_all.deb config/packages/*_all.deb
+				do
+					if [ -L "${FILE}" ]
+					then
+						cp -L "${FILE}" chroot/packages
+					elif [ -e "${FILE}" ]
+					then
+						cp ${CP_OPTIONS} "${FILE}" chroot/packages
+					fi
+				done
+			fi
+
+			if Find_files chroot/packages/*.deb
+			then
+				# If we bootstrapped a minimal chroot, we need
+				# to install apt-utils before we have
+				# completed all the indices.
+				if [ ! -e chroot/usr/bin/apt-ftparchive ]
+				then
+					Apt chroot update
+				fi
+
+				# Check depends
+				Check_package chroot /usr/bin/apt-ftparchive apt-utils
+
+				# Installing depends
+				Install_packages
+
+				# Generate Packages and Packages.gz
+				echo "cd /packages && apt-ftparchive packages . > Packages" | Chroot chroot sh
+				gzip -9 -c chroot/packages/Packages > chroot/packages/Packages.gz
+
+				# Generate Release
+				echo "cd /packages && apt-ftparchive \
+					-o APT::FTPArchive::Release::Origin=config/packages.chroot \
+					release . > Release" | Chroot chroot sh
+
+				# Add to sources.list.d
+				echo "deb [ trusted=yes ] file:/packages ./" > chroot/etc/apt/sources.list.d/packages.list
+
+				# Move top-level sources away, otherwise apt always preferes it (#644148)
+				if [ -e chroot/etc/apt/sources.list ]
+				then
+					mv chroot/etc/apt/sources.list chroot/etc/apt/sources.list.d/zz-sources.list
+				fi
+
+				# Removing depends
+				Remove_packages
+			else
+				Echo_warning "Local packages must be named with suffix '_all.deb' or '_\$architecture.deb'."
+			fi
+		fi
+
+		if Find_files chroot/packages/*.deb
+		then
+			gunzip < chroot/packages/Packages.gz | awk '/^Package: / { print tolower($2) }' \
+			>> chroot/root/packages.chroot
+		fi
+
+		# Update indices from cache
+		if [ "${LB_CACHE_INDICES}" = "true" ] && [ -d cache/indices.bootstrap ]
+		then
+			if Find_files cache/indices.bootstrap/secring.gpg*
+			then
+				cp -f cache/indices.bootstrap/secring.gpg* chroot/etc/apt
+			fi
+
+			if Find_files cache/indices.bootstrap/trusted.gpg*
+			then
+				cp -rf cache/indices.bootstrap/trusted.gpg* chroot/etc/apt
+			fi
+
+			if [ -f cache/indices.bootstrap/pkgcache.bin ]
+			then
+				cp -f cache/indices.bootstrap/pkgcache.bin chroot/var/cache/apt
+			fi
+
+			if [ -f cache/indices.bootstrap/srcpkgcache.bin ]
+			then
+				cp -f cache/indices.bootstrap/srcpkgcache.bin chroot/var/cache/apt
+			fi
+
+			if Find_files cache/indices.bootstrap/*_Packages
+			then
+				cp -f cache/indices.bootstrap/*_Packages chroot/var/lib/apt/lists
+			fi
+
+			if Find_files cache/indices.bootstrap/*_Sources
+			then
+				cp -f cache/indices.bootstrap/*_Sources chroot/var/lib/apt/lists
+			fi
+
+			if Find_files cache/indices.bootstrap/*Release*
+			then
+				cp -f cache/indices.bootstrap/*Release* chroot/var/lib/apt/lists
+			fi
+
+			if [ "${LB_APT}" = "aptitude" ] && ! command -v aptitude >/dev/null
+			then
+				Chroot chroot "apt-get ${APT_OPTIONS} update"
+				Chroot chroot "apt-get ${APT_OPTIONS} install aptitude"
+			fi
+		else # Get fresh indices
+			# Check local keyring packages
+			if Find_files config/archives/*.deb
+			then
+				for PACKAGE in config/archives/*.deb
+				do
+					cp ${PACKAGE} chroot/root
+					Chroot chroot "dpkg -i /root/$(basename ${PACKAGE})"
+					rm -f chroot/root/$(basename ${PACKAGE})
+				done
+			fi
+
+			# Installing aptitude
+			if [ "${LB_APT}" = "aptitude" ] && [ ! $(Chroot chroot "which aptitude") ]
+			then
+				Chroot chroot "apt-get ${APT_OPTIONS} update"
+				Chroot chroot "apt-get ${APT_OPTIONS} install aptitude"
+			fi
+
+			# Rebuild apt indices from scratch.
+			# Due to the fact that apt doesn't understand
+			# pinning on the fly, we need to manually remove
+			# the cached indices and rebuild them again.
+			rm -rf chroot/var/cache/apt/*.bin
+
+			Apt chroot update
+
+			# Installing keyring packages
+			if [ -n "${LB_KEYRING_PACKAGES}" ]
+			then
+				Apt chroot "install ${LB_KEYRING_PACKAGES}"
+			fi
+
+			rm -rf chroot/var/cache/apt/*.bin
+
+			Apt chroot update
+			Apt chroot "upgrade"
+			Apt chroot "dist-upgrade"
+
+			if [ "${LB_CACHE_INDICES}" = "true" ]
+			then
+				mkdir -p cache/indices.bootstrap
+
+				if Find_files chroot/etc/apt/secring.gpg*
+				then
+					cp -f chroot/etc/apt/secring.gpg* cache/indices.bootstrap
+				fi
+
+				cp -rf chroot/etc/apt/trusted.gpg* cache/indices.bootstrap
+
+				cp -f chroot/var/cache/apt/pkgcache.bin cache/indices.bootstrap
+
+				if Find_files chroot/var/cache/apt/srcpkgcache.bin
+				then
+					cp -f chroot/var/cache/apt/srcpkgcache.bin cache/indices.bootstrap
+				fi
+
+				cp -f chroot/var/lib/apt/lists/*_Packages cache/indices.bootstrap
+
+				if Find_files chroot/var/lib/apt/lists/*_Sources
+				then
+					cp -f chroot/var/lib/apt/lists/*_Sources cache/indices.bootstrap
+				fi
+
+				cp -f chroot/var/lib/apt/lists/*Release* cache/indices.bootstrap
+			fi
+		fi
+
+		# Saving cache
+		Save_package_cache chroot
+
+		# Creating stage file
+		Create_stagefile
+		;;
+
+	remove)
+		Echo_message "Deconfiguring file /etc/apt/sources.list"
+
+		# Acquire lock file
+		Acquire_lockfile
+
+		# Restore top-level sources
+		if [ -e chroot/etc/apt/sources.list.d/zz-sources.list ]
+		then
+			mv chroot/etc/apt/sources.list.d/zz-sources.list chroot/etc/apt/sources.list
+		fi
+
+		# Configure generic indices
+		# Cleaning apt list cache
+		rm -rf chroot/var/lib/apt/lists
+		mkdir -p chroot/var/lib/apt/lists/partial
+
+		# Configure custom sources.list
+		Create_apt_sources_list binary "${_PASS}"
+
+		# Removing chroot-only apt sources
+		for FILE in config/archives/*.list.chroot
+		do
+			if [ -e "${FILE}" ]
+			then
+				rm -f "chroot/etc/apt/sources.list.d/$(basename ${FILE} .chroot)"
+				Chroot_try_unbind_path_from_list chroot ${FILE}
+			fi
+		done
+
+		# Removing chroot-only apt configuration
+		for FILE in config/archives/*.conf.chroot
+		do
+			if [ -e "${FILE}" ]
+			then
+				rm -f "chroot/etc/apt/apt.conf.d/$(basename ${FILE} .chroot)"
+			fi
+		done
+
+		# Removing chroot-only apt preferences
+		for FILE in config/archives/*.pref.chroot
+		do
+			if [ -e "${FILE}" ]
+			then
+				rm -f "chroot/etc/apt/preferences.d/$(basename ${FILE} .chroot)"
+			fi
+		done
+
+		# Remove chroot-only apt auth
+		# Note: .conf is assumed to be apt.conf, so use new suffix .auth
+		for FILE in config/archives/*.auth.chroot
+		do
+			if [ -e "${FILE}" ]
+			then
+				rm "chroot/etc/apt/auth.conf.d/$(basename ${FILE} .auth.chroot).conf"
+			fi
+		done
+
+		# Remove chroot-only local archive keys
+		for FILE in config/archives/*.key.chroot
+		do
+			if [ -e "${FILE}" ]
+			then
+				if grep -q "PGP PUBLIC KEY BLOCK" "${FILE}"
+				then
+					rm "chroot/etc/apt/trusted.gpg.d/$(basename ${FILE}).asc"
+				else
+					rm "chroot/etc/apt/trusted.gpg.d/$(basename ${FILE}).gpg"
+				fi
+			fi
+		done
+
+		# Adding local apt sources (binary)
+		for FILE in config/archives/*.list config/archives/*.list.binary
+		do
+			if [ -e "${FILE}" ]
+			then
+				sed -e "s|@DISTRIBUTION@|${LB_DISTRIBUTION_BINARY}|g" \
+				    -e "s|@PARENT_DISTRIBUTION@|${LB_PARENT_DISTRIBUTION_BINARY}|g" \
+				    -e "s|@ARCHIVE_AREAS@|${LB_ARCHIVE_AREAS}|g" \
+				    -e "s|@PARENT_ARCHIVE_AREAS@|${LB_PARENT_ARCHIVE_AREAS}|g" \
+				"${FILE}" > "chroot/etc/apt/sources.list.d/$(basename ${FILE} .binary)"
+				Chroot_try_bind_path_from_list chroot ${FILE}
+
+				if [ "${_PASS}" != "source" ] && [ "${LB_APT_SOURCE_ARCHIVES}" = "false" ]
+				then
+					# Disable source archives
+					sed -i "s/^deb-src/#deb-src/g" "chroot/etc/apt/sources.list.d/$(basename ${FILE} .binary)"
+				fi
+			fi
+		done
+
+		# Adding local apt configuration (binary)
+		for FILE in config/archives/*.conf config/archives/*.conf.binary
+		do
+			if [ -e "${FILE}" ]
+			then
+				cp ${FILE} chroot/etc/apt/apt.conf.d/$(basename ${FILE} .binary)
+			fi
+		done
+
+		# Adding local apt preferences (binary)
+		for FILE in config/archives/*.pref config/archives/*.pref.binary
+		do
+			if [ -e "${FILE}" ]
+			then
+				cp ${FILE} chroot/etc/apt/preferences.d/$(basename ${FILE} .binary)
+			fi
+		done
+
+		# Adding local apt auth (chroot)
+		# Note: .conf is assumed to be apt.conf, so use new suffix .auth
+		for FILE in config/archives/*.auth.binary
+		do
+			if [ -e "${FILE}" ]
+			then
+				cp ${FILE} chroot/etc/apt/auth.conf.d/$(basename ${FILE} .auth.binary).conf
+			fi
+		done
+
+		# Adding local apt keys (binary)
+		for FILE in config/archives/*.key config/archives/*.key.binary
+		do
+			if [ -e "${FILE}" ]
+			then
+				if grep -q "PGP PUBLIC KEY BLOCK" "${FILE}"
+				then
+					cp ${FILE} chroot/etc/apt/trusted.gpg.d/$(basename ${FILE}).asc
+				else
+					cp ${FILE} chroot/etc/apt/trusted.gpg.d/$(basename ${FILE}).gpg
+				fi
+			fi
+		done
+
+		# Updating indices
+		Apt chroot update
+
+		# Unmount local repository - after apt update or it will fail due to missing files
+		Chroot_try_unbind_path chroot "${LB_PARENT_MIRROR_CHROOT}"
+		Chroot_try_unbind_path chroot "${LB_MIRROR_CHROOT}"
+
+		# Unmount local apt sources (binary)
+		for FILE in config/archives/*.list config/archives/*.list.binary
+		do
+			if [ -e "${FILE}" ]
+			then
+				Chroot_try_unbind_path_from_list chroot ${FILE}
+			fi
+		done
+
+		# Cleaning apt package cache
+		rm -rf chroot/var/cache/apt
+		mkdir -p chroot/var/cache/apt/archives/partial
+
+		# Cleaning apt package lists
+		if [ "${LB_APT_INDICES}" = "false" ]
+		then
+			rm -rf chroot/var/lib/apt/lists
+			mkdir -p chroot/var/lib/apt/lists/partial
+		fi
+
+		# Remove local package repository
+		rm -f chroot/etc/apt/sources.list.d/packages.list
+		rm -rf chroot/packages
+		rm -f chroot/var/lib/apt/lists/_packages_._*
+
+		# Ensure package list is removed
+		rm -f chroot/root/packages.chroot
+
+		# Removing stage file
+		Remove_stagefile
+		;;
+
+	*)
+		Echo_error "Invalid action parameter: '${_ACTION}'"
+		Usage --fail
+		;;
+esac

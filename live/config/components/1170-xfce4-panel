@@ -1,0 +1,59 @@
+#!/bin/sh
+
+. /usr/lib/live/config.sh
+
+## live-config(7) - System Configuration Components
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+#set -e
+
+Cmdline ()
+{
+	# Reading kernel command line
+	for _PARAMETER in ${LIVE_CONFIG_CMDLINE}
+	do
+		case "${_PARAMETER}" in
+			live-config.username=*|username=*)
+				LIVE_USERNAME="${_PARAMETER#*username=}"
+				;;
+		esac
+	done
+}
+
+Init ()
+{
+	# Checking if package is installed or already configured
+	if ! pkg_is_installed "xfce4-panel" || \
+	   component_was_executed "xfce4-panel"
+	then
+		exit 0
+	fi
+	# Check for 4.16, which has dropped the welcome dialog.
+	if pkg_test_version xfce4-panel '>=' 4.16; then
+		exit 0
+	fi
+
+	echo -n " xfce4-panel"
+}
+
+Config ()
+{
+	if [ ! -e /home/"${LIVE_USERNAME}"/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml ]
+	then
+		sudo -u "${LIVE_USERNAME}" mkdir -p /home/"${LIVE_USERNAME}"/.config/xfce4/xfconf/xfce-perchannel-xml
+		sudo -u "${LIVE_USERNAME}" cp /etc/xdg/xfce4/panel/default.xml /home/"${LIVE_USERNAME}"/.config/xfce4/xfconf/xfce-perchannel-xml/xfce4-panel.xml
+	fi
+
+	# Creating state file
+	touch /var/lib/live/config/xfce4-panel
+}
+
+Cmdline
+Init
+Config

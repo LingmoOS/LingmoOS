@@ -1,0 +1,11 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+# The test suite needs GoogleTest and GPU pixel tests; it runs in development
+# builds, not in the package build.
+override_dh_auto_configure:
+	dh_auto_configure -- -DBUILD_TESTING=OFF -DLINGMO_ENABLE_XWAYLAND=ON
+
+override_dh_auto_test:

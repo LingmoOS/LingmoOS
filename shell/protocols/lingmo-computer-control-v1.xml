@@ -1,0 +1,294 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<protocol name="lingmo_computer_control_v1">
+
+  <description summary="let an agent drive the seat once the user allows it">
+    This protocol lets the Lingmo computer-use service move the pointer and
+    type on the primary seat on behalf of an agent application, after the user
+    has allowed it in a dialog the compositor asks for.
+
+    The compositor only advertises this global to the executables it trusts
+    for this. Every other client never sees it.
+
+    Input sent through a control is handled like input from a device: window
+    management, keyboard shortcuts, drags and pointer constraints all apply.
+    Real input always wins: it releases whatever the control holds and pauses
+    the control for a short while.
+  </description>
+
+  <interface name="lingmo_computer_control_manager_v1" version="1">
+    <description summary="asks for control of the seat">
+      A factory for lingmo_computer_control_v1 objects.
+    </description>
+
+    <request name="destroy" type="destructor">
+      <description summary="release the manager">
+        Destroying the manager does not end the controls it created.
+      </description>
+    </request>
+
+    <request name="request_control">
+      <description summary="ask the user for control">
+        Creates a control and asks the user whether the named agent may take
+        over the pointer and keyboard. Exactly one of granted or revoked
+        follows, in the user's own time.
+
+        Only one control exists at a time: while another is pending or granted,
+        the new one is revoked with the busy reason at once.
+      </description>
+      <arg name="id" type="new_id" interface="lingmo_computer_control_v1"/>
+      <arg name="agent_name" type="string"
+           summary="the agent application's name, shown to the user"/>
+    </request>
+  </interface>
+
+  <interface name="lingmo_computer_control_v1" version="1">
+    <description summary="one control of the seat">
+      A control starts pending, becomes granted when the user allows it, and
+      ends with revoked. A revoked control rejects every input request; asking
+      again takes a new control, and a new answer from the user.
+
+      Rejections are sent while the request is handled, in request order, so a
+      wl_display.sync after a batch of requests tells whether any of it was
+      dropped.
+    </description>
+
+    <enum name="error">
+      <entry name="invalid_state" value="0" summary="a button or key state is neither released nor pressed"/>
+      <entry name="invalid_clipboard" value="1"
+             summary="the clipboard fd is not a regular file, or is too large"/>
+    </enum>
+
+    <enum name="revoke_reason">
+      <entry name="denied" value="0" summary="the user did not allow it"/>
+      <entry name="stopped" value="1" summary="the user stopped the control"/>
+      <entry name="locked" value="2" summary="the session locked or ended"/>
+      <entry name="busy" value="3" summary="another control is pending or granted"/>
+      <entry name="unavailable" value="4" summary="the user could not be asked"/>
+    </enum>
+
+    <enum name="rejection">
+      <entry name="not_granted" value="0" summary="the control is pending or revoked"/>
+      <entry name="paused" value="1" summary="the user is using the pointer or keyboard"/>
+      <entry name="protected" value="2"
+             summary="the input would reach a dialog that answers for the user"/>
+      <entry name="untypable" value="3"
+             summary="the text has characters the layout cannot type, and no text field takes them or it mixes them with control keys"/>
+      <entry name="no_window" value="4"
+             summary="the window is gone or cannot take the window request"/>
+    </enum>
+
+    <enum name="window_state" bitfield="true">
+      <entry name="active" value="1" summary="the window has the focus"/>
+      <entry name="minimized" value="2"/>
+      <entry name="hidden" value="4" summary="the user hid its application"/>
+      <entry name="other_desk" value="8" summary="the window is on a desk that is not shown"/>
+    </enum>
+
+    <enum name="state">
+      <entry name="released" value="0"/>
+      <entry name="pressed" value="1"/>
+    </enum>
+
+    <request name="destroy" type="destructor">
+      <description summary="end the control">
+        Releases every button and key the control holds.
+      </description>
+    </request>
+
+    <request name="motion">
+      <description summary="move the pointer">
+        Moves the pointer to a point in the compositor's global logical
+        coordinate space, the one wl_output and xdg_output positions are in.
+        Points outside every output are clamped to the nearest one.
+      </description>
+      <arg name="x" type="fixed"/>
+      <arg name="y" type="fixed"/>
+    </request>
+
+    <request name="button">
+      <description summary="press or release a pointer button">
+        The button is a Linux evdev code, e.g. BTN_LEFT. A press is rejected
+        when the pointer is over a protected dialog. A release of a button this
+        control pressed is never rejected; any other release is ignored.
+      </description>
+      <arg name="button" type="uint"/>
+      <arg name="state" type="uint" enum="state"/>
+    </request>
+
+    <request name="axis">
+      <description summary="scroll">
+        Scrolls by whole wheel clicks at the pointer; positive values scroll
+        down and to the right.
+      </description>
+      <arg name="horizontal" type="int"/>
+      <arg name="vertical" type="int"/>
+    </request>
+
+    <request name="key">
+      <description summary="press or release a key">
+        The key is a Linux evdev code for the key as labelled on a PC
+        keyboard, with no positional modifier swap: KEY_LEFTMETA is the
+        Meta or Command key. A press is rejected while the keyboard focus is on
+        a protected dialog. A release of a key this control pressed is never
+        rejected; any other release is ignored.
+      </description>
+      <arg name="key" type="uint"/>
+      <arg name="state" type="uint" enum="state"/>
+    </request>
+
+    <request name="keysym">
+      <description summary="press or release the key that types a keysym">
+        Presses or releases the key that types the keysym on the current
+        keyboard layout, without the Shift or AltGr level it may need: the
+        client names a shortcut's modifiers itself. It is how a shortcut
+        written with a character, such as Ctrl+Z, reaches the key labelled
+        with it on any layout. A press is rejected as untypable when the
+        layout has no such key, and as the key request's press otherwise; the
+        release releases the key the press pressed.
+      </description>
+      <arg name="keysym" type="uint" summary="an XKB keysym"/>
+      <arg name="state" type="uint" enum="state"/>
+    </request>
+
+    <request name="type_text">
+      <description summary="type a string">
+        Types UTF-8 text into whatever has the keyboard focus. Line feeds, tabs
+        and backspaces are typed as Return, Tab and Backspace. When the current
+        keyboard layout has every other character, the string is typed as key
+        strokes, with Shift or AltGr as needed; otherwise all of it is committed
+        to the focused text field at once, since clients may apply a commit
+        before keys sent earlier. The whole string is rejected as untypable, and
+        nothing typed, when it needs a commit and no text field has the focus,
+        or when it needs a commit and has line feeds, tabs or backspaces: send
+        those parts separately, giving the client time to handle each.
+      </description>
+      <arg name="text" type="string"/>
+    </request>
+
+    <request name="list_windows">
+      <description summary="list the application windows">
+        Sends a window event for every application window, most recently used
+        first, then windows_done. Rejected as not_granted, with no window
+        events, unless the control is granted.
+      </description>
+    </request>
+
+    <request name="activate_window">
+      <description summary="bring a window forward">
+        Brings the window forward and gives it the focus, as the user's click
+        on its application in the dock does: a minimized or hidden window comes
+        back and a window on another desk brings its desk up. The handle is one
+        a window event of this control named. Rejected as no_window when that
+        window is gone, and as an input request would be otherwise.
+      </description>
+      <arg name="handle" type="uint"/>
+    </request>
+
+    <request name="get_pointer">
+      <description summary="ask where the pointer is">
+        Sends a pointer event, or is rejected as not_granted unless the control
+        is granted.
+      </description>
+    </request>
+
+    <request name="close_window">
+      <description summary="ask a window to close">
+        Asks the window to close, as its close button does; the application may
+        ask the user first. A window that stopped responding is killed. Rejected
+        as no_window when the window is gone or cannot be closed, as protected
+        when it belongs to the process that shows system dialogs, and as an
+        input request would be otherwise.
+      </description>
+      <arg name="handle" type="uint"/>
+    </request>
+
+    <request name="set_window_frame">
+      <description summary="move and resize a window">
+        Moves the window's frame to the given geometry in the global logical
+        coordinate space. A maximized, full-screen or snapped window becomes a
+        normal one. The size is kept within the window's limits, and kept as
+        it is when the window cannot be resized; the frame is kept on screen
+        enough to grab. Rejected as no_window when the window is gone,
+        minimized, hidden or on another desk, and as close_window is otherwise.
+      </description>
+      <arg name="handle" type="uint"/>
+      <arg name="x" type="int"/>
+      <arg name="y" type="int"/>
+      <arg name="width" type="int"/>
+      <arg name="height" type="int"/>
+    </request>
+
+    <request name="set_clipboard">
+      <description summary="put text on the clipboard">
+        Replaces the clipboard with the text, as copying it would; the agent
+        pastes it with the application's shortcut. The fd is a regular file,
+        such as a memfd, holding UTF-8 text of at most 16 MiB; the compositor
+        reads it at once and closes it. The text is offered as
+        text/plain;charset=utf-8, text/plain, UTF8_STRING, STRING and TEXT.
+        Rejected as an input request would be.
+      </description>
+      <arg name="fd" type="fd"/>
+    </request>
+
+    <request name="settle">
+      <description summary="wait for the screen to settle">
+        The callback's done event comes once no output has drawn a frame and
+        the clients with the keyboard and pointer focus have read every event
+        sent to them, both for a short while, so a capture shows what earlier
+        requests led to. Its data is 1 then, or 0 when the timeout passed
+        first, as it does while something animates. Works in any state of the
+        control.
+      </description>
+      <arg name="callback" type="new_id" interface="wl_callback"/>
+      <arg name="timeout" type="uint" summary="milliseconds, at most 10000"/>
+    </request>
+
+    <event name="granted">
+      <description summary="the user allowed the control">
+        Input requests take effect from now on.
+      </description>
+    </event>
+
+    <event name="revoked">
+      <description summary="the control ended">
+        Buttons and keys the control held have been released. The control is
+        inert from now on; the client should destroy it.
+      </description>
+      <arg name="reason" type="uint" enum="revoke_reason"/>
+    </event>
+
+    <event name="rejected">
+      <description summary="an input request was dropped"/>
+      <arg name="reason" type="uint" enum="rejection"/>
+    </event>
+
+    <event name="window">
+      <description summary="an application window">
+        The handle stays the same for the window as long as the control
+        exists. The geometry is the window's frame in the global logical
+        coordinate space, and means nothing while the window is minimized,
+        hidden or on another desk.
+      </description>
+      <arg name="handle" type="uint"/>
+      <arg name="app_id" type="string" summary="xdg_toplevel's app_id, possibly empty"/>
+      <arg name="title" type="string"/>
+      <arg name="x" type="int"/>
+      <arg name="y" type="int"/>
+      <arg name="width" type="int"/>
+      <arg name="height" type="int"/>
+      <arg name="state" type="uint" enum="window_state"/>
+    </event>
+
+    <event name="windows_done">
+      <description summary="the window list is complete"/>
+    </event>
+
+    <event name="pointer">
+      <description summary="where the pointer is">
+        In the global logical coordinate space.
+      </description>
+      <arg name="x" type="fixed"/>
+      <arg name="y" type="fixed"/>
+    </event>
+  </interface>
+</protocol>

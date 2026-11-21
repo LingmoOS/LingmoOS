@@ -1,0 +1,262 @@
+name: Build ISO of Lingmo OS
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+  workflow_dispatch:
+    inputs:
+      release:
+        description: "构建完成后发布为 GitHub Release"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+env:
+  DEBIAN_FRONTEND: noninteractive
+
+jobs:
+  build:
+    name: Build ISO of Lingmo OS
+    outputs:
+      iso-artifact-id: ${{ steps.iso-upload.outputs.artifact-id }}
+      build-version: ${{ steps.system-version.outputs.build-version }}
+    runs-on: ubuntu-latest
+    container:
+      image: debian:testing
+      options: --privileged
+    steps:
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y \
+            git \
+            ca-certificates
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      # 版本号一致性门禁：与 base-files 比对（不一致则失败）
+      - name: Check system version consistency
+        id: system-version
+        run: |
+          set -e
+          # 这一步在“安装系统依赖”之前，容器里可能还没有 python3
+          command -v python3 >/dev/null 2>&1 || { apt-get update -qq && apt-get install -y -qq python3; }
+          git clone --depth 1 https://github.com/LingmoOS/lingmo-version.git /tmp/lingmo-version
+          git clone --depth 1 https://github.com/LingmoOS/base-files.git /tmp/base-files
+          python3 /tmp/lingmo-version/lingmo-version check \
+              --base-files /tmp/base-files --builder "$PWD" --json > /tmp/lingmo-version.json
+          python3 tools/publish/version-directory.py /tmp/lingmo-version.json >> "$GITHUB_OUTPUT"
+
+      - name: Install system dependencies
+        run: |
+          apt-get update
+          apt-get install -y --no-install-recommends \
+            apt-utils ca-certificates curl \
+            live-build debootstrap \
+            xorriso squashfs-tools \
+            mtools dosfstools \
+            gpg cpio zstd \
+            gettext \
+            sudo git jq python3-yaml
+          curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg 2>/dev/null
+          chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+          apt-get update
+          apt-get install -y gh
+
+      - name: Test Live startup and publication contract
+        run: |
+          python3 tests/test_live_release.py
+          python3 tests/test_broadcom_download.py
+          python3 tests/test_build_diagnostics.py
+          bash -n tools/publish/sourceforge.sh
+
+      # Lingmo 定制的 live-build（支持 LB_LIVE_DIR 改介质目录名）
+      # ⚠️ 构建容器是 debian:testing(sid)，其 live-build(1:20250814) 版本**高于**我们
+      #    trixie 分支的 1:20250505+deb13u1+lingmo1，所以只靠版本号赢不了 ⇒ 必须 apt pin。
+      - name: Use Lingmo live-build
+        run: |
+          set -e
+          echo "deb https://download.opensuse.org/repositories/home:/LingmoOS/Debian_13/ /" \
+            > /etc/apt/sources.list.d/lingmo-obs.list
+          curl -fsSL https://download.opensuse.org/repositories/home:/LingmoOS/Debian_13/Release.key \
+            | gpg --dearmor -o /etc/apt/trusted.gpg.d/lingmo-obs.gpg
+          cat > /etc/apt/preferences.d/lingmo-live-build <<'EOF'
+          Package: live-build
+          Pin: origin download.opensuse.org
+          Pin-Priority: 1001
+          EOF
+          apt-get update
+          apt-get install -y --allow-downgrades live-build
+          echo "=== 实际使用的 live-build ==="
+          dpkg-query -W -f='${Package} ${Version}\n' live-build
+          # 断言：必须是 Lingmo 定制版，否则后面 LB_LIVE_DIR 不生效、ISO 会找不到介质
+          dpkg-query -W -f='${Version}' live-build | grep -q '+lingmo' \
+            || { echo "ERROR: live-build 不是 Lingmo 定制版（pin 未生效？）" >&2; exit 1; }
+
+      - name: Free up disk space
+        run: |
+          echo "=== Disk space before cleanup ==="
+          df -h
+          apt-get clean
+          rm -rf /var/cache/apt/archives/*.deb 2>/dev/null || true
+          rm -rf /tmp/* 2>/dev/null || true
+          echo "=== Disk space after cleanup ==="
+          df -h
+
+      - name: Create debian-cd symlink
+        run: |
+          ln -sf sid /usr/share/live/build/data/debian-cd/trixie 2>/dev/null || true
+      
+      # Trixie's -26 driver fails to build against the selected 6.18 kernel.
+      # Keep the Debian base suite unchanged; stage only this verified driver.
+      - name: Download Broadcom DKMS for Linux 6.18
+        run: bash tools/ci/download-broadcom.sh
+
+      - name: Prepare build environment
+        run: |
+          mkdir -p build
+          cp -r scripts/* build/
+          cp -v .getopt.sh build/
+          chmod +x build/build.sh
+          chmod +x build/auto/config
+          chmod +x tools/build_version_2.sh
+          cd build/lingmo-config
+          TARGET=$(cat variant-default)
+          ln -sfn "$TARGET" variant-default-dir
+          mv variant-default-dir variant-default
+
+      - name: Build ISO
+        working-directory: build
+        run: |
+          sudo ./build.sh
+
+      - name: Collect failed build diagnostics
+        if: failure()
+        run: bash tools/ci/collect-build-diagnostics.sh build build-diagnostics
+
+      - name: Upload failed build diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-diagnostics
+          path: build-diagnostics/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Stage artifacts
+        run: |
+          mkdir -p artifact
+          cp -v build/images/*.iso artifact/ 2>/dev/null || echo "No ISO in build/images/"
+          find build -name "*.iso" -exec cp -v {} artifact/ \; 2>/dev/null || true
+          if ! ls artifact/*.iso 2>/dev/null; then
+            echo "No ISO files found" >&2
+            exit 1
+          fi
+
+      - name: Generate checksum manifests and instructions
+        run: bash tools/publish/checksums.sh artifact
+
+      - name: Upload ISO
+        id: iso-upload
+        uses: actions/upload-artifact@v4
+        with:
+          name: upload-iso
+          path: artifact/
+          compression-level: 0
+          if-no-files-found: error
+
+      - name: Generate version tag
+        id: version
+        if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && inputs.release)
+        run: |
+          . tools/build_version_2.sh
+          TAG="lingmoOS-$(generate_build_ver)"
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+
+      - name: Publish to GitHub Release
+        if: (github.event_name == 'push' && github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch' && inputs.release) && steps.version.outputs.tag != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${{ steps.version.outputs.tag }}"
+          REPO="${{ github.repository }}"
+          ARCHIVE=$(ls -1 artifact/*.iso 2>/dev/null | head -1)
+
+          if [ -z "${ARCHIVE}" ]; then
+            echo "No ISO file found in artifact/"
+            exit 1
+          fi
+
+          echo "Release 文件: ${ARCHIVE}"
+          ls -lh "${ARCHIVE}"
+          SIZE=$(stat -c%s "${ARCHIVE}")
+          echo "文件大小: ${SIZE} bytes"
+
+          # 同一版本重复构建时 tag 已存在：改为覆盖上传，避免 gh release create 失败
+          if gh release view "${TAG}" --repo "${REPO}" >/dev/null 2>&1; then
+            echo "Release ${TAG} 已存在，覆盖其中的 ISO"
+          else
+            echo "创建 Release: ${TAG}"
+            gh release create "${TAG}" \
+              --repo "${REPO}" \
+              --title "Build ${TAG}" \
+              --notes "自动构建的 Lingmo OS ISO" \
+              --target "${{ github.ref_name }}" \
+              --latest=false
+          fi
+
+          # GitHub Release 单个文件限制 2GiB，超过则分片上传
+          if [ "${SIZE}" -gt 2147483648 ]; then
+            echo "文件超过 2GiB，分片上传"
+            split -b 1900M "${ARCHIVE}" "${ARCHIVE}.part-"
+            for part in "${ARCHIVE}".part-*; do
+              echo "上传分片: $(basename "${part}") ($(du -h "${part}" | cut -f1))"
+              gh release upload "${TAG}" "${part}" \
+                --repo "${REPO}" \
+                --clobber
+            done
+            echo "清理分片文件"
+            rm -f "${ARCHIVE}".part-*
+          else
+            echo "上传 ISO 到 Release"
+            gh release upload "${TAG}" "${ARCHIVE}" \
+              --repo "${REPO}" \
+              --clobber
+          fi
+
+          echo "Release ${TAG} 完成"
+
+  publish-sourceforge:
+    name: Publish complete ISO to SourceForge
+    needs: build
+    if: always() && needs.build.outputs.iso-artifact-id != '' && github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    concurrency:
+      group: sourceforge-iso-publish
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: upload-iso
+          path: artifact
+      - name: Install upload tools
+        run: sudo apt-get update && sudo apt-get install -y rsync openssh-client
+      - name: Upload ISO, checksums and instructions
+        env:
+          SF_USERNAME: ${{ vars.SF_USERNAME || secrets.SF_USERNAME }}
+          SF_PROJECT: ${{ vars.SF_PROJECT || secrets.SF_PROJECT }}
+          SF_REMOTE_DIR: ${{ vars.SF_REMOTE_DIR || secrets.SF_REMOTE_DIR }}
+          SF_BUILD_VERSION: ${{ needs.build.outputs.build-version }}
+          SF_SSH_PRIVATE_KEY: ${{ secrets.SF_SSH_PRIVATE_KEY }}
+          SF_KNOWN_HOSTS: ${{ secrets.SF_KNOWN_HOSTS }}
+        run: bash tools/publish/sourceforge.sh artifact

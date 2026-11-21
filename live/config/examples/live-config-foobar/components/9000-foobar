@@ -1,0 +1,69 @@
+#!/bin/sh
+
+. /usr/lib/live/config.sh
+
+## live-config-foobar(7) - Additional Configuration Components for live systems
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+## Copyright (C) 2015 John Doe <john@example.org>
+##
+## live-config-foobar comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+set -e
+
+Cmdline ()
+{
+	# Boot parameters can be acted up either this way...
+	if ! echo ${LIVE_CONFIG_CMDLINE} | grep -qs "example.foobar" && \
+	   ! echo ${LIVE_CONFIG_CMDLINE} | grep -qs "foobar"
+	then
+		return
+	fi
+
+	# ...or if you want to specify certain options:
+	for _PARAMETER in ${LIVE_CONFIG_CMDLINE}
+	do
+		case "${_PARAMETER}" in
+			example.foobar=*|foobar=*)
+				EXAMPLE_FOOBAR="${_PARAMETER#*foobar=}"
+				;;
+		esac
+	done
+}
+
+Init ()
+{
+	# Checking if package is installed or already configured
+	if ! pkg_is_installed "foobar" || \
+	   component_was_executed "foobar"
+	then
+		exit 0
+	fi
+
+	echo -n " foobar"
+}
+
+Config ()
+{
+	# Configuring foobar either this way...
+	if [ -n "${EXAMPLE_FOOBAR}" ]
+	then
+		sleep 1
+	fi
+
+	# ...or if you want to specify certain options:
+	case "${EXAMPLE_FOOBAR}" in
+		foo)
+			sleep 1
+			;;
+	esac
+
+	# Creating state file
+	touch /var/lib/live/config/foobar
+}
+
+Cmdline
+Init
+Config

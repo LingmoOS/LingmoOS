@@ -1,0 +1,76 @@
+#!/bin/sh
+
+. /usr/lib/live/config.sh
+
+## live-config(7) - System Configuration Components
+## Copyright (C) 2016-2020 The Debian Live team
+## Copyright (C) 2006-2015 Daniel Baumann <mail@daniel-baumann.ch>
+##
+## This program comes with ABSOLUTELY NO WARRANTY; for details see COPYING.
+## This is free software, and you are welcome to redistribute it
+## under certain conditions; see COPYING for details.
+
+
+#set -e
+
+Cmdline ()
+{
+	# Reading kernel command line
+	for _PARAMETER in ${LIVE_CONFIG_CMDLINE}
+	do
+		case "${_PARAMETER}" in
+			live-config.utc=*|utc=*)
+				LIVE_UTC="${_PARAMETER#*utc=}"
+				;;
+		esac
+	done
+}
+
+Init ()
+{
+	# Checking if package is installed
+	if ! pkg_is_installed "util-linux" || \
+	   component_was_executed "util-linux"
+	then
+		exit 0
+	fi
+
+	echo -n " util-linux"
+}
+
+Config ()
+{
+	rm -f /etc/rc?.d/*hwclock*
+
+	if [ -n "${LIVE_UTC}" ]
+	then
+		case "${LIVE_UTC}" in
+			yes)
+
+cat > /etc/adjtime << EOF
+0.0 0 0.0
+0
+UTC
+EOF
+
+				;;
+
+			no)
+
+cat > /etc/adjtime << EOF
+0.0 0 0.0
+0
+LOCAL
+EOF
+
+				;;
+		esac
+	fi
+
+	# Creating state file
+	touch /var/lib/live/config/util-linux
+}
+
+Cmdline
+Init
+Config

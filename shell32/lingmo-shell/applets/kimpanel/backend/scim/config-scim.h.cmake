@@ -1,6 +1,0 @@
-#ifndef CONFIG_H_CMAKE
-#define CONFIG_H_CMAKE
-
-#define SCIM_ICON_DIR "@SCIM_ICON_DIR@"
-
-#endif // CONFIG_H_CMAKE
