@@ -1,0 +1,108 @@
+
+name: Sync LingmoOS Source
+
+on:
+  schedule:
+    - cron: "0 18 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: lingmo-source-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout LingmoOS
+        uses: actions/checkout@v4
+        with:
+          path: output
+          fetch-depth: 0
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git rsync curl
+
+      - name: Install Repo
+        run: |
+          mkdir -p "$HOME/bin"
+
+          curl -fsSL \
+            https://storage.googleapis.com/git-repo-downloads/repo \
+            -o "$HOME/bin/repo"
+
+          chmod +x "$HOME/bin/repo"
+          echo "$HOME/bin" >> "$GITHUB_PATH"
+
+      - name: Initialize source workspace
+        run: |
+          mkdir -p "$RUNNER_TEMP/lingmo-workspace"
+
+          cd "$RUNNER_TEMP/lingmo-workspace"
+
+          repo init \
+            -u https://github.com/LingmoOS/manifest.git \
+            -m manifests/standard.xml
+
+      - name: Sync source repositories
+        run: |
+          cd "$RUNNER_TEMP/lingmo-workspace"
+
+          repo sync -c -j8
+
+      - name: Export source code
+        run: |
+          WORKSPACE="$RUNNER_TEMP/lingmo-workspace"
+          EXPORT="$RUNNER_TEMP/lingmo-export"
+
+          mkdir -p "$EXPORT"
+
+          rsync -a \
+            --exclude='/.repo/' \
+            --exclude='.git' \
+            "$WORKSPACE/" "$EXPORT/"
+
+          cd "$WORKSPACE"
+
+          repo manifest \
+            -o "$EXPORT/SOURCE_MANIFEST.xml"
+
+          repo manifest -r \
+            -o "$EXPORT/SOURCE_MANIFEST.lock.xml"
+
+      - name: Update source snapshot
+        run: |
+          rsync -a --delete \
+            --exclude='/.git/' \
+            --exclude='/.github/' \
+            --exclude='/README.md' \
+            --exclude='/LICENSE' \
+            --exclude='/.gitignore' \
+            "$RUNNER_TEMP/lingmo-export/" \
+            "$GITHUB_WORKSPACE/output/"
+
+      - name: Commit and push
+        run: |
+          cd "$GITHUB_WORKSPACE/output"
+
+          git config user.name "github-actions[bot]"
+          git config user.email \
+            "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add -f -A
+
+          if git diff --cached --quiet; then
+            echo "No source changes detected."
+            exit 0
+          fi
+
+          git commit -m "chore: sync Lingmo OS source tree"
+
+          git push origin HEAD
+
