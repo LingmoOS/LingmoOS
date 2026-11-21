@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 #include "photoswindow.h"
 #include "globalmenu.h"
+#include "editengine.h"
 #include <base/paths.h>
 #include <base/i18n.h>
 #include <base/event_loop.h>
@@ -96,7 +97,7 @@ public:
     Viewer(std::function<void()> close, std::function<void()> previous, std::function<void()> next,
            std::function<void()> favorite, std::function<void()> trash,
            std::function<void(bool)> fullScreen, std::function<void(bool)> slideShow, std::function<void()> restore,
-           std::function<void(const std::string&)> exportCopy)
+           std::function<void(const std::string&, const EditParams&)> exportCopy)
         : m_close(std::move(close)), m_previous(std::move(previous)), m_next(std::move(next)), m_favorite(std::move(favorite)), m_trash(std::move(trash)), m_fullScreen(std::move(fullScreen)), m_slideShow(std::move(slideShow)), m_restore(std::move(restore)), m_exportCopy(std::move(exportCopy)) {
         m_back = addChild<RoundImageButton>("chevron-left"); m_back->setToolTip(tr("Back")); m_back->onClicked = m_close;
         m_prev = addChild<RoundImageButton>("chevron-left"); m_prev->setToolTip(tr("Previous")); m_prev->onClicked = m_previous;
@@ -129,7 +130,7 @@ public:
         m_temperature = addSlider(tr("Temperature"), -1, 1, 0);
         auto* rotate = m_editor->addChild<Button>(tr("Rotate 90°")); rotate->onClicked = [this] { m_rotation = (m_rotation + 1) % 4; updateEditInfo(); };
         auto* reset = m_editor->addChild<Button>(tr("Reset Adjustments")); reset->onClicked = [this] { m_brightness->setValue(0); m_contrast->setValue(0); m_saturation->setValue(0); m_temperature->setValue(0); m_rotation = 0; updateEditInfo(); };
-        auto* save = m_editor->addChild<Button>(tr("Save Copy")); save->onClicked = [this] { if (m_exportCopy && !m_path.empty()) m_exportCopy(m_path); };
+        auto* save = m_editor->addChild<Button>(tr("Save Copy")); save->onClicked = [this] { if (m_exportCopy && !m_path.empty()) m_exportCopy(m_path, {m_brightness->value(), m_contrast->value(), m_saturation->value(), m_temperature->value(), m_rotation}); };
         m_editor->setVisible(false);
     }
     void setPhoto(const Photo& photo, size_t index, size_t count) {
@@ -151,7 +152,7 @@ private:
     void updateEditInfo() { m_previewOverlay->setAdjustments(m_brightness->value(), m_contrast->value(), m_saturation->value(), m_temperature->value()); if (!m_editing) { m_info->setText(m_photoInfo); return; } m_info->setText(std::string(tr("Edit mode")) + "\n" + tr("Preview updates as you adjust the controls.") + "\n" + tr("Rotation") + ": " + std::to_string(m_rotation * 90) + "°\n" + tr("Brightness") + ": " + std::to_string(m_brightness->value()) + "\n" + tr("Contrast") + ": " + std::to_string(m_contrast->value()) + "\n" + tr("Saturation") + ": " + std::to_string(m_saturation->value()) + "\n" + tr("Temperature") + ": " + std::to_string(m_temperature->value()) + "\n\n" + m_photoInfo); }
     void setZoom(double value) { m_zoom = std::clamp(value, .5, 3.0); updateTransform(); }
     void updateTransform() { if (m_image) m_image->setTransform({{}, (m_flipped ? -1 : 1) * m_zoom}); }
-    std::function<void()> m_close, m_previous, m_next, m_favorite, m_trash, m_restore; std::function<void(bool)> m_fullScreen, m_slideShow; std::function<void(const std::string&)> m_exportCopy; RoundImageButton *m_back, *m_prev, *m_nextButton, *m_favoriteButton, *m_trashButton, *m_zoomOut, *m_zoomIn, *m_resetZoom, *m_flip, *m_fullScreenButton, *m_slideButton, *m_restoreButton; ImageView* m_image; EditPreviewOverlay* m_previewOverlay; Label* m_info; Column* m_editor; Label* m_editorTitle; Slider *m_brightness, *m_contrast, *m_saturation, *m_temperature; std::string m_photoInfo, m_path; int m_sourceWidth = 0, m_sourceHeight = 0, m_rotation = 0; double m_zoom = 1; bool m_flipped = false, m_fullScreenState = false, m_sliding = false, m_editing = false;
+    std::function<void()> m_close, m_previous, m_next, m_favorite, m_trash, m_restore; std::function<void(bool)> m_fullScreen, m_slideShow; std::function<void(const std::string&, const EditParams&)> m_exportCopy; RoundImageButton *m_back, *m_prev, *m_nextButton, *m_favoriteButton, *m_trashButton, *m_zoomOut, *m_zoomIn, *m_resetZoom, *m_flip, *m_fullScreenButton, *m_slideButton, *m_restoreButton; ImageView* m_image; EditPreviewOverlay* m_previewOverlay; Label* m_info; Column* m_editor; Label* m_editorTitle; Slider *m_brightness, *m_contrast, *m_saturation, *m_temperature; std::string m_photoInfo, m_path; int m_sourceWidth = 0, m_sourceHeight = 0, m_rotation = 0; double m_zoom = 1; bool m_flipped = false, m_fullScreenState = false, m_sliding = false, m_editing = false;
 };
 
 class Root final : public View {
@@ -187,7 +188,7 @@ public:
         auto* quickTrash = m_quickBar->addChild<RoundImageButton>("", 28); quickTrash->setSource("user-trash"); quickTrash->setToolTip(tr("Recently Deleted")); quickTrash->onClicked = [this] { selectPage("trash"); };
         m_scroll = addChild<ScrollView>(); m_content = m_scroll->setContent<Column>(); m_content->setSpacing(20); m_content->setMargins({28, 16, 28, 24});
         m_status = addChild<Label>(); m_status->setColor(ColorId::DisabledText);
-        m_viewer = addChild<Viewer>([this] { closeViewer(); }, [this] { moveViewer(-1); }, [this] { moveViewer(1); }, [this] { toggleViewerFavorite(); }, [this] { trashViewer(); }, [this](bool enabled) { m_owner.window().setFullScreen(enabled); }, [this](bool enabled) { setSlideShow(enabled); }, [this] { restoreViewer(); }, [this](const std::string& path) { exportCopy(path); }); m_viewer->setVisible(false);
+        m_viewer = addChild<Viewer>([this] { closeViewer(); }, [this] { moveViewer(-1); }, [this] { moveViewer(1); }, [this] { toggleViewerFavorite(); }, [this] { trashViewer(); }, [this](bool enabled) { m_owner.window().setFullScreen(enabled); }, [this](bool enabled) { setSlideShow(enabled); }, [this] { restoreViewer(); }, [this](const std::string& path, const EditParams& params) { exportCopy(path, params); }); m_viewer->setVisible(false);
         m_subscriptions.push_back(m_scanner.changed.connect([this] { refresh(); }));
         m_page = "photos"; refresh();
     }
@@ -225,7 +226,7 @@ private:
         m_status->setText(std::to_string(photos.size()) + " " + tr("photos")); requestLayout(); requestPaint();
     }
     void createAlbum() { const auto name = m_albumName->text(); if (name.empty()) return; if (m_store.createAlbum(name) != 0) { m_albumName->clear(); refresh(); } }
-    void exportCopy(const std::string& path) { std::filesystem::path source(path); std::filesystem::path target = source.parent_path() / (source.stem().string() + " (edited)" + source.extension().string()); std::error_code error; std::filesystem::copy_file(source, target, std::filesystem::copy_options::skip_existing, error); }
+    void exportCopy(const std::string& path, const EditParams& params) { std::filesystem::path source(path); std::filesystem::path target = source.parent_path() / (source.stem().string() + " (edited).png"); std::string error; saveEditedCopy(path, target.string(), params, &error); }
     void selectPage(const std::string& id) { m_page = id; m_sidebar->setCurrent(id); m_headerTitle->setText(id == "recent" ? tr("Recently Added") : id == "favorites" ? tr("Favorites") : id == "albums" ? tr("Albums") : tr("Recently Deleted")); refresh(); }
     void scanPictures() { const char* home = std::getenv("HOME"); if (home) m_scanner.scan(std::string(home) + "/Pictures"); }
     void openViewer(size_t index) {

@@ -86,12 +86,14 @@ public:
     ComputerCard(ComputerView::Entry entry, std::function<void(const std::string&)> open,
                  std::function<void(const ComputerView::Entry&)> properties,
                  std::function<void(const ComputerView::Entry&)> eject,
-                 std::function<void(const std::string&)> openInNewTab)
+                 std::function<void(const std::string&)> openInNewTab,
+                 std::function<void(const std::string&)> select)
         : m_entry(std::move(entry))
         , m_open(std::move(open))
         , m_properties(std::move(properties))
         , m_eject(std::move(eject))
         , m_openInNewTab(std::move(openInNewTab))
+        , m_select(std::move(select))
     {
         setName("computer-card");
         setTracksHover(true);
@@ -120,6 +122,15 @@ public:
         requestLayout();
     }
 
+    const std::string& id() const { return m_entry.id; }
+    void setSelected(bool selected)
+    {
+        if (m_selected == selected)
+            return;
+        m_selected = selected;
+        requestPaint();
+    }
+
     bool acceptsPointer() const override { return true; }
 
 protected:
@@ -146,9 +157,12 @@ protected:
     void paint(ui::Painter& painter) override
     {
         const ui::Theme& theme = ui::Theme::current();
-        const ui::Color fill = isHovered() ? theme.text.withAlpha(theme.darkMode ? .12 : .07)
-                                           : theme.text.withAlpha(theme.darkMode ? .07 : .045);
-        painter.drawSmoothRectangle(localRect(), theme.mediumRadius, fill);
+        const ui::Color fill = m_selected ? theme.highlight.withAlpha(theme.darkMode ? .28 : .16)
+                                           : isHovered() ? theme.text.withAlpha(theme.darkMode ? .12 : .07)
+                                                         : theme.text.withAlpha(theme.darkMode ? .07 : .045);
+        painter.drawSmoothRectangle(localRect(), theme.mediumRadius, fill,
+                                    m_selected ? 1 : 0,
+                                    m_selected ? theme.highlight : ui::Color{});
         if (m_entry.drive && m_entry.total > 0) {
             const double ratio = std::clamp(double(m_entry.used) / double(m_entry.total), 0.0, 1.0);
             const ui::RectF bar {68, 68, std::max(0.0, geometry().width - 82), 7};
@@ -177,6 +191,10 @@ protected:
         }
         if (event.button == ui::MouseButton::Left && event.clickCount >= 2 && m_open)
             m_open(m_entry.url);
+        else if (event.button == ui::MouseButton::Left) {
+            if (m_select)
+                m_select(m_entry.id);
+        }
     }
 
 private:
@@ -185,10 +203,12 @@ private:
     std::function<void(const ComputerView::Entry&)> m_properties;
     std::function<void(const ComputerView::Entry&)> m_eject;
     std::function<void(const std::string&)> m_openInNewTab;
+    std::function<void(const std::string&)> m_select;
     std::unique_ptr<ui::Menu> m_menu;
     ui::ThemeIcon* m_icon = nullptr;
     ui::Label* m_name = nullptr;
     ui::Label* m_detail = nullptr;
+    bool m_selected = false;
 };
 
 } // namespace
@@ -252,6 +272,7 @@ void ComputerView::rebuild()
     }
     m_cards.clear();
     m_entries.clear();
+    m_selectedId.clear();
 
     using Lingmo::base::paths::UserDirectory;
     const std::array<std::pair<UserDirectory, const char*>, 6> folders = {{
@@ -266,11 +287,11 @@ void ComputerView::rebuild()
         const std::string path = Lingmo::base::paths::userDirectory(directory);
         if (!directoryExists(path))
             continue;
-        m_entries.push_back({standardFolderName(path), base::url::fromLocalFile(path), icon, {}, false, false, {}, 0, 0});
+        m_entries.push_back({standardFolderName(path), base::url::fromLocalFile(path), icon, path, false, false, {}, 0, 0});
     }
 
     std::vector<Entry> drives;
-    Entry root {tr("System Disk"), base::url::fromLocalFile("/"), "drive-harddisk", {}, true, false,
+    Entry root {tr("System Disk"), base::url::fromLocalFile("/"), "drive-harddisk", "root", true, false,
                filesystemType("/"), 0, 0};
     storageUsage("/", root.used, root.total);
     drives.push_back(std::move(root));
@@ -282,7 +303,7 @@ void ComputerView::rebuild()
         if (path.empty() || path == "/")
             continue;
         Entry drive {place.displayName(), place.url, place.iconName.empty() ? "drive-harddisk" : place.iconName,
-                     place.udi, true, place.canEject, filesystemType(path), 0, 0};
+                     place.udi.empty() ? path : place.udi, true, place.canEject, filesystemType(path), 0, 0};
         storageUsage(path, drive.used, drive.total);
         drives.push_back(std::move(drive));
     }
@@ -292,7 +313,8 @@ void ComputerView::rebuild()
         if (!ejectAction)
             ejectAction = [this](const Entry& item) { m_places->requestEjectById(item.id); };
         m_cards.push_back(m_content->addChild<ComputerCard>(entry, m_open, m_properties,
-                                                              std::move(ejectAction), m_openInNewTab));
+                                                              std::move(ejectAction), m_openInNewTab,
+                                                              [this](const std::string& id) { selectCard(id); }));
     }
     m_content->requestLayout();
     requestLayout();
@@ -302,6 +324,16 @@ void ComputerView::rebuild()
 void ComputerView::requestEject(const std::string& id)
 {
     m_places->requestEjectById(id);
+}
+
+void ComputerView::selectCard(const std::string& id)
+{
+    m_selectedId = id;
+    for (ui::View* view : m_cards) {
+        auto* card = dynamic_cast<ComputerCard*>(view);
+        if (card)
+            card->setSelected(card->id() == m_selectedId);
+    }
 }
 
 void ComputerView::retranslate()
@@ -338,7 +370,7 @@ void ComputerView::layoutContent()
     const int folderCount = int(std::count_if(m_entries.begin(), m_entries.end(), [](const Entry& e) { return !e.drive; }));
     const int folderColumns = std::max(1, int(std::floor((width + kGap) / (kFolderWidth + kGap))));
     const int folderRows = (folderCount + folderColumns - 1) / folderColumns;
-    const double folderWidth = std::max(kFolderWidth, (width - kGap * (folderColumns - 1)) / folderColumns);
+    const double folderWidth = kFolderWidth;
     const double titleHeight = std::max(22.0, m_foldersTitle->sizeHint().height);
     m_foldersTitle->setGeometry({kMargin, kTopMargin, width, titleHeight});
     double y = kTopMargin + titleHeight + 12;

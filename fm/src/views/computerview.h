@@ -56,6 +56,7 @@ protected:
 private:
     class Content;
     void rebuild();
+    void selectCard(const std::string& id);
     void layoutContent();
     double contentHeight(double width) const;
 
@@ -71,6 +72,7 @@ private:
     Content* m_content = nullptr;
     std::vector<Entry> m_entries;
     std::vector<ui::View*> m_cards;
+    std::string m_selectedId;
 };
 
 } // namespace fm

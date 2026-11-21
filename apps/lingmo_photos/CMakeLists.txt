@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(lingmo-photos VERSION 1.0.18 LANGUAGES CXX)
+project(lingmo-photos VERSION 1.0.21 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -9,13 +9,17 @@ include(CTest)
 
 find_package(LingmoSDK REQUIRED)
 find_package(SQLite3 REQUIRED)
+find_package(PkgConfig REQUIRED)
+pkg_check_modules(GdkPixbuf REQUIRED IMPORTED_TARGET gdk-pixbuf-2.0)
 
 add_library(photos-core STATIC
     src/photostore.cpp
     src/libraryscanner.cpp
+    src/editengine.cpp
 )
 target_include_directories(photos-core PUBLIC src)
 target_link_libraries(photos-core PUBLIC SQLite::SQLite3 Lingmo::SDKBase)
+target_link_libraries(photos-core PUBLIC PkgConfig::GdkPixbuf)
 
 add_executable(lingmo-photos
     src/main.cpp

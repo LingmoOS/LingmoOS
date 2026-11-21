@@ -174,8 +174,8 @@ public:
 protected:
     void layout() override
     {
-        const double targetWidth = geometry().width * 0.72;
-        const double targetHeight = geometry().height * 0.64;
+        const double targetWidth = std::min(960.0, std::max(520.0, geometry().width * 0.68));
+        const double targetHeight = std::min(700.0, std::max(420.0, geometry().height * 0.62));
         const double targetX = (geometry().width - targetWidth) / 2;
         const double targetY = (geometry().height - targetHeight) / 2;
         const double width = m_origin.width + (targetWidth - m_origin.width) * m_progress;
@@ -241,7 +241,9 @@ protected:
         // The panel region is left transparent by the launcher surface, so
         // the compositor can blur the desktop behind this card.
         const ui::Color tint = theme.darkMode ? ui::Color {24, 26, 32, 255} : ui::Color {248, 249, 252, 255};
-        painter.fillRoundedRect(m_panel, radius, tint.withAlpha(0.12));
+        // The popup surface is transparent so the compositor can blur it; a
+        // stronger tint keeps the card readable when blur is unavailable.
+        painter.fillRoundedRect(m_panel, radius, tint.withAlpha(0.58));
         const ui::Color border = m_ink.r < 128 ? ui::Color {0, 0, 0, 58} : ui::Color {255, 255, 255, 72};
         painter.drawRoundedRect(m_panel, {radius, 0, ui::Corners::Circular}, {}, 1, border);
     }

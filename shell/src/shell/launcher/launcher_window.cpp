@@ -59,6 +59,11 @@ LauncherWindow::LauncherWindow(Shell *shell, std::unique_ptr<Launcher> launcher,
         m_folderWindow = ui::Window::createPopup(m_window->window(), placement, false);
         m_folderWindow->resize(m_window->window()->size());
         m_folderWindow->setBackgroundColor(ui::Color {0, 0, 0, 0});
+        // Keep the popup surface genuinely transparent. The folder panel
+        // requests a local backdrop blur through folderBlurChanged; applying
+        // GlassMaterial here would tint the entire popup dark before that
+        // local blur is composited.
+        m_folderWindow->setBackgroundGlass(std::nullopt);
         m_folderWindow->setContentView(std::move(overlay));
         m_folderWindow->show();
     };

@@ -136,9 +136,12 @@ std::unique_ptr<ui::View> PropertiesDialog::createContent()
     layout->setSpacing(kLargeSpacing);
     m_pages = layout->addChild<ui::SegmentedControl>(std::vector<std::string>{tr("General"), tr("Permissions")},
                                                      ui::SegmentedControl::Style::Tabs);
+    m_pages->setLayoutHints({.alignment = ui::Alignment::Center});
     m_pages->setCurrentIndex(m_page);
     m_pages->onCurrentChanged = [this](int index) { setPage(index); };
-    m_pageHost = layout->addChild<ui::View>();
+    // The active page must participate in the dialog's intrinsic height.
+    // A plain View reports zero height, which used to crop the property rows.
+    m_pageHost = layout->addChild<ui::ColumnLayout>();
     m_pageHost->setLayoutHints({.fillWidth = true});
     setPage(m_page);
     return layout;
