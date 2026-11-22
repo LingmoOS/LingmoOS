@@ -10,8 +10,10 @@
 #include <ctime>
 #include <filesystem>
 #include <map>
+#include <string_view>
 #include <unistd.h>
 
+#include "base/i18n.h"
 #include "base/locale.h"
 #include "base/paths.h"
 #include "base/settings.h"
@@ -23,6 +25,8 @@
 
 namespace Lingmo::Shell {
 
+using Lingmo::i18n::tr;
+
 static void updateItem(LauncherItem *item, const base::DesktopEntry &entry)
 {
     item->id = entry.id;
@@ -30,6 +34,77 @@ static void updateItem(LauncherItem *item, const base::DesktopEntry &entry)
     item->genericName = entry.genericName;
     item->comment = entry.comment;
     item->iconName = entry.icon;
+    item->categories = entry.categories;
+}
+
+enum class AppCategory {
+    Applications,
+    Development,
+    Education,
+    Games,
+    Graphics,
+    Internet,
+    Media,
+    Office,
+    Science,
+    System,
+    Utilities,
+};
+
+static AppCategory appCategory(const LauncherItem &item)
+{
+    static constexpr std::pair<std::string_view, AppCategory> categories[] = {
+            {"Game", AppCategory::Games},
+            {"AudioVideo", AppCategory::Media},
+            {"Audio", AppCategory::Media},
+            {"Video", AppCategory::Media},
+            {"WebBrowser", AppCategory::Internet},
+            {"Network", AppCategory::Internet},
+            {"Email", AppCategory::Internet},
+            {"InstantMessaging", AppCategory::Internet},
+            {"Office", AppCategory::Office},
+            {"Finance", AppCategory::Office},
+            {"Graphics", AppCategory::Graphics},
+            {"Photography", AppCategory::Graphics},
+            {"Viewer", AppCategory::Graphics},
+            {"Development", AppCategory::Development},
+            {"Education", AppCategory::Education},
+            {"Science", AppCategory::Science},
+            {"Settings", AppCategory::System},
+            {"System", AppCategory::System},
+            {"PackageManager", AppCategory::System},
+            {"Utility", AppCategory::Utilities},
+            {"Accessories", AppCategory::Utilities},
+            {"FileManager", AppCategory::Utilities},
+            {"Archiving", AppCategory::Utilities},
+    };
+    for (const auto &[category, bucket] : categories) {
+        if (std::find(item.categories.begin(), item.categories.end(), category) != item.categories.end())
+            return bucket;
+    }
+    return AppCategory::Applications;
+}
+
+static std::string folderName(const LauncherItem &first, const LauncherItem &second)
+{
+    const AppCategory firstCategory = appCategory(first);
+    const AppCategory category = firstCategory == appCategory(second)
+            ? firstCategory
+            : AppCategory::Applications;
+    switch (category) {
+    case AppCategory::Development: return tr("Development");
+    case AppCategory::Education: return tr("Education");
+    case AppCategory::Games: return tr("Games");
+    case AppCategory::Graphics: return tr("Graphics");
+    case AppCategory::Internet: return tr("Internet");
+    case AppCategory::Media: return tr("Media");
+    case AppCategory::Office: return tr("Office");
+    case AppCategory::Science: return tr("Science");
+    case AppCategory::System: return tr("System");
+    case AppCategory::Utilities: return tr("Utilities");
+    case AppCategory::Applications: return tr("Applications");
+    }
+    return tr("Applications");
 }
 
 static std::string absolutePath(const std::string &path)
@@ -45,7 +120,8 @@ LauncherModel::LauncherModel(Applications &applications, ApplicationLauncher &la
     , m_rows(*this, [](const LauncherItem &item) { return item.id; },
              [](const LauncherItem &a, const LauncherItem &b) {
                  return a.name == b.name && a.genericName == b.genericName && a.comment == b.comment
-                         && a.iconName == b.iconName && a.newInstalled == b.newInstalled
+                         && a.iconName == b.iconName && a.categories == b.categories
+                         && a.newInstalled == b.newInstalled
                          && a.folder == b.folder && a.members == b.members
                          && a.memberIcons == b.memberIcons;
              })
@@ -411,6 +487,8 @@ void LauncherModel::onApplicationsChanged()
         auto &members = it->second.second;
         std::erase_if(members, [&](const std::string &id) { return !m_appItems.contains(id); });
         if (members.size() >= 2) {
+            if (it->second.first == "Folder")
+                it->second.first = folderName(m_appItems.at(members[0]), m_appItems.at(members[1]));
             ++it;
             continue;
         }
@@ -517,12 +595,13 @@ bool LauncherModel::makeFolder(const std::string &sourceId, const std::string &t
         const std::string targetMember = target->id;
         const std::string targetIcon = target->iconName;
         const std::string sourceIcon = source->iconName;
+        const std::string defaultFolderName = folderName(*source, *target);
         m_items.erase(std::remove_if(m_items.begin(), m_items.end(), [&](const LauncherItem &item) {
                           return item.id == sourceId || item.id == targetId;
                       }), m_items.end());
         LauncherItem folder;
         folder.id = folderId;
-        folder.name = "Folder";
+        folder.name = defaultFolderName;
         folder.folder = true;
         folder.members = {targetMember, sourceId};
         folder.memberIcons = {targetIcon, sourceIcon};

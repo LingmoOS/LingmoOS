@@ -158,6 +158,8 @@ void LauncherCell::setMetrics(const LauncherMetrics &metrics)
     m_icon->setSize(metrics.iconSize);
     for (ui::ThemeIcon *icon : m_folderIcons)
         icon->setSize(metrics.iconSize * 0.38);
+    if (m_dropIcon)
+        m_dropIcon->setSize(metrics.iconSize * 0.36);
     if (m_mask)
         m_mask->setSize(metrics.iconSize);
     m_label->setFontSize(metrics.labelPixelSize);
@@ -236,34 +238,79 @@ void LauncherCell::pointerRelease(const ui::PointerEvent &event)
         beginRename();
 }
 
-void LauncherCell::setDropPreview(bool active, const std::string &iconName)
+void LauncherCell::setDragHover(bool active)
 {
-    if (active && !m_dropIcon) {
-        m_dropIcon = addChild<ui::ThemeIcon>();
-        m_dropIcon->setOpacity(0.85);
-    }
-    if (active && m_dropIcon) {
-        m_dropIcon->setIconName(iconName.empty() ? "application-x-desktop" : iconName);
-        m_dropIcon->setVisible(true);
-    }
     const double target = active ? 1.0 : 0.0;
-    if (!active && m_dropIcon)
-        m_dropIcon->setVisible(false);
-    if (m_dropTween.target() == target && !m_dropTween.isRunning()) {
-        if (!active)
-            m_dropProgress = 0;
-        requestLayout();
-        requestPaint();
+    if (m_hoverTween.target() == target && (m_hoverProgress == target || m_hoverTween.isRunning()))
+        return;
+    m_hoverTween.start(window(), m_hoverProgress, target, std::chrono::milliseconds(150), easing::outCubic,
+                       [this](double value) {
+                           m_hoverProgress = value;
+                           requestLayout();
+                           requestPaint();
+                       });
+}
+
+void LauncherCell::setFolderPreview(bool active, const std::string &incomingIconName)
+{
+    if (active) {
+        if (m_isFolder || m_dragging)
+            return;
+        if (!m_dropIcon) {
+            m_dropIcon = addChild<ui::ThemeIcon>();
+            m_dropIcon->setSize(m_metrics.iconSize * 0.36);
+        }
+        m_dropIcon->setIconName(incomingIconName.empty() ? "application-x-desktop" : incomingIconName);
+        m_dropIcon->setOpacity(0);
+        m_dropIcon->setVisible(true);
+        m_folderPreview = true;
+    } else if (!m_folderPreview && m_dropProgress == 0 && !m_dropTween.isRunning()) {
+        setDragHover(false);
         return;
     }
-    m_dropTween.start(window(), m_dropProgress, target, std::chrono::milliseconds(180), easing::outCubic,
+
+    const double target = active ? 1.0 : 0.0;
+    if (m_dropTween.target() == target && m_dropTween.isRunning())
+        return;
+    m_dropTween.start(window(), m_dropProgress, target, std::chrono::milliseconds(260),
+                      active ? easing::outBack : easing::outCubic,
                       [this](double value) {
                           m_dropProgress = value;
-                          if (value <= 0 && m_dropIcon)
-                              m_dropIcon->setVisible(false);
+                          if (value <= 0) {
+                              m_folderPreview = false;
+                              if (m_dropIcon)
+                                  m_dropIcon->setVisible(false);
+                          }
                           requestLayout();
                           requestPaint();
                       });
+}
+
+void LauncherCell::animateFolderCreated()
+{
+    const double width = m_metrics.cellWidth;
+    const double height = m_metrics.cellHeight;
+    const auto apply = [this, width, height](double progress) {
+        const double scale = 0.82 + 0.18 * progress;
+        setTransform({{width * (1 - scale) / 2, height * (1 - scale) / 2}, scale});
+        setOpacity(std::clamp(0.58 + 0.42 * progress, 0.0, 1.0));
+        if (progress >= 1) {
+            setTransform({});
+            setOpacity(1);
+        }
+        requestPaint();
+    };
+    apply(0);
+    m_folderCreateTween.start(window(), 0, 1, std::chrono::milliseconds(240), easing::outCubic, apply);
+}
+
+ui::RectF LauncherCell::folderMiniRect(const ui::RectF &icon, int index) const
+{
+    const double mini = icon.width * 0.36;
+    const double gap = icon.width * 0.10;
+    const double startX = icon.x + (icon.width - mini * 2 - gap) / 2;
+    const double startY = icon.y + (icon.height - mini * 2 - gap) / 2;
+    return {startX + (index % 2) * (mini + gap), startY + (index / 2) * (mini + gap), mini, mini};
 }
 
 void LauncherCell::setBackdrop(ui::Color color)
@@ -271,7 +318,7 @@ void LauncherCell::setBackdrop(ui::Color color)
     if (color == m_backdrop)
         return;
     m_backdrop = color;
-    if (m_selected)
+    if (m_selected || m_folderPreview || m_isFolder)
         requestPaint();
 }
 
@@ -366,23 +413,34 @@ ui::RectF LauncherCell::newMarkRect() const
 
 void LauncherCell::layout()
 {
-    ui::RectF icon = iconRect();
-    if (m_dropProgress > 0 && !m_icon->isVisible())
-        icon = {};
-    if (m_dropProgress > 0 && m_icon->isVisible()) {
-        const double scale = 1.0 - 0.28 * m_dropProgress;
-        const double size = icon.width * scale;
-        icon = {icon.x + (icon.width - size) / 2, icon.y + (icon.height - size) / 2, size, size};
+    const ui::RectF baseIcon = iconRect();
+    const auto interpolate = [](const ui::RectF &from, const ui::RectF &to, double progress) {
+        return ui::RectF {from.x + (to.x - from.x) * progress,
+                          from.y + (to.y - from.y) * progress,
+                          from.width + (to.width - from.width) * progress,
+                          from.height + (to.height - from.height) * progress};
+    };
+    const double hoverScale = 1.0 + 0.055 * m_hoverProgress;
+    const double hoverSize = baseIcon.width * hoverScale;
+    const ui::RectF hoveredIcon {baseIcon.x + (baseIcon.width - hoverSize) / 2,
+                                 baseIcon.y + (baseIcon.height - hoverSize) / 2,
+                                 hoverSize,
+                                 hoverSize};
+    ui::RectF icon = hoveredIcon;
+    if ((m_folderPreview || m_dropProgress > 0) && m_dropProgress > 0) {
+        icon = interpolate(hoveredIcon, folderMiniRect(baseIcon, 0), m_dropProgress);
+        if (m_dropIcon) {
+            const ui::RectF finalIncoming = folderMiniRect(baseIcon, 1);
+            const double startSize = finalIncoming.width * 0.18;
+            const ui::RectF startIncoming {baseIcon.x + (baseIcon.width - startSize) / 2,
+                                           baseIcon.y + (baseIcon.height - startSize) / 2,
+                                           startSize,
+                                           startSize};
+            m_dropIcon->setGeometry(interpolate(startIncoming, finalIncoming, m_dropProgress));
+            m_dropIcon->setOpacity(std::clamp(m_dropProgress, 0.0, 1.0));
+        }
     }
     m_icon->setGeometry(icon);
-    if (m_dropIcon) {
-        const ui::RectF base = iconRect();
-        const double size = base.width * 0.46 * m_dropProgress;
-        m_dropIcon->setGeometry({base.x + (base.width - size) / 2,
-                                 base.y + (base.height - size) / 2,
-                                 size,
-                                 size});
-    }
     const double mini = m_metrics.iconSize * 0.36;
     const double gap = m_metrics.iconSize * 0.10;
     const double startX = icon.x + (icon.width - mini * 2 - gap) / 2;
@@ -406,20 +464,21 @@ void LauncherCell::layout()
 
 void LauncherCell::paint(ui::Painter &painter)
 {
-    if (m_isFolder && !m_dragging) {
+    const bool showFolderMaterial = (m_isFolder && !m_dragging) || (m_folderPreview && m_dropProgress > 0);
+    if (showFolderMaterial) {
         const ui::RectF icon = iconRect();
-        // Folders use a translucent material plate so the wallpaper remains
-        // visible behind the four miniature application icons.
         const double radius = std::max(10.0, icon.width * 0.20);
         const ui::Color backdrop = m_backdrop;
+        const double previewAlpha = m_isFolder ? 1.0 : std::clamp(m_dropProgress, 0.0, 1.0);
         const ui::Color background {
             uint8_t(std::min(255, int(backdrop.r * 0.55 + 255 * 0.45))),
             uint8_t(std::min(255, int(backdrop.g * 0.55 + 255 * 0.45))),
             uint8_t(std::min(255, int(backdrop.b * 0.55 + 255 * 0.45))),
-            188};
-        // Launcher folders use circular corners regardless of the window
-        // corner preference, matching the compact icon material.
+            uint8_t(188 + (m_isFolder ? 0 : std::lround(42 * previewAlpha)))};
+        painter.drawShadow(icon, radius, 8, ui::Color {0, 0, 0, uint8_t(44 * previewAlpha)}, {0, 3});
         painter.drawRoundedRect(icon, {radius, 0, ui::Corners::Circular}, background);
+        if (m_folderPreview && m_dropProgress > 0)
+            painter.strokeRoundedRect(icon, radius, ui::Color {255, 255, 255, uint8_t(82 * previewAlpha)}, 1);
     }
     const ui::RectF selection = selectionRect();
     if (selection.width > 0)

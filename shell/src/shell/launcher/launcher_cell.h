@@ -53,7 +53,9 @@ public:
     void setDragging(bool dragging);
     void setMenuOpen(bool open);
     void beginRename();
-    void setDropPreview(bool active, const std::string &iconName = {});
+    void setDragHover(bool active);
+    void setFolderPreview(bool active, const std::string &incomingIconName = {});
+    void animateFolderCreated();
     bool isPressDimmed() const { return (m_pressed || m_menuOpen) && !m_dragging; }
     // The colour the selection is inked against.
     void setBackdrop(ui::Color color);
@@ -90,6 +92,7 @@ private:
     void updateMask();
     void updateCountBadge();
     void finishRename();
+    ui::RectF folderMiniRect(const ui::RectF &icon, int index) const;
 
     LauncherView *m_view;
     std::string m_id;
@@ -109,6 +112,8 @@ private:
     ui::Label *m_label = nullptr;
     ui::TextField *m_renameField = nullptr;
     ui::Color m_backdrop {0, 0, 0, 255};
+    LauncherTween m_hoverTween;
+    double m_hoverProgress = 0;
     bool m_selected = false;
     bool m_dragging = false;
     bool m_menuOpen = false;
@@ -121,6 +126,8 @@ private:
     LauncherSpring m_moveY;
     LauncherTween m_dropTween;
     double m_dropProgress = 0;
+    bool m_folderPreview = false;
+    LauncherTween m_folderCreateTween;
 };
 
 } // namespace Lingmo::Shell

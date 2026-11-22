@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <limits>
 #include <set>
 #include <utility>
 
@@ -17,6 +18,7 @@
 #include "shell/launcher/launcher_search_field.h"
 #include "shell/launcher/launcher_wallpaper.h"
 #include "ui/application.h"
+#include "ui/bitmap.h"
 #include "ui/drag.h"
 #include "ui/icon.h"
 #include "ui/keys.h"
@@ -41,6 +43,27 @@ static constexpr std::chrono::milliseconds kSettleDuration {270};
 // turns the page rather than settling on the nearest one.
 static constexpr double kFlickThreshold = 10;
 static constexpr double kFlickVelocity = 400;
+
+static ui::Image imageFromBitmap(const ui::Bitmap &bitmap)
+{
+    if (bitmap.isNull())
+        return {};
+    ui::Image image(bitmap.width(), bitmap.height());
+    uint32_t *out = image.bits();
+    for (int y = 0; y < bitmap.height(); ++y) {
+        const auto *line = reinterpret_cast<const uint32_t *>(bitmap.constScanLine(y));
+        for (int x = 0; x < bitmap.width(); ++x) {
+            const uint32_t pixel = line[x];
+            const uint32_t alpha = pixel >> 24;
+            const auto unpremultiply = [alpha](uint32_t channel) {
+                return alpha == 0 ? 0u : std::min(255u, (channel * 255 + alpha / 2) / alpha);
+            };
+            *out++ = alpha << 24 | unpremultiply((pixel >> 16) & 0xff) << 16
+                    | unpremultiply((pixel >> 8) & 0xff) << 8 | unpremultiply(pixel & 0xff);
+        }
+    }
+    return image;
+}
 
 static int jsRound(double value)
 {
@@ -106,7 +129,8 @@ public:
         m_title = addChild<ui::Label>();
         m_title->setTextAlignment(ui::Label::TextAlignment::Center);
         m_title->setVerticallyCentered(true);
-        m_title->setWeight(500);
+        m_title->setWeight(600);
+        m_title->setFontSize(24);
         m_titleField = addChild<ui::TextField>();
         m_titleField->setHorizontallyCentered(true);
         m_titleField->setVisible(false);
@@ -115,6 +139,11 @@ public:
     }
 
     bool acceptsPointer() const override { return true; }
+    void setBackdrop(ui::Image backdrop)
+    {
+        m_backdrop = std::move(backdrop);
+        requestPaint();
+    }
     void setItems(const std::vector<LauncherItem> &items)
     {
         for (ui::ThemeIcon *icon : m_icons)
@@ -144,6 +173,7 @@ public:
         m_count = items.size();
         m_page = 0;
         m_reordering = false;
+        m_dropIndex = -1;
         m_swiping = false;
         requestLayout();
     }
@@ -213,6 +243,7 @@ protected:
         const double rowHeight = metrics.cellHeight;
         const double iconSize = metrics.iconSize;
         const int pageCapacity = std::max(1, m_columns * m_rows);
+        m_slots.resize(m_count);
         for (size_t i = 0; i < m_icons.size(); ++i) {
             m_icons[i]->setSize(iconSize);
             const bool onPage = int(i) / pageCapacity == m_page;
@@ -227,9 +258,18 @@ protected:
             const double cellX = x + outerPadding + col * columnWidth;
             const double iconX = cellX + (columnWidth - iconSize) / 2;
             const double iconY = gridTop + row * rowHeight;
-            m_icons[i]->setGeometry({iconX, iconY, iconSize, iconSize});
+            m_slots[i] = {iconX, iconY, iconSize, iconSize};
+            const bool dragged = m_reordering && int(i) == m_pressIndex;
+            const ui::RectF iconRect = dragged
+                    ? ui::RectF {m_dragPosition.x - iconSize / 2, m_dragPosition.y - iconSize / 2,
+                                 iconSize, iconSize}
+                    : m_slots[i];
+            m_icons[i]->setGeometry(iconRect);
+            m_icons[i]->setOpacity(dragged ? 0.82 : 1.0);
             m_names[i]->setFontSize(metrics.labelPixelSize);
-            m_names[i]->setGeometry({cellX, iconY + iconSize + 4, columnWidth, labelHeight});
+            const double labelX = dragged ? m_dragPosition.x - columnWidth / 2 : cellX;
+            const double labelY = dragged ? iconRect.bottom() + 4 : iconY + iconSize + 4;
+            m_names[i]->setGeometry({labelX, labelY, columnWidth, labelHeight});
         }
     }
     void paint(ui::Painter &painter) override
@@ -238,14 +278,27 @@ protected:
             return;
         const double radius = std::min(18.0, std::min(m_panel.width, m_panel.height) * 0.04);
         const ui::Theme &theme = ui::Theme::current();
-        // The panel region is left transparent by the launcher surface, so
-        // the compositor can blur the desktop behind this card.
+        painter.save();
+        painter.clipRoundedRect(m_panel, radius);
+        if (!m_backdrop.isNull())
+            painter.drawImage(m_backdrop, localRect());
+        else if (m_view->m_wallpaper.isPicture() && !m_view->m_wallpaper.image().isNull()) {
+            painter.drawImage(m_view->m_wallpaper.image(), localRect());
+            painter.fillRect(m_panel, ui::Color {0, 0, 0, 102});
+        } else {
+            painter.fillRect(m_panel, m_view->m_wallpaper.color());
+        }
         const ui::Color tint = theme.darkMode ? ui::Color {24, 26, 32, 255} : ui::Color {248, 249, 252, 255};
-        // The popup surface is transparent so the compositor can blur it; a
-        // stronger tint keeps the card readable when blur is unavailable.
-        painter.fillRoundedRect(m_panel, radius, tint.withAlpha(0.58));
+        painter.fillRect(m_panel, tint.withAlpha(0.34));
+        painter.restore();
         const ui::Color border = m_ink.r < 128 ? ui::Color {0, 0, 0, 58} : ui::Color {255, 255, 255, 72};
         painter.drawRoundedRect(m_panel, {radius, 0, ui::Corners::Circular}, {}, 1, border);
+        if (m_reordering && m_dropIndex >= 0 && m_dropIndex < int(m_slots.size())) {
+            const ui::RectF slot = m_slots[size_t(m_dropIndex)];
+            painter.drawRoundedRect({slot.x - 8, slot.y - 8, slot.width + 16, slot.height + 16},
+                                    {16, 0, ui::Corners::Circular}, {}, 2,
+                                    ui::Color {80, 160, 255, 180});
+        }
     }
     void pointerMove(const ui::PointerEvent &event) override
     {
@@ -265,7 +318,9 @@ protected:
         if (!m_reordering)
             return;
         m_dragPosition = event.position;
+        m_dropIndex = nearestSlot(event.position);
         requestLayout();
+        requestPaint();
     }
     void pointerRelease(const ui::PointerEvent &event) override
     {
@@ -281,7 +336,7 @@ protected:
             requestLayout();
             return;
         }
-        if (m_title->isVisible() && m_title->geometry().contains(event.position)) {
+        if (!m_reordering && m_title->isVisible() && m_title->geometry().contains(event.position)) {
             if (LauncherCell *folder = m_view->cell(m_folderId)) {
                 m_view->closeFolderOverlay();
                 folder->beginRename();
@@ -289,19 +344,30 @@ protected:
             return;
         }
         if (m_reordering) {
-            int target = -1;
-            for (size_t i = 0; i < m_count && i < m_icons.size(); ++i) {
-                if (m_icons[i]->isVisible() && m_icons[i]->geometry().contains(event.position)) {
-                    target = int(i);
-                    break;
-                }
+            auto &model = m_view->m_launcher.applications();
+            const std::string draggedId = m_ids[size_t(m_pressIndex)];
+            bool changed = false;
+            if (outsidePanel(event.position)) {
+                changed = model.removeFromFolder(m_folderId, draggedId);
+            } else {
+                const int target = nearestSlot(event.position);
+                if (target >= 0 && target != m_pressIndex)
+                    changed = model.moveInFolder(m_folderId, draggedId, target);
             }
-            if (target >= 0 && target != m_pressIndex)
-                m_view->m_launcher.applications().moveInFolder(m_folderId, m_ids[size_t(m_pressIndex)], target);
-            m_view->m_launcher.applications().endReorder(true);
+            model.endReorder(true);
             m_reordering = false;
             m_pressIndex = -1;
-            requestLayout();
+            m_dropIndex = -1;
+            if (changed) {
+                const std::vector<LauncherItem> items = model.folderItems(m_folderId);
+                if (model.findById(m_folderId) < 0)
+                    m_view->closeFolderOverlay();
+                else
+                    setItems(items);
+            } else {
+                requestLayout();
+            }
+            requestPaint();
             return;
         }
         for (size_t i = 0; i < m_count && i < m_ids.size(); ++i) {
@@ -317,6 +383,7 @@ protected:
     {
         m_pressPosition = event.position;
         m_pressIndex = -1;
+        m_dropIndex = -1;
         m_swiping = false;
         for (size_t i = 0; i < m_count && i < m_icons.size(); ++i) {
             if (m_icons[i]->isVisible() && m_icons[i]->geometry().contains(event.position)) {
@@ -326,6 +393,37 @@ protected:
         }
     }
 private:
+    int nearestSlot(ui::PointF position) const
+    {
+        const double gridTop = m_panel.y + m_panel.height * 0.17;
+        if (m_pressIndex < 0 || outsidePanel(position) || position.y < gridTop)
+            return -1;
+        const ui::RectF source = m_slots[size_t(m_pressIndex)];
+        if (source.contains(position))
+            return m_pressIndex;
+        int nearest = -1;
+        double bestDistance = std::numeric_limits<double>::max();
+        for (size_t i = 0; i < m_count && i < m_slots.size(); ++i) {
+            if (int(i) == m_pressIndex || !m_icons[i]->isVisible())
+                continue;
+            const ui::RectF slot = m_slots[i];
+            const double dx = position.x - (slot.x + slot.width / 2);
+            const double dy = position.y - (slot.y + slot.height / 2);
+            const double distance = dx * dx + dy * dy;
+            if (distance < bestDistance) {
+                bestDistance = distance;
+                nearest = int(i);
+            }
+        }
+        return nearest;
+    }
+
+    bool outsidePanel(ui::PointF position) const
+    {
+        return position.x < m_panel.x || position.y < m_panel.y || position.x >= m_panel.right()
+                || position.y >= m_panel.bottom();
+    }
+
     void finishRename(bool save)
     {
         const std::string name = m_titleField->text();
@@ -339,9 +437,11 @@ private:
     }
 
     LauncherView *m_view;
+    ui::Image m_backdrop;
     std::vector<ui::ThemeIcon *> m_icons;
     std::vector<ui::Label *> m_names;
     std::vector<std::string> m_ids;
+    std::vector<ui::RectF> m_slots;
     ui::Label *m_title = nullptr;
     ui::TextField *m_titleField = nullptr;
     std::string m_folderId;
@@ -350,6 +450,7 @@ private:
     ui::PointF m_pressPosition;
     ui::PointF m_dragPosition;
     int m_pressIndex = -1;
+    int m_dropIndex = -1;
     bool m_reordering = false;
     int m_columns = 1;
     int m_rows = 1;
@@ -469,13 +570,16 @@ LauncherView::LauncherView(Launcher &launcher, LauncherWallpaper &wallpaper, App
 {
     setName("launcher");
     m_pagesView = addChild<Pages>(this);
-    m_folderOverlayOwner = std::make_unique<FolderOverlay>(this);
-    m_folderOverlay = m_folderOverlayOwner.get();
     m_search = addChild<LauncherSearchField>();
     m_notFound = addChild<ui::Label>(tr("Not found"));
     m_notFound->setColor(kWhite);
     m_notFound->setVisible(false);
     m_indicator = addChild<Indicator>(this);
+    // Keep the folder in the launcher's own surface.  This lets the
+    // compositor blur the desktop below the card without introducing a
+    // full-screen transparent popup surface.
+    m_folderOverlay = addChild<FolderOverlay>(this);
+    m_folderOverlay->setVisible(false);
 
     m_wheelReset.setSingleShot(true);
     m_wheelReset.setInterval(std::chrono::milliseconds(250));
@@ -494,10 +598,24 @@ LauncherView::LauncherView(Launcher &launcher, LauncherWallpaper &wallpaper, App
             m_reorderTimer.start();
             return;
         }
+        LauncherCell *source = cell(m_draggedId);
+        LauncherCell *target = cell(m_hoveredId);
+        if (!source || !target) {
+            m_reorderPending = false;
+            m_folderDropState = FolderDropState::Dragging;
+            return;
+        }
+        if (m_folderPreviewEligible && !source->isFolder() && !target->isFolder()) {
+            m_folderDropState = FolderDropState::FolderPreview;
+            target->setFolderPreview(true, source->iconName());
+            return;
+        }
+        if (!source->isFolder() && target->isFolder())
+            return;
+
         m_reorderPending = false;
-        const LauncherCell *hovered = cell(m_hoveredId);
-        if (hovered)
-            requestMove(hovered->page() * m_metrics.pageCount + hovered->index());
+        m_folderDropState = FolderDropState::Dragging;
+        requestMove(target->page() * m_metrics.pageCount + target->index());
     };
     // Only a drag reorder slides the icons; this keeps them sliding a moment
     // after a swap.
@@ -1267,11 +1385,10 @@ void LauncherView::cellClicked(LauncherCell *cell, ui::MouseButton button, ui::P
             if (m_folderOverlay) {
                 m_openFolderId = cell->id();
                 cell->setVisible(false);
-                if (m_folderOverlayOwner && folderOverlayCreated) {
-                    folderOverlayCreated(std::unique_ptr<ui::View>(std::move(m_folderOverlayOwner)));
-                }
-                if (folderOverlayShown)
-                    folderOverlayShown(true);
+                ui::Bitmap backdrop = grab(LauncherWallpaper::kQuality);
+                LauncherWallpaper::blur(backdrop);
+                m_folderOverlay->setBackdrop(imageFromBitmap(backdrop));
+                m_folderOverlay->setVisible(true);
                 m_folderProgress = 0;
                 m_folderTween.start(window(), m_folderProgress, 1, std::chrono::milliseconds(300),
                                     easing::outCubic,
@@ -1303,8 +1420,9 @@ void LauncherView::closeFolderOverlay()
                             m_folderOverlay->setProgress(value);
                             if (value <= 0)
                                  {
-                                     if (folderOverlayShown)
-                                         folderOverlayShown(false);
+                                     if (folderBlurChanged)
+                                         folderBlurChanged({}, false);
+                                     m_folderOverlay->setVisible(false);
                                      if (!m_openFolderId.empty()) {
                                          if (LauncherCell *folder = cell(m_openFolderId))
                                              folder->setVisible(true);
@@ -1392,6 +1510,7 @@ bool LauncherView::startCellDrag(LauncherCell *cell, ui::View *icon)
         return false;
     m_launcher.applications().beginReorder();
     m_draggedId = cell->id();
+    m_folderDropState = FolderDropState::Dragging;
     cell->setDragging(true);
     // Losing the activation to the drag must not hide the launcher.
     m_launcher.setDragging(true);
@@ -1403,10 +1522,13 @@ void LauncherView::endDrag()
     m_reorderTimer.stop();
     m_edgeTimer.stop();
     m_edge = 0;
-    if (LauncherCell *old = cell(m_hoveredId))
-        old->setDropPreview(false);
+    if (LauncherCell *old = cell(m_hoveredId)) {
+        old->setFolderPreview(false);
+        old->setDragHover(false);
+    }
     m_hoveredId.clear();
     m_reorderPending = false;
+    m_folderDropState = FolderDropState::Normal;
     if (m_draggedId.empty())
         return;
     const std::string id = std::exchange(m_draggedId, {});
@@ -1465,9 +1587,15 @@ void LauncherView::dragLeave()
 {
     m_reorderTimer.stop();
     m_reorderPending = false;
-    if (LauncherCell *old = cell(m_hoveredId))
-        old->setDropPreview(false);
+    if (LauncherCell *old = cell(m_hoveredId)) {
+        old->setFolderPreview(false);
+        old->setDragHover(false);
+    }
     m_hoveredId.clear();
+    if (!m_draggedId.empty())
+        m_folderDropState = m_folderDropState == FolderDropState::FolderPreview
+                ? FolderDropState::Cancelled
+                : FolderDropState::Dragging;
     m_edgeTimer.stop();
     m_edge = 0;
 }
@@ -1475,14 +1603,36 @@ void LauncherView::dragLeave()
 uint32_t LauncherView::drop(const ui::DragEvent &event)
 {
     updateDragTarget(event.position);
+    LauncherCell *source = cell(m_draggedId);
+    LauncherCell *target = cell(m_hoveredId);
+    const bool previewCommit = m_folderDropState == FolderDropState::FolderPreview && source && target
+            && !source->isFolder() && !target->isFolder();
+    const bool addToFolder = source && target && !source->isFolder() && target->isFolder();
     if (m_reorderPending && !m_draggedId.empty() && !m_hoveredId.empty()
-        && m_hoveredId != m_draggedId) {
+        && m_hoveredId != m_draggedId && (previewCommit || addToFolder)) {
         m_reorderTimer.stop();
+        if (previewCommit || addToFolder) {
+            target->setFolderPreview(false);
+            target->setDragHover(false);
+        }
+        const std::string sourceId = m_draggedId;
+        const std::string targetId = m_hoveredId;
         if (m_launcher.applications().makeFolder(m_draggedId, m_hoveredId)) {
-            if (LauncherCell *target = cell(m_hoveredId))
-                target->setDropPreview(false);
+            const auto &items = m_launcher.applications().allItems();
+            const auto created = std::find_if(items.begin(), items.end(), [&](const LauncherItem &item) {
+                if (!item.folder)
+                    return false;
+                return std::find(item.members.begin(), item.members.end(), sourceId) != item.members.end()
+                        && std::find(item.members.begin(), item.members.end(), targetId) != item.members.end();
+            });
+            if (created != items.end()) {
+                if (LauncherCell *folder = cell(created->id))
+                    folder->animateFolderCreated();
+            }
+            m_folderDropState = FolderDropState::FolderCreated;
             m_reorderPending = false;
             m_hoveredId.clear();
+            m_folderPreviewEligible = false;
             return ui::MoveAction;
         }
     }
@@ -1495,8 +1645,12 @@ uint32_t LauncherView::drop(const ui::DragEvent &event)
         if (const LauncherCell *hovered = cell(m_hoveredId))
             requestMove(hovered->page() * m_metrics.pageCount + hovered->index());
     }
-    if (LauncherCell *old = cell(m_hoveredId))
-        old->setDropPreview(false);
+    if (LauncherCell *old = cell(m_hoveredId)) {
+        old->setFolderPreview(false);
+        old->setDragHover(false);
+    }
+    if (m_folderDropState == FolderDropState::FolderPreview || m_folderDropState == FolderDropState::Hovering)
+        m_folderDropState = FolderDropState::Cancelled;
     m_reorderPending = false;
     m_hoveredId.clear();
     return ui::MoveAction;
@@ -1543,19 +1697,44 @@ void LauncherView::updateDragTarget(ui::PointF position)
                 hovered = rows[size_t(index)].id;
         }
     }
+    if (hovered == m_draggedId)
+        hovered.clear();
     if (hovered != m_hoveredId) {
-        if (LauncherCell *old = cell(m_hoveredId))
-            old->setDropPreview(false);
+        if (LauncherCell *old = cell(m_hoveredId)) {
+            old->setFolderPreview(false);
+            old->setDragHover(false);
+        }
         m_hoveredId = hovered;
+        m_folderPreviewEligible = false;
         if (!m_hoveredId.empty()) {
-            if (LauncherCell *target = cell(m_hoveredId))
-                target->setDropPreview(true, cell(m_draggedId) ? cell(m_draggedId)->iconName() : std::string());
+            if (LauncherCell *target = cell(m_hoveredId)) {
+                target->setDragHover(true);
+                const ui::RectF bounds = target->geometry();
+                const ui::PointF local {position.x - bounds.x, position.y - bounds.y};
+                m_folderPreviewEligible = target->iconRect().contains(local) && !target->isFolder();
+            }
+            m_folderDropState = FolderDropState::Hovering;
+        } else if (!m_draggedId.empty()) {
+            m_folderDropState = FolderDropState::Dragging;
         }
         m_reorderPending = !hovered.empty();
         if (m_reorderPending)
             m_reorderTimer.start();
         else
             m_reorderTimer.stop();
+    } else if (!m_hoveredId.empty()) {
+        if (LauncherCell *target = cell(m_hoveredId)) {
+            const ui::RectF bounds = target->geometry();
+            const ui::PointF local {position.x - bounds.x, position.y - bounds.y};
+            const bool eligible = target->iconRect().contains(local) && !target->isFolder();
+            if (eligible != m_folderPreviewEligible) {
+                m_folderPreviewEligible = eligible;
+                m_reorderTimer.stop();
+                target->setFolderPreview(false);
+                if (eligible && m_reorderPending)
+                    m_reorderTimer.start();
+            }
+        }
     }
 }
 

@@ -7,6 +7,7 @@
 #include <algorithm>
 
 #include "base/file.h"
+#include "base/i18n.h"
 #include "base/settings.h"
 #include "base/strings.h"
 #include "dbus_test_client.h"
@@ -29,8 +30,8 @@ protected:
     LauncherTest()
     {
         applications.addSimple("zeta", "Zeta");
-        applications.addSimple("alpha", "Alpha", "", "GenericName=Web Browser\n");
-        applications.addSimple("mid", "Middle", "", "Comment=\xc3\x89" "cran\n");
+        applications.addSimple("alpha", "Alpha", "", "GenericName=Web Browser\nCategories=Network;WebBrowser;\n");
+        applications.addSimple("mid", "Middle", "", "Comment=\xc3\x89" "cran\nCategories=Office;WordProcessor;\n");
         applications.addSimple("console", "Console", "", "Terminal=true\n");
     }
 
@@ -136,6 +137,7 @@ TEST_F(LauncherTest, CreatesPersistsAndSearchesFolders)
     ASSERT_NE(model().rows().end(), folder);
     const std::string folderId = folder->id;
     EXPECT_EQ(2u, model().folderItems(folderId).size());
+    EXPECT_EQ(Lingmo::i18n::tr("Applications"), folder->name);
     EXPECT_TRUE(model().renameFolder(folderId, "Work"));
     const auto renamed = std::find_if(model().rows().begin(), model().rows().end(),
                                       [&](const shell::LauncherItem &item) { return item.id == folderId; });
@@ -174,6 +176,57 @@ TEST_F(LauncherTest, CreatesPersistsAndSearchesFolders)
     EXPECT_GE(model().findById("alpha"), 0);
     EXPECT_GE(model().findById("mid"), 0);
     EXPECT_GE(model().findById("zeta"), 0);
+}
+
+TEST_F(LauncherTest, FoldersUseSharedCategoriesAndPreserveMemberOrder)
+{
+    start();
+    applications.addSimple("game-a", "Game A", "", "Categories=Game;\n");
+    applications.addSimple("game-b", "Game B", "", "Categories=Game;\n");
+    applications.addSimple("game-c", "Game C", "", "Categories=Game;\n");
+    applications.scan();
+    ASSERT_TRUE(test::runUntil([&] { return model().count() == 6; }));
+
+    ASSERT_TRUE(model().makeFolder("game-a", "game-b"));
+    const auto folder = std::find_if(model().allItems().begin(), model().allItems().end(),
+                                     [](const shell::LauncherItem &item) { return item.folder; });
+    ASSERT_NE(model().allItems().end(), folder);
+    const std::string folderId = folder->id;
+    EXPECT_EQ(Lingmo::i18n::tr("Games"), folder->name);
+
+    ASSERT_TRUE(model().makeFolder("game-c", folderId));
+    ASSERT_TRUE(model().moveInFolder(folderId, "game-c", 0));
+    const auto items = model().folderItems(folderId);
+    ASSERT_EQ(3u, items.size());
+    EXPECT_EQ("game-c", items[0].id);
+    EXPECT_EQ("game-b", items[1].id);
+    EXPECT_EQ("game-a", items[2].id);
+
+    ASSERT_TRUE(model().removeFromFolder(folderId, "game-a"));
+    EXPECT_EQ(2u, model().folderItems(folderId).size());
+    EXPECT_GE(model().findById("game-a"), 0);
+    model().save();
+    shell::waitForFileThread();
+
+    launcher.reset();
+    start();
+    applications.scan();
+    ASSERT_TRUE(test::runUntil([&] { return model().count() == 5; }));
+    const auto restored = model().folderItems(folderId);
+    ASSERT_EQ(2u, restored.size());
+    EXPECT_EQ("game-c", restored[0].id);
+    EXPECT_EQ("game-b", restored[1].id);
+}
+
+TEST_F(LauncherTest, MigratesTheOldDefaultFolderName)
+{
+    start("[Launcher]\norder=legacy,zeta\n\n[LauncherFolders/legacy]\nname=Folder\nmembers=alpha,mid\n");
+    applications.scan();
+    ASSERT_TRUE(test::runUntil([&] { return model().count() == 2; }));
+    const auto folder = std::find_if(model().rows().begin(), model().rows().end(),
+                                     [](const shell::LauncherItem &item) { return item.folder; });
+    ASSERT_NE(model().rows().end(), folder);
+    EXPECT_EQ(Lingmo::i18n::tr("Applications"), folder->name);
 }
 
 TEST_F(LauncherTest, PagesFollowTheList)

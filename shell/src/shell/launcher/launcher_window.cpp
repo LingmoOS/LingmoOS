@@ -37,45 +37,14 @@ LauncherWindow::LauncherWindow(Shell *shell, std::unique_ptr<Launcher> launcher,
     auto view = std::make_unique<LauncherView>(*m_launcher, *m_wallpaper, shell->badges());
     m_view = view.get();
     m_view->folderBlurChanged = [this](ui::RectF panel, bool active) {
-        if (!m_folderWindow)
-            return;
+        // The folder is rendered by LauncherView on this surface.  Keep the
+        // blur on that same surface so the desktop remains visible through
+        // the transparent card instead of relying on a full-screen popup.
         if (!active || (m_dock && m_dock->settings().efficientMode())) {
-            m_folderWindow->setBackgroundBlur({}, 0);
+            m_window->window()->setBackgroundBlur({}, 0);
             return;
         }
-        const int left = std::max(0, int(std::floor(panel.x)));
-        const int top = std::max(0, int(std::floor(panel.y)));
-        const int right = std::min(int(std::lround(m_folderWindow->size().width)), int(std::ceil(panel.right())));
-        const int bottom = std::min(int(std::lround(m_folderWindow->size().height)), int(std::ceil(panel.bottom())));
-        m_folderWindow->setBackgroundBlur({double(left), double(top), double(std::max(1, right - left)),
-                                           double(std::max(1, bottom - top))}, 18);
-    };
-    m_view->folderOverlayCreated = [this](std::unique_ptr<ui::View> overlay) {
-        ui::PopupPlacement placement;
-        placement.anchorRect = {0, 0, 1, 1};
-        placement.anchor = ui::PopupAnchor::TopLeft;
-        placement.gravity = ui::PopupAnchor::TopLeft;
-        placement.flipX = placement.flipY = placement.slide = placement.resize = false;
-        m_folderWindow = ui::Window::createPopup(m_window->window(), placement, false);
-        m_folderWindow->resize(m_window->window()->size());
-        m_folderWindow->setBackgroundColor(ui::Color {0, 0, 0, 0});
-        // Keep the popup surface genuinely transparent. The folder panel
-        // requests a local backdrop blur through folderBlurChanged; applying
-        // GlassMaterial here would tint the entire popup dark before that
-        // local blur is composited.
-        m_folderWindow->setBackgroundGlass(std::nullopt);
-        m_folderWindow->setContentView(std::move(overlay));
-        m_folderWindow->show();
-    };
-    m_view->folderOverlayShown = [this](bool shown) {
-        if (!m_folderWindow)
-            return;
-        if (shown) {
-            m_folderWindow->show();
-        } else {
-            m_folderWindow->setBackgroundBlur({}, 0);
-            m_folderWindow->hide();
-        }
+        m_window->window()->setBackgroundBlur(panel, 18);
     };
     m_window->setContentView(std::move(view));
     // Transparent: until the wallpaper decodes, the dimmer darkens what is
@@ -109,9 +78,6 @@ LauncherWindow::~LauncherWindow()
     m_launcher->hideWindow = nullptr;
     m_launcher->focusSearchWindow = nullptr;
     m_view->folderBlurChanged = nullptr;
-    m_view->folderOverlayCreated = nullptr;
-    m_view->folderOverlayShown = nullptr;
-    m_folderWindow.reset();
     m_window.reset();
     m_wallpaper.reset();
     m_launcher.reset();

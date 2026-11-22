@@ -31,6 +31,8 @@ static constexpr double kLargeSpacing = 12;
 // width makes FramelessDialog rely on an implicit layout width, which is not
 // defined for the nested segmented control and collapses the window.
 static constexpr double kContentWidth = 520;
+static constexpr double kPageWidth = 440;
+static constexpr double kPageHeight = 400;
 
 // "Fri Oct 16 09:30:00 2026", local time.
 static std::string textDate(int64_t milliseconds)
@@ -134,15 +136,15 @@ std::unique_ptr<ui::View> PropertiesDialog::createContent()
 {
     auto layout = std::make_unique<ui::ColumnLayout>();
     layout->setSpacing(kLargeSpacing);
-    m_pages = layout->addChild<ui::SegmentedControl>(std::vector<std::string>{tr("General"), tr("Permissions")},
-                                                     ui::SegmentedControl::Style::Tabs);
-    m_pages->setLayoutHints({.alignment = ui::Alignment::Center});
+    m_pages = layout->addChild<ui::SegmentedControl>(
+            std::vector<std::string>{tr("General"), tr("Permissions")}, ui::SegmentedControl::Style::Segmented);
+    m_pages->setLayoutHints({.fillWidth = true});
     m_pages->setCurrentIndex(m_page);
     m_pages->onCurrentChanged = [this](int index) { setPage(index); };
     // The active page must participate in the dialog's intrinsic height.
     // A plain View reports zero height, which used to crop the property rows.
     m_pageHost = layout->addChild<ui::ColumnLayout>();
-    m_pageHost->setLayoutHints({.fillWidth = true});
+    m_pageHost->setLayoutHints({.fillWidth = true, .preferredHeight = kPageHeight});
     setPage(m_page);
     return layout;
 }
@@ -161,10 +163,9 @@ void PropertiesDialog::setPage(int index)
     }
     if (old)
         base::EventLoop::current()->post([old] {});
-    if (m_page == 0)
-        m_pageHost->addChild(createGeneralContent());
-    else
-        m_pageHost->addChild(createPermissionsContent());
+    std::unique_ptr<ui::View> page = m_page == 0 ? createGeneralContent() : createPermissionsContent();
+    page->setLayoutHints({.preferredWidth = kPageWidth, .horizontalAlignment = ui::Alignment::Center});
+    m_pageHost->addChild(std::move(page));
     fit();
 }
 

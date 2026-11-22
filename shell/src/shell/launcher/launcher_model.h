@@ -28,6 +28,7 @@ struct LauncherItem {
     std::string genericName;
     std::string comment;
     std::string iconName;
+    std::vector<std::string> categories;
     // Installed since the launcher last looked, until it is opened.
     bool newInstalled = false;
     bool folder = false;

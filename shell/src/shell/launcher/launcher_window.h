@@ -68,7 +68,6 @@ private:
     std::unique_ptr<Launcher> m_launcher;
     Dock *m_dock;
     std::unique_ptr<LauncherWallpaper> m_wallpaper;
-    std::unique_ptr<ui::Window> m_folderWindow;
     std::unique_ptr<ShellWindow> m_window;
     LauncherView *m_view = nullptr;
     std::vector<base::Subscription> m_subscriptions;
