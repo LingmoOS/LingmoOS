@@ -52,6 +52,7 @@ public:
     // Window::isDeskHidden flipped: the window's desk was activated or left,
     // or the window moved to another desk.
     virtual void onWindowDeskHiddenChanged(Window* window) { }
+    virtual void onWindowStageHiddenChanged(Window* window) { }
 
     // Window::minimizedSnapshot was taken or dropped.
     virtual void onWindowMinimizedSnapshotChanged(Window* window) { }

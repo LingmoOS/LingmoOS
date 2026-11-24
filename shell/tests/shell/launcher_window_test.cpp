@@ -389,6 +389,18 @@ TEST_F(LauncherWindowTest, LosingTheActivationHides)
     launcher().setDragging(false);
 }
 
+TEST_F(LauncherWindowTest, DockToggleSurvivesTheOpeningFocusTransition)
+{
+    open();
+    launcher().toggle();
+    ASSERT_TRUE(launcher().isShown());
+    manager.activation()->deactivate(launcherWindow->window()->wmWindow());
+    test::runFor(std::chrono::milliseconds(20));
+    EXPECT_TRUE(launcher().isShown());
+    launcher().hide();
+    EXPECT_FALSE(launcher().isShown());
+}
+
 TEST_F(LauncherWindowTest, ACancelledDragPutsTheOrderBackUnsaved)
 {
     std::string stored;

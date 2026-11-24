@@ -37,11 +37,13 @@
 #include "scene/window_visual_node.h"
 #include "shm_test_util.h"
 #include "wm/activation.h"
+#include "wm/desks/desk.h"
 #include "wm/anchored_placement.h"
 #include "wm/placement.h"
 #include "wm/quit_all.h"
 #include "wm/snap_drag_controller.h"
 #include "wm/stacking.h"
+#include "wm/stage/stage_manager.h"
 #include "wm/toplevel_event_handler.h"
 #include "wm/transient_manager.h"
 #include "wm/window.h"
@@ -2088,6 +2090,76 @@ TEST_F(WmTest, DesktopPopupTreeStaysAboveApplicationsAndBelowDock)
     verifyOrder();
     manager.raise(application);
     verifyOrder();
+}
+
+TEST_F(WmTest, StageGroupsAreIndependentFromDesksAndPreserveGeometry)
+{
+    Window *first = makeWindow({40, 50, 240, 160});
+    Window *second = makeWindow({360, 120, 260, 180});
+    manager.stageManager()->setEnabled(true);
+    const auto initial = manager.stageManager()->snapshot();
+    ASSERT_EQ(2u, initial.groups.size());
+    EXPECT_EQ(1u, manager.desks()->desks().size());
+    const base::Rect firstBounds = first->bounds();
+    EXPECT_TRUE(manager.stageManager()->switchTo(initial.groups[1].id));
+    EXPECT_TRUE(first->isStageHidden());
+    EXPECT_FALSE(first->isVisible());
+    EXPECT_TRUE(second->isVisible());
+    EXPECT_EQ(firstBounds, first->bounds());
+    EXPECT_EQ(second, manager.activation()->activeWindow());
+    EXPECT_EQ(1u, manager.desks()->desks().size());
+}
+
+TEST_F(WmTest, StageGroupMembershipCanMoveAndSeparateWithoutDeskMutation)
+{
+    Window *first = makeWindow({20, 20, 200, 120});
+    Window *second = makeWindow({300, 20, 200, 120});
+    manager.stageManager()->setEnabled(true);
+    auto snapshot = manager.stageManager()->snapshot();
+    ASSERT_EQ(2u, snapshot.groups.size());
+    const auto target = snapshot.groups.front().id;
+    EXPECT_TRUE(manager.stageManager()->moveWindow(second->id(), target));
+    snapshot = manager.stageManager()->snapshot();
+    ASSERT_EQ(1u, snapshot.groups.size());
+    EXPECT_EQ(2u, snapshot.groups.front().windows.size());
+    EXPECT_TRUE(manager.stageManager()->separateWindow(second->id()));
+    snapshot = manager.stageManager()->snapshot();
+    EXPECT_EQ(2u, snapshot.groups.size());
+    EXPECT_EQ(1u, manager.desks()->desks().size());
+    EXPECT_FALSE(first->bounds().isEmpty());
+}
+
+TEST_F(WmTest, StageSelectionsRemainScopedToTheirDesk)
+{
+    Window *first = makeWindow({20, 20, 200, 120});
+    Window *second = makeWindow({300, 20, 200, 120});
+    manager.stageManager()->setEnabled(true);
+    auto firstDesk = manager.stageManager()->snapshot();
+    const auto firstDeskId = firstDesk.desk;
+    ASSERT_EQ(2u, firstDesk.groups.size());
+    const auto firstDeskGroup = firstDesk.groups.front().id;
+    const auto secondDeskGroup = firstDesk.groups.back().id;
+    ASSERT_TRUE(manager.stageManager()->switchTo(secondDeskGroup));
+
+    Desk *desk = manager.desks()->newDesk(DesksCreationRemovalSource::Api);
+    ASSERT_NE(nullptr, desk);
+    ASSERT_TRUE(manager.desks()->moveWindowFromActiveDeskTo(second, desk));
+    manager.desks()->activateDesk(desk, DesksSwitchSource::DeskRestored);
+
+    auto secondDesk = manager.stageManager()->snapshot();
+    ASSERT_EQ(desk->id(), secondDesk.desk);
+    ASSERT_EQ(1u, secondDesk.groups.size());
+    ASSERT_TRUE(manager.stageManager()->switchTo(secondDesk.groups.front().id));
+
+    manager.desks()->activateDesk(manager.desks()->deskAt(0), DesksSwitchSource::DeskRestored);
+    firstDesk = manager.stageManager()->snapshot();
+    ASSERT_EQ(firstDeskId, firstDesk.desk);
+    const auto active = firstDesk.active.find(firstDesk.groups.front().output);
+    ASSERT_NE(firstDesk.active.end(), active);
+    EXPECT_EQ(firstDeskGroup, active->second);
+    EXPECT_NE(secondDeskGroup, active->second);
+    EXPECT_EQ(2u, manager.desks()->desks().size());
+    (void)first;
 }
 
 ////////////////////////////////////////////////////////////////////////////////

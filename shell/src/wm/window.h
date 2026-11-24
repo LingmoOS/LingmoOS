@@ -298,7 +298,7 @@ public:
     // False while minimized, hidden or on a desk that is not active. An
     // invisible window is not rendered and is not hit tested; its surface and
     // state stay alive. Upstream: aura::Window::IsVisible.
-    bool isVisible() const { return m_visible && !m_deskHidden; }
+    bool isVisible() const { return m_visible && !m_deskHidden && !m_stageHidden; }
 
     // The window's own visibility, whatever its desk: a window on an inactive
     // desk can still be activated, which brings its desk up.
@@ -313,6 +313,14 @@ public:
 
     void setDeskHidden(bool hidden);
 
+    bool isStageHidden() const { return m_stageHidden; }
+    void setStageHidden(bool hidden);
+
+    // Stage Manager keeps a transitioning window out of pointer targeting
+    // while its scene node remains drawable for the presentation animation.
+    bool isStageTransitioning() const { return m_stageTransitioning; }
+    void setStageTransitioning(bool transitioning);
+
     // Hidden by the shell: off screen at once, with no animation and no
     // thumbnail, and orthogonal to the state type. A minimized window that is
     // hidden stays minimized and returns to the dock when it is unhidden.
@@ -324,6 +332,7 @@ public:
     // times the client's own (set_opacity). At zero it is still shown for
     // everything but the eye: frames, input, stacking.
     void setOpacity(float opacity);
+    float opacity() const { return m_opacity; }
 
     // Drawn at `scale` of its size about `anchor`, a point in bounds()
     // coordinates, animated there from what is drawn now unless `animate` is
@@ -518,6 +527,8 @@ private:
     bool m_visible = true;
     bool m_hidden = false;
     bool m_deskHidden = false;
+    bool m_stageHidden = false;
+    bool m_stageTransitioning = false;
     bool m_active = false;
     bool m_resizing = false;
     bool m_dragged = false;

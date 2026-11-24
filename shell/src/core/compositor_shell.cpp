@@ -68,6 +68,7 @@
 #include "shell/shell.h"
 #include "shell/keyboard/screen_keyboard.h"
 #include "shell/shell_window.h"
+#include "shell/stage/stage_window.h"
 #include "shell/statusbar/device_usage.h"
 #include "shell/statusbar/status_bar.h"
 #include "shell/statusbar/status_bar_window.h"
@@ -673,6 +674,9 @@ void CompositorShell::initShell()
                                                std::function<void(const ui::Bitmap &)> done) {
         return wallpaper->cache().load(path, deviceSize, std::move(done));
     });
+    m_shell->addComponent(std::make_unique<shell::StageWindow>(
+            m_shell.get(), shell::createScreenGrabber(m_globals->imageCapture(),
+                                                      m_globals->toplevelList())));
     auto *osd = m_shell->addComponent(std::make_unique<shell::Osd>(
             m_shell.get(), shell::createSessionOsdLevels(environment.bus)));
     auto dock = std::make_unique<shell::Dock>(environment.bus, m_shell->tasks(), m_shell->launcher(),

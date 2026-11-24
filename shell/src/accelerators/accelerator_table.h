@@ -67,6 +67,7 @@ inline constexpr auto kAcceleratorData = std::to_array<AcceleratorData>({
         {true, XKB_KEY_m, MetaDown | AltDown, AcceleratorAction::MoveActiveWindowBetweenDisplays},
         {true, XKB_KEY_Tab, MetaDown, AcceleratorAction::ToggleOverview},
         {true, XKB_KEY_XF86LaunchA, NoModifier, AcceleratorAction::ToggleOverview},
+        {true, XKB_KEY_s, MetaDown | ShiftDown, AcceleratorAction::ToggleStageManager},
 
         // Desks, with Meta where upstream has Search.
         {true, XKB_KEY_bracketleft, MetaDown, AcceleratorAction::DesksActivateDeskLeft},
@@ -147,6 +148,8 @@ inline constexpr auto kCommandAcceleratorData = std::to_array<AcceleratorData>({
          AcceleratorAction::MoveActiveWindowBetweenDisplays},
         {true, XKB_KEY_Up, ControlDown, AcceleratorAction::ToggleOverview},
         {true, XKB_KEY_XF86LaunchA, NoModifier, AcceleratorAction::ToggleOverview},
+        {true, XKB_KEY_s, ControlDown | MetaDown | ShiftDown,
+         AcceleratorAction::ToggleStageManager},
 
         // Desks, with Control+Command where PC has Meta.
         {true, XKB_KEY_bracketleft, ControlDown | MetaDown,

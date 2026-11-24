@@ -23,6 +23,7 @@
 #include "wm/desks/desks_controller.h"
 #include "wm/overview/overview_controller.h"
 #include "wm/show_desktop_controller.h"
+#include "wm/stage/stage_manager.h"
 #include "wm/toplevel_event_handler.h"
 #include "wm/window.h"
 #include "wm/window_cycle_controller.h"
@@ -80,6 +81,12 @@ bool canToggleOverview(const CommandContext &context)
 bool canToggleShowDesktop(const CommandContext &context)
 {
     return context.windowManager && context.windowManager->showDesktop();
+}
+
+bool canToggleStageManager(const CommandContext &context)
+{
+    return context.windowManager && context.windowManager->stageManager()
+            && context.windowManager->allowsActivation();
 }
 
 void cycleForwardMru(const CommandContext &context)
@@ -175,6 +182,13 @@ void toggleOverview(const CommandContext &context)
 void toggleShowDesktop(const CommandContext &context)
 {
     context.windowManager->showDesktop()->toggle();
+}
+
+void toggleStageManager(const CommandContext &context)
+{
+    wm::StageManager *stage = context.windowManager ? context.windowManager->stageManager() : nullptr;
+    if (stage)
+        stage->setEnabled(!stage->enabled());
 }
 
 void moveActiveWindowBetweenDisplays(const CommandContext &context)

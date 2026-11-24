@@ -380,7 +380,7 @@ void Window::setPresentationHidden(bool hidden)
 void Window::updateNodeVisibility()
 {
     if (m_node)
-        m_node->setVisible(isVisible() && !m_presentationHidden);
+        m_node->setVisible((isVisible() || m_stageTransitioning) && !m_presentationHidden);
 }
 
 void Window::updateSurfacePlacement()
@@ -444,6 +444,30 @@ void Window::setDeskHidden(bool hidden)
     onEffectiveVisibilityChanged(wasVisible);
 }
 
+void Window::setStageHidden(bool hidden)
+{
+    if (hidden == m_stageHidden)
+        return;
+    const bool wasVisible = isVisible();
+    m_stageHidden = hidden;
+    forEachObserver(this, m_observers, [this](WindowObserver *observer) {
+        observer->onWindowStageHiddenChanged(this);
+    });
+    onEffectiveVisibilityChanged(wasVisible);
+}
+
+void Window::setStageTransitioning(bool transitioning)
+{
+    if (transitioning == m_stageTransitioning)
+        return;
+    m_stageTransitioning = transitioning;
+    // Keep the scene node available for WindowAnimation while the client
+    // surface itself is hidden. WM hit testing skips the transition state.
+    if (m_rootSurface)
+        m_rootSurface->setHidden(transitioning || !isVisible());
+    updateNodeVisibility();
+}
+
 void Window::onEffectiveVisibilityChanged(bool wasVisible)
 {
     const bool visible = isVisible();
@@ -451,7 +475,7 @@ void Window::onEffectiveVisibilityChanged(bool wasVisible)
         return;
     updateNodeVisibility();
     if (m_rootSurface)
-        m_rootSurface->setHidden(!visible);
+        m_rootSurface->setHidden(!visible || m_stageTransitioning);
     forEachObserver(this, m_observers, [this, visible](WindowObserver *observer) {
         observer->onWindowVisibilityChanged(this, visible);
     });

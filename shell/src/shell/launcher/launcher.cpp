@@ -7,6 +7,7 @@
 #include <algorithm>
 
 #include "base/logging.h"
+#include "core/main_loop.h"
 #include "shell/common/task_manager.h"
 #include "shell/dock/dock.h"
 
@@ -20,7 +21,11 @@ Launcher::Launcher(base::dbus::Connection *bus, TaskManager &tasks, ApplicationL
     , m_tasks(tasks)
     , m_dock(dock)
     , m_applications(tasks.applicationSource(), launcher, std::move(settingsPath))
+    , m_toggleGraceTimer(core::mainLoop())
 {
+    m_toggleGraceTimer.setSingleShot(true);
+    m_toggleGraceTimer.setInterval(std::chrono::milliseconds(500));
+    m_toggleGraceTimer.onTimeout = [this] { m_toggleGrace = false; };
     const auto note = [this](const std::string &application) { noteApplicationOpened(application); };
     m_subscriptions.push_back(m_tasks.applicationAdded.connect(note));
     // A window can open before the registry has its new entry.
@@ -74,6 +79,8 @@ void Launcher::show()
 void Launcher::hide()
 {
     m_shown = false;
+    m_toggleGraceTimer.stop();
+    m_toggleGrace = false;
     setDragging(false);
     if (hideWindow)
         hideWindow();
@@ -81,7 +88,18 @@ void Launcher::hide()
 
 void Launcher::toggle()
 {
-    m_shown ? hide() : show();
+    if (m_shown) {
+        hide();
+        return;
+    }
+    m_toggleGrace = true;
+    m_toggleGraceTimer.start();
+    show();
+}
+
+bool Launcher::inToggleGracePeriod() const
+{
+    return m_shown && m_toggleGrace;
 }
 
 void Launcher::focusSearch()

@@ -98,9 +98,12 @@ public:
     // the main loop with the image in the output's buffer orientation and
     // the wl_output transform that turns it upright, or a null image when
     // the frame failed. Dropping the returned handle abandons the request.
+    // Only compositor-owned previews may include a hidden toplevel; protocol
+    // clients cannot set this option.
     using CaptureDone = std::function<void(ui::Bitmap image, uint32_t transform)>;
     [[nodiscard]] std::shared_ptr<void> capture(std::shared_ptr<compositor::CaptureSource> source,
-                                                bool cursors, CaptureDone done);
+                                                bool cursors, CaptureDone done,
+                                                bool includeHiddenWindow = false);
     // The whole of the output named `output`, for capture().
     static std::shared_ptr<compositor::CaptureSource> outputSource(const std::string &output);
 

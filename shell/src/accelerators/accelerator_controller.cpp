@@ -173,6 +173,8 @@ bool AcceleratorController::canPerformAction(AcceleratorAction action,
         return commands::canToggleOverview(m_context);
     case AcceleratorAction::ToggleShowDesktop:
         return commands::canToggleShowDesktop(m_context);
+    case AcceleratorAction::ToggleStageManager:
+        return commands::canToggleStageManager(m_context);
 
     // The following are always enabled.
     case AcceleratorAction::ToggleScreenKeyboard:
@@ -282,6 +284,9 @@ void AcceleratorController::performAction(AcceleratorAction action, const Accele
         break;
     case AcceleratorAction::ToggleShowDesktop:
         commands::toggleShowDesktop(m_context);
+        break;
+    case AcceleratorAction::ToggleStageManager:
+        commands::toggleStageManager(m_context);
         break;
     case AcceleratorAction::DesksActivateDeskLeft:
     case AcceleratorAction::DesksActivateDeskRight:

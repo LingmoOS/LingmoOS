@@ -246,8 +246,14 @@ void ShowDesktopController::slideTo(double target)
 
 void ShowDesktopController::present()
 {
-    for (Window *window : m_windows)
+    for (Window *window : m_windows) {
+        // Stage transitions own the presentation transform for their
+        // windows. Let the desktop slide continue for the remaining windows
+        // without overwriting the stage animation on these ones.
+        if (window->isStageTransitioning())
+            continue;
         window->setPresentationOffset((base::PointF(awayOffset(window)) * m_progress).toPoint());
+    }
 }
 
 void ShowDesktopController::release(Window *window)

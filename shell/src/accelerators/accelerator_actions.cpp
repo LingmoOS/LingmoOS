@@ -34,6 +34,7 @@ constexpr auto kActionNames = std::to_array<std::pair<AcceleratorAction, const c
         {AcceleratorAction::MoveActiveWindowBetweenDisplays, "move-active-window-between-displays"},
         {AcceleratorAction::ToggleOverview, "toggle-overview"},
         {AcceleratorAction::ToggleShowDesktop, "toggle-show-desktop"},
+        {AcceleratorAction::ToggleStageManager, "toggle-stage-manager"},
         {AcceleratorAction::DesksActivateDeskLeft, "desks-activate-desk-left"},
         {AcceleratorAction::DesksActivateDeskRight, "desks-activate-desk-right"},
         {AcceleratorAction::DesksMoveActiveItemLeft, "desks-move-active-item-left"},

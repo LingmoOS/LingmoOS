@@ -55,6 +55,7 @@
 #include "wm/mru_window_tracker.h"
 #include "wm/overview/overview_controller.h"
 #include "wm/show_desktop_controller.h"
+#include "wm/stage/stage_manager.h"
 #include "wm/toplevel_event_handler.h"
 #include "wm/window.h"
 #include "wm/window_cycle_controller.h"
@@ -734,6 +735,26 @@ TEST_F(AcceleratorTest, ActionsRunWithoutAKeyUnderTheSameRestrictions)
     session.notifyFramePresented();
     EXPECT_FALSE(controller->performActionWithoutKey(AcceleratorAction::ToggleShowDesktop));
     EXPECT_FALSE(showDesktop->isActive());
+}
+
+TEST_F(AcceleratorTest, StageManagerShortcutTogglesCompositorState)
+{
+    makeWindow(base::Rect(100, 100, 300, 200));
+    wm::StageManager *stage = manager.stageManager();
+    ASSERT_NE(nullptr, stage);
+    EXPECT_FALSE(stage->enabled());
+
+    chord({KEY_LEFTMETA, KEY_LEFTSHIFT}, KEY_S);
+    EXPECT_TRUE(stage->enabled());
+    EXPECT_FALSE(stage->snapshot().groups.empty());
+
+    chord({KEY_LEFTMETA, KEY_LEFTSHIFT}, KEY_S);
+    EXPECT_FALSE(stage->enabled());
+
+    ASSERT_TRUE(session.requestLock());
+    session.notifyFramePresented();
+    EXPECT_FALSE(controller->performActionWithoutKey(AcceleratorAction::ToggleStageManager));
+    EXPECT_FALSE(stage->enabled());
 }
 
 TEST_F(AcceleratorTest, WindowActionsLeaveTheShellsOwnWindowsAlone)
@@ -1903,9 +1924,10 @@ TEST_F(AcceleratorTest, ServiceListsActionsWithTheirDefaultsOverTheBus)
     const auto reply = proxy.call("accelerators");
     ASSERT_FALSE(reply.isError()) << reply.error().message;
     const base::json::Value actions = parse(reply.value<std::string>().value_or(""))["actions"];
-    EXPECT_EQ(46u, actions.size());
+    EXPECT_EQ(47u, actions.size());
     bool sawMaximize = false;
     bool sawOverview = false;
+    bool sawStageManager = false;
     for (const base::json::Value &action : actions.toArray()) {
         if (action["name"].toString() == "toggle-overview") {
             // Meta+Tab and the dedicated key.
@@ -1915,6 +1937,15 @@ TEST_F(AcceleratorTest, ServiceListsActionsWithTheirDefaultsOverTheBus)
             EXPECT_EQ("Tab", defaults[0]["keyName"].toString());
             EXPECT_EQ(static_cast<int>(MetaDown), defaults[0]["modifiers"].toInt());
             EXPECT_EQ(XKB_KEY_XF86LaunchA, defaults[1]["keysym"].toInt());
+            continue;
+        }
+        if (action["name"].toString() == "toggle-stage-manager") {
+            sawStageManager = true;
+            const base::json::Value &defaults = action["defaults"];
+            ASSERT_EQ(1u, defaults.size());
+            EXPECT_EQ("S", defaults[0]["keyName"].toString());
+            EXPECT_EQ(static_cast<int>(ControlDown | MetaDown | ShiftDown),
+                      defaults[0]["modifiers"].toInt());
             continue;
         }
         if (action["name"].toString() == "toggle-app-list") {
@@ -1943,6 +1974,7 @@ TEST_F(AcceleratorTest, ServiceListsActionsWithTheirDefaultsOverTheBus)
     }
     EXPECT_TRUE(sawMaximize);
     EXPECT_TRUE(sawOverview);
+    EXPECT_TRUE(sawStageManager);
 
     const auto added = proxy.call("addAccelerator", std::string("lock-screen"),
                                   uint32_t(KEY_ESC), uint32_t(0), uint32_t(MetaDown));

@@ -237,6 +237,14 @@ void LauncherWindow::activeChanged()
     ui::Window *window = m_window->window();
     if (!window || window->isActive() || !m_launcher->isShown() || keepsShownWhileInactive())
         return;
+    if (m_launcher->inToggleGracePeriod()) {
+        // Keep the launcher as the active surface while the Dock click's
+        // release and the new surface focus settle. Without this, the
+        // compositor can leave the launcher visible but inactive and the
+        // next pointer motion appears to dismiss it.
+        m_window->activate();
+        return;
+    }
     // A turn later: activation can pass through other windows on its way to
     // one of the launcher's own.
     std::weak_ptr<bool> alive = m_alive;

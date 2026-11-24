@@ -1528,6 +1528,7 @@ void LauncherView::endDrag()
     }
     m_hoveredId.clear();
     m_reorderPending = false;
+    m_folderPreviewEligible = false;
     m_folderDropState = FolderDropState::Normal;
     if (m_draggedId.empty())
         return;
@@ -1592,6 +1593,7 @@ void LauncherView::dragLeave()
         old->setDragHover(false);
     }
     m_hoveredId.clear();
+    m_folderPreviewEligible = false;
     if (!m_draggedId.empty())
         m_folderDropState = m_folderDropState == FolderDropState::FolderPreview
                 ? FolderDropState::Cancelled
@@ -1653,6 +1655,7 @@ uint32_t LauncherView::drop(const ui::DragEvent &event)
         m_folderDropState = FolderDropState::Cancelled;
     m_reorderPending = false;
     m_hoveredId.clear();
+    m_folderPreviewEligible = false;
     return ui::MoveAction;
 }
 
@@ -1709,8 +1712,7 @@ void LauncherView::updateDragTarget(ui::PointF position)
         if (!m_hoveredId.empty()) {
             if (LauncherCell *target = cell(m_hoveredId)) {
                 target->setDragHover(true);
-                const ui::RectF bounds = target->geometry();
-                const ui::PointF local {position.x - bounds.x, position.y - bounds.y};
+                const ui::PointF local = target->mapFromWindow(mapToWindow(position));
                 m_folderPreviewEligible = target->iconRect().contains(local) && !target->isFolder();
             }
             m_folderDropState = FolderDropState::Hovering;
@@ -1724,15 +1726,19 @@ void LauncherView::updateDragTarget(ui::PointF position)
             m_reorderTimer.stop();
     } else if (!m_hoveredId.empty()) {
         if (LauncherCell *target = cell(m_hoveredId)) {
-            const ui::RectF bounds = target->geometry();
-            const ui::PointF local {position.x - bounds.x, position.y - bounds.y};
+            const ui::PointF local = target->mapFromWindow(mapToWindow(position));
             const bool eligible = target->iconRect().contains(local) && !target->isFolder();
             if (eligible != m_folderPreviewEligible) {
                 m_folderPreviewEligible = eligible;
                 m_reorderTimer.stop();
                 target->setFolderPreview(false);
-                if (eligible && m_reorderPending)
+                // Moving from the icon to the surrounding cell cancels only
+                // folder preview. Keep the ordinary reorder dwell alive so
+                // the normal displacement animation still happens.
+                if (m_reorderPending) {
+                    m_folderDropState = FolderDropState::Hovering;
                     m_reorderTimer.start();
+                }
             }
         }
     }

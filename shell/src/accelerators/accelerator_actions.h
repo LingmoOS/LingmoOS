@@ -47,6 +47,7 @@ enum class AcceleratorAction : uint32_t {
     MoveActiveWindowBetweenDisplays,
     ToggleOverview,
     ToggleShowDesktop,
+    ToggleStageManager,
     // Desks.
     DesksActivateDeskLeft,
     DesksActivateDeskRight,

@@ -49,6 +49,7 @@ bool canMoveActiveWindowBetweenDisplays(const CommandContext &context);
 bool canCloseWindow(const CommandContext &context);
 bool canToggleOverview(const CommandContext &context);
 bool canToggleShowDesktop(const CommandContext &context);
+bool canToggleStageManager(const CommandContext &context);
 
 void cycleForwardMru(const CommandContext &context);
 void cycleBackwardMru(const CommandContext &context);
@@ -68,6 +69,8 @@ void moveActiveWindowBetweenDisplays(const CommandContext &context);
 void toggleOverview(const CommandContext &context);
 // Slides the application windows aside to show the desktop, or back.
 void toggleShowDesktop(const CommandContext &context);
+// Enables or disables the compositor-owned Stage Manager model.
+void toggleStageManager(const CommandContext &context);
 // Desks.
 void activateDesk(const CommandContext &context, bool activateLeft);
 void activateDeskAtIndex(const CommandContext &context, AcceleratorAction action);

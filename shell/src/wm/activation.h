@@ -67,6 +67,8 @@ public:
 
     // Called by WindowManager just before `window` is destroyed.
     void onWindowRemoving(Window *window);
+    void beginVisibilityUpdate();
+    void endVisibilityUpdate(bool focus, Window *preferred);
 
 private:
     void setActiveWindow(Window *window);
@@ -76,6 +78,8 @@ private:
     Window *m_activeWindow = nullptr;
     std::vector<ActivationObserver *> m_observers;
     bool m_updating = false;
+    bool m_visibilityBatch = false;
+    Window *m_deferredFallback = nullptr;
 };
 
 } // namespace Lingmo::WM

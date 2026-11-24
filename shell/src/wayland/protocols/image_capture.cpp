@@ -141,6 +141,7 @@ struct Frame {
     // The compositor's own capture: no resource or buffer, the picture goes
     // to `done` while someone still holds `handle`.
     bool internal = false;
+    bool includeHiddenWindow = false;
     ImageCaptureManager::CaptureDone done;
     std::weak_ptr<void> handle;
     ui::Bitmap image;
@@ -506,7 +507,8 @@ void ImageCaptureManager::setToplevelSourceResolver(ToplevelSourceResolver resol
 }
 
 std::shared_ptr<void> ImageCaptureManager::capture(std::shared_ptr<compositor::CaptureSource> source,
-                                                   bool cursors, CaptureDone done)
+                                                   bool cursors, CaptureDone done,
+                                                   bool includeHiddenWindow)
 {
     auto handle = std::make_shared<int>(0);
     auto session = std::make_shared<Session>();
@@ -517,6 +519,7 @@ std::shared_ptr<void> ImageCaptureManager::capture(std::shared_ptr<compositor::C
     frame->session = session;
     frame->resource = nullptr;
     frame->internal = true;
+    frame->includeHiddenWindow = includeHiddenWindow;
     frame->done = std::move(done);
     frame->handle = handle;
     frame->attached = true;
@@ -682,7 +685,8 @@ void ImageCaptureManager::renderPending(render::Renderer &renderer, const Painte
         }
         // A minimized window paints nothing; the frame waits for it to come
         // back, so the stream holds its last picture instead of going blank.
-        if (window && !source->node->isVisible())
+        if (window && !source->node->isVisible()
+            && !(frame->internal && frame->includeHiddenWindow))
             continue;
 
         // The frame's own context: the display's for an output, the window's
@@ -719,7 +723,17 @@ void ImageCaptureManager::renderPending(render::Renderer &renderer, const Painte
 
         const auto paint = [&] {
             if (window) {
-                source->node->render(renderer);
+                auto *node = const_cast<scene::Node *>(source->node);
+                const bool wasVisible = node->isVisible();
+                const bool includeHidden = frame->internal && frame->includeHiddenWindow;
+                if (includeHidden && !wasVisible)
+                    node->setVisible(true);
+                const bool wasRevealing = renderer.revealHiddenSurfaces;
+                renderer.revealHiddenSurfaces = wasRevealing || includeHidden;
+                node->render(renderer);
+                renderer.revealHiddenSurfaces = wasRevealing;
+                if (includeHidden && !wasVisible)
+                    node->setVisible(false);
                 if (session->cursors && painters.cursors)
                     painters.cursors();
             } else if (painters.scene) {

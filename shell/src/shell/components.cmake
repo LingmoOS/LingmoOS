@@ -16,6 +16,14 @@ add_library(lingmo-shell-wallpaper STATIC
 target_link_libraries(lingmo-shell-wallpaper PUBLIC lingmo-shell Lingmo::AppearanceClient)
 target_link_libraries(lingmo-aurora PRIVATE lingmo-shell-wallpaper)
 
+# Stage Manager's compositor-owned recent-groups strip.
+add_library(lingmo-shell-stage
+    src/shell/stage/stage_window.cpp
+    src/shell/stage/stage_window.h
+)
+target_link_libraries(lingmo-shell-stage PUBLIC lingmo-shell lingmo-shell-screenshot)
+target_link_libraries(lingmo-aurora PRIVATE lingmo-shell-stage)
+
 # The on-screen display: org.lingmo.Osd and its level panel.
 add_library(lingmo-shell-osd STATIC
     src/shell/osd/level_track.cpp

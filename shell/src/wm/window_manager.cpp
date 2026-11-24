@@ -142,6 +142,7 @@ WindowManager::WindowManager(compositor::Compositor *compositor, input::Seat *se
     m_activation.addObserver(this);
     m_mruTracker = std::make_unique<MruWindowTracker>(this);
     m_desks = std::make_unique<DesksController>(this);
+    m_stage = std::make_unique<StageManager>(this);
     m_overview = std::make_unique<OverviewController>(this);
     m_showDesktop = std::make_unique<ShowDesktopController>(this);
     m_statusItems = std::make_unique<StatusItems>(this);
@@ -151,6 +152,7 @@ WindowManager::~WindowManager()
 {
     m_activation.removeObserver(this);
     m_statusItems.reset();
+    m_stage.reset();
     m_showDesktop.reset();
     m_overview.reset();
     // Tear down through destroyWindow so activation and drags unwind cleanly.
@@ -165,14 +167,19 @@ void WindowManager::setOutputBounds(const base::Rect &bounds)
     if (bounds == m_outputBounds)
         return;
     m_outputBounds = bounds;
+    if (m_stage)
+        m_stage->beginOutputChange();
     followDisplays();
     // The reservations are edge thicknesses, so they survive a resolution
     // change and simply apply to the new output.
     setWorkArea(zonedWorkArea(m_outputBounds, m_outputBounds, {}, true));
     // With a display manager its displaysChanged follows, once windows are
     // back on the new outputs.
-    if (!m_displayManager)
+    if (!m_displayManager) {
         notifyOutputsChanged();
+        if (m_stage)
+            m_stage->outputsChanged();
+    }
 }
 
 void WindowManager::setDisplayManager(display::DisplayManager *manager)
@@ -187,11 +194,15 @@ void WindowManager::setDisplayManager(display::DisplayManager *manager)
         return;
     if (m_displayManager->applied())
         m_previousDisplays = m_displayManager->applied()->logicalDisplays;
+    m_stage->beginOutputChange();
     m_displaysChanged = m_displayManager->displaysChanged.connect(
             [this](uint64_t, uint64_t) {
                 if (!m_displayManager->applied()
-                    || m_displayManager->applied()->logicalDisplays.empty())
+                    || m_displayManager->applied()->logicalDisplays.empty()) {
+                    m_stage->outputsChanged();
                     return;
+                }
+                m_stage->beginOutputChange();
                 followDisplays();
                 const WMEvent event(WMEventType::WorkAreaChanged);
                 for (Window *window : std::vector<Window *>(m_stackingOrder)) {
@@ -226,6 +237,7 @@ void WindowManager::setDisplayManager(display::DisplayManager *manager)
                     window->state()->onEvent(event);
                 }
                 notifyOutputsChanged();
+                m_stage->outputsChanged();
             });
 }
 
@@ -692,6 +704,7 @@ Window *WindowManager::createWindow(compositor::Surface *rootSurface, const Wind
     // Onto a desk before anything is drawn or announced: a dialog of a window
     // on another desk starts out hidden with it.
     m_desks->onWindowAdded(window);
+    m_stage->onWindowAdded(window);
 
     restackScene();
 
@@ -814,6 +827,7 @@ void WindowManager::destroyWindow(Window *window)
     });
 
     m_eventHandler->onWindowRemoving(window);
+    m_stage->onWindowRemoving(window);
     m_desks->onWindowRemoving(window);
     m_transientManager->windowDestroying(window);
     if (m_popupKeyboardRoot == window) {
@@ -1576,7 +1590,7 @@ Window *WindowManager::frameAt(const base::PointF &location, FrameArea *area) co
 
     for (auto it = m_stackingOrder.rbegin(); it != m_stackingOrder.rend(); ++it) {
         Window *window = *it;
-        if (!window->isVisible())
+        if (!window->isVisible() || window->isStageTransitioning())
             continue;
 
         // Moved aside, or sliding: the frame's pixels are elsewhere than its bounds.
@@ -1623,7 +1637,7 @@ Window *WindowManager::resizeHandleAt(const base::PointF &location, bool touch, 
 
     for (auto it = m_stackingOrder.rbegin(); it != m_stackingOrder.rend(); ++it) {
         Window *window = *it;
-        if (!window->isVisible())
+        if (!window->isVisible() || window->isStageTransitioning())
             continue;
 
         // Checked before the window's own area: the handles reach a pixel in.
@@ -1988,6 +2002,12 @@ void WindowManager::onWindowActivated(Window *gainedActive, Window *)
     if (m_seat && !m_keyboardGrab)
         m_seat->setFocusedSurface(gainedActive ? gainedActive->rootSurface() : nullptr);
     activeWindowChanged(gainedActive);
+}
+
+void WindowManager::onWindowActivatingForStage(Window *window)
+{
+    if (m_stage)
+        m_stage->prepareActivation(window);
 }
 
 } // namespace Lingmo::WM

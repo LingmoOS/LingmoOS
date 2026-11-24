@@ -13,6 +13,7 @@
 #include "wm/window.h"
 #include "wm/window_cycle_controller.h"
 #include "wm/window_manager.h"
+#include "wm/stage/stage_manager.h"
 
 namespace Lingmo::Session {
 
@@ -54,6 +55,8 @@ void SessionTeardown::clearCursor()
 
 void SessionTeardown::onSessionBlocked()
 {
+    if (wm::StageManager *stage = m_windowManager->stageManager())
+        stage->setSessionBlocked(true);
     m_windowManager->dismissPopupGrabs();
     m_windowManager->cancelInteractions();
     if (m_windowCycle)
@@ -75,6 +78,8 @@ void SessionTeardown::onSessionBlocked()
 
 void SessionTeardown::onSessionUnblocked()
 {
+    if (wm::StageManager *stage = m_windowManager->stageManager())
+        stage->setSessionBlocked(false);
     // The window that had the keyboard gets it back, so typing carries on
     // where it stopped; one that closed meanwhile leaves it to the topmost
     // window left. The cursor stays the compositor's until the pointer moves.

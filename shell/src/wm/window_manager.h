@@ -26,6 +26,7 @@
 #include "wm/activation.h"
 #include "wm/placement.h"
 #include "wm/stacking.h"
+#include "wm/stage/stage_manager.h"
 #include "wm/types.h"
 #include "wm/window_frame.h"
 #include "wm/window_modality_controller.h"
@@ -174,6 +175,7 @@ public:
     MruWindowTracker *mruWindowTracker() const { return m_mruTracker.get(); }
 
     DesksController *desks() const { return m_desks.get(); }
+    StageManager *stageManager() const { return m_stage.get(); }
 
     OverviewController *overview() const { return m_overview.get(); }
 
@@ -397,6 +399,7 @@ public:
     // Whether this window is still managed. Callbacks are re-entrant, so a
     // pointer held across one has to be re-checked before it is used again.
     bool hasWindow(const Window *window) const;
+    void onWindowActivatingForStage(Window *window);
 
     // --- Output and work area ---
 
@@ -590,6 +593,7 @@ private:
     std::unique_ptr<TransientManager> m_transientManager;
     std::unique_ptr<MruWindowTracker> m_mruTracker;
     std::unique_ptr<DesksController> m_desks;
+    std::unique_ptr<StageManager> m_stage;
     std::unique_ptr<OverviewController> m_overview;
     std::unique_ptr<ShowDesktopController> m_showDesktop;
     std::unique_ptr<StatusItems> m_statusItems;

@@ -77,10 +77,11 @@ public:
         core::mainLoop()->post([done, images] { done(images); });
     }
 
-    void grabWindow(wm::Window *window, bool cursor, Done done) override
+    void grabWindow(wm::Window *window, bool cursor, Done done, bool includeHidden) override
     {
         calls.push_back(std::string("window ") + (window ? std::to_string(window->id()) : "none")
-                        + (cursor ? " cursor" : ""));
+                        + (cursor ? " cursor" : "")
+                        + (includeHidden ? " hidden" : ""));
         ui::Bitmap image(base::Size(100, 50), ui::Bitmap::Format::Argb32Premultiplied);
         image.fill(0xff00ff00u);
         core::mainLoop()->post([done, image, window] { done({window ? image : ui::Bitmap()}); });

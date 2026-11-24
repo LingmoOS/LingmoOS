@@ -11,6 +11,7 @@
 
 #include "base/dbus.h"
 #include "base/signal.h"
+#include "base/timer.h"
 #include "shell/launcher/launcher_model.h"
 
 namespace Lingmo::Shell {
@@ -47,6 +48,10 @@ public:
     // Follows the logical state: the window can still be mapped while the
     // compositor unmaps it.
     void toggle();
+    // Dock activation can briefly report a focus loss while its pointer
+    // release is still settling. The window consumes this grace period once
+    // before applying the normal deactivation policy.
+    bool inToggleGracePeriod() const;
     void focusSearch();
 
     bool isPinnedInDock(const std::string &desktop) const;
@@ -75,6 +80,8 @@ private:
     LauncherModel m_applications;
     std::unique_ptr<base::dbus::Object> m_object;
     bool m_shown = false;
+    base::Timer m_toggleGraceTimer;
+    bool m_toggleGrace = false;
     bool m_dragging = false;
     bool m_openedTaken = false;
     std::vector<std::string> m_openedApplications;

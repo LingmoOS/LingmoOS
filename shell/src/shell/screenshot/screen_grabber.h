@@ -41,7 +41,10 @@ public:
     virtual void grabOutputs(const std::vector<std::string> &outputs, bool cursor, Done done) = 0;
     // The window as it is shown: outline and shadow included, with the
     // transparent margins the shadow needs. The dock's body with its glass.
-    virtual void grabWindow(wm::Window *window, bool cursor, Done done) = 0;
+    // `includeHidden` is for compositor-owned previews such as Stage Manager;
+    // protocol screenshot requests keep the normal visibility rules.
+    virtual void grabWindow(wm::Window *window, bool cursor, Done done,
+                            bool includeHidden = false) = 0;
     // What `source` paints, as a window capture does.
     virtual void grabSource(std::shared_ptr<compositor::CaptureSource> source, bool cursor, Done done)
     {

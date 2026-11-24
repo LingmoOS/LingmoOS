@@ -16,11 +16,13 @@
 #include <wayland-server-core.h>
 
 #include "compositor/compositor.h"
+#include "compositor/capture_source.h"
 #include "fake_renderer.h"
 #include "scene/node.h"
 #include "scene/scene.h"
 #include "session/secure_container.h"
 #include "session/session_controller.h"
+#include "loop_test_util.h"
 #include "ui/bitmap.h"
 #include "wayland/protocols/image_capture.h"
 #include "wayland/protocols/wl_output.h"
@@ -33,6 +35,17 @@ class CaptureRenderer : public testsupport::FakeRenderer
 {
 public:
     base::Size viewportSize() const override { return {8, 6}; }
+
+    ui::Bitmap captureImage(const render::OutputRenderContext &, const base::Size &size,
+                            const std::function<void()> &paint) override
+    {
+        capturing = true;
+        paint();
+        capturing = false;
+        ui::Bitmap image(size, ui::Bitmap::Format::Argb32Premultiplied);
+        image.fill(0xff0c2238);
+        return image;
+    }
 
     ui::Bitmap captureFrame(const std::function<void()> &paint) override
     {
@@ -70,6 +83,20 @@ public:
         pending->taken = &taken;
         return pending;
     }
+};
+
+class CaptureVisibilityProbe final : public scene::Node
+{
+public:
+    void render(render::Renderer &renderer) const override
+    {
+        wasVisibleDuringCapture = isVisible();
+        revealedHiddenSurfaces = renderer.revealHiddenSurfaces;
+        scene::Node::render(renderer);
+    }
+
+    mutable bool wasVisibleDuringCapture = false;
+    mutable bool revealedHiddenSurfaces = false;
 };
 
 class ImageCaptureTest : public testing::Test
@@ -285,6 +312,34 @@ protected:
             close(fd);
     }
 };
+
+TEST_F(ImageCaptureTest, InternalPreviewCanCaptureAHiddenWindowWithoutShowingIt)
+{
+    auto node = std::make_shared<CaptureVisibilityProbe>();
+    node->setGeometry(base::Rect(0, 0, 8, 6));
+    node->setVisible(false);
+    auto source = std::make_shared<compositor::CaptureSource>();
+    source->kind = compositor::CaptureSource::Kind::Window;
+    source->node = node.get();
+    source->bounds = base::Rect(0, 0, 8, 6);
+    source->scale = 1;
+    source->outputName = model.name;
+
+    bool completed = false;
+    auto request = manager->capture(source, false, [&](ui::Bitmap image, uint32_t) {
+        completed = !image.isNull();
+    }, true);
+    ASSERT_NE(nullptr, request);
+    manager->renderPending(renderer, [](bool) { });
+
+    EXPECT_TRUE(node->wasVisibleDuringCapture);
+    EXPECT_TRUE(node->revealedHiddenSurfaces);
+    EXPECT_FALSE(node->isVisible());
+    manager->presented(17, 1000000123);
+    test::processPendingEvents();
+    EXPECT_TRUE(completed);
+    EXPECT_FALSE(node->isVisible());
+}
 
 TEST_F(ImageCaptureTest, PixelsStrideAndPresentation)
 {

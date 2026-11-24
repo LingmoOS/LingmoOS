@@ -62,12 +62,12 @@ public:
         start(std::move(sources), cursor, std::move(done));
     }
 
-    void grabWindow(wm::Window *window, bool cursor, Done done) override
+    void grabWindow(wm::Window *window, bool cursor, Done done, bool includeHidden) override
     {
         std::shared_ptr<compositor::CaptureSource> source;
         if (m_capture && m_windows && window)
             source = m_windows->shadowedSourceFor(window);
-        start({source}, cursor, std::move(done));
+        start({source}, cursor, std::move(done), includeHidden);
     }
 
     void grabSource(std::shared_ptr<compositor::CaptureSource> source, bool cursor, Done done) override
@@ -88,6 +88,7 @@ private:
     struct Request {
         Done done;
         bool cursor = false;
+        bool includeHiddenWindow = false;
         std::vector<Slot> slots;
         std::vector<ui::Bitmap> images;
         int remaining = 0;
@@ -96,7 +97,8 @@ private:
 
     using Requests = std::list<Request>;
 
-    void start(std::vector<std::shared_ptr<compositor::CaptureSource>> sources, bool cursor, Done done)
+    void start(std::vector<std::shared_ptr<compositor::CaptureSource>> sources, bool cursor, Done done,
+               bool includeHiddenWindow = false)
     {
         if (sources.empty()) {
             done({});
@@ -106,6 +108,7 @@ private:
         const Requests::iterator it = std::prev(m_requests.end());
         request.done = std::move(done);
         request.cursor = cursor;
+        request.includeHiddenWindow = includeHiddenWindow;
         request.slots.resize(sources.size());
         request.images.resize(sources.size());
         request.remaining = int(sources.size());
@@ -136,7 +139,7 @@ private:
         slot.handle = m_capture->capture(slot.source, it->cursor,
                                          [this, it, index](ui::Bitmap image, uint32_t transform) {
                                              received(it, index, std::move(image), transform);
-                                         });
+                                         }, it->includeHiddenWindow);
         return false;
     }
 

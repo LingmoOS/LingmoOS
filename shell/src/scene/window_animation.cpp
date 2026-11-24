@@ -1094,7 +1094,8 @@ void WindowAnimation::render(render::Renderer &renderer) const
                     const bool revealed = renderer.revealHiddenSurfaces;
                     renderer.suppressWindowOutlines = true;
                     renderer.suppressBackgroundBlur = blurSuppressed;
-                    renderer.revealHiddenSurfaces = isPresentedHidden();
+                    renderer.revealHiddenSurfaces = isPresentedHidden()
+                            || (renderer.capturing && revealed);
                     renderer.presentationSubmission = submission;
                     renderer.windowCorners = corners;
                     renderSubtree(renderer);

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.22)
 
 project(lingmo-aurora
-    VERSION 1.1.3
+    VERSION 1.1.6
     DESCRIPTION "Lingmo Aurora Wayland compositor and window manager"
     LANGUAGES C CXX
 )
@@ -523,6 +523,8 @@ add_library(lingmo-wm STATIC
     src/wm/desks/desk_animation.h
     src/wm/desks/desks_controller.cpp
     src/wm/desks/desks_controller.h
+    src/wm/stage/stage_manager.cpp
+    src/wm/stage/stage_manager.h
     src/wm/desks/desk_preferences.cpp
     src/wm/desks/desk_preferences.h
     src/wm/gestures/wm_gesture_handler.cpp

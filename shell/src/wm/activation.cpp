@@ -77,6 +77,9 @@ void Activation::activate(Window *window)
     if (m_updating)
         return;
 
+    if (window)
+        m_manager->onWindowActivatingForStage(window);
+
     Window *target = window ? activatableFor(window) : nullptr;
     if (window && !target)
         return;
@@ -88,13 +91,42 @@ void Activation::deactivate(Window *window)
 {
     if (!window || window != m_activeWindow || m_updating)
         return;
+    if (m_visibilityBatch) {
+        m_deferredFallback = window;
+        return;
+    }
     setActiveWindow(nextActivatableWindow(window));
+}
+
+void Activation::beginVisibilityUpdate()
+{
+    m_visibilityBatch = true;
+    m_deferredFallback = nullptr;
+}
+
+void Activation::endVisibilityUpdate(bool focus, Window *preferred)
+{
+    const bool needsFallback = m_deferredFallback
+            || (m_activeWindow && !m_activeWindow->isVisible());
+    m_visibilityBatch = false;
+    Window *target = nullptr;
+    if (focus && preferred && m_manager->hasWindow(preferred) && preferred->isVisible())
+        target = activatableFor(preferred);
+    else if (needsFallback)
+        target = nextActivatableWindow(m_deferredFallback);
+    m_deferredFallback = nullptr;
+    if (target != m_activeWindow)
+        setActiveWindow(target);
 }
 
 void Activation::onWindowRemoving(Window *window)
 {
     if (window != m_activeWindow)
         return;
+    if (m_visibilityBatch) {
+        m_deferredFallback = window;
+        return;
+    }
     setActiveWindow(nextActivatableWindow(window));
 }
 
