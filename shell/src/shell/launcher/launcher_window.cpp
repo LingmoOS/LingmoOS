@@ -225,10 +225,14 @@ bool LauncherWindow::keepsShownWhileInactive() const
 {
     if (m_gestureActive || m_launcher->isDragging() || m_view->isMenuOpen())
         return true;
-    // The capture tools take the keyboard to picture the launcher, not to close it.
+    // Capture tools take the keyboard to picture the launcher, and notification
+    // banners are non-interactive overlays. Neither should dismiss the launcher
+    // when it briefly loses activation while the overlay is mapped.
     const auto &windows = m_shell->windowManager()->windows();
     return std::any_of(windows.begin(), windows.end(), [](const wm::Window *window) {
-        return window->role() == wm::WindowRole::Capture && window->isVisible();
+        return window->isVisible()
+                && (window->role() == wm::WindowRole::Capture
+                    || window->role() == wm::WindowRole::Notification);
     });
 }
 

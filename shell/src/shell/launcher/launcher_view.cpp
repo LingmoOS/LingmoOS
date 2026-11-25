@@ -1337,6 +1337,12 @@ void LauncherView::backgroundReleased(ui::PointF position)
         return;
     m_backgroundPressed = false;
     if (!m_flicking) {
+        // A background click commits an active folder rename first. The click
+        // must not fall through to the launcher's dismissible background.
+        if (finishInlineRename() || m_inlineRenameDismissGuard) {
+            m_inlineRenameDismissGuard = false;
+            return;
+        }
         // Anything that is not an icon, the search field or the dots dismisses.
         dismissRequested();
         return;
@@ -1408,6 +1414,31 @@ void LauncherView::cellClicked(LauncherCell *cell, ui::MouseButton button, ui::P
 void LauncherView::renameFolderInline(const std::string &folderId, std::string name)
 {
     m_launcher.applications().renameFolder(folderId, std::move(name));
+}
+
+bool LauncherView::finishInlineRename()
+{
+    for (const auto &[id, cell] : m_cells) {
+        if (!cell->isRenaming())
+            continue;
+        cell->finishRename();
+        return true;
+    }
+    return false;
+}
+
+void LauncherView::inlineRenameFinished()
+{
+    m_inlineRenameDismissGuard = true;
+}
+
+void LauncherView::clearInlineRenameDismissGuardSoon()
+{
+    std::weak_ptr<bool> alive = m_alive;
+    core::mainLoop()->post([this, alive] {
+        if (!alive.expired())
+            m_inlineRenameDismissGuard = false;
+    });
 }
 
 void LauncherView::closeFolderOverlay()

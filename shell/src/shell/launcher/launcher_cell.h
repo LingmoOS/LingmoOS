@@ -53,6 +53,7 @@ public:
     void setDragging(bool dragging);
     void setMenuOpen(bool open);
     void beginRename();
+    bool isRenaming() const;
     void setDragHover(bool active);
     void setFolderPreview(bool active, const std::string &incomingIconName = {});
     void animateFolderCreated();
@@ -88,6 +89,8 @@ protected:
 
 private:
     class Icon;
+
+    friend class LauncherView;
 
     void updateMask();
     void updateCountBadge();

@@ -47,6 +47,7 @@ public:
         m_title->setVerticallyCentered(true);
         m_title->setElide(ui::Label::Elide::Right);
         m_title->setColor(ui::Color {255, 255, 255, 255});
+        m_title->setVisible(false);
         m_icon = m_face->addChild<ui::ThemeIcon>("application-x-executable", 26);
         m_placeholder = m_face->addChild<ui::ThemeIcon>("application-x-executable", 44);
         m_placeholder->setOpacity(.76);
@@ -61,10 +62,10 @@ public:
 
     bool acceptsPointer() const override { return true; }
 
-    void setGroup(wm::StageManager::Id group)
+    bool setGroup(wm::StageManager::Id group)
     {
         if (m_group == group)
-            return;
+            return false;
         m_group = group;
         m_thumbnailGroup = 0;
         m_thumbnailRevision = 0;
@@ -76,6 +77,7 @@ public:
         m_image->setSource({});
         m_placeholder->setVisible(true);
         invalidateFace();
+        return true;
     }
 
     void setThumbnail(wm::StageManager::Id group, uint64_t revision, const ui::Bitmap &bitmap)
@@ -167,6 +169,15 @@ public:
         requestPaint();
     }
 
+    void setStackPosition(size_t index)
+    {
+        const double tilt = index % 2 == 0 ? -3.2 : 2.4;
+        if (tilt == m_tilt)
+            return;
+        m_tilt = tilt;
+        invalidateFace();
+    }
+
     void childrenLaidOut() override
     {
         if (!m_faceDirty || !window() || geometry().width <= 0 || geometry().height <= 0)
@@ -185,7 +196,7 @@ public:
         const double inset = 4 * scale;
         base::AffineTransform perspective(.985, 0, .035, .985, 6 * scale, 1 * scale);
         perspective.translate(width / 2, height / 2);
-        perspective.rotate(-2.5);
+        perspective.rotate(m_tilt);
         perspective.translate(-width / 2, -height / 2);
         painter.setTransform(perspective);
         painter.drawBitmap({inset, inset, width - 2 * inset, height - 2 * inset}, source, true);
@@ -266,11 +277,11 @@ protected:
     void layout() override
     {
         m_face->setGeometry(localRect());
-        m_image->setGeometry({8, 8, geometry().width - 16, geometry().height - 34});
-        m_title->setGeometry({44, geometry().height - 27, geometry().width - 52, 20});
-        m_icon->setGeometry({10, geometry().height - 32, 26, 26});
+        m_image->setGeometry({4, 4, geometry().width - 8, geometry().height - 8});
+        m_title->setGeometry({0, 0, 0, 0});
+        m_icon->setGeometry({10, geometry().height - 38, 30, 30});
         m_placeholder->setGeometry({(geometry().width - 44) / 2,
-                                    8 + (geometry().height - 34 - 44) / 2, 44, 44});
+                                    (geometry().height - 44) / 2, 44, 44});
         m_raster->setGeometry(localRect());
     }
 
@@ -278,7 +289,7 @@ protected:
     {
         const auto &theme = ui::Theme::current();
         const ui::Color fill = m_selected ? theme.highlight.withAlpha(0.24)
-                                         : theme.secondBackground.withAlpha(0.70);
+                                         : theme.secondBackground.withAlpha(0.30);
         for (size_t i = m_stackCount; i > 1; --i) {
             const double offset = double(i - 1) * 4;
             const ui::RectF back {offset, offset, geometry().width - offset,
@@ -387,6 +398,7 @@ private:
     std::unique_ptr<ui::Animation> m_dragAnimation;
     double m_entryProgress = 1;
     double m_hoverProgress = 0;
+    double m_tilt = -3.2;
     std::optional<ui::PointF> m_press;
     ui::PointF m_pressWindow;
     ui::PointF m_dragOffset;
@@ -416,6 +428,12 @@ public:
             if (active == m_snapshot.active.end() || active->second != group.id)
                 m_visibleGroups.push_back(group);
         }
+        std::stable_sort(m_visibleGroups.begin(), m_visibleGroups.end(),
+                         [](const auto &left, const auto &right) {
+                             if (left.lastUsed != right.lastUsed)
+                                 return left.lastUsed > right.lastUsed;
+                             return left.id < right.id;
+                         });
         while (m_cards.size() < m_visibleGroups.size()) {
             auto *card = m_content->addChild<Card>();
             m_cards.push_back(card);
@@ -426,10 +444,11 @@ public:
             m_cards[i]->setVisible(visible);
             if (!visible)
                 continue;
-            if (!wasVisible)
-                m_cards[i]->animateIn();
             const auto &group = m_visibleGroups[i];
-            m_cards[i]->setGroup(group.id);
+            const bool changedGroup = m_cards[i]->setGroup(group.id);
+            if (!wasVisible || changedGroup)
+                m_cards[i]->animateIn();
+            m_cards[i]->setStackPosition(i);
             std::string title = "Stage " + std::to_string(i + 1);
             std::string icon = "application-x-executable";
             if (!group.windows.empty()) {
@@ -520,7 +539,7 @@ StageWindow::StageWindow(Shell *shell, std::unique_ptr<ScreenGrabber> grabber)
     }));
     m_subscriptions.push_back(m_shell->outputsChanged.connect([this] { place(); }));
     m_snapshot = manager->snapshot();
-    manager->setEnabled(true);
+    manager->setEnabled(manager->preferenceEnabled());
     sync(m_snapshot);
     refreshThumbnails();
     place();

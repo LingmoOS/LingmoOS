@@ -152,6 +152,9 @@ private:
     bool searchKey(uint32_t key);
     void handleWheel(const ui::ScrollEvent &event);
     void openMenu(LauncherCell *cell, ui::PointF windowPosition);
+    bool finishInlineRename();
+    void inlineRenameFinished();
+    void clearInlineRenameDismissGuardSoon();
     void endDrag();
     void requestMove(int to);
     void applyMove();
@@ -184,6 +187,7 @@ private:
     LauncherTween m_folderTween;
     double m_folderProgress = 0;
     std::string m_openFolderId;
+    bool m_inlineRenameDismissGuard = false;
 
     int m_currentPage = -1;
     double m_contentX = 0;

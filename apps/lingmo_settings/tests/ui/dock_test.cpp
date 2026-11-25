@@ -63,7 +63,8 @@ TEST(DockPage, HasEveryControl)
     EXPECT_EQ(page.count("settings::SliderRow"), 3);
     EXPECT_NE(findView<settings::RowComboBox>(page.window->window().contentView(), "dock:visibility"), nullptr);
     EXPECT_EQ(page.count("settings::NavigationItem"), 3);
-    EXPECT_EQ(page.count("settings::SwitchRow"), 4);
+    EXPECT_EQ(page.count("settings::SwitchRow"), 5);
+    EXPECT_NE(findView<settings::SwitchRow>(page.window->window().contentView(), "stage:enabled"), nullptr);
 }
 
 TEST(DockPage, SizeStaysWhereItIsDragged)

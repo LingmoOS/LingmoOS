@@ -74,7 +74,12 @@ LauncherCell::LauncherCell(LauncherView *view, std::string id)
     m_renameField = addChild<ui::TextField>();
     m_renameField->setHorizontallyCentered(true);
     m_renameField->setVisible(false);
-    m_renameField->onAccepted = [this] { finishRename(); };
+    m_renameField->onAccepted = [this] {
+        finishRename();
+        // Enter completes the edit without a background pointer release; do
+        // not consume the next unrelated click as the rename's dismissal.
+        m_view->clearInlineRenameDismissGuardSoon();
+    };
     m_renameField->onEditingFinished = [this] { finishRename(); };
 }
 
@@ -82,6 +87,7 @@ void LauncherCell::finishRename()
 {
     if (!m_renameField->isVisible())
         return;
+    m_view->inlineRenameFinished();
     m_view->renameFolderInline(m_id, m_renameField->text());
     m_renameField->setVisible(false);
     m_label->setVisible(true);
@@ -89,6 +95,11 @@ void LauncherCell::finishRename()
 }
 
 LauncherCell::~LauncherCell() = default;
+
+bool LauncherCell::isRenaming() const
+{
+    return m_renameField && m_renameField->isVisible();
+}
 
 void LauncherCell::setItem(const LauncherItem &item)
 {

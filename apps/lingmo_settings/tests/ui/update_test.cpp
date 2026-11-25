@@ -75,6 +75,42 @@ TEST(UpdatePage, AdvancedSettingsOpens) {
     EXPECT_EQ(window.currentPage()->title(), "Advanced Settings");
 }
 
+TEST(UpdatePage, AvailableUpdateCanBeRechecked) {
+    settings::SettingsWindow window;
+    window.switchToPage("update"); window.reveal(); window.window().grab();
+    auto* recheck = find(window.currentPage(), "update:recheck");
+    auto* status = dynamic_cast<ui::Label*>(find(window.currentPage(), "update:status"));
+    ASSERT_TRUE(recheck); ASSERT_TRUE(status);
+    EXPECT_FALSE(recheck->isVisible());
+
+    auto* bus = base::dbus::Connection::session(); ASSERT_TRUE(bus);
+    int32_t state = 3; int calls = 0;
+    base::dbus::Object update(bus, "/org/lingmo/Services/Update", "org.lingmo.Services.Update");
+    update.addProperty("state", [&] { return state; });
+    update.addProperty("channel", [] { return int32_t(0); });
+    update.addProperty("newVersion", [] { return std::string("5.0"); });
+    update.addProperty("upgradableCount", [] { return int32_t(2); });
+    update.addProperty("changelogText", [] { return std::string("Bug fixes"); });
+    update.addProperty("errorLog", [] { return std::string(); });
+    update.addSignal("stateChanged", "i");
+    update.addMethod("checkForUpdate", "", "", [&](base::dbus::MethodCall& call) {
+        ++calls;
+        state = 1;
+        update.emitSignal("stateChanged", state);
+        call.reply();
+    });
+    ASSERT_TRUE(update.publish()); ASSERT_TRUE(bus->requestName("org.lingmo.Services"));
+
+    ASSERT_TRUE(wait([&] { return recheck->isVisible(); }));
+    EXPECT_EQ(status->text(), "Updates available");
+    // The link owns the same UpdateStatus callback as the primary action;
+    // verify its available-state presentation here without requiring native
+    // pointer injection into the test window.
+    EXPECT_EQ(calls, 0);
+
+    bus->releaseName("org.lingmo.Services");
+}
+
 TEST(UpdatePage, InstalledUpdatePromptsForRestart) {
     settings::SettingsWindow window;
     window.switchToPage("update"); window.reveal(); window.window().grab();

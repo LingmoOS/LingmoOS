@@ -30,9 +30,8 @@ static constexpr double kLargeSpacing = 12;
 // Keep the two-page property form wide enough for labels and paths.  A zero
 // width makes FramelessDialog rely on an implicit layout width, which is not
 // defined for the nested segmented control and collapses the window.
-static constexpr double kContentWidth = 520;
-static constexpr double kPageWidth = 440;
-static constexpr double kPageHeight = 400;
+static constexpr double kContentWidth = 440;
+static constexpr double kPageWidth = 380;
 
 // "Fri Oct 16 09:30:00 2026", local time.
 static std::string textDate(int64_t milliseconds)
@@ -141,10 +140,10 @@ std::unique_ptr<ui::View> PropertiesDialog::createContent()
     m_pages->setLayoutHints({.fillWidth = true});
     m_pages->setCurrentIndex(m_page);
     m_pages->onCurrentChanged = [this](int index) { setPage(index); };
-    // The active page must participate in the dialog's intrinsic height.
-    // A plain View reports zero height, which used to crop the property rows.
+    // The page host measures its current page, so the dialog only reserves the
+    // rows that are actually present instead of keeping a large empty panel.
     m_pageHost = layout->addChild<ui::ColumnLayout>();
-    m_pageHost->setLayoutHints({.fillWidth = true, .preferredHeight = kPageHeight});
+    m_pageHost->setLayoutHints({.fillWidth = true});
     setPage(m_page);
     return layout;
 }
@@ -164,7 +163,10 @@ void PropertiesDialog::setPage(int index)
     if (old)
         base::EventLoop::current()->post([old] {});
     std::unique_ptr<ui::View> page = m_page == 0 ? createGeneralContent() : createPermissionsContent();
-    page->setLayoutHints({.preferredWidth = kPageWidth, .horizontalAlignment = ui::Alignment::Center});
+    // ColumnLayout uses `alignment` for its cross-axis placement. The
+    // horizontalAlignment field belongs to CellLayout and leaves this page
+    // at the left edge when used here.
+    page->setLayoutHints({.alignment = ui::Alignment::Center, .preferredWidth = kPageWidth});
     m_pageHost->addChild(std::move(page));
     fit();
 }

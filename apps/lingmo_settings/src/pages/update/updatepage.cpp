@@ -3,6 +3,7 @@
 
 #include <chrono>
 #include <ctime>
+#include <functional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -38,6 +39,51 @@ using Lingmo::i18n::format;
 namespace settings {
 
 namespace {
+
+// Accent-coloured text action used for secondary update operations.
+class LinkLabel : public View
+{
+public:
+    explicit LinkLabel(std::string text)
+    {
+        m_label = addChild<Label>(std::move(text));
+        m_label->setFontSize(metrics::points(8));
+    }
+
+    SizeF sizeHint() const override { return m_label->sizeHint(); }
+    bool acceptsPointer() const override { return true; }
+    CursorShape cursorShape() const override { return CursorShape::Pointer; }
+
+    std::function<void()> onClicked;
+
+protected:
+    void layout() override
+    {
+        m_label->setColor(isEnabled() ? Theme::current().highlight
+                                      : Theme::current().disabledText);
+        m_label->setGeometry(localRect());
+    }
+
+    void pointerPress(const PointerEvent& event) override
+    {
+        if (isEnabled() && event.button == MouseButton::Left)
+            m_pressed = true;
+    }
+
+    void pointerRelease(const PointerEvent& event) override
+    {
+        if (!m_pressed)
+            return;
+        m_pressed = false;
+        if (isEnabled() && event.button == MouseButton::Left
+            && localRect().contains(event.position) && onClicked)
+            onClicked();
+    }
+
+private:
+    Label* m_label;
+    bool m_pressed = false;
+};
 
 class SecondaryLabel : public Label
 {
@@ -224,11 +270,22 @@ private:
         m_subtitleLabel = textCol->addChild<SecondaryLabel>();
         m_subtitleLabel->setLayoutHints({.fillWidth = true});
 
-        // Right: action button
-        m_actionButton = row->addChild<Button>();
+        // Right: primary action with a small secondary recheck link below it.
+        ColumnLayout* actions = row->addChild<ColumnLayout>();
+        actions->setSpacing(metrics::xs);
+        actions->setLayoutHints({.verticalAlignment = Alignment::Center});
+
+        m_actionButton = actions->addChild<Button>();
         m_actionButton->setName("update:action");
-        m_actionButton->setLayoutHints({.verticalAlignment = Alignment::Center});
         m_actionButton->onClicked = [this] { onActionClicked(); };
+
+        m_recheckLink = actions->addChild<LinkLabel>(tr("Check again"));
+        m_recheckLink->setName("update:recheck");
+        m_recheckLink->setVisible(false);
+        m_recheckLink->onClicked = [this] {
+            if (m_status && m_status->isAvailable() && !m_status->isRequestPending())
+                m_status->checkForUpdate();
+        };
     }
 
     // ── update info card ─────────────────────────────────────────────────────
@@ -264,6 +321,7 @@ private:
             m_subtitleLabel->setVisible(true);
             m_progressBar->setVisible(false);
             m_updateCard->setVisible(false);
+            m_recheckLink->setVisible(false);
             m_actionButton->setText(tr("Check for updates"));
             m_actionButton->setEnabled(false);
             return;
@@ -291,6 +349,7 @@ private:
         m_progressBar->setVisible(false);
         m_subtitleLabel->setVisible(true);
         m_updateCard->setVisible(false);
+        m_recheckLink->setVisible(false);
         m_actionButton->setEnabled(!m_status->isRequestPending());
 
         switch (state) {
@@ -324,6 +383,8 @@ private:
             m_statusLabel->setText(tr("Updates available"));
             m_subtitleLabel->setText(lastCheckStr);
             m_actionButton->setText(tr("Update now"));
+            m_recheckLink->setVisible(true);
+            m_recheckLink->setEnabled(!m_status->isRequestPending());
 
             // Fill update card
             const bool isSystem = (state == update::State::SystemUpgrade);
@@ -479,6 +540,7 @@ private:
     ProgressBar*    m_progressBar;
     SecondaryLabel* m_subtitleLabel;
     Button*         m_actionButton;
+    LinkLabel*      m_recheckLink;
     UpdateInfoCard* m_updateCard;
 };
 

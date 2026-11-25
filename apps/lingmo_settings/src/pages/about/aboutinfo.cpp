@@ -290,7 +290,10 @@ std::string debianVersion()
 
 std::string auroraVersion()
 {
-    std::ifstream file("/usr/share/lingmo-aurora/version");
+    // Aurora installs the CMake project version as aurora-version. Keep the
+    // source of truth in the compositor package instead of falling back to a
+    // stale placeholder when the metadata is present.
+    std::ifstream file("/usr/share/lingmo-aurora/aurora-version");
     std::string version;
     if (!std::getline(file, version))
         return "1.0.0";

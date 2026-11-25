@@ -349,6 +349,26 @@ TEST_F(LauncherWindowTest, ClicksOutsideTheIconsHideAndRightClicksOpenTheMenu)
     EXPECT_FALSE(launcher().isShown());
 }
 
+TEST_F(LauncherWindowTest, BackgroundClickEndsFolderRenameWithoutHidingLauncher)
+{
+    open();
+    launcher().show();
+    frame();
+    ASSERT_TRUE(model().makeFolder("app00", "app01"));
+    const auto folder = std::find_if(model().rows().begin(), model().rows().end(),
+                                     [](const shell::LauncherItem &item) { return item.folder; });
+    ASSERT_NE(model().rows().end(), folder);
+    ASSERT_TRUE(test::runUntil([&] { return view()->cell(folder->id) != nullptr; }));
+
+    shell::LauncherCell *cell = view()->cell(folder->id);
+    cell->beginRename();
+    ASSERT_TRUE(cell->isRenaming());
+    click(20, 900);
+
+    EXPECT_FALSE(cell->isRenaming());
+    EXPECT_TRUE(launcher().isShown());
+}
+
 TEST_F(LauncherWindowTest, TheWheelTurnsAPagePerNotchAndTheDotsPage)
 {
     open();
@@ -387,6 +407,25 @@ TEST_F(LauncherWindowTest, LosingTheActivationHides)
     test::runFor(std::chrono::milliseconds(20));
     EXPECT_TRUE(launcher().isShown());
     launcher().setDragging(false);
+}
+
+TEST_F(LauncherWindowTest, NotificationOverlayDoesNotDismiss)
+{
+    open();
+    launcher().show();
+    frame();
+
+    auto notification = std::make_unique<shell::ShellWindow>(shell.get(), wm::WindowRole::Notification);
+    notification->setFocusPolicy(wm::FocusPolicy::NoFocus);
+    notification->setSize({240, 100});
+    notification->show();
+    ASSERT_TRUE(test::runUntil([&] { return notification->wmWindow() && notification->wmWindow()->isVisible(); }));
+
+    manager.activation()->deactivate(launcherWindow->window()->wmWindow());
+    test::runFor(std::chrono::milliseconds(20));
+    EXPECT_TRUE(launcher().isShown());
+
+    notification->hide();
 }
 
 TEST_F(LauncherWindowTest, DockToggleSurvivesTheOpeningFocusTransition)

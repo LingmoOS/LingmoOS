@@ -10,7 +10,9 @@
 #include <vector>
 
 #include "base/geometry.h"
+#include "base/file_watcher.h"
 #include "base/signal.h"
+#include "base/settings.h"
 #include "base/timer.h"
 #include "wm/activation.h"
 #include "wm/desks/desks_controller.h"
@@ -49,6 +51,10 @@ public:
     ~StageManager() override;
 
     bool enabled() const { return m_enabled; }
+    bool preferenceEnabled() const
+    {
+        return m_settings.boolValue("StageManager/Enabled", false);
+    }
     bool changingVisibility() const { return m_updating; }
     void setEnabled(bool enabled);
     void setSessionBlocked(bool blocked);
@@ -105,6 +111,7 @@ private:
     void prune();
     void reconcile(Window *preferred = nullptr, bool focus = false);
     void publish();
+    void reloadPreferences();
     void beginTransition(Id target, Window *preferred, bool focus);
     void tickTransition();
     void finishTransition();
@@ -112,6 +119,8 @@ private:
     std::map<std::string, Id> &active();
 
     WindowManager *m_manager;
+    base::Settings m_settings;
+    base::FileWatch m_settingsWatch;
     bool m_enabled = false;
     bool m_blocked = false;
     bool m_updating = false;

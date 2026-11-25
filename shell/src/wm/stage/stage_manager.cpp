@@ -5,10 +5,12 @@
 
 #include <algorithm>
 #include <cmath>
+#include <filesystem>
 #include <limits>
 
 #include "base/auto_reset.h"
 #include "core/main_loop.h"
+#include "core/preferences.h"
 #include "display/display_manager.h"
 #include "wm/desks/desk.h"
 #include "wm/mru_window_tracker.h"
@@ -24,8 +26,16 @@ namespace Lingmo::WM {
 
 StageManager::StageManager(WindowManager *manager)
     : m_manager(manager)
+    , m_settings(preferencesFile("shell"))
     , m_transitionTimer(core::mainLoop())
 {
+    std::error_code error;
+    std::filesystem::create_directories(
+            std::filesystem::path(m_settings.path()).parent_path(), error);
+    m_settingsWatch = base::FileWatch::file(m_settings.path(), [this] {
+        reloadPreferences();
+    }, core::mainLoop());
+    reloadPreferences();
     m_transitionTimer.setInterval(std::chrono::milliseconds(16));
     m_transitionTimer.onTimeout = [this] { tickTransition(); };
     m_manager->desks()->addObserver(this);
@@ -164,6 +174,13 @@ void StageManager::publish()
 {
     ++m_revision;
     changed(snapshot());
+}
+
+void StageManager::reloadPreferences()
+{
+    m_settings.reload();
+    if (m_settings.contains("StageManager/Enabled"))
+        setEnabled(preferenceEnabled());
 }
 
 void StageManager::beginTransition(Id target, Window *preferred, bool focus)

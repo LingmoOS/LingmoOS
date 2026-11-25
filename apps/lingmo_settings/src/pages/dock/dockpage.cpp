@@ -155,6 +155,16 @@ public:
         area->onToggled = [this](bool checked) { m_settings.setMinimizedArea(checked); };
         Section* desktop=content()->addChild<Section>(tr("Desktop and widgets"));
         auto* desktopCard=desktop->addChild<Card>(Card::Style::List);
+        auto* stage = desktopCard->addChild<SwitchRow>(tr("Stage Manager"));
+        stage->setName("stage:enabled");
+        stage->setChecked(Lingmo::base::Settings(
+                                  Lingmo::base::paths::lingmoConfig("shell"))
+                                  .boolValue("StageManager/Enabled", false));
+        stage->onToggled=[](bool enabled) {
+            Lingmo::base::Settings config(Lingmo::base::paths::lingmoConfig("shell"));
+            config.setValue("StageManager/Enabled", enabled);
+            config.sync();
+        };
         auto* show=desktopCard->addChild<SwitchRow>(tr("Show widgets on desktop"));
         show->setChecked(Lingmo::base::Settings(Lingmo::base::paths::lingmoConfig("filemanager")).boolValue("DesktopWidgets/visible",true));
         show->onToggled=[](bool enabled){Lingmo::base::Settings config(Lingmo::base::paths::lingmoConfig("filemanager"));config.setValue("DesktopWidgets/visible",enabled);config.sync();Lingmo::base::dbus::Proxy(Lingmo::base::dbus::Connection::session(),"org.lingmo.FileManager","/FileManager","org.lingmo.FileManager").send("RefreshWidgets");};
