@@ -113,6 +113,7 @@ void AppearanceWatcher::apply(sd_bus_message* reply)
     std::string fixedFamily = Theme::current().fixedFontFamily;
     std::string iconTheme = Theme::current().iconTheme;
     bool continuous = Theme::current().continuousCorners;
+    int controlStyle = Theme::current().controlStyle;
 
     if (sd_bus_message_enter_container(reply, 'a', "{sv}") < 0)
         return;
@@ -137,6 +138,8 @@ void AppearanceWatcher::apply(sd_bus_message* reply)
             sd_bus_message_read(reply, "i", &value);
             if (key == "accentColor")
                 accent = value;
+            else if (key == "controlStyle")
+                controlStyle = value;
         } else if (type == "d") {
             double value = 0;
             sd_bus_message_read(reply, "d", &value);
@@ -167,6 +170,7 @@ void AppearanceWatcher::apply(sd_bus_message* reply)
     theme.fixedFontFamily = fixedFamily;
     theme.iconTheme = iconTheme;
     theme.continuousCorners = continuous;
+    theme.controlStyle = std::clamp(controlStyle, 0, 1);
     Theme::setCurrent(theme);
 }
 

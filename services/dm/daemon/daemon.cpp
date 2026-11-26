@@ -36,6 +36,12 @@ static bool oobeAutologin()
     return state.boolValue("Account/Autologin", true);
 }
 
+static std::string oobeAccountUser()
+{
+    const base::Settings state("/etc/lingmo-initial-setup-account.conf");
+    return state.stringValue("Account/User");
+}
+
 // How long the login screen or a session may take to open its display.
 static constexpr int kControlTimeoutMs = 10000;
 static constexpr int kControlPollMs = 20;
@@ -111,6 +117,10 @@ Daemon::~Daemon()
 
 bool Daemon::start()
 {
+    const std::string setupUser = oobeAccountUser();
+    if (!setupUser.empty())
+        cleanupCompletedOobeSession(setupUser);
+
     const auto greeter = uidOf(m_config.greeterUser);
     if (!greeter) {
         LM_CRITICAL(base::LogCategory::defaultCategory()) << "No login screen user" << m_config.greeterUser;
@@ -185,6 +195,7 @@ bool Daemon::autologin()
     start.command = {DM_SESSION_WRAPPER};
     start.command.insert(start.command.end(), entry->exec.begin(), entry->exec.end());
     start.environment = sessionEnvironment(*entry, m_config.sessionVt);
+    start.session = id;
 
     m_login = std::make_unique<HelperProcess>();
     auto *login = m_login.get();
@@ -450,6 +461,7 @@ void Daemon::startSession(const std::vector<std::string> &command, const std::ve
         start.command.insert(start.command.end(), entry->exec.begin(), entry->exec.end());
         const auto variables = sessionEnvironment(*entry, m_config.sessionVt);
         start.environment.insert(start.environment.end(), variables.begin(), variables.end());
+        start.session = session;
         m_state.remember(m_login->user(), session);
     } else if (!command.empty()) {
         start.command = {DM_SESSION_WRAPPER};
@@ -485,6 +497,7 @@ void Daemon::launchSession(PendingStart start)
     if (!m_login)
         return;
 
+    m_activeSession = start.session;
     setGraphicsMode(m_config.sessionVt);
     m_greeterSpent = true;
 
@@ -532,8 +545,12 @@ void Daemon::launchSession(PendingStart start)
 
 void Daemon::onSessionFinished()
 {
+    const std::string user = m_session ? m_session->user() : std::string {};
+    const std::string session = std::exchange(m_activeSession, std::string {});
     release(m_session);
     restoreTextMode(m_config.sessionVt);
+    if (session == "lingmo-initial-setup")
+        cleanupCompletedOobeSession(user);
     if (m_stopping)
         return;
 
@@ -546,6 +563,15 @@ void Daemon::onSessionFinished()
     // A crash, another desktop's own logout, or a session that failed before
     // it was shown: the login screen comes back.
     returnToGreeter();
+}
+
+void Daemon::cleanupCompletedOobeSession(const std::string &user)
+{
+    if (user.empty() || !oobeComplete(user))
+        return;
+    if (!removeSessionDesktopFiles(m_config.sessionDirectories, "lingmo-initial-setup"))
+        LM_WARNING(base::LogCategory::defaultCategory())
+                << "Cannot remove the completed initial setup session entry";
 }
 
 void Daemon::whenControlled(HelperProcess *helper, int vt, std::function<void(bool)> then)

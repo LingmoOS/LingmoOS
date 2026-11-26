@@ -144,6 +144,34 @@ public:
             m_widgetStyles.push_back(choice);
         }
         theme->addChild<Footnote>(tr("Automatic keeps widgets colorful on the active desktop and uses monochrome in the background."));
+
+        // --- Control style (Liquid Glass / Classic) ---
+        // The installed SDK and appearance client headers don't yet expose
+        // controlStyle, so we read/write the setting file directly (same
+        // pattern as the Stage Manager switch on this page).
+        Section* controlSection = content()->addChild<Section>(tr("Control style"));
+        Card* controlCard = controlSection->addChild<Card>(Card::Style::List);
+        auto* controlStyles = controlCard->addChild<ChoiceRow>(tr("Control style"));
+        const char* styleNames[] = {tr("Classic"), tr("Liquid Glass")};
+        for (int i = 0; i < 2; ++i) {
+            auto* choice = controlStyles->options()->addChild<ImageSelectionItem>(
+                dataPath(i == 0 ? "images/style_classic.svg" : "images/style_liquid.svg"),
+                styleNames[i], SizeF{92, 64}, 0, ImageSelectionItem::PreviewFit::Cover);
+            choice->setName("appearance:control-style-" + std::to_string(i));
+            choice->onClicked = [this, i] {
+                Lingmo::base::Settings config(Lingmo::base::paths::lingmoConfig("services"));
+                config.setValue("Appearance/ControlStyle", int64_t(i));
+                config.sync();
+                // Notify the compositor / appearance service via D-Bus.
+                Lingmo::base::dbus::Proxy(Lingmo::base::dbus::Connection::session(),
+                    "org.lingmo.Services", "/org/lingmo/Services/Appearance",
+                    "org.lingmo.Services.Appearance").send("setControlStyle", int32_t(i));
+                update();
+            };
+            m_controlStyles.push_back(choice);
+        }
+        controlSection->addChild<Footnote>(tr("Liquid Glass uses a frosted-glass material with subtle highlights and depth. Changes apply immediately without restarting."));
+
         auto* surfaces=content()->addChild<Section>(tr("Desktop surfaces"));
         auto* surfaceCard=surfaces->addChild<Card>(Card::Style::List);
         auto* menu=surfaceCard->addChild<NavigationItem>(tr("Menu Bar"));menu->onClicked=[&window]{window.switchToPage("statusbar");};
@@ -193,6 +221,11 @@ private:
         m_auto->setChecked(automatic);
         for (size_t i = 0; i < m_swatches.size(); ++i)
             m_swatches[i]->setChecked(theme.highlight == kAccentColors[i]);
+        // Read control style directly from the settings file (same as Stage Manager switch).
+        const int cs = int(Lingmo::base::Settings(Lingmo::base::paths::lingmoConfig("services"))
+                               .intValue("Appearance/ControlStyle", 0));
+        for (size_t i = 0; i < m_controlStyles.size(); ++i)
+            m_controlStyles[i]->setChecked(int(i) == cs);
     }
 
     Appearance m_appearance;
@@ -202,6 +235,7 @@ private:
     ImageSelectionItem* m_auto;
     std::vector<AccentSwatch*> m_swatches;
     std::vector<ImageSelectionItem*> m_widgetStyles;
+    std::vector<ImageSelectionItem*> m_controlStyles;
 };
 
 } // namespace

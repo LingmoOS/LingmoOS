@@ -8,14 +8,6 @@
 
 namespace oobe {
 
-#ifndef OOBE_SESSION_DESKTOP_FILE
-#define OOBE_SESSION_DESKTOP_FILE "/usr/share/wayland-sessions/lingmo-initial-setup.desktop"
-#endif
-
-#ifndef OOBE_APPLICATION_DESKTOP_FILE
-#define OOBE_APPLICATION_DESKTOP_FILE "/usr/share/applications/lingmo-initial-setup-app.desktop"
-#endif
-
 inline std::filesystem::path completionPath(const std::filesystem::path& home)
 {
     return home / ".config" / "lingmo" / "oobe.conf";
@@ -45,22 +37,6 @@ inline bool clearAccountState(const std::filesystem::path& root = "/etc")
 {
     std::error_code error;
     return std::filesystem::remove(root / "lingmo-initial-setup-account.conf", error) || !error;
-}
-
-// The setup session is only useful before the first login. Remove both
-// desktop entries after completion so display managers cannot offer it again.
-inline bool removeDesktopEntries()
-{
-    bool removed = true;
-    for (const std::filesystem::path path : {OOBE_SESSION_DESKTOP_FILE,
-                                             OOBE_APPLICATION_DESKTOP_FILE}) {
-        std::error_code error;
-        if (std::filesystem::exists(path, error) && !std::filesystem::remove(path, error))
-            removed = false;
-        if (error)
-            removed = false;
-    }
-    return removed;
 }
 
 } // namespace oobe

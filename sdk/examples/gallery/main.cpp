@@ -6,6 +6,7 @@
 #include <cstdio>
 #include <memory>
 #include <string>
+#include <tuple>
 #include <vector>
 
 #include "base/event_loop.h"
@@ -19,6 +20,7 @@
 #include "ui/keys.h"
 #include "ui/label.h"
 #include "ui/layout.h"
+#include "ui/menu.h"
 #include "ui/progress_bar.h"
 #include "ui/scroll_view.h"
 #include "ui/segmented_control.h"
@@ -67,6 +69,7 @@ private:
     Window& m_window;
     ButtonGroup m_group;
     Animation m_motion;
+    Menu m_editMenu;
     std::unique_ptr<ConfirmDialog> m_confirm;
     std::unique_ptr<DialogWindow> m_details;
     std::unique_ptr<View> m_root;
@@ -138,6 +141,22 @@ Gallery::Gallery(Window& window)
     choices->addChild<ComboBox>(std::vector<std::string>{"Automatic", "Light", "Dark"});
     TabBar* tabs = page->addChild<TabBar>(std::vector<std::string>{"General", "Display", "Sound"});
     tabs->setLayoutHints({.fillWidth = true});
+
+    heading(page, "Menus");
+    Button* editMenuButton = row(page)->addChild<Button>("Edit menu");
+    for (const auto& [text, icon, shortcut] : {
+                 std::tuple{"Undo", "edit-undo", "Ctrl+Z"},
+                 std::tuple{"Redo", "edit-redo", "Ctrl+Shift+Z"},
+                 std::tuple{"Cut", "edit-cut", "Ctrl+X"},
+                 std::tuple{"Copy", "edit-copy", "Ctrl+C"},
+                 std::tuple{"Paste", "edit-paste", "Ctrl+V"},
+                 std::tuple{"Delete", "edit-delete", ""},
+                 std::tuple{"Find", "edit-find", "Ctrl+F"},
+         }) {
+        const size_t index = m_editMenu.addItem(text, [] {}, shortcut);
+        m_editMenu.setItemIcon(index, icon);
+    }
+    editMenuButton->onClicked = [this, editMenuButton] { m_editMenu.popupFor(editMenuButton); };
 
     heading(page, "Text");
     TextField* field = page->addChild<TextField>();

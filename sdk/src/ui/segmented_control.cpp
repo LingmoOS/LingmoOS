@@ -187,30 +187,54 @@ void SegmentedControl::paint(Painter& painter)
     const RectF bounds = localRect();
     const Color plate = color(ColorId::SegmentedControlPlate);
     const double tabRadius = theme.smallRadius + 2;
-    if (m_style == Style::Segmented) {
-        painter.drawRoundedRect(bounds, {bounds.height / 2},
-                                m_trackColor ? m_trackColor->resolve() : color(ColorId::SegmentedControlTrack));
-    } else {
-        painter.drawRoundedRect(bounds, {tabRadius, 0, themeCorners()}, color(ColorId::SegmentedTabBackground));
-    }
-    if (m_current < 0 || m_current >= int(m_segments.size()))
-        return;
 
-    const RectF item = itemRect(size_t(m_current));
-    if (m_style == Style::Segmented) {
-        // A plain rectangle with a drop shadow: Gaussian deviation (radius + 1) / 3.33.
+    if (theme.controlStyle == 1) {
+        // Liquid Glass: glass tray with more pronounced plate.
+        const Color track = m_trackColor ? m_trackColor->resolve() : color(ColorId::SegmentedControlTrack);
+        if (m_style == Style::Segmented) {
+            painter.drawShadow(bounds, bounds.height / 2, 4, Color{0, 0, 0, uint8_t(theme.darkMode ? 42 : 24)}, {0, 1});
+            painter.drawSmoothRectangle(bounds, bounds.height / 2, track, 0.5, Color{255, 255, 255, uint8_t(theme.darkMode ? 44 : 80)});
+        } else {
+            painter.drawShadow(bounds, tabRadius, 4, Color{0, 0, 0, uint8_t(theme.darkMode ? 42 : 24)}, {0, 1});
+            painter.drawRoundedRect(bounds, {tabRadius, 0, themeCorners()}, color(ColorId::SegmentedTabBackground), 0.5,
+                                    Color{255, 255, 255, uint8_t(theme.darkMode ? 44 : 80)});
+        }
+        if (m_current < 0 || m_current >= int(m_segments.size()))
+            return;
+        const RectF item = itemRect(size_t(m_current));
         const RectF highlight = item.adjusted(kPlateInset, kPlateInset, -kPlateInset, -kPlateInset);
-        painter.drawShadow(highlight, highlight.height / 2, 1.2, color(ColorId::SegmentedControlPlateShadow),
-                           {0, 1});
-        painter.drawSmoothRectangle(highlight, highlight.height / 2, plate);
+        if (m_style == Style::Segmented) {
+            painter.drawShadow(highlight, highlight.height / 2, 2.5, color(ColorId::SegmentedControlPlateShadow), {0, 1});
+            painter.drawSmoothRectangle(highlight, highlight.height / 2, plate, 0.5,
+                                        Color{255, 255, 255, uint8_t(theme.darkMode ? 70 : 160)});
+        } else {
+            if (color(ColorId::SegmentedTabPlateShadow).a > 0)
+                painter.drawShadow(highlight, theme.smallRadius, 1.2, color(ColorId::SegmentedTabPlateShadow));
+            painter.drawRoundedRect(highlight, {tabRadius, kPlateInset, themeCorners()}, plate, 0.5,
+                                    Color{255, 255, 255, uint8_t(theme.darkMode ? 70 : 160)});
+        }
     } else {
-        // Concentric with the bar through the inset.
-        const Color shadow = color(ColorId::SegmentedTabPlateShadow);
-        if (shadow.a > 0)
-            painter.drawShadow(item.adjusted(kPlateInset, kPlateInset, -kPlateInset, -kPlateInset), theme.smallRadius,
-                               0.9, shadow);
-        painter.drawRoundedRect(item.adjusted(kPlateInset, kPlateInset, -kPlateInset, -kPlateInset),
-                                {tabRadius, kPlateInset, themeCorners()}, plate);
+        if (m_style == Style::Segmented) {
+            painter.drawRoundedRect(bounds, {bounds.height / 2},
+                                    m_trackColor ? m_trackColor->resolve() : color(ColorId::SegmentedControlTrack));
+        } else {
+            painter.drawRoundedRect(bounds, {tabRadius, 0, themeCorners()}, color(ColorId::SegmentedTabBackground));
+        }
+        if (m_current < 0 || m_current >= int(m_segments.size()))
+            return;
+        const RectF item = itemRect(size_t(m_current));
+        if (m_style == Style::Segmented) {
+            const RectF highlight = item.adjusted(kPlateInset, kPlateInset, -kPlateInset, -kPlateInset);
+            painter.drawShadow(highlight, highlight.height / 2, 1.2, color(ColorId::SegmentedControlPlateShadow), {0, 1});
+            painter.drawSmoothRectangle(highlight, highlight.height / 2, plate);
+        } else {
+            const Color shadow = color(ColorId::SegmentedTabPlateShadow);
+            if (shadow.a > 0)
+                painter.drawShadow(item.adjusted(kPlateInset, kPlateInset, -kPlateInset, -kPlateInset), theme.smallRadius,
+                                   0.9, shadow);
+            painter.drawRoundedRect(item.adjusted(kPlateInset, kPlateInset, -kPlateInset, -kPlateInset),
+                                    {tabRadius, kPlateInset, themeCorners()}, plate);
+        }
     }
 }
 

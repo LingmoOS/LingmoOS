@@ -821,8 +821,13 @@ void LauncherView::paint(ui::Painter &painter)
         if (!m_wallpaper.isPicture())
             painter.fillRect(bounds, m_wallpaper.color());
         else {
-            // Until it has decoded, the dimmer darkens what is behind the window.
-            painter.drawImage(m_wallpaper.image(), bounds);
+            // Fill with the average wallpaper colour first so grab() never
+            // returns a fully-black bitmap when the image hasn't decoded yet.
+            if (m_wallpaper.image().isNull())
+                painter.fillRect(bounds, m_wallpaper.backdropColor());
+            else
+                painter.drawImage(m_wallpaper.image(), bounds);
+            // Dimmer on top — also covers the transitional colour fill.
             painter.fillRect(bounds, ui::Color {0, 0, 0, 102});
         }
         painter.restore();

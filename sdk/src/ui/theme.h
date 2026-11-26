@@ -43,6 +43,8 @@ struct Theme
     std::string iconTheme = "lingmo-light";
     // The compositor's window corners on large panels.
     bool continuousCorners = true;
+    // 0 = Classic (existing look), 1 = Liquid Glass.
+    int controlStyle = 0;
 
     // Points to logical pixels at the 96 dpi logical resolution.
     double fontSize() const { return fontPointSize * 4 / 3; }

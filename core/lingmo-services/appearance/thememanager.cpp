@@ -48,6 +48,7 @@ ThemeManager::ThemeManager(Settings &settings, dbus::Connection *session, dbus::
     // init value
     m_continuousCorners = m_settings.boolValue("Appearance/ContinuousCorners", true);
     m_accentColor = int(m_settings.intValue("Appearance/AccentColor", 0));
+    m_controlStyle = int(m_settings.intValue("Appearance/ControlStyle", 0));
     m_cursorTheme = m_settings.stringValue("Appearance/CursorTheme", "default");
     m_cursorSize = int(m_settings.intValue("Appearance/CursorSize", 24));
     m_iconTheme = m_settings.stringValue("Appearance/IconTheme", "lingmo-light");
@@ -129,6 +130,7 @@ bool ThemeManager::publish()
                 [this](bool antialias, const std::string &hintStyle) { setFontRendering(antialias, hintStyle); },
                 {{"antialias", "hintStyle"}, {}});
     o.addMethod("updateFontConfig", [this] { updateFontConfig(); });
+    o.addMethod("setControlStyle", [this](int32_t value) { setControlStyle(value); }, {{"style"}, {}});
 
     o.addProperty("isDarkMode", [this] { return isDarkMode(); });
     o.addProperty("darkModeSchedule", [this] { return int32_t(darkModeSchedule()); });
@@ -145,6 +147,7 @@ bool ThemeManager::publish()
     o.addProperty("cursorTheme", [this] { return cursorTheme(); });
     o.addProperty("cursorSize", [this] { return int32_t(cursorSize()); });
     o.addProperty("iconTheme", [this] { return iconTheme(); });
+    o.addProperty("controlStyle", [this] { return int32_t(controlStyle()); });
 
     o.addSignal("darkModeChanged", "b");
     o.addSignal("darkModeScheduleChanged", "i");
@@ -161,6 +164,7 @@ bool ThemeManager::publish()
     o.addSignal("iconThemeChanged", "");
     o.addSignal("systemFontPointSizeChanged", "");
     o.addSignal("systemFontChanged", "");
+    o.addSignal("controlStyleChanged", "i");
     return o.publish();
 }
 
@@ -431,4 +435,19 @@ void ThemeManager::setIconTheme(const std::string &iconTheme)
     write("IconTheme", m_iconTheme);
     updateGtk3Config();
     emitSignal("iconThemeChanged");
+}
+
+int ThemeManager::controlStyle() const
+{
+    return m_controlStyle;
+}
+
+void ThemeManager::setControlStyle(int style)
+{
+    style = std::clamp(style, 0, 1);
+    if (m_controlStyle == style)
+        return;
+    m_controlStyle = style;
+    write("ControlStyle", int64_t(m_controlStyle));
+    emitSignal("controlStyleChanged", int32_t(m_controlStyle));
 }

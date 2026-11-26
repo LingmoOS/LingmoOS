@@ -810,6 +810,103 @@ void EglRenderer::drawTextureMappedRects(Texture *texture, const std::vector<Map
         drawTextureQuads(glTexture, quads, count, alpha);
 }
 
+void EglRenderer::drawTextureMesh(Texture *texture,
+                                  const std::vector<Renderer::MeshVertex> &triangles,
+                                  float alpha)
+{
+    auto *glTexture = dynamic_cast<GlTexture *>(texture);
+    if (!m_current || !glTexture || triangles.empty())
+        return;
+    const bool external = glTexture->target() == GL_TEXTURE_EXTERNAL_OES;
+    if (external && !m_externalProgram)
+        return;
+
+    // Convert logical screen positions to NDC clip space, using the same
+    // transform as quadFor(). Vertices are in absolute logical coordinates;
+    // subtract m_pass.offset() first, then normalize and rotate.
+    const bool quarterTurn = outputContext().transform == 1 || outputContext().transform == 3;
+    const float W = (quarterTurn ? m_pass.viewport().height() : m_pass.viewport().width())
+                    / rasterScale();
+    const float H = (quarterTurn ? m_pass.viewport().width() : m_pass.viewport().height())
+                    / rasterScale();
+    if (W <= 0.0f || H <= 0.0f)
+        return;
+
+    const size_t N = triangles.size();
+    std::vector<float> positions(N * 2);
+    std::vector<float> uvCoords(N * 2);
+
+    const base::PointF passOffset = m_pass.offset();
+    const bool inverted = glTexture->inverted;
+
+    for (size_t i = 0; i < N; ++i) {
+        const Renderer::MeshVertex &mv = triangles[i];
+        // Subtract render-pass offset (same as textureQuad's corner lambda)
+        float lx = mv.x - float(passOffset.x());
+        float ly = mv.y - float(passOffset.y());
+        // Normalize to [0,1]
+        float nx = lx / W;
+        float ny = ly / H;
+        // Apply output rotation (mirrors quadFor switch)
+        switch (outputContext().transform) {
+        case 1: { float t = nx; nx = ny; ny = 1.0f - t; break; }
+        case 2: nx = 1.0f - nx; ny = 1.0f - ny; break;
+        case 3: { float t = nx; nx = 1.0f - ny; ny = t; break; }
+        default: break;
+        }
+        // Map to NDC [-1,1]
+        positions[2 * i]     = nx * 2.0f - 1.0f;
+        positions[2 * i + 1] = 1.0f - ny * 2.0f;
+        uvCoords[2 * i]     = mv.u;
+        uvCoords[2 * i + 1] = inverted ? 1.0f - mv.v : mv.v;
+    }
+
+    const GlProgram &program = external ? m_externalProgram : m_textureProgram;
+    TextureUniforms &uniforms = external ? m_externalUniforms : m_textureUniforms;
+    glUseProgram(program);
+    applyRoundedClip(program);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(glTexture->target(), glTexture->name());
+
+    const bool hasAlpha = pixelFormatHasAlpha(glTexture->format()) && !glTexture->contentOpaque;
+    if (alpha != uniforms.lastAlpha) {
+        glUniform1f(uniforms.alpha, alpha);
+        uniforms.lastAlpha = alpha;
+    }
+    const float swizzle = !external && pixelFormatIsBgr(glTexture->format()) ? 1.0f : 0.0f;
+    if (!external && swizzle != uniforms.lastSwizzle) {
+        glUniform1f(uniforms.swizzle, swizzle);
+        uniforms.lastSwizzle = swizzle;
+    }
+    if (float(hasAlpha) != uniforms.lastHasAlpha) {
+        glUniform1f(uniforms.hasAlpha, hasAlpha ? 1.0f : 0.0f);
+        uniforms.lastHasAlpha = float(hasAlpha);
+    }
+
+    const GLuint posAttr = GlProgram::kPositionAttribute;
+    const GLuint uvAttr  = GlProgram::kTexCoordAttribute;
+    glVertexAttribPointer(posAttr, 2, GL_FLOAT, GL_FALSE, 0, positions.data());
+    glEnableVertexAttribArray(posAttr);
+    glVertexAttribPointer(uvAttr, 2, GL_FLOAT, GL_FALSE, 0, uvCoords.data());
+    glEnableVertexAttribArray(uvAttr);
+
+    // The mesh always has alpha (shadow overflow in the texture), so use
+    // premultiplied alpha blending, matching drawTextureQuads' default path.
+    if (m_pass.blendMode() == GlRenderPass::BlendMode::Copy) {
+        glDisable(GL_BLEND);
+    } else {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+    glDrawArrays(GL_TRIANGLES, 0, GLsizei(N));
+
+    glDisable(GL_BLEND);
+    glDisableVertexAttribArray(posAttr);
+    glDisableVertexAttribArray(uvAttr);
+    glBindTexture(glTexture->target(), 0);
+}
+
 void EglRenderer::alignTextureDraw(const Texture *texture, const base::RectF &target,
                                    const base::AffineTransform &mapping, base::RectF &aligned,
                                    base::AffineTransform &texelMapping) const

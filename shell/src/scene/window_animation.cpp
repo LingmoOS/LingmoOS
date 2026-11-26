@@ -11,6 +11,7 @@
 #include "scene/window_animation.h"
 
 #include <algorithm>
+#include <array>
 #include <chrono>
 #include <cmath>
 #include <functional>
@@ -312,6 +313,23 @@ void WindowAnimation::start(Type type, const base::Rect &from, const base::Rect 
     } else if (type == Type::Restore) {
         m_dockWindow = to;
         m_dockSlot = from;
+    }
+    // Compute where the Genie deformation "is" for this new animation.
+    // For a fresh animation: Minimize starts at t=0 (window), Restore at t=1 (dock).
+    // For an interrupted animation: estimate from the rectangular bounds so the
+    // mesh continues from its actual visual position rather than jumping.
+    if (type == Type::Minimize || type == Type::Restore) {
+        const double winW  = m_dockWindow.width();
+        const double dockW = m_dockSlot.width();
+        if (interrupted && winW > dockW) {
+            // previous.bounds.width() sits between dockW and winW; convert to t.
+            const double w = previous.bounds.width();
+            const double ratio = std::clamp((w - dockW) / (winW - dockW), 0.0, 1.0);
+            // ratio=1 → at window (t=0), ratio=0 → at dock (t=1)
+            m_genieStartT = 1.0 - ratio;
+        } else {
+            m_genieStartT = (type == Type::Minimize) ? 0.0 : 1.0;
+        }
     }
     m_boundsContentReady = true;
     m_running = true;
@@ -621,6 +639,120 @@ void WindowAnimation::draw(render::Renderer &renderer, render::Texture *texture,
     renderer.drawTextureF(texture, target, value.opacity * alpha * renderer.opacityScale);
 }
 
+void WindowAnimation::drawGenie(render::Renderer &renderer, render::Texture *texture,
+                                const base::Rect &coverage, const base::Rect &original,
+                                const Sample &value, float alpha) const
+{
+    // Genie Effect: the window body is sliced into horizontal strips; each
+    // strip deforms toward the dock slot with a phase offset so the nearest
+    // edge leads.  UV maps back to the original texture position so content
+    // is never distorted in texture space — only the screen geometry warps.
+    if (!texture || original.isEmpty() || coverage.isEmpty())
+        return;
+
+    // t=0: window fully visible, t=1: window fully at dock.
+    // For Restore the sample's progress runs 0→1 as the window expands, so
+    // reverse to match the dock→window direction.
+    // For interrupted animations m_genieStartT records the mesh position at
+    // which the previous animation was cut off; interpolate from there to the
+    // natural endpoint so the reversal is continuous rather than jumping.
+    const double tFinal = (m_type == Type::Restore) ? 0.0 : 1.0;
+    const double t = m_genieStartT + (tFinal - m_genieStartT) * value.progress;
+
+    // m_dockWindow is always the window rect; m_dockSlot always the dock icon.
+    // Both are set correctly for Minimize and Restore in start().
+    const double winLeft   = m_dockWindow.left();
+    const double winRight  = m_dockWindow.right();
+    const double winTop    = m_dockWindow.top();
+    const double winHeight = m_dockWindow.height();
+
+    const double dockCx    = (m_dockSlot.left() + m_dockSlot.right())  / 2.0;
+    const double dockHalfW = (m_dockSlot.right() - m_dockSlot.left())  / 2.0;
+    const double dockCy    = (m_dockSlot.top()  + m_dockSlot.bottom()) / 2.0;
+
+    // Determine which edge of the window faces the dock, so the nearest rows
+    // lead the deformation.
+    const bool bottomDock = m_dockSlot.top()    >= m_dockWindow.bottom() - 1;
+    const bool topDock    = m_dockSlot.bottom() <= m_dockWindow.top()    + 1;
+
+    // The y-coordinate all rows converge toward (the dock icon edge).
+    const double dockY = bottomDock ? double(m_dockSlot.top())
+                       : topDock    ? double(m_dockSlot.bottom())
+                                    : dockCy;
+
+    // UV extents of the window body within the coverage (shadow-padded) texture.
+    const float covW     = float(coverage.width());
+    const float covH     = float(coverage.height());
+    const float uvBodyL  = float(original.left()   - coverage.left()) / covW;
+    const float uvBodyR  = float(original.right()  - coverage.left()) / covW;
+    const float uvBodyT  = float(original.top()    - coverage.top())  / covH;
+    const float uvBodyBH = float(original.height()) / covH; // body height in UV space
+
+    // Mesh: kRows horizontal strips, 2 triangles each = kRows*6 MeshVertices.
+    constexpr int kRows        = 32;
+    constexpr double kLeadFactor = 0.4; // fraction by which the leading edge precedes
+
+    // dockCy normalised in window height for left/right dock phase computation
+    const double dockCy_norm = winHeight > 0
+            ? std::clamp((dockCy - winTop) / winHeight, 0.0, 1.0)
+            : 0.5;
+
+    std::vector<render::Renderer::MeshVertex> triangles;
+    triangles.reserve(kRows * 6);
+
+    // Precompute per-row: (leftX, rightX, screenY, uvV)
+    struct RowVertex { float lx, rx, y, uvv; };
+    std::array<RowVertex, kRows + 1> rows;
+
+    for (int r = 0; r <= kRows; ++r) {
+        const double v = double(r) / kRows; // 0 = top, 1 = bottom within window
+
+        // phaseV: 1 for the row closest to the dock (leads), 0 for the far edge.
+        double phaseV;
+        if (bottomDock)
+            phaseV = v;              // bottom rows lead
+        else if (topDock)
+            phaseV = 1.0 - v;        // top rows lead
+        else
+            phaseV = 1.0 - std::abs(v - dockCy_norm); // left/right: by y proximity
+
+        const double rowStart = (1.0 - phaseV) * kLeadFactor;
+        const double rawProg  = (t - rowStart) / (1.0 - kLeadFactor);
+        const double rp       = smoothStep(std::clamp(rawProg, 0.0, 1.0));
+
+        // Screen position of the left and right edges of this row
+        rows[r].lx  = float(winLeft  + (dockCx - dockHalfW - winLeft)  * rp);
+        rows[r].rx  = float(winRight + (dockCx + dockHalfW - winRight) * rp);
+        rows[r].y   = float((winTop + v * winHeight) * (1.0 - rp) + dockY * rp);
+        rows[r].uvv = uvBodyT + float(v) * uvBodyBH;
+    }
+
+    const float finalAlpha = float(value.opacity) * alpha
+                             * float(renderer.opacityScale);
+
+    for (int r = 0; r < kRows; ++r) {
+        const RowVertex &top = rows[r];
+        const RowVertex &bot = rows[r + 1];
+
+        // Four corners: TL, TR, BL, BR
+        render::Renderer::MeshVertex tl{top.lx, top.y, uvBodyL, top.uvv};
+        render::Renderer::MeshVertex tr{top.rx, top.y, uvBodyR, top.uvv};
+        render::Renderer::MeshVertex bl{bot.lx, bot.y, uvBodyL, bot.uvv};
+        render::Renderer::MeshVertex br{bot.rx, bot.y, uvBodyR, bot.uvv};
+
+        // Triangle 1: TL TR BL
+        triangles.push_back(tl);
+        triangles.push_back(tr);
+        triangles.push_back(bl);
+        // Triangle 2: TR BR BL
+        triangles.push_back(tr);
+        triangles.push_back(br);
+        triangles.push_back(bl);
+    }
+
+    renderer.drawTextureMesh(texture, triangles, finalAlpha);
+}
+
 render::RoundedShape WindowAnimation::transformedShape(render::RoundedShape shape,
                                                        const base::Rect &original, const Sample &sample)
 {
@@ -821,7 +953,12 @@ bool WindowAnimation::textureIsCurrent(render::Renderer &renderer, const base::R
     // A texture drawn without its blurs, or with them, is only kept for a draw
     // that wants the same.
     const bool blurSuppressed =
-            renderer.suppressBackgroundBlur || presentedScaled() || m_presentedAt;
+            renderer.suppressBackgroundBlur || presentedScaled() || m_presentedAt
+            // A Launcher surface leaves a transparent hole for the folder panel;
+            // drawBackgroundBlur inside the offscreen pass would read from the
+            // empty texture instead of the compositor output and write black there.
+            // Suppress it so the transparent panel composites naturally.
+            || m_style == Style::Launcher;
     // The blurs in the texture read the output behind the window, which may
     // have changed wherever this frame draws it again, and nowhere else. One
     // drawn without them reads nothing behind it: the overview's full repaints
@@ -1053,7 +1190,8 @@ void WindowAnimation::render(render::Renderer &renderer) const
         render::PresentationSubmission *submission = renderer.presentationSubmission;
         // The overview draws a window's blurs where it shows it.
         const bool blurSuppressed =
-                renderer.suppressBackgroundBlur || presentedScaled() || m_presentedAt;
+                renderer.suppressBackgroundBlur || presentedScaled() || m_presentedAt
+                || m_style == Style::Launcher;
         swapStashedTexture(blurSuppressed);
         const bool contentChanged =
                 m_textureDamage.hasDamage(*this, coverage, renderer.rasterScale());
@@ -1197,7 +1335,16 @@ void WindowAnimation::render(render::Renderer &renderer) const
         } else if (morphsExterior()) {
             drawExteriorMorph(renderer, value, blend);
         } else {
-            if (exterior < 1) {
+            if (m_minimizeStyle == MinimizeStyle::Genie && isDockTransition()) {
+                // The Genie mesh tessellates the window body directly; drawing
+                // the whole texture on top via the affine-scale path would
+                // produce a ghost image (the compressed body drawn at `exterior`
+                // opacity behind the mesh). Skip the exterior rect draw: the
+                // shadow fades with the body as the mesh collapses.
+                drawGenie(renderer, m_texture.get(), m_coverage, m_textureBounds, value);
+                // Outline is part of the snapshot and deforms with the mesh;
+                // skip the separate SSD outline draw for the Genie path.
+            } else if (exterior < 1) {
                 if (exterior > 0)
                     draw(renderer, m_texture.get(), m_coverage, m_textureBounds, value, exterior);
                 renderer.pushRoundedClip(bodyShape(m_textureBounds, value.bounds));
@@ -1214,9 +1361,11 @@ void WindowAnimation::render(render::Renderer &renderer) const
                 if (m_visual.clipContent)
                     renderer.popRoundedClip();
             }
-            Sample outlined = value;
-            outlined.opacity *= exterior;
-            outline(renderer, m_visual, m_textureBounds, outlined);
+            if (m_minimizeStyle != MinimizeStyle::Genie || !isDockTransition()) {
+                Sample outlined = value;
+                outlined.opacity *= exterior;
+                outline(renderer, m_visual, m_textureBounds, outlined);
+            }
         }
     }
     if (m_scaleFrom != m_scaleTo) {

@@ -57,6 +57,11 @@ void DockPreferences::reload()
     m_layout.setBehavior(efficient ? DockAutoHideBehavior::Never
                                   : behaviorFromSetting(int(m_settings.intValue("Dock/Visibility", 0))));
     m_manager.setDockTransitionsAbovePanels(!efficient && m_settings.boolValue("Dock/MinimizedArea", true));
+    const int style = int(m_settings.intValue("Dock/MinimizeStyle", 0));
+    if (style != m_minimizeStyle) {
+        m_minimizeStyle = style;
+        m_manager.setMinimizeStyle(style);
+    }
 }
 
 } // namespace Lingmo::WM

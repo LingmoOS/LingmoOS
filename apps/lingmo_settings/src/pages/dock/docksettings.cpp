@@ -40,6 +40,7 @@ DockSettings::DockSettings()
     m_bounceOnLaunch = shell.boolValue("Dock/BounceOnLaunch", true);
     m_taskbarAlignment = int(shell.intValue("Dock/TaskbarAlignment", 0));
     m_taskbarSearch = int(shell.intValue("Dock/TaskbarSearch", 0));
+    m_minimizeStyle = int(shell.intValue("Dock/MinimizeStyle", 0));
 }
 
 void DockSettings::readMode()
@@ -149,6 +150,19 @@ void DockSettings::setTaskbarSearch(int value)
     if (value == m_taskbarSearch) return;
     m_dock.send("setTaskbarSearch", int32_t(value));
     m_taskbarSearch = value;
+}
+
+void DockSettings::setMinimizeStyle(int style)
+{
+    style = std::clamp(style, 0, 1);
+    if (style == m_minimizeStyle)
+        return;
+    m_minimizeStyle = style;
+    // Written directly to the shell settings file; the compositor file-watches
+    // it and picks up the change without a D-Bus round-trip to the dock.
+    Settings config(paths::lingmoConfig("shell"));
+    config.setValue("Dock/MinimizeStyle", int64_t(style));
+    config.sync();
 }
 
 } // namespace settings

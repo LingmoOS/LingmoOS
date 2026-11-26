@@ -49,6 +49,8 @@ public:
     // A label as the menu shows it: the exporter's "_" mnemonic markers
     // dropped, "__" a literal underscore.
     static std::string plainLabel(const std::string &label);
+    // The first usable D-Bus key combination in the toolkit's menu notation.
+    static std::string formatShortcut(const std::vector<std::vector<std::string>> &shortcuts);
 
 private:
     struct State;

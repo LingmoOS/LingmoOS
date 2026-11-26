@@ -208,4 +208,46 @@ void BitmapPainter::drawBitmap(const base::RectF& target, const Bitmap& bitmap, 
     canvas->restore();
 }
 
+void BitmapPainter::drawBitmapQuad(const base::RectF& src, const Bitmap& bitmap, const Quad& dst)
+{
+    if (!m_canvas || bitmap.isNull())
+        return;
+    const sk_sp<SkImage> image = SkImages::RasterFromPixmapCopy(skPixmap(bitmap));
+    if (!image)
+        return;
+
+    // Build a projective matrix that maps the source rectangle to the
+    // four destination corners via SkMatrix::setPolyToPoly.
+    const SkPoint srcPts[4] = {
+        {SkScalar(src.left()), SkScalar(src.top())},
+        {SkScalar(src.right()), SkScalar(src.top())},
+        {SkScalar(src.left()), SkScalar(src.bottom())},
+        {SkScalar(src.right()), SkScalar(src.bottom())},
+    };
+    const SkPoint dstPts[4] = {
+        {SkScalar(dst.tl.x()), SkScalar(dst.tl.y())},
+        {SkScalar(dst.tr.x()), SkScalar(dst.tr.y())},
+        {SkScalar(dst.bl.x()), SkScalar(dst.bl.y())},
+        {SkScalar(dst.br.x()), SkScalar(dst.br.y())},
+    };
+    SkMatrix persp;
+    if (!persp.setPolyToPoly(SkSpan<const SkPoint>(srcPts, 4), SkSpan<const SkPoint>(dstPts, 4)))
+        return; // degenerate quad
+
+    SkPaint paint;
+    paint.setAlphaf(float(std::clamp(m_state.opacity, 0.0, 1.0)));
+    paint.setBlendMode(toSkBlendMode(m_state.mode));
+    paint.setAntiAlias(true);
+
+    SkCanvas* canvas = m_canvas->canvas.get();
+    canvas->save();
+    canvas->concat(toSkMatrix(m_state.transform));
+    canvas->concat(persp);
+    canvas->drawImageRect(image,
+                          SkRect::MakeXYWH(SkScalar(src.x()), SkScalar(src.y()),
+                                           SkScalar(src.width()), SkScalar(src.height())),
+                          SkSamplingOptions(SkFilterMode::kLinear), &paint);
+    canvas->restore();
+}
+
 } // namespace Lingmo::ui

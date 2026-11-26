@@ -118,7 +118,17 @@ ui::RectF parityPlate(const ui::RectF &slot, double glyph, double scale)
 
 void paintTile(ui::Painter &painter, const ui::RectF &rect)
 {
+    // Liquid Glass: soft drop shadow to lift the tile off the panel surface,
+    // then the translucent fill, then a one-pixel white rim on the top edge.
+    painter.drawShadow(rect, kTileRadius, 6,
+                       dark() ? ui::Color{0, 0, 0, 55} : ui::Color{0, 0, 0, 30},
+                       {0, 1.5});
     painter.fillRoundedRect(rect, kTileRadius, tileColor(), ui::Corners::Continuous);
+    // Top-edge specular highlight — the lit rim of the glass tile.
+    const double rimAlpha = dark() ? 0.22 : 0.42;
+    painter.strokeRoundedRect(rect.adjusted(0.5, 0.5, -0.5, -0.5), kTileRadius - 0.5,
+                               ui::Color{255, 255, 255, uint8_t(rimAlpha * 255)},
+                               1, ui::Corners::Continuous);
 }
 
 std::string artwork(std::string_view name, bool white)

@@ -80,26 +80,65 @@ void Button::paint(Painter& painter)
     const bool enabled = isEnabled();
     const RectF bounds = localRect();
     const double radius = theme.mediumRadius;
-    Color surface = color(ColorId::ButtonBackground);
-    if (!enabled)
-        surface = surface.withAlpha(surface.a / 255.0 * 0.38);
-    painter.fillRoundedRect(bounds, radius, surface, themeCorners());
 
-    if (enabled) {
-        const double stateOpacity = std::max(m_hoverAmount * 0.08, m_pressed ? 0.12 : 0.0);
-        if (stateOpacity > 0)
-            painter.fillRoundedRect(bounds, radius, theme.highlight.withAlpha(stateOpacity), themeCorners());
-        if (m_rippleOpacity > 0 && m_rippleProgress > 0) {
+    if (theme.controlStyle == 1) {
+        // Liquid Glass: semi-transparent glass surface with an edge highlight.
+        Color surface = color(ColorId::ButtonBackground);
+        if (!enabled)
+            surface = surface.withAlpha(surface.a / 255.0 * 0.28);
+
+        // Drop shadow for lift effect.
+        if (enabled)
+            painter.drawShadow(bounds, radius, 6, Color{0, 0, 0, uint8_t(theme.darkMode ? 60 : 40)}, {0, 1});
+
+        painter.fillRoundedRect(bounds, radius, surface, themeCorners());
+
+        // Top-edge specular highlight (the lit rim of the glass).
+        const double rimAlpha = enabled ? (m_pressed ? 0.18 : (m_hoverAmount > 0 ? 0.32 + m_hoverAmount * 0.12 : 0.24)) : 0.10;
+        const Color rimColor = Color{255, 255, 255, uint8_t(rimAlpha * 255)};
+        // A thin line along the top edge using strokeRoundedRect inset by half a pixel.
+        painter.strokeRoundedRect(bounds.adjusted(0.5, 0.5, -0.5, -0.5), radius - 0.5, rimColor,
+                                  painter.borderWidth(1), themeCorners());
+
+        // Press: add a brief brightness shift.
+        if (enabled && m_pressed)
+            painter.fillRoundedRect(bounds, radius, Color{0, 0, 0, 20}, themeCorners());
+
+        // Ripple.
+        if (enabled && m_rippleOpacity > 0 && m_rippleProgress > 0) {
             const double farX = std::max(m_rippleOrigin.x, bounds.width - m_rippleOrigin.x);
             const double farY = std::max(m_rippleOrigin.y, bounds.height - m_rippleOrigin.y);
-            const double maxRadius = std::hypot(farX, farY);
-            const double radiusNow = std::max(1.0 / painter.scale(), maxRadius * m_rippleProgress);
+            const double maxR = std::hypot(farX, farY);
+            const double rNow = std::max(1.0 / painter.scale(), maxR * m_rippleProgress);
             painter.save();
             painter.clipRoundedRect(bounds, radius, themeCorners());
-            painter.fillEllipse({m_rippleOrigin.x - radiusNow, m_rippleOrigin.y - radiusNow,
-                                 radiusNow * 2, radiusNow * 2},
-                                theme.highlight.withAlpha(0.16 * m_rippleOpacity));
+            painter.fillEllipse({m_rippleOrigin.x - rNow, m_rippleOrigin.y - rNow, rNow * 2, rNow * 2},
+                                 Color{255, 255, 255, uint8_t(0.14 * m_rippleOpacity * 255)});
             painter.restore();
+        }
+    } else {
+        // Classic.
+        Color surface = color(ColorId::ButtonBackground);
+        if (!enabled)
+            surface = surface.withAlpha(surface.a / 255.0 * 0.38);
+        painter.fillRoundedRect(bounds, radius, surface, themeCorners());
+
+        if (enabled) {
+            const double stateOpacity = std::max(m_hoverAmount * 0.08, m_pressed ? 0.12 : 0.0);
+            if (stateOpacity > 0)
+                painter.fillRoundedRect(bounds, radius, theme.highlight.withAlpha(stateOpacity), themeCorners());
+            if (m_rippleOpacity > 0 && m_rippleProgress > 0) {
+                const double farX = std::max(m_rippleOrigin.x, bounds.width - m_rippleOrigin.x);
+                const double farY = std::max(m_rippleOrigin.y, bounds.height - m_rippleOrigin.y);
+                const double maxRadius = std::hypot(farX, farY);
+                const double radiusNow = std::max(1.0 / painter.scale(), maxRadius * m_rippleProgress);
+                painter.save();
+                painter.clipRoundedRect(bounds, radius, themeCorners());
+                painter.fillEllipse({m_rippleOrigin.x - radiusNow, m_rippleOrigin.y - radiusNow,
+                                     radiusNow * 2, radiusNow * 2},
+                                    theme.highlight.withAlpha(0.16 * m_rippleOpacity));
+                painter.restore();
+            }
         }
     }
 

@@ -13,6 +13,7 @@
 #include "wm/window_manager.h"
 #include "wm/window_modality_controller.h"
 #include "wm/window_state.h"
+#include "wm/stage/stage_manager.h"
 
 namespace Lingmo::WM {
 
@@ -163,6 +164,25 @@ void Activation::setActiveWindow(Window *window)
     if (m_activeWindow) {
         m_activeWindow->setActiveInternal(true);
         m_manager->raise(m_activeWindow);
+        // Raise all other windows in the same Stage group so the entire
+        // group sits above windows from other groups, preserving their
+        // relative order among themselves (macOS application-level z-order).
+        if (auto *stage = m_manager->stageManager(); stage && stage->enabled()) {
+            const auto id = stage->groupFor(m_activeWindow);
+            if (id) {
+                // Walk the stacking order bottom-to-top and raise group peers
+                // below the active window, keeping their relative sequence.
+                const std::vector<Window *> snap = m_manager->windows();
+                for (Window *peer : snap) {
+                    if (peer == m_activeWindow || stage->groupFor(peer) != id)
+                        continue;
+                    if (peer->isVisible() && !peer->state()->isMinimized())
+                        m_manager->raise(peer);
+                }
+                // Raise the focus target last so it ends up topmost in the group.
+                m_manager->raise(m_activeWindow);
+            }
+        }
     }
     m_updating = false;
 

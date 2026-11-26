@@ -235,6 +235,21 @@ public:
             drawTextureMapped(texture, rect.target.toEnclosingRect(), alpha, rect.mapping);
     }
 
+    // A single vertex for a tessellated mesh draw. Positions are in logical
+    // screen coordinates (the same space as drawTextureF). UV is in [0,1].
+    struct MeshVertex {
+        float x, y; // logical screen position
+        float u, v; // texture coordinate
+    };
+
+    // Draw a texture over an arbitrary triangle mesh. `triangles` is a flat
+    // list of vertices, every three forming one triangle (GL_TRIANGLES order).
+    // Positions are in logical screen coordinates; UV is in [0,1] texture
+    // space. Used by the Genie Effect minimize animation.
+    virtual void drawTextureMesh(Texture * /*texture*/,
+                                 const std::vector<MeshVertex> & /*triangles*/,
+                                 float /*alpha*/) {}
+
     // A non-empty `shape`, in the same coordinates as `bounds`, masks the blur
     // instead of the rounded rectangle. In a BackdropPass, the blur of surface
     // `owner`, by damage id, keeps its result for the next pass.

@@ -721,9 +721,6 @@ void OobeWindow::complete()
     if (!oobe::markComplete(Lingmo::base::paths::home()))
         return;
     oobe::clearAccountState();
-    // Cleanup is best effort: an unprivileged OOBE process may not be able to
-    // remove root-owned package files, but that must not trap the user in OOBE.
-    oobe::removeDesktopEntries();
     m_window.hide();
     if (auto* application = Application::instance())
         application->quit();

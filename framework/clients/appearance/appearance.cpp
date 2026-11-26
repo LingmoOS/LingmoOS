@@ -4,6 +4,7 @@
 
 #include "lingmo/appearance/appearance.h"
 
+#include <algorithm>
 #include <cstdint>
 
 using namespace Lingmo::Base;
@@ -187,6 +188,17 @@ int Appearance::cursorSize() const
 void Appearance::setCursorSize(int size)
 {
     m_service.send("setCursorSize", int32_t(size));
+}
+
+int Appearance::controlStyle() const
+{
+    return value<int32_t>("controlStyle", 0);
+}
+
+void Appearance::setControlStyle(int style)
+{
+    store("controlStyle", base::dbus::Variant(int32_t(std::clamp(style, 0, 1))));
+    m_service.send("setControlStyle", int32_t(style));
 }
 
 std::string Appearance::wallpaper() const

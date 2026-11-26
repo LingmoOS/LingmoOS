@@ -641,13 +641,31 @@ void TextField::paint(Painter& painter)
 
     // The background, its focus ring concentric through the inset.
     if (d->frameVisible) {
-        painter.drawRoundedRect(bounds, {theme.smallRadius, 0, themeCorners()}, theme.alternateBackground, 1,
-                                focused ? theme.highlight : theme.alternateBackground);
-    }
-    if (focused && d->frameVisible) {
-        painter.drawRoundedRect(bounds.adjusted(-kFocusRing, -kFocusRing, kFocusRing, kFocusRing),
-                                {theme.smallRadius, -kFocusRing, themeCorners()}, Color{0, 0, 0, 0}, 2,
-                                color(ColorId::TextFieldFocusRing));
+        const Theme& theme = Theme::current();
+        if (theme.controlStyle == 1) {
+            // Liquid Glass: translucent input area with rim highlight on focus.
+            const Color bg = theme.darkMode ? Color{255, 255, 255, 30} : Color{255, 255, 255, 140};
+            if (focused)
+                painter.drawShadow(bounds, theme.smallRadius, 5,
+                                   Color{0, 0, 0, uint8_t(theme.darkMode ? 48 : 28)}, {0, 1});
+            painter.drawRoundedRect(bounds, {theme.smallRadius, 0, themeCorners()}, bg, 1,
+                                    focused ? color(ColorId::ComboBoxFocusBorder)
+                                            : Color{255, 255, 255, uint8_t(theme.darkMode ? 50 : 100)});
+            if (focused) {
+                painter.drawRoundedRect(
+                    bounds.adjusted(-kFocusRing, -kFocusRing, kFocusRing, kFocusRing),
+                    {theme.smallRadius, -kFocusRing, themeCorners()}, Color{0, 0, 0, 0}, 2,
+                    color(ColorId::TextFieldFocusRing));
+            }
+        } else {
+            painter.drawRoundedRect(bounds, {theme.smallRadius, 0, themeCorners()}, theme.alternateBackground, 1,
+                                    focused ? theme.highlight : theme.alternateBackground);
+            if (focused) {
+                painter.drawRoundedRect(bounds.adjusted(-kFocusRing, -kFocusRing, kFocusRing, kFocusRing),
+                                        {theme.smallRadius, -kFocusRing, themeCorners()}, Color{0, 0, 0, 0}, 2,
+                                        color(ColorId::TextFieldFocusRing));
+            }
+        }
     }
 
     const RectF content = bounds.adjusted(d->left(), 0, -d->right(), 0);

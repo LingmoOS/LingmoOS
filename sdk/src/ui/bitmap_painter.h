@@ -83,6 +83,14 @@ public:
     void drawBitmap(base::PointF topLeft, const Bitmap& bitmap);
     // Scaled into the rectangle; smooth filters, otherwise nearest pixel.
     void drawBitmap(const base::RectF& target, const Bitmap& bitmap, bool smooth = true);
+    // Four-corner perspective draw: maps the source bitmap onto the quad
+    // defined by dstQuad[TL, TR, BL, BR] (in painter coordinates). Uses
+    // Skia's setPolyToPoly for a true projective (non-affine) transform,
+    // which is required for trapezoid/perspective effects.
+    struct Quad {
+        base::PointF tl, tr, bl, br;
+    };
+    void drawBitmapQuad(const base::RectF& src, const Bitmap& bitmap, const Quad& dst);
 
 private:
     struct State

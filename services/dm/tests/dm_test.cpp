@@ -236,6 +236,23 @@ TEST_F(DisplayManagerTest, EarlierDirectoriesWinAndIdsNameFilesOnly)
     EXPECT_FALSE(dm::findSession(directories, ""));
 }
 
+TEST_F(DisplayManagerTest, RemoveSessionDesktopFilesOnlyRemovesTheRequestedSession)
+{
+    base::file::TemporaryDirectory system("/tmp", "dm-test");
+    writeFile(directory.path() + "/lingmo-initial-setup.desktop",
+              "[Desktop Entry]\nName=Setup\nExec=/bin/true\n");
+    writeFile(system.path() + "/lingmo-initial-setup.desktop",
+              "[Desktop Entry]\nName=Setup\nExec=/bin/true\n");
+    writeFile(system.path() + "/lingmo-wayland.desktop",
+              "[Desktop Entry]\nName=Lingmo\nExec=/bin/true\n");
+
+    ASSERT_TRUE(dm::removeSessionDesktopFiles({directory.path(), system.path()}, "lingmo-initial-setup"));
+    EXPECT_FALSE(std::filesystem::exists(directory.path() + "/lingmo-initial-setup.desktop"));
+    EXPECT_FALSE(std::filesystem::exists(system.path() + "/lingmo-initial-setup.desktop"));
+    EXPECT_TRUE(std::filesystem::exists(system.path() + "/lingmo-wayland.desktop"));
+    EXPECT_FALSE(dm::removeSessionDesktopFiles({directory.path()}, "../lingmo-wayland"));
+}
+
 TEST(SessionTest, EnvironmentsCarryWhatPamSystemdReads)
 {
     const auto contains = [](const std::vector<std::string> &list, const std::string &value) {

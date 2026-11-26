@@ -6,7 +6,9 @@ The installer configures `lingmo-dm` to start the `lingmo-initial-setup` Wayland
 session for the installed account. OOBE writes
 `~/.config/lingmo/oobe.conf` after the user chooses **Get Started**. On later
 automatic logins, `lingmo-dm` sees that marker and starts `lingmo-wayland`
-instead. The marker is per user, so it never affects another account.
+instead. Once the setup session exits, `lingmo-dm` removes its root-owned
+Wayland session entry so it no longer appears on the login screen. The marker
+is per user, so it never affects another account.
 
 ## Build
 

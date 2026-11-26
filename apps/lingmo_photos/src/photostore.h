@@ -3,6 +3,7 @@
 #pragma once
 
 #include <cstdint>
+#include <optional>
 #include <string>
 #include <vector>
 
@@ -31,6 +32,7 @@ public:
     PhotoStore& operator=(const PhotoStore&) = delete;
 
     void upsert(const Photo& photo);
+    std::optional<Photo> photoByPath(const std::string& path) const;
     std::vector<Photo> photos(bool favorites = false, bool trash = false) const;
     std::vector<Photo> search(const std::string& query) const;
     void setFavorite(int64_t id, bool favorite);
@@ -43,6 +45,7 @@ public:
     void deleteAlbum(int64_t id);
     std::vector<Photo> albumPhotos(int64_t id) const;
     void addToAlbum(int64_t albumId, int64_t photoId);
+    void removeFromAlbum(int64_t albumId, int64_t photoId);
     size_t count(bool trash = false) const;
 
 private:

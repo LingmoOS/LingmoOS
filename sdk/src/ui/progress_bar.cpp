@@ -62,15 +62,30 @@ void ProgressBar::paint(Painter& painter)
     const Theme& theme = Theme::current();
     const RectF bounds = localRect();
     const double radius = std::min(bounds.width, bounds.height) / 2;
-    painter.fillRoundedRect(bounds, radius, theme.alternateBackground);
+
+    if (theme.controlStyle == 1) {
+        // Liquid Glass: grooved track with inner highlight.
+        const Color track = theme.darkMode ? Color{255,255,255,45} : Color{0,0,0,22};
+        painter.drawShadow(bounds, radius, 3, Color{0,0,0,28}, {0,1});
+        painter.fillRoundedRect(bounds, radius, track);
+        painter.fillRoundedRect({bounds.x, bounds.y, bounds.width, bounds.height * 0.4}, radius,
+                                Color{255,255,255,22});
+    } else {
+        painter.fillRoundedRect(bounds, radius, theme.alternateBackground);
+    }
+
     if (m_indeterminate) {
         const double width = std::max(bounds.height, bounds.width / 3);
         painter.fillRoundedRect({(bounds.width - width) * m_phase, 0, width, bounds.height}, radius,
                                 theme.highlight);
     } else if (m_value > 0) {
-        // Never shorter than a dot, so a little progress still shows.
         const double width = std::max(bounds.height, bounds.width * m_value);
         painter.fillRoundedRect({0, 0, width, bounds.height}, radius, theme.highlight);
+        if (theme.controlStyle == 1) {
+            // Specular on the filled portion.
+            painter.fillRoundedRect({0, 0, width, bounds.height * 0.45}, radius,
+                                    Color{255,255,255,45});
+        }
     }
 }
 

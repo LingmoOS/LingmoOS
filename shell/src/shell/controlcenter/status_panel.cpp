@@ -241,7 +241,17 @@ void PanelRow::paint(ui::Painter &painter)
     const double inset = kRowMargin - kBackgroundMargin + kRowInset;
     const ui::RectF slot {inset, (geometry().height - kBadgeSize) / 2, kBadgeSize, kBadgeSize};
     const ui::RectF plate = ::Lingmo::Shell::Panel::parityPlate(slot, kGlyphSize, painter.scale());
+    // Liquid Glass: soft shadow under the badge plate so it floats.
+    painter.drawShadow(plate, plate.width / 2, 3,
+                       ui::Color{0, 0, 0, uint8_t(::Lingmo::Shell::Panel::isDark(surface) ? 60 : 35)},
+                       {0, 1});
     painter.fillRoundedRect(plate, plate.width / 2, badge);
+    if (!m_active) {
+        // Rim highlight on the inactive badge (accent badge already stands out).
+        const double rimA = ::Lingmo::Shell::Panel::isDark(surface) ? 0.26 : 0.40;
+        painter.strokeRoundedRect(plate.adjusted(0.5, 0.5, -0.5, -0.5), plate.width / 2 - 0.5,
+                                  ui::Color{255, 255, 255, uint8_t(rimA * 255)}, 1);
+    }
 }
 
 void PanelRow::hoverChanged()

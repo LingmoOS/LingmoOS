@@ -95,9 +95,18 @@ void HeaderButton::paint(Painter& painter)
         int plate = std::min(box.width, box.height) - 2 * margin;
         if ((plate - icon.width) % 2 != 0)
             plate -= 1;
-        painter.fillDeviceRoundedRect({icon.x + (icon.width - plate) / 2, icon.y + (icon.height - plate) / 2,
-                                       plate, plate},
-                                      plate / 2.0, tint.withAlpha(alpha));
+        const Rect plateRect = {icon.x + (icon.width - plate) / 2, icon.y + (icon.height - plate) / 2, plate, plate};
+        if (Theme::current().controlStyle == 1) {
+            // Liquid Glass: glass bead instead of plain fill.
+            const Color glassFill = Color{255, 255, 255, uint8_t(alpha * 0.65 * 255)};
+            const Color glassRim  = Color{255, 255, 255, uint8_t(alpha * 0.90 * 255)};
+            painter.fillDeviceRoundedRect(plateRect, plate / 2.0, glassFill);
+            // Top-edge rim highlight.
+            painter.fillDeviceRoundedRect({plateRect.x, plateRect.y, plateRect.width, plateRect.height / 2},
+                                          plate / 2.0, glassRim);
+        } else {
+            painter.fillDeviceRoundedRect(plateRect, plate / 2.0, tint.withAlpha(alpha));
+        }
     }
 
     const std::string artworkName = currentArtwork();

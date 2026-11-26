@@ -10,6 +10,7 @@
 
 #include "include/core/SkCanvas.h"
 #include "include/core/SkSurface.h"
+#include "ui/theme.h"
 
 #include "ui/keys.h"
 #include "ui/painter.h"
@@ -137,28 +138,34 @@ RectF Slider::handleRect() const
 
 void Slider::paint(Painter& painter)
 {
+    const Theme& theme = Theme::current();
     const RectF bounds = localRect();
     const RectF handle = handleRect();
     const double centreY = bounds.height / 2;
-    // The track runs between the handle's centres at both ends, its round
-    // caps reaching a little past them.
     const double start = kHandle / 2 - kTrack / 2;
     const double length = std::max(0.0, bounds.width - kHandle) + kTrack;
+    const bool glass = theme.controlStyle == 1;
+
+    // Liquid Glass: use a slightly taller track with an inner highlight.
+    const double trackH = glass ? kTrack * 1.5 : kTrack;
 
     painter.save();
     if (!isEnabled())
         painter.multiplyOpacity(0.4);
-    // Rounded rectangles, snapped as the rounded-rectangle shader draws them.
-    painter.drawRoundedRect({start, centreY - kTrack / 2, length, kTrack}, {kTrack / 2}, color(ColorId::SliderTrack));
+    painter.drawRoundedRect({start, centreY - trackH / 2, length, trackH}, {trackH / 2}, color(ColorId::SliderTrack));
+    if (glass) {
+        // Inner specular: a slim white line along the top of the groove.
+        painter.drawRoundedRect({start, centreY - trackH / 2, length, trackH * 0.4}, {trackH / 2},
+                                Color{255, 255, 255, 30});
+    }
     if (visualPosition() > 0) {
         const double filled = std::max(0.0, bounds.width - kHandle) * visualPosition() + kTrack;
-        painter.drawRoundedRect({start, centreY - kTrack / 2, filled, kTrack}, {kTrack / 2},
+        painter.drawRoundedRect({start, centreY - trackH / 2, filled, trackH}, {trackH / 2},
                                 color(ColorId::SliderTrackFilled));
     }
     if (m_stepped && m_step > 0 && m_to != m_from) {
         const int intervals = int(std::ceil(std::abs(m_to - m_from) / m_step));
         const double travel = std::max(0.0, bounds.width - kHandle);
-        // Marks only while they stay apart.
         if (intervals > 0 && intervals <= int(travel / 6)) {
             const Color mark = color(ColorId::SliderTickMark);
             for (int i = 0; i <= intervals; ++i) {
@@ -221,6 +228,11 @@ void Slider::paint(Painter& painter)
                               SkRect::MakeXYWH(SkScalar((origin.x - padding) * scale), SkScalar(origin.y * scale),
                                                SkScalar((kHandle + 2 * padding) * scale), SkScalar(kHandle * scale)),
                               SkSamplingOptions(SkFilterMode::kLinear), &paint);
+    }
+    // Liquid Glass: add a specular highlight on top of the handle bead.
+    if (glass && layer && source) {
+        const RectF topHalf = {handle.x + 2, handle.y + 2, handle.width - 4, handle.height * 0.42};
+        painter.drawSmoothRectangle(topHalf, kHandle / 2, Color{255, 255, 255, 55});
     }
     painter.restore();
 }

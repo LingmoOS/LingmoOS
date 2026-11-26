@@ -317,14 +317,27 @@ void ComboBox::paint(Painter& painter)
 {
     const Theme& theme = Theme::current();
     const bool enabled = isEnabled();
-    // Pressed only, as FishUI's (no hover colour); an editable box keeps
-    // its colour, the field taking the presses.
-    const Color background = color(enabled && !m_field && m_pressed ? ColorId::ComboBoxBackgroundPressed
-                                                                     : ColorId::ComboBoxBackground);
     const bool open = m_menu && m_menu->isOpen();
     const bool focused = m_field ? m_field->hasFocus() : hasFocus();
-    painter.drawRoundedRect(localRect(), {theme.smallRadius, 0, themeCorners()}, background, 1,
-                            enabled && (focused || open) ? color(ColorId::ComboBoxFocusBorder) : background);
+
+    if (theme.controlStyle == 1) {
+        // Liquid Glass: translucent surface + rim highlight.
+        const Color bg = color(enabled && !m_field && m_pressed ? ColorId::ComboBoxBackgroundPressed
+                                                                 : ColorId::ComboBoxBackground);
+        if (enabled)
+            painter.drawShadow(localRect(), theme.smallRadius, 5, Color{0, 0, 0, uint8_t(theme.darkMode ? 50 : 32)}, {0, 1});
+        painter.drawRoundedRect(localRect(), {theme.smallRadius, 0, themeCorners()}, bg, 1,
+                                enabled && (focused || open) ? color(ColorId::ComboBoxFocusBorder) : Color{255,255,255, uint8_t(theme.darkMode ? 55 : 100)});
+        // Top-edge rim specular.
+        const double rimA = enabled ? (m_pressed ? 0.16 : (m_hovered ? 0.30 : 0.22)) : 0.08;
+        painter.strokeRoundedRect(localRect().adjusted(0.5, 0.5, -0.5, -0.5), theme.smallRadius - 0.5,
+                                  Color{255, 255, 255, uint8_t(rimA * 255)}, painter.borderWidth(1), themeCorners());
+    } else {
+        const Color background = color(enabled && !m_field && m_pressed ? ColorId::ComboBoxBackgroundPressed
+                                                                        : ColorId::ComboBoxBackground);
+        painter.drawRoundedRect(localRect(), {theme.smallRadius, 0, themeCorners()}, background, 1,
+                                enabled && (focused || open) ? color(ColorId::ComboBoxFocusBorder) : background);
+    }
 }
 
 void ComboBox::enabledChanged()

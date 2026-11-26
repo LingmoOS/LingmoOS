@@ -63,6 +63,10 @@ public:
     int cursorSize() const;
     void setCursorSize(int size);
 
+    // 0 = Classic, 1 = Liquid Glass.
+    int controlStyle() const;
+    void setControlStyle(int style);
+
     std::string wallpaper() const;
     void setWallpaper(const std::string& path);
     std::vector<std::string> userWallpapers() const;

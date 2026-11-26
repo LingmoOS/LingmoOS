@@ -61,6 +61,11 @@ public:
         None
     };
 
+    // How the minimize and restore transitions are drawn. Normal scales the
+    // whole window toward the dock slot as a rectangle. Genie deforms it into
+    // a flowing curved shape, with the edge nearest the dock leading.
+    enum class MinimizeStyle { Normal, Genie };
+
     static constexpr bool isCrossFade(Type type)
     {
         return type == Type::Bounds || type == Type::DragBounds;
@@ -104,6 +109,10 @@ public:
 
     // The dock slot moved while a minimize runs toward it or holds on it.
     void setMinimizeTarget(const base::Rect &target);
+
+    // Which minimize/restore transition style to use.
+    void setMinimizeStyle(MinimizeStyle style) { m_minimizeStyle = style; }
+    MinimizeStyle minimizeStyle() const { return m_minimizeStyle; }
 
     // A minimize that ends by holding its last frame on the dock slot, until
     // releaseHold(): the shell takes over with its thumbnail in its own commit,
@@ -245,6 +254,12 @@ private:
     WindowVisualState m_oldVisual;
     void draw(render::Renderer &renderer, render::Texture *texture, const base::Rect &coverage,
               const base::Rect &original, const Sample &sample, float alpha = 1) const;
+    // Draws the window body as a tessellated mesh deformed toward the dock
+    // slot, producing the Genie Effect. Called instead of draw() for Minimize
+    // and Restore when m_minimizeStyle == MinimizeStyle::Genie.
+    void drawGenie(render::Renderer &renderer, render::Texture *texture,
+                   const base::Rect &coverage, const base::Rect &original,
+                   const Sample &value, float alpha = 1.0f) const;
     // The subtree with its outlying subsurfaces and shadow overflow, which the
     // texture holds.
     base::Rect textureCoverage() const;
@@ -371,6 +386,12 @@ private:
     // The window's own bounds and its dock slot, for the exterior fade.
     base::RectF m_dockWindow;
     base::RectF m_dockSlot;
+    MinimizeStyle m_minimizeStyle = MinimizeStyle::Normal;
+    // The Genie deformation parameter (0=window, 1=dock) at which the current
+    // animation started. For a fresh animation this is 0 (Minimize) or 1
+    // (Restore). For an interrupted animation it records where the mesh
+    // actually was so the reversal continues from that position.
+    double m_genieStartT = 0;
 
     struct TargetAdjustment {
         base::PointF position;

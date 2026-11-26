@@ -334,8 +334,17 @@ protected:
             if (int(i) == m_current && m_menu->m_items[row.index].enabled) {
                 const RectF highlight = row.rect.adjusted(kHighlightInsetX, kHighlightInsetY,
                                                           -kHighlightInsetX, -kHighlightInsetY);
-                painter.drawRoundedRect(highlight, {theme.smallRadius, 0, themeCorners()},
-                                        color(ColorId::MenuHighlight));
+                const Theme& th = Theme::current();
+                if (th.controlStyle == 1) {
+                    // Liquid Glass: glass selection pill with rim highlight.
+                    painter.drawShadow(highlight, th.smallRadius, 3, Color{0,0,0,32}, {0,1});
+                    painter.drawRoundedRect(highlight, {th.smallRadius, 0, themeCorners()},
+                                            color(ColorId::MenuHighlight), 0.5,
+                                            Color{255,255,255, uint8_t(th.darkMode ? 60 : 100)});
+                } else {
+                    painter.drawRoundedRect(highlight, {theme.smallRadius, 0, themeCorners()},
+                                            color(ColorId::MenuHighlight));
+                }
             }
         }
     }

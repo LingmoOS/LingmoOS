@@ -14,6 +14,7 @@ public:
     explicit PhotosWindow(std::string database = {});
     ~PhotosWindow();
     void show();
+    void openFile(const std::string& path);
     void showAbout();
     void setMenuAction(std::function<void(int)> action) { m_menuAction = std::move(action); }
     void setViewerActive(bool active);

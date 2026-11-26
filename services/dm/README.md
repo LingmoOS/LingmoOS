@@ -3,6 +3,10 @@
 The Lingmo display manager. It runs the login screen and starts the Wayland
 session the user picks.
 
+After the configured account completes Lingmo initial setup, the root-owned
+display manager removes the setup session entry so it is no longer offered on
+the login screen.
+
 ## Dependencies
 
 The base library of [lingmo-toolkit](https://github.com/lingmoos/lingmo-toolkit)

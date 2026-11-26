@@ -355,6 +355,11 @@ public:
     // area; without it they go into the dock's icons, under the panels.
     void setDockTransitionsAbovePanels(bool above);
 
+    // 0 = Normal (scale), 1 = Genie Effect.  Applied to new minimize/restore
+    // animations; already-running ones finish as they started.
+    int minimizeStyle() const { return m_minimizeStyle; }
+    void setMinimizeStyle(int style);
+
     // --- Popup grabs ---
 
     // The chain of popups holding an explicit grab, outermost first. A pointer
@@ -599,6 +604,7 @@ private:
     std::unique_ptr<StatusItems> m_statusItems;
     std::vector<scene::Node *> m_deskOverlays;
     bool m_dockTransitionsAbovePanels = true;
+    int m_minimizeStyle = 0;
     std::unique_ptr<ToplevelEventHandler> m_eventHandler;
     Placement m_placement;
     WindowModalityController m_modality;

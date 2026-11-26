@@ -198,9 +198,15 @@ void WindowState::enterState(WindowStateType next)
         }
         if (next == WindowStateType::Minimized) {
             animation->start(Type::Minimize, previousBounds, target);
+            animation->setMinimizeStyle(m_window->manager()->minimizeStyle() == 1
+                    ? scene::WindowAnimation::MinimizeStyle::Genie
+                    : scene::WindowAnimation::MinimizeStyle::Normal);
             requestMinimizedSnapshot(animation);
         } else if (previous == WindowStateType::Minimized) {
             animation->start(Type::Restore, target, m_window->bounds());
+            animation->setMinimizeStyle(m_window->manager()->minimizeStyle() == 1
+                    ? scene::WindowAnimation::MinimizeStyle::Genie
+                    : scene::WindowAnimation::MinimizeStyle::Normal);
         } else if (previousBounds != m_window->bounds()) {
             animation->start(Type::Bounds, previousBounds, m_window->bounds());
         }

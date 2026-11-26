@@ -153,6 +153,13 @@ public:
         SwitchRow* area = minimized->addChild<SwitchRow>(tr("Minimized windows area"));
         area->setChecked(m_settings.minimizedArea());
         area->onToggled = [this](bool checked) { m_settings.setMinimizedArea(checked); };
+        auto* animRow = minimized->addChild<ListRow>(tr("Minimize animation"));
+        animRow->setInteractive(false);
+        auto* animBox = animRow->addContent<RowComboBox>(
+                std::vector<std::string>{tr("Scale"), tr("Genie Effect")});
+        animBox->setName("dock:minimize-animation");
+        animBox->setCurrentIndex(m_settings.minimizeStyle());
+        animBox->onActivated = [this](int index) { m_settings.setMinimizeStyle(index); };
         Section* desktop=content()->addChild<Section>(tr("Desktop and widgets"));
         auto* desktopCard=desktop->addChild<Card>(Card::Style::List);
         auto* stage = desktopCard->addChild<SwitchRow>(tr("Stage Manager"));

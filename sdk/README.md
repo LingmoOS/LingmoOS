@@ -37,7 +37,8 @@ make
 ```
 
 `examples/` has a demo window, `lingmo-toolkit-demo`, and
-`lingmo-toolkit-gallery` with every control.
+`lingmo-toolkit-gallery` with every control, including an edit menu with theme
+icons and optional shortcuts.
 
 ## License
 

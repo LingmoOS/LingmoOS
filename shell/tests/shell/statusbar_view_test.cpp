@@ -741,6 +741,15 @@ TEST(DBusMenuPopupTest, LabelsLoseTheirMnemonics)
     EXPECT_EQ("Tom & Jerry", shell::DBusMenuPopup::plainLabel("Tom & Jerry"));
 }
 
+TEST(DBusMenuPopupTest, FormatsShortcutNames)
+{
+    EXPECT_EQ(shell::DBusMenuPopup::formatShortcut({{"Control", "Shift", "x"}}), "Ctrl+Shift+X");
+    EXPECT_EQ(shell::DBusMenuPopup::formatShortcut({{"Alt", "F4"}}), "Alt+F4");
+    EXPECT_EQ(shell::DBusMenuPopup::formatShortcut({{"Control", "BackSpace"}}), "Ctrl+Backspace");
+    EXPECT_EQ(shell::DBusMenuPopup::formatShortcut({{"Control"}}), "");
+    EXPECT_EQ(shell::DBusMenuPopup::formatShortcut({}), "");
+}
+
 TEST_F(StatusBarViewTest, EfficientModeMovesSystemItemsBesideTheDockAndRestoresTopBar)
 {
     auto &applications = static_cast<test::FakeApplications &>(shell->applications());

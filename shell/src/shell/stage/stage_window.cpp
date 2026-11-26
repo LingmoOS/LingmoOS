@@ -28,7 +28,8 @@ namespace {
 
 constexpr int kWidth = 190;
 constexpr int kCardHeight = 112;
-constexpr int kGap = 12;
+constexpr int kLabelHeight = 20;   // app name label below the card
+constexpr int kGap = 16;           // gap between card+label rows
 constexpr int kMargin = 8;
 constexpr int kEdgeInset = 10;
 
@@ -153,6 +154,9 @@ public:
         invalidateFace();
     }
 
+    // Expose the stored title text so the View can feed it to the label below.
+    const std::string &titleText() const { return m_title->text(); }
+
     void setApplicationIcon(std::string icon)
     {
         icon = icon.empty() ? "application-x-executable" : std::move(icon);
@@ -169,12 +173,15 @@ public:
         requestPaint();
     }
 
-    void setStackPosition(size_t index)
+    // Perspective parameters: dy_norm is the signed normalised distance of
+    // this card's centre from the strip's vertical centre (-1=top, +1=bottom).
+    // The card rasterises with a right-side trapezoid warp so the right edge
+    // appears to converge toward the vanishing point at (0, stripCenterY).
+    void setPerspectiveFactor(double dyNorm)
     {
-        const double tilt = index % 2 == 0 ? -3.2 : 2.4;
-        if (tilt == m_tilt)
+        if (std::abs(dyNorm - m_dyNorm) < 0.001)
             return;
-        m_tilt = tilt;
+        m_dyNorm = dyNorm;
         invalidateFace();
     }
 
@@ -189,17 +196,79 @@ public:
         ui::Bitmap tilted(source.size(), ui::Bitmap::Format::Argb32Premultiplied);
         if (tilted.isNull())
             return;
-        ui::BitmapPainter painter(tilted);
+
         const double scale = window()->scale();
-        const double width = source.width();
-        const double height = source.height();
+        const double W = source.width();
+        const double H = source.height();
         const double inset = 4 * scale;
-        base::AffineTransform perspective(.985, 0, .035, .985, 6 * scale, 1 * scale);
-        perspective.translate(width / 2, height / 2);
-        perspective.rotate(m_tilt);
-        perspective.translate(-width / 2, -height / 2);
-        painter.setTransform(perspective);
-        painter.drawBitmap({inset, inset, width - 2 * inset, height - 2 * inset}, source, true);
+
+        // Perspective approximation using N horizontal slices, each given a
+        // slightly different horizontal shear. This avoids needing a
+        // non-affine API: each slice is a thin affine-sheared strip.
+        //
+        // m_dyNorm: signed normalised distance of card centre from strip
+        // centre (-1 = top of strip, +1 = bottom). At the centre the card
+        // is rectangular. The right edge leans based on position.
+        //
+        // For a card above the strip centre (dyNorm < 0):
+        //   right-top corner leans outward (+x), right-bottom inward.
+        // For a card below the strip centre (dyNorm > 0): reversed.
+        //
+        // kMaxShrink: max physical pixel shift of the right edge extreme.
+        constexpr double kMaxShrink = 14.0;
+        constexpr int kSlices = 16;
+
+        ui::BitmapPainter painter(tilted);
+        painter.setAntialiasing(true);
+
+        const double sliceH = (H - 2 * inset) / kSlices;
+        for (int s = 0; s < kSlices; ++s) {
+            const double vTop = double(s)       / kSlices;  // 0..1 within content area
+            const double vBot = double(s + 1)   / kSlices;
+            const double vMid = (vTop + vBot) / 2.0;
+
+            // dy for this slice within the card: maps 0..1 → -0.5..+0.5
+            // then scaled by m_dyNorm to get the signed influence.
+            const double localDy = vMid - 0.5;  // -0.5 at top, +0.5 at bottom
+
+            // Combined: strip-level position (m_dyNorm) modulates how much
+            // the within-card gradient tilts. At strip centre dyNorm≈0 the
+            // card is flat; at extremes the right edge tilts more.
+            const double shearFactor = m_dyNorm * localDy;  // positive → right leans right
+            const double xShift = -kMaxShrink * scale * shearFactor;
+
+            const double srcY0 = inset + vTop * (H - 2 * inset);
+            const double srcY1 = inset + vBot * (H - 2 * inset);
+            const double srcX0 = inset;
+            const double srcX1 = W - inset;
+
+            // Apply a horizontal shear: left column stays at srcX0,
+            // right column shifts by xShift (varying per slice).
+            // This is an affine shear: for a point (x, y) in the source,
+            //   x' = x + xShift * (x - srcX0) / (srcX1 - srcX0)
+            // which equals an AffineTransform with m21 = xShift / (srcX1-srcX0).
+            const double shearPerUnit = xShift / (srcX1 - srcX0);
+            // Translate so origin is at srcX0, apply shear, translate back.
+            base::AffineTransform t;
+            t.translate(srcX0, srcY0);
+            // m11=1 m12=0 m21=shearPerUnit m22=1 (shear x by y is m21)
+            // But we want shear x by x-offset, so it's a column-independent
+            // horizontal stretch + shift. Simpler: just translate the source
+            // rect to shift the right side.
+            // We use a plain translate with scale:
+            // For each slice, the left x stays, the right x shifts by xShift.
+            // Map source rect to slightly widened/shifted dest rect.
+            const double destX0 = srcX0;
+            const double destX1 = srcX1 + xShift;
+            const double scaleX = (destX1 - destX0) / (srcX1 - srcX0);
+            // x' = destX0 + (x - srcX0) * scaleX = x * scaleX + (destX0 - srcX0*scaleX)
+            t = base::AffineTransform(scaleX, 0, 0, 1,
+                                      destX0 - srcX0 * scaleX,
+                                      0);
+            painter.setTransform(t);
+            painter.drawBitmap({srcX0, srcY0, srcX1 - srcX0, srcY1 - srcY0}, source, true);
+        }
+
         m_raster->setPixels(tilted.width(), tilted.height(),
                             reinterpret_cast<const uint32_t *>(tilted.constBits()),
                             tilted.stride(), true, scale);
@@ -260,7 +329,7 @@ protected:
     void pointerRelease(const ui::PointerEvent &event) override
     {
         const bool dragged = m_dragged;
-        const bool draggedOut = dragged && event.position.x < 0;
+        const bool draggedOut = dragged && event.position.x > geometry().width;
         m_press.reset();
         m_dragged = false;
         if (dragged) {
@@ -398,7 +467,8 @@ private:
     std::unique_ptr<ui::Animation> m_dragAnimation;
     double m_entryProgress = 1;
     double m_hoverProgress = 0;
-    double m_tilt = -3.2;
+    double m_tilt = 0.0;
+    double m_dyNorm = 0.0;  // signed normalised dist from strip centre (-1..1)
     std::optional<ui::PointF> m_press;
     ui::PointF m_pressWindow;
     ui::PointF m_dragOffset;
@@ -437,18 +507,27 @@ public:
         while (m_cards.size() < m_visibleGroups.size()) {
             auto *card = m_content->addChild<Card>();
             m_cards.push_back(card);
+            // App name label: sits below each card in the content view,
+            // outside the card itself so it doesn't disturb the thumbnail.
+            auto *label = m_content->addChild<ui::Label>();
+            label->setElide(ui::Label::Elide::Right);
+            label->setVerticallyCentered(true);
+            label->setColor(ui::Color {230, 230, 230, 255});
+            label->setFontSize(12);
+            m_labels.push_back(label);
         }
         for (size_t i = 0; i < m_cards.size(); ++i) {
             const bool visible = i < m_visibleGroups.size();
             const bool wasVisible = m_cards[i]->isVisible();
             m_cards[i]->setVisible(visible);
+            m_labels[i]->setVisible(visible);
             if (!visible)
                 continue;
             const auto &group = m_visibleGroups[i];
             const bool changedGroup = m_cards[i]->setGroup(group.id);
             if (!wasVisible || changedGroup)
                 m_cards[i]->animateIn();
-            m_cards[i]->setStackPosition(i);
+            (void)i; // stack position handled by setPerspectiveFactor in layout()
             std::string title = "Stage " + std::to_string(i + 1);
             std::string icon = "application-x-executable";
             if (!group.windows.empty()) {
@@ -466,6 +545,7 @@ public:
                 }
             }
             m_cards[i]->setTitle(std::move(title));
+            m_labels[i]->setText(m_cards[i]->titleText());
             m_cards[i]->setApplicationIcon(std::move(icon));
             m_cards[i]->setStackCount(group.windows.size());
             m_cards[i]->setSelected(false);
@@ -503,13 +583,31 @@ protected:
         const double width = geometry().width;
         const double visibleHeight = geometry().height - 2 * kMargin;
         m_scroll->setGeometry({kMargin, kMargin, width - 2 * kMargin, visibleHeight});
-        m_content->setGeometry({0, 0, width - 2 * kMargin,
-                                double(m_visibleGroups.size()) * (kCardHeight + kGap)});
+        const double rowHeight = kCardHeight + kLabelHeight + kGap;
+        const size_t n = m_visibleGroups.size();
+        m_content->setGeometry({0, 0, width - 2 * kMargin, double(n) * rowHeight});
+
+        // Compute the strip's total content height and its vertical centre
+        // in content coordinates, then map each card's centre to a normalised
+        // distance [-1, +1] and pass it to the card for perspective warping.
+        const double totalH = double(n) * rowHeight;
+        const double stripCy = totalH / 2.0;
+
         for (size_t i = 0; i < m_cards.size(); ++i) {
             if (!m_cards[i]->isVisible())
                 continue;
-            const double y = i * (kCardHeight + kGap);
-            m_cards[i]->setGeometry({0, y, width - 4 * kMargin, kCardHeight});
+            const double y = double(i) * rowHeight;
+            const double cardWidth = width - 4 * kMargin;
+            m_cards[i]->setGeometry({0, y, cardWidth, kCardHeight});
+            m_labels[i]->setGeometry({0, y + kCardHeight + 2, cardWidth, kLabelHeight});
+
+            // dy_norm: signed normalised distance of this card's centre from
+            // the strip centre.  Clamped so edge cards never go beyond ±1.
+            const double cardCy = y + kCardHeight / 2.0;
+            const double dyNorm = totalH > 0
+                    ? std::clamp((cardCy - stripCy) / (totalH / 2.0), -1.0, 1.0)
+                    : 0.0;
+            m_cards[i]->setPerspectiveFactor(dyNorm);
         }
     }
 
@@ -520,6 +618,7 @@ private:
     ui::ScrollView *m_scroll = nullptr;
     ui::View *m_content = nullptr;
     std::vector<Card *> m_cards;
+    std::vector<ui::Label *> m_labels;
 };
 
 StageWindow::StageWindow(Shell *shell, std::unique_ptr<ScreenGrabber> grabber)
@@ -642,13 +741,14 @@ void StageWindow::place()
     const base::Rect workArea = m_shell->workArea(*output);
     if (workArea.isEmpty())
         return;
-    const int height = std::clamp(kCardHeight + 2 * kMargin,
-                                  kCardHeight + 2 * kMargin,
+    const int height = std::clamp(kCardHeight + kLabelHeight + 2 * kMargin,
+                                  kCardHeight + kLabelHeight + 2 * kMargin,
                                   workArea.height() - 2 * kEdgeInset);
     m_window->setOutput(output->name);
+    const int rowHeight = kCardHeight + kLabelHeight + kGap;
     const int stripHeight = std::min(workArea.height() - 2 * kEdgeInset,
                                      std::max(height, int(m_view->visibleGroupCount())
-                                                              * (kCardHeight + kGap)
+                                                              * rowHeight
                                                               + 2 * kMargin));
     m_window->setGeometry({workArea.left() + kEdgeInset, workArea.top() + kEdgeInset,
                            kWidth, stripHeight});

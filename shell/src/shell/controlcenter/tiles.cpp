@@ -167,7 +167,16 @@ void CardItem::paint(ui::Painter &painter)
     const double padding = ui::Theme::current().largeSpacing;
     const ui::RectF slot {padding, (geometry().height - kPlateSize) / 2, kPlateSize, kPlateSize};
     const ui::RectF rect = ::Lingmo::Shell::Panel::parityPlate(slot, kIconSize, painter.scale());
+    // Liquid Glass: a soft shadow under the icon plate so it floats above the tile.
+    painter.drawShadow(rect, rect.width / 2, 4,
+                       ui::Color{0, 0, 0, uint8_t(darkSurface ? 70 : 40)}, {0, 1});
     painter.fillRoundedRect(rect, rect.width / 2, plate);
+    // Rim highlight on the icon plate (skipped when checked — the accent fill reads without it).
+    if (!m_checked) {
+        const double rimA = darkSurface ? 0.28 : 0.45;
+        painter.strokeRoundedRect(rect.adjusted(0.5, 0.5, -0.5, -0.5), rect.width / 2 - 0.5,
+                                  ui::Color{255, 255, 255, uint8_t(rimA * 255)}, 1);
+    }
 }
 
 void CardItem::pointerPress(const ui::PointerEvent &event)

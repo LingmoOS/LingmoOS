@@ -7,6 +7,7 @@
 
 #include <algorithm>
 #include <dirent.h>
+#include <filesystem>
 #include <map>
 #include <set>
 #include <sys/stat.h>
@@ -172,6 +173,28 @@ std::optional<SessionEntry> findSession(const std::vector<std::string> &director
     }
 
     return std::nullopt;
+}
+
+bool removeSessionDesktopFiles(const std::vector<std::string> &directories, const std::string &id)
+{
+    if (id.empty() || id == "." || id == ".." || id.find_first_of("/\\") != std::string::npos)
+        return false;
+
+    bool removed = true;
+    for (const std::string &directory : directories) {
+        const std::filesystem::path path = std::filesystem::path(directory) / (id + ".desktop");
+        std::error_code error;
+        const auto status = std::filesystem::symlink_status(path, error);
+        if (error == std::errc::no_such_file_or_directory)
+            continue;
+        if (error || (!std::filesystem::is_regular_file(status) && !std::filesystem::is_symlink(status))) {
+            removed = false;
+            continue;
+        }
+        if (!std::filesystem::remove(path, error) || error)
+            removed = false;
+    }
+    return removed;
 }
 
 std::vector<std::string> sessionEnvironment(const SessionEntry &session, int vt)

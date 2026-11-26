@@ -64,6 +64,15 @@ bool saveEditedCopy(const std::string& source, const std::string& target, const 
             return false;
         }
     }
+    if (params.flipped) {
+        GdkPixbuf* flipped = gdk_pixbuf_flip(transformed, TRUE);
+        g_object_unref(transformed);
+        if (!flipped) {
+            fail(error, "Unable to flip image");
+            return false;
+        }
+        transformed = flipped;
+    }
 
     const auto extension = target.find_last_of('.');
     std::string format = extension == std::string::npos ? "png" : target.substr(extension + 1);

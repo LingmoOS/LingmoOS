@@ -22,6 +22,7 @@ std::optional<SessionEntry> readSessionFile(const std::string &path);
 std::vector<SessionEntry> findSessions(const std::vector<std::string> &directories);
 
 std::optional<SessionEntry> findSession(const std::vector<std::string> &directories, const std::string &id);
+bool removeSessionDesktopFiles(const std::vector<std::string> &directories, const std::string &id);
 
 // For pam_systemd, set before pam_open_session (sddm's Display::startAuth).
 std::vector<std::string> sessionEnvironment(const SessionEntry &session, int vt);

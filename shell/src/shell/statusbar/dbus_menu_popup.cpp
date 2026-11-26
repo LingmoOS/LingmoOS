@@ -4,6 +4,9 @@
 
 #include "shell/statusbar/dbus_menu_popup.h"
 
+#include <algorithm>
+#include <cctype>
+
 #include "shell/statusbar/dbus_menu.h"
 #include "ui/icon.h"
 #include "ui/menu.h"
@@ -61,6 +64,59 @@ std::string DBusMenuPopup::plainLabel(const std::string &label)
         text += label[i];
     }
     return text;
+}
+
+std::string DBusMenuPopup::formatShortcut(const std::vector<std::vector<std::string>> &shortcuts)
+{
+    for (const std::vector<std::string> &keys : shortcuts) {
+        std::vector<std::string> labels;
+        bool hasKey = false;
+        for (const std::string &key : keys) {
+            if (key.empty())
+                continue;
+            std::string lowered = key;
+            std::transform(lowered.begin(), lowered.end(), lowered.begin(),
+                           [](unsigned char ch) { return char(std::tolower(ch)); });
+            if (lowered == "control" || lowered == "ctrl" || lowered == "ctl" || lowered == "primary")
+                labels.emplace_back("Ctrl");
+            else if (lowered == "shift" || lowered == "shft")
+                labels.emplace_back("Shift");
+            else if (lowered == "alt" || lowered == "mod1")
+                labels.emplace_back("Alt");
+            else if (lowered == "super" || lowered == "meta" || lowered == "hyper")
+                labels.emplace_back("Super");
+            else {
+                hasKey = true;
+                if (lowered == "backspace")
+                    labels.emplace_back("Backspace");
+                else if (lowered == "return" || lowered == "kp_enter")
+                    labels.emplace_back("Enter");
+                else if (lowered == "escape")
+                    labels.emplace_back("Esc");
+                else if (lowered == "space")
+                    labels.emplace_back("Space");
+                else if (lowered == "page_up")
+                    labels.emplace_back("Page Up");
+                else if (lowered == "page_down")
+                    labels.emplace_back("Page Down");
+                else if (key.size() == 1)
+                    labels.emplace_back(1, char(std::toupper(static_cast<unsigned char>(key.front()))));
+                else
+                    labels.push_back(key);
+            }
+        }
+        if (!hasKey)
+            continue;
+
+        std::string label;
+        for (const std::string &part : labels) {
+            if (!label.empty())
+                label += '+';
+            label += part;
+        }
+        return label;
+    }
+    return {};
 }
 
 void DBusMenuPopup::wire(const std::shared_ptr<State> &state, ui::Menu &menu, int32_t id)
@@ -129,7 +185,7 @@ void DBusMenuPopup::fill(const std::shared_ptr<State> &state, ui::Menu &menu, in
             menu.addItem(text, [state, rowId] {
                 if (state->dbus)
                     state->dbus->activate(rowId);
-            });
+            }, formatShortcut(row->shortcut));
         }
         menu.setItemEnabled(index, row->enabled);
         menu.setItemChecked(index, row->toggle != DBusMenuItem::Toggle::None && row->toggleState == 1);

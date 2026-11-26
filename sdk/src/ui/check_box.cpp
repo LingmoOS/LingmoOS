@@ -27,6 +27,7 @@ static constexpr double kRingInset = 3;
 // light edge, both concentric through RoundedRectangle's inset.
 static void paintPlate(Painter& painter, const RectF& rect, double radius, bool on, bool focused, bool innerEdge)
 {
+    const Theme& theme = Theme::current();
     if (focused) {
         painter.drawRoundedRect(rect.adjusted(-kRingInset, -kRingInset, kRingInset, kRingInset), {radius, -kRingInset},
                                 Color{0, 0, 0, 0}, 2, color(ColorId::ToggleFocusRing));
@@ -34,8 +35,15 @@ static void paintPlate(Painter& painter, const RectF& rect, double radius, bool 
     painter.drawRoundedRect(rect, {radius}, color(on ? ColorId::ToggleBackgroundChecked : ColorId::ToggleBackground),
                             1, color(on ? ColorId::ToggleBorderChecked : ColorId::ToggleBorder));
     if (innerEdge) {
-        painter.drawRoundedRect(rect.adjusted(1, 1, -1, -1), {radius, 1}, Color{0, 0, 0, 0}, 1,
-                                color(on ? ColorId::CheckBoxInnerEdgeChecked : ColorId::CheckBoxInnerEdge));
+        // Liquid Glass: use a brighter inner-edge highlight to simulate the glass rim.
+        const Color inner = theme.controlStyle == 1
+                ? (on ? Color{255, 255, 255, 60} : Color{255, 255, 255, 40})
+                : color(on ? ColorId::CheckBoxInnerEdgeChecked : ColorId::CheckBoxInnerEdge);
+        painter.drawRoundedRect(rect.adjusted(1, 1, -1, -1), {radius, 1}, Color{0, 0, 0, 0}, 1, inner);
+    }
+    if (theme.controlStyle == 1 && !on) {
+        // Liquid Glass: soft drop shadow under the box to lift it off the background.
+        painter.drawShadow(rect, radius, 3, Color{0, 0, 0, 30}, {0, 1});
     }
 }
 

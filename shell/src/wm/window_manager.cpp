@@ -1005,6 +1005,13 @@ void WindowManager::setDockTransitionsAbovePanels(bool above)
     restackScene();
 }
 
+void WindowManager::setMinimizeStyle(int style)
+{
+    m_minimizeStyle = style;
+    // Already-running animations finish as they started; new ones pick up the
+    // updated style when enterState() calls setMinimizeStyle() on the animation.
+}
+
 void WindowManager::stackAtBottomOfLayer(Window *window)
 {
     auto it = std::find(m_stackingOrder.begin(), m_stackingOrder.end(), window);

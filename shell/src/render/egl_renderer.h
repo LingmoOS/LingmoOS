@@ -94,6 +94,8 @@ public:
                            const base::AffineTransform &mapping) override;
     void drawTextureMappedRects(Texture *texture, const std::vector<MappedRect> &rects,
                                 float alpha) override;
+    void drawTextureMesh(Texture *texture, const std::vector<Renderer::MeshVertex> &triangles,
+                         float alpha) override;
 
     std::unique_ptr<Texture> createTexture(const base::Size &size, const uint8_t *pixels, int stride,
                                            PixelFormat format) override;

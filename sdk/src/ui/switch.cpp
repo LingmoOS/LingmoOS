@@ -62,16 +62,38 @@ void Switch::checkedChanged(bool animated)
 
 void Switch::paintIndicator(Painter& painter, const RectF& rect)
 {
+    const Theme& theme = Theme::current();
     painter.save();
     if (!isEnabled())
         painter.multiplyOpacity(0.5);
-    // Plain antialiased rectangles, not snapped.
-    painter.drawSmoothRectangle(rect, rect.height / 2,
-                                mix(color(ColorId::SwitchTrack), color(ColorId::SwitchTrackOn), m_color));
+
+    const Color trackColor = mix(color(ColorId::SwitchTrack), color(ColorId::SwitchTrackOn), m_color);
+    painter.drawSmoothRectangle(rect, rect.height / 2, trackColor);
+
+    if (theme.controlStyle == 1) {
+        // Liquid Glass: rim highlight on top edge of track.
+        const double rimA = isChecked() ? 0.18 : 0.26;
+        painter.drawSmoothRectangle(
+            {rect.x + 0.5, rect.y + 0.5, rect.width - 1, rect.height * 0.45},
+            rect.height / 2,
+            Color{255, 255, 255, uint8_t(rimA * 255)});
+    }
+
     const double travel = rect.width - kHandle - 2 * kHandleMargin;
     const RectF handle = {rect.x + kHandleMargin + travel * m_handle,
                           rect.y + (rect.height - kHandle) / 2, kHandle, kHandle};
+
+    if (theme.controlStyle == 1) {
+        // Handle: a glassy bead with a soft drop shadow.
+        painter.drawShadow(handle, kHandle / 2, 3, Color{0, 0, 0, 50}, {0, 1});
+    }
     painter.drawSmoothRectangle(handle, kHandle / 2, color(ColorId::SwitchHandle));
+
+    if (theme.controlStyle == 1) {
+        // Handle top-edge specular.
+        const RectF topHalf = {handle.x + 1, handle.y + 1, handle.width - 2, handle.height * 0.45};
+        painter.drawSmoothRectangle(topHalf, kHandle / 2, Color{255, 255, 255, 60});
+    }
     painter.restore();
 }
 

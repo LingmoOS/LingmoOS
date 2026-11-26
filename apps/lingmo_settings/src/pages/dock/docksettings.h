@@ -54,6 +54,10 @@ public:
     int taskbarSearch() const { return m_taskbarSearch; }
     void setTaskbarSearch(int value);
 
+    // 0 = Normal (scale), 1 = Genie Effect.
+    int minimizeStyle() const { return m_minimizeStyle; }
+    void setMinimizeStyle(int style);
+
 private:
     void readMode();
     bool m_efficientMode = false;
@@ -76,6 +80,7 @@ private:
     bool m_bounceOnLaunch = true;
     int m_taskbarAlignment = 0;
     int m_taskbarSearch = 0;
+    int m_minimizeStyle = 0;
 };
 
 } // namespace settings

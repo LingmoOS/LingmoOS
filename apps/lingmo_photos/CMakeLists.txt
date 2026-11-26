@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(lingmo-photos VERSION 1.0.21 LANGUAGES CXX)
+project(lingmo-photos VERSION 1.0.23 LANGUAGES CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)

@@ -12,6 +12,7 @@ struct EditParams {
     double saturation = 0;
     double temperature = 0;
     int rotation = 0;
+    bool flipped = false;
 };
 
 // Writes an edited copy without modifying the source file.

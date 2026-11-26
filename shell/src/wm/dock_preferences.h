@@ -23,11 +23,15 @@ public:
 
     void reload();
 
+    // 0 = Normal (scale), 1 = Genie Effect.
+    int minimizeStyle() const { return m_minimizeStyle; }
+
 private:
     DockLayoutManager &m_layout;
     WindowManager &m_manager;
     base::Settings m_settings;
     base::FileWatch m_watch;
+    int m_minimizeStyle = 0;
 };
 
 } // namespace Lingmo::WM

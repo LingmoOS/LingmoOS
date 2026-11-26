@@ -115,7 +115,16 @@ void ScrollBar::paint(Painter& painter)
         handle = {kPadding, handleStart(), width, handleLength()};
     else
         handle = {handleStart(), kPadding, handleLength(), width};
-    painter.drawSmoothRectangle(handle, theme.smallRadius, color);
+
+    if (theme.controlStyle == 1) {
+        // Liquid Glass: slightly rounded pill with a subtle rim.
+        const double r = std::min(handle.width, handle.height) / 2;
+        painter.drawShadow(handle, r, 2, Color{0, 0, 0, uint8_t(0.14 * m_opacity * 255)}, {0, 1});
+        painter.drawSmoothRectangle(handle, r, color, 0.5,
+                                    Color{255, 255, 255, uint8_t(0.22 * m_opacity * 255)});
+    } else {
+        painter.drawSmoothRectangle(handle, theme.smallRadius, color);
+    }
 }
 
 void ScrollBar::pointerEnter()

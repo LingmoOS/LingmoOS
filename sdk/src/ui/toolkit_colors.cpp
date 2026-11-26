@@ -12,7 +12,8 @@ static constexpr Color kWhite = Color::rgb(0xFFFFFF);
 static constexpr Color kBlack = Color::rgb(0x000000);
 static constexpr Color kTransparent = Color{0, 0, 0, 0};
 
-void addToolkitColors(ColorMixer& mixer, const Theme& theme)
+// Classic style – the existing colour recipes, unchanged.
+static void addClassicColors(ColorMixer& mixer, const Theme& theme)
 {
     const bool dark = theme.darkMode;
 
@@ -28,7 +29,6 @@ void addToolkitColors(ColorMixer& mixer, const Theme& theme)
     mixer[ColorId::Separator] = withAlpha(ColorId::DisabledText, dark ? 0.3 : 0.1);
     mixer[ColorId::HeaderSeparator] = withAlpha(ColorId::Text, dark ? 0.12 : 0.08);
     mixer[ColorId::ItemPressed] = withAlpha(ColorId::Text, dark ? 0.05 : 0.1);
-    // Inactive windows keep the blur and halve the see-through instead of going opaque.
     mixer[ColorId::TranslucentWindowBackground] = withAlpha(ColorId::Background, dark ? 0.85 : 0.8);
     mixer[ColorId::TranslucentWindowBackgroundInactive] = withAlpha(ColorId::Background, dark ? 0.92 : 0.9);
 
@@ -98,22 +98,167 @@ void addToolkitColors(ColorMixer& mixer, const Theme& theme)
     mixer[ColorId::MenuSeparator] = dark ? kWhite.withAlpha(0.14) : kBlack.withAlpha(0.1);
     mixer[ColorId::MenuDisabledText] = withAlpha(ColorId::Text, 0.4);
     mixer[ColorId::MenuShortcutText] = withAlpha(ColorId::Text, 0.5);
-    // Dark glass over a bright backdrop washes out a grey chevron, so in
-    // dark mode it takes the label's colour.
     mixer[ColorId::MenuArrow] = dark ? ColorId::Text : ColorId::DisabledText;
     mixer[ColorId::MenuArrowDisabled] = dark ? ColorId::MenuDisabledText : ColorId::DisabledText;
     mixer[ColorId::MenuScrollIndicator] = dark ? kWhite.withAlpha(0.35) : kBlack.withAlpha(0.25);
 
     mixer[ColorId::WindowTabBarTrack] = dark ? kWhite.withAlpha(0.06) : kBlack.withAlpha(0.045);
-    // Light schemes are not always white; a translucent pill lifts off any of them.
     mixer[ColorId::WindowTabBarSelected] = kWhite.withAlpha(dark ? 0.13 : 0.8);
-    // Light mode raises a white pill on a pale track; a hairline keeps its edge.
     mixer[ColorId::WindowTabBarSelectedEdge] = dark ? kTransparent : Color::fromArgb(0x0F000000);
 
     mixer[ColorId::ToolTipBackground] = withAlpha(ColorId::SecondBackground, 0.95);
     mixer[ColorId::ToolTipShadow] = kBlack.withAlpha(0.15);
     mixer[ColorId::ToastShadow] = kBlack.withAlpha(0.14);
     mixer[ColorId::AboutDialogBackground] = withAlpha(ColorId::Background, 0.8);
+}
+
+// Liquid Glass style – frosted-glass material colours.
+//
+// Design principles:
+//   • Controls are mostly transparent; they let the blurred backdrop show
+//     through rather than painting a solid fill.
+//   • A thin white/near-white edge highlight on the top/leading edge and a
+//     subtler shadow on the bottom/trailing edge give the impression of a
+//     convex glass surface.
+//   • Pressed and hover states shift the glass opacity and add a specular flash,
+//     not a colour change.
+//   • Text always reads: white on dark glass, near-black on light glass.
+//   • Accent colour is used only for filled elements (switch-on track, sliders,
+//     checkboxes when checked) where identification of state matters most.
+static void addLiquidGlassColors(ColorMixer& mixer, const Theme& theme)
+{
+    const bool dark = theme.darkMode;
+
+    // Semantic colours are the same as Classic (they come from the user's accent
+    // and system palette), only control-surface colours change.
+    mixer[ColorId::Background] = theme.background;
+    mixer[ColorId::SecondBackground] = theme.secondBackground;
+    mixer[ColorId::AlternateBackground] = theme.alternateBackground;
+    mixer[ColorId::Text] = theme.text;
+    mixer[ColorId::DisabledText] = theme.disabledText;
+    mixer[ColorId::Highlight] = theme.highlight;
+    mixer[ColorId::HighlightedText] = theme.highlightedText;
+
+    mixer[ColorId::DestructiveAction] = dark ? Color::rgb(0xFF453A) : Color::rgb(0xD92D20);
+    mixer[ColorId::Separator] = dark ? kWhite.withAlpha(0.1) : kBlack.withAlpha(0.07);
+    mixer[ColorId::HeaderSeparator] = dark ? kWhite.withAlpha(0.08) : kBlack.withAlpha(0.06);
+    mixer[ColorId::ItemPressed] = dark ? kWhite.withAlpha(0.08) : kBlack.withAlpha(0.06);
+    // Window fills: a subtly translucent glass surface.
+    mixer[ColorId::TranslucentWindowBackground] = dark ? Color::fromArgb(0xCC1C1C1E)
+                                                       : Color::fromArgb(0xCCF2F4F6);
+    mixer[ColorId::TranslucentWindowBackgroundInactive] = dark ? Color::fromArgb(0xDD1C1C1E)
+                                                               : Color::fromArgb(0xDDF2F4F6);
+
+    // --- Buttons ---
+    // The glass surface: very slightly white/grey, mostly transparent.
+    // On dark backdrops the glass appears lighter; on light ones it appears
+    // as a slightly frosted clear surface.
+    mixer[ColorId::ButtonBackground] = dark ? kWhite.withAlpha(0.12) : kWhite.withAlpha(0.60);
+    // Hover adds a brighter specular flash on the top of the glass.
+    mixer[ColorId::ButtonBackgroundHovered] = dark ? kWhite.withAlpha(0.20) : kWhite.withAlpha(0.72);
+    // Press compresses the glass: slightly darker and more saturated.
+    mixer[ColorId::ButtonBackgroundPressed] = dark ? kWhite.withAlpha(0.08) : kWhite.withAlpha(0.48);
+    mixer[ColorId::ButtonFocusRing] = withAlpha(ColorId::Highlight, 0.6);
+
+    // --- ComboBox (Dropdown) ---
+    mixer[ColorId::ComboBoxBackground] = dark ? kWhite.withAlpha(0.12) : kWhite.withAlpha(0.60);
+    mixer[ColorId::ComboBoxBackgroundPressed] = dark ? kWhite.withAlpha(0.08) : kWhite.withAlpha(0.48);
+    mixer[ColorId::ComboBoxFocusBorder] = ColorId::Highlight;
+
+    // --- Checkbox / Radio ---
+    mixer[ColorId::ToggleBackground] = dark ? kWhite.withAlpha(0.14) : kWhite.withAlpha(0.55);
+    mixer[ColorId::ToggleBackgroundChecked] = ColorId::Highlight;
+    mixer[ColorId::ToggleBorder] = dark ? kWhite.withAlpha(0.30) : kBlack.withAlpha(0.14);
+    mixer[ColorId::ToggleBorderChecked] = darker(ColorId::Highlight, 1.1);
+    mixer[ColorId::ToggleFocusRing] = withAlpha(ColorId::Highlight, 0.45);
+    // Inner edge highlight simulates the top-lit rim of a glass surface.
+    mixer[ColorId::CheckBoxInnerEdge] = kWhite.withAlpha(0.14);
+    mixer[ColorId::CheckBoxInnerEdgeChecked] = kWhite.withAlpha(0.28);
+    mixer[ColorId::ToggleMark] = kWhite;
+
+    // --- Switch ---
+    // Track: glassy pill, clearly distinct off/on.
+    mixer[ColorId::SwitchTrack] = dark ? kWhite.withAlpha(0.18) : kBlack.withAlpha(0.10);
+    mixer[ColorId::SwitchTrackOn] = ColorId::Highlight;
+    // Handle: a bright glass bead with a soft shadow.
+    mixer[ColorId::SwitchHandle] = kWhite;
+
+    // --- Slider ---
+    // Track: a thin glass groove.
+    mixer[ColorId::SliderTrack] = dark ? kWhite.withAlpha(0.22) : kBlack.withAlpha(0.09);
+    mixer[ColorId::SliderTrackFilled] = ColorId::Highlight;
+    mixer[ColorId::SliderTickMark] = dark ? kWhite.withAlpha(0.45) : kBlack.withAlpha(0.28);
+    // Handle: glossy white bead.
+    mixer[ColorId::SliderHandle] = kWhite;
+    mixer[ColorId::SliderHandlePressed] = Color::rgb(0xF4F4F4);
+    mixer[ColorId::SliderHandleBorder] = kBlack.withAlpha(0.06);
+    mixer[ColorId::SliderHandleShadow] = kBlack.withAlpha(0.14);
+    mixer[ColorId::SliderHandleShadowPressed] = kBlack.withAlpha(0.20);
+
+    // --- Segmented Control ---
+    // Track: a subtle glass tray.
+    mixer[ColorId::SegmentedControlTrack] = dark ? kWhite.withAlpha(0.09) : kBlack.withAlpha(0.05);
+    // Selected plate: a bright glass pill inside the tray.
+    mixer[ColorId::SegmentedControlPlate] = dark ? kWhite.withAlpha(0.18) : kWhite.withAlpha(0.80);
+    mixer[ColorId::SegmentedControlPlateShadow] = kBlack.withAlpha(dark ? 0.22 : 0.10);
+    mixer[ColorId::SegmentedControlTextPressed] = withAlpha(ColorId::Text, 0.45);
+    mixer[ColorId::SegmentedTabBackground] = dark ? kWhite.withAlpha(0.07) : kWhite.withAlpha(0.50);
+    mixer[ColorId::SegmentedTabPlateShadow] = dark ? kBlack.withAlpha(0.14) : kTransparent;
+
+    // --- Scroll bars ---
+    mixer[ColorId::ScrollBarThumb] = dark ? kWhite.withAlpha(0.42) : kBlack.withAlpha(0.32);
+    mixer[ColorId::ScrollBarThumbDragging] = dark ? kWhite.withAlpha(0.56) : kBlack.withAlpha(0.44);
+
+    // --- Text Field ---
+    mixer[ColorId::TextFieldPlaceholder] = withAlpha(ColorId::Text, 0.38);
+    mixer[ColorId::TextFieldFocusRing] = withAlpha(ColorId::Highlight, 0.35);
+
+    // --- Round (window) buttons ---
+    mixer[ColorId::RoundButtonHovered] = dark ? kWhite.withAlpha(0.16) : kWhite.withAlpha(0.70);
+    mixer[ColorId::RoundButtonPressed] = dark ? kWhite.withAlpha(0.08) : kWhite.withAlpha(0.50);
+
+    mixer[ColorId::HeaderButtonTint] = dark ? kWhite : Color::rgb(0x2A2A2F);
+
+    // --- Dialog buttons ---
+    mixer[ColorId::DialogButtonBackground] = dark ? kWhite.withAlpha(0.11) : kWhite.withAlpha(0.60);
+    mixer[ColorId::DialogButtonBackgroundHovered] = dark ? kWhite.withAlpha(0.19) : kWhite.withAlpha(0.70);
+    // The edge highlight is the glass rim; replaces the flat border.
+    mixer[ColorId::DialogButtonBorder] = dark ? kWhite.withAlpha(0.22) : kWhite.withAlpha(0.72);
+    mixer[ColorId::DialogButtonInnerEdge] = kWhite.withAlpha(dark ? 0.14 : 0.30);
+    mixer[ColorId::DialogButtonProminentText] = kWhite;
+    mixer[ColorId::DialogButtonProminentInnerEdge] = kWhite.withAlpha(0.28);
+    mixer[ColorId::DialogButtonFocusRing] = withAlpha(ColorId::Highlight, 0.40);
+
+    // --- Menus ---
+    // Menu items: a highlight pill that feels like a glass selection.
+    mixer[ColorId::MenuHighlight] = withAlpha(ColorId::Highlight, dark ? 0.80 : 0.88);
+    mixer[ColorId::MenuSeparator] = dark ? kWhite.withAlpha(0.11) : kBlack.withAlpha(0.08);
+    mixer[ColorId::MenuDisabledText] = withAlpha(ColorId::Text, 0.36);
+    mixer[ColorId::MenuShortcutText] = withAlpha(ColorId::Text, 0.46);
+    mixer[ColorId::MenuArrow] = dark ? ColorId::Text : ColorId::DisabledText;
+    mixer[ColorId::MenuArrowDisabled] = dark ? ColorId::MenuDisabledText : ColorId::DisabledText;
+    mixer[ColorId::MenuScrollIndicator] = dark ? kWhite.withAlpha(0.32) : kBlack.withAlpha(0.22);
+
+    // --- Window tab bar ---
+    mixer[ColorId::WindowTabBarTrack] = dark ? kWhite.withAlpha(0.08) : kBlack.withAlpha(0.04);
+    mixer[ColorId::WindowTabBarSelected] = dark ? kWhite.withAlpha(0.17) : kWhite.withAlpha(0.84);
+    mixer[ColorId::WindowTabBarSelectedEdge] = dark ? kWhite.withAlpha(0.06) : Color::fromArgb(0x0F000000);
+
+    // --- Tooltips ---
+    // A frosted glass tooltip with a barely opaque tinted background.
+    mixer[ColorId::ToolTipBackground] = dark ? Color::fromArgb(0xDD2C2C2E) : Color::fromArgb(0xDDFFFFFF);
+    mixer[ColorId::ToolTipShadow] = kBlack.withAlpha(0.18);
+    mixer[ColorId::ToastShadow] = kBlack.withAlpha(0.16);
+    mixer[ColorId::AboutDialogBackground] = dark ? Color::fromArgb(0xBB1C1C1E)
+                                                 : Color::fromArgb(0xBBF5F6FA);
+}
+
+void addToolkitColors(ColorMixer& mixer, const Theme& theme)
+{
+    if (theme.controlStyle == 1)
+        addLiquidGlassColors(mixer, theme);
+    else
+        addClassicColors(mixer, theme);
 }
 
 } // namespace Lingmo::ui

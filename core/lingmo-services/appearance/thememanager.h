@@ -85,6 +85,10 @@ public:
 
     void updateFontConfig();
 
+    // 0 = Classic, 1 = Liquid Glass.
+    int controlStyle() const;
+    void setControlStyle(int style);
+
     // After any change the interface announces.
     Lingmo::Base::Signal<> changed;
 
@@ -105,6 +109,7 @@ private:
 
     bool m_continuousCorners = true;
     int m_accentColor = 0;
+    int m_controlStyle = 0;  // 0 = Classic, 1 = Liquid Glass
 
     std::string m_cursorTheme;
     int m_cursorSize = 24;

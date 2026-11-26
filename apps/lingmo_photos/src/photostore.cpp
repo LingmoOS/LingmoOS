@@ -51,6 +51,7 @@ PhotoStore::PhotoStore(std::string path)
     if (sqlite3_open(path.c_str(), &m_private->db) != SQLITE_OK)
         throw std::runtime_error("Unable to open photo database");
     execute(m_private->db,
+            "PRAGMA foreign_keys=ON;"
             "PRAGMA journal_mode=WAL;"
             "CREATE TABLE IF NOT EXISTS photos(id INTEGER PRIMARY KEY, path TEXT UNIQUE NOT NULL, name TEXT NOT NULL,"
             "folder TEXT NOT NULL, captured TEXT NOT NULL, format TEXT NOT NULL, width INTEGER NOT NULL DEFAULT 0,"
@@ -86,6 +87,21 @@ void PhotoStore::upsert(const Photo& photo) {
     sqlite3_bind_int(statement.value, 10, photo.trashed);
     if (sqlite3_step(statement.value) != SQLITE_DONE)
         throw std::runtime_error(sqlite3_errmsg(m_private->db));
+}
+
+std::optional<Photo> PhotoStore::photoByPath(const std::string& path) const
+{
+    Statement statement(m_private->db,
+                        "SELECT id,path,name,folder,captured,format,width,height,bytes,favorite,trashed "
+                        "FROM photos WHERE path=?");
+    sqlite3_bind_text(statement.value, 1, path.c_str(), -1, SQLITE_TRANSIENT);
+    if (sqlite3_step(statement.value) != SQLITE_ROW)
+        return std::nullopt;
+    return Photo{sqlite3_column_int64(statement.value, 0), text(statement.value, 1), text(statement.value, 2),
+                 text(statement.value, 3), text(statement.value, 4), text(statement.value, 5),
+                 sqlite3_column_int(statement.value, 6), sqlite3_column_int(statement.value, 7),
+                 sqlite3_column_int64(statement.value, 8), bool(sqlite3_column_int(statement.value, 9)),
+                 bool(sqlite3_column_int(statement.value, 10))};
 }
 
 std::vector<Photo> PhotoStore::photos(bool favorites, bool trash) const {
@@ -158,6 +174,7 @@ int64_t PhotoStore::createAlbum(const std::string& name) {
 void PhotoStore::renameAlbum(int64_t id, const std::string& name) { Statement statement(m_private->db, "UPDATE albums SET name=? WHERE id=?"); sqlite3_bind_text(statement.value, 1, name.c_str(), -1, SQLITE_TRANSIENT); sqlite3_bind_int64(statement.value, 2, id); sqlite3_step(statement.value); }
 void PhotoStore::deleteAlbum(int64_t id) { Statement statement(m_private->db, "DELETE FROM albums WHERE id=?"); sqlite3_bind_int64(statement.value, 1, id); sqlite3_step(statement.value); }
 void PhotoStore::addToAlbum(int64_t albumId, int64_t photoId) { Statement statement(m_private->db, "INSERT OR IGNORE INTO album_photos(album_id,photo_id) VALUES(?,?)"); sqlite3_bind_int64(statement.value, 1, albumId); sqlite3_bind_int64(statement.value, 2, photoId); sqlite3_step(statement.value); }
+void PhotoStore::removeFromAlbum(int64_t albumId, int64_t photoId) { Statement statement(m_private->db, "DELETE FROM album_photos WHERE album_id=? AND photo_id=?"); sqlite3_bind_int64(statement.value, 1, albumId); sqlite3_bind_int64(statement.value, 2, photoId); sqlite3_step(statement.value); }
 std::vector<Photo> PhotoStore::albumPhotos(int64_t id) const {
     std::vector<Photo> result; Statement statement(m_private->db, "SELECT p.id,p.path,p.name,p.folder,p.captured,p.format,p.width,p.height,p.bytes,p.favorite,p.trashed FROM photos p JOIN album_photos ap ON ap.photo_id=p.id WHERE ap.album_id=? AND p.trashed=0 ORDER BY p.captured DESC,p.name"); sqlite3_bind_int64(statement.value, 1, id);
     while (sqlite3_step(statement.value) == SQLITE_ROW) result.push_back({sqlite3_column_int64(statement.value, 0), text(statement.value, 1), text(statement.value, 2), text(statement.value, 3), text(statement.value, 4), text(statement.value, 5), sqlite3_column_int(statement.value, 6), sqlite3_column_int(statement.value, 7), sqlite3_column_int64(statement.value, 8), bool(sqlite3_column_int(statement.value, 9)), bool(sqlite3_column_int(statement.value, 10))}); return result;

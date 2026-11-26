@@ -41,6 +41,7 @@ private:
     struct PendingStart {
         std::vector<std::string> command;
         std::vector<std::string> environment;
+        std::string session;
     };
 
     // Starts the configured user's session without the login screen, the first
@@ -62,6 +63,7 @@ private:
     void cancelSession();
     void launchSession(PendingStart start);
     void onSessionFinished();
+    void cleanupCompletedOobeSession(const std::string &user);
 
     // then(true) once logind has taken `vt` for the helper's session, then(false)
     // after a timeout; nothing runs once the helper is released.
@@ -78,6 +80,7 @@ private:
     std::unique_ptr<HelperProcess> m_greeter;
     std::unique_ptr<HelperProcess> m_login;
     std::unique_ptr<HelperProcess> m_session;
+    std::string m_activeSession;
     std::vector<std::unique_ptr<HelperProcess>> m_released;
     std::optional<PendingStart> m_pendingStart;
     std::vector<Lingmo::base::dbus::MethodCall> m_switchRequests;
