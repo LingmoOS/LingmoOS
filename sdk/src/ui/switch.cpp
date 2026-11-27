@@ -68,32 +68,22 @@ void Switch::paintIndicator(Painter& painter, const RectF& rect)
         painter.multiplyOpacity(0.5);
 
     const Color trackColor = mix(color(ColorId::SwitchTrack), color(ColorId::SwitchTrackOn), m_color);
-    painter.drawSmoothRectangle(rect, rect.height / 2, trackColor);
-
-    if (theme.controlStyle == 1) {
-        // Liquid Glass: rim highlight on top edge of track.
-        const double rimA = isChecked() ? 0.18 : 0.26;
-        painter.drawSmoothRectangle(
-            {rect.x + 0.5, rect.y + 0.5, rect.width - 1, rect.height * 0.45},
-            rect.height / 2,
-            Color{255, 255, 255, uint8_t(rimA * 255)});
-    }
+    // Hover brightens the track slightly for a tactile preview.
+    const Color displayTrack = isHovered()
+        ? mix(trackColor, Color{255, 255, 255, trackColor.a}, theme.darkMode ? 0.12 : 0.10)
+        : trackColor;
+    painter.drawSmoothRectangle(rect, rect.height / 2, displayTrack);
 
     const double travel = rect.width - kHandle - 2 * kHandleMargin;
     const RectF handle = {rect.x + kHandleMargin + travel * m_handle,
                           rect.y + (rect.height - kHandle) / 2, kHandle, kHandle};
 
     if (theme.controlStyle == 1) {
-        // Handle: a glassy bead with a soft drop shadow.
+        // Liquid Glass: soft drop shadow under the handle bead for lift.
+        // No rim or specular on the thumb — the white circle already reads as glass.
         painter.drawShadow(handle, kHandle / 2, 3, Color{0, 0, 0, 50}, {0, 1});
     }
     painter.drawSmoothRectangle(handle, kHandle / 2, color(ColorId::SwitchHandle));
-
-    if (theme.controlStyle == 1) {
-        // Handle top-edge specular.
-        const RectF topHalf = {handle.x + 1, handle.y + 1, handle.width - 2, handle.height * 0.45};
-        painter.drawSmoothRectangle(topHalf, kHandle / 2, Color{255, 255, 255, 60});
-    }
     painter.restore();
 }
 

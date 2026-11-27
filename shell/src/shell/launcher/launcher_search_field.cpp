@@ -208,8 +208,13 @@ void LauncherSearchField::paint(ui::Painter &painter)
     const ui::RectF pill {(bounds.width - width) / 2, (bounds.height - height) / 2, width, height};
     painter.save();
     painter.multiplyOpacity(m_backgroundOpacity);
+    // Liquid Glass: shadow lifts the search field off the wallpaper.
+    painter.drawShadow(pill, height / 2, 8, ui::Color{0, 0, 0, 50}, {0, 2.0});
     painter.drawRoundedRect(pill, {height / 2, 0, ui::Corners::Circular}, kWhite, m_focused ? 1 : 0,
                             ui::Color {255, 255, 255, 89});
+    // Top-edge specular rim.
+    painter.strokeRoundedRect(pill.adjusted(0.5, 0.5, -0.5, -0.5), height / 2 - 0.5,
+                              ui::Color{255, 255, 255, 60}, 1, ui::Corners::Circular);
     painter.restore();
 }
 

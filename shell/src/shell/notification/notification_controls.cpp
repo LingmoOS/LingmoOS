@@ -8,6 +8,7 @@
 #include <cmath>
 
 #include "base/i18n.h"
+#include "shell/controlcenter/panel_style.h"
 #include "shell/notification/notification_motion.h"
 #include "ui/application.h"
 #include "ui/label.h"
@@ -219,7 +220,15 @@ void ClearButton::paint(ui::Painter &painter)
     const ui::RectF rect = localRect();
     const double radius = rect.height / 2;
     if (m_kind == Kind::Clear) {
+        const bool dark = Panel::isDark(theme.background);
+        painter.drawShadow(rect, radius, 4,
+                           dark ? ui::Color{0, 0, 0, 55} : ui::Color{0, 0, 0, 25},
+                           {0, 1});
         painter.drawSmoothRectangle(rect, radius, pillFill(theme.background, m_hovered, m_pressed));
+        const double rimAlpha = dark ? 0.22 : 0.42;
+        painter.strokeRoundedRect(rect.adjusted(0.5, 0.5, -0.5, -0.5), radius - 0.5,
+                                  ui::Color{255, 255, 255, uint8_t(rimAlpha * 255)},
+                                  1, ui::Corners::Continuous);
     } else if ((m_hovered || progress() > 0) && m_tint) {
         // Not snapped: the glyph is not either.
         painter.drawSmoothRectangle(rect, radius, m_tint(m_pressed ? 2 : 1));
@@ -305,7 +314,17 @@ void PillButton::layout()
 void PillButton::paint(ui::Painter &painter)
 {
     const ui::RectF rect = localRect();
-    painter.drawSmoothRectangle(rect, rect.height / 2, pillFill(ui::Theme::current().background, m_hovered, m_pressed));
+    const double radius = rect.height / 2;
+    const ui::Color surface = ui::Theme::current().background;
+    const bool dark = Panel::isDark(surface);
+    painter.drawShadow(rect, radius, 4,
+                       dark ? ui::Color{0, 0, 0, 55} : ui::Color{0, 0, 0, 25},
+                       {0, 1});
+    painter.drawSmoothRectangle(rect, radius, pillFill(surface, m_hovered, m_pressed));
+    const double rimAlpha = dark ? 0.22 : 0.42;
+    painter.strokeRoundedRect(rect.adjusted(0.5, 0.5, -0.5, -0.5), radius - 0.5,
+                              ui::Color{255, 255, 255, uint8_t(rimAlpha * 255)},
+                              1, ui::Corners::Continuous);
 }
 
 } // namespace Lingmo::Shell

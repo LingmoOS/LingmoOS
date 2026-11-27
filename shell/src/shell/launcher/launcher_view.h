@@ -29,9 +29,9 @@ namespace Lingmo::Shell {
 class ApplicationBadges;
 class Launcher;
 class LauncherCell;
+class LauncherFolderView;
 class LauncherSearchField;
 class LauncherWallpaper;
-class FolderOverlay;
 
 // The launcher's content: the blurred wallpaper, the search field, the
 // application grid in pages that slide sideways, the page dots and "Not
@@ -118,7 +118,7 @@ protected:
 private:
     enum class FolderDropState { Normal, Dragging, Hovering, FolderPreview, FolderCreated, Cancelled };
 
-    friend class FolderOverlay;
+    friend class LauncherFolderView;
     friend class LauncherCell;
     class Pages;
     class Page;
@@ -162,7 +162,10 @@ private:
     void updateBackdrop();
     void retranslate();
     void retire(std::unique_ptr<ui::View> view);
+    // Opens/closes the folder overlay — replaces the old FolderOverlay.
+    void openFolderOverlay(const std::string &folderId, ui::RectF from);
     void closeFolderOverlay();
+    LauncherFolderView *folderView() const { return m_folderView; }
 
     // Pages: the background's press, flick and click.
     void backgroundPressed(ui::PointF position);
@@ -183,9 +186,7 @@ private:
     LauncherSearchField *m_search = nullptr;
     Indicator *m_indicator = nullptr;
     ui::Label *m_notFound = nullptr;
-    FolderOverlay *m_folderOverlay = nullptr;
-    LauncherTween m_folderTween;
-    double m_folderProgress = 0;
+    LauncherFolderView *m_folderView = nullptr;
     std::string m_openFolderId;
     bool m_inlineRenameDismissGuard = false;
 

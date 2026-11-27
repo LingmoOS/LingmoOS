@@ -33,6 +33,9 @@ public:
 
     // The icon size the dock's metrics scale from.
     static constexpr int kBaseIconSize = 54;
+    // The icon size of the efficient taskbar, where the bar is a full-width
+    // strip rather than a floating dock.
+    static constexpr int kTaskbarIconSize = 44;
 
     // `path` is shell.conf.
     explicit DockSettings(std::string path);
@@ -42,14 +45,17 @@ public:
     bool efficientMode() const { return m_efficientMode; }
     void setEfficientMode(bool enabled);
     base::Signal<> efficientModeChanged;
-    static constexpr int taskbarHeight = 52;
+    static constexpr int taskbarHeight = 64;
+    // The taskbar's corner radius, mirrored on its bottom corners as the
+    // strip stands against the screen edge.
+    static constexpr int taskbarRadius = 28;
     enum TaskbarAlignment { AlignLeft = 0, AlignCenter = 1 };
     enum TaskbarSearch { SearchHidden = 0, SearchShown = 1 };
     TaskbarAlignment taskbarAlignment() const { return m_taskbarAlignment; }
     void setTaskbarAlignment(TaskbarAlignment alignment);
     TaskbarSearch taskbarSearch() const { return m_taskbarSearch; }
     void setTaskbarSearch(TaskbarSearch search);
-    int iconSize() const { return m_efficientMode ? 32 : m_iconSize; }
+    int iconSize() const { return m_efficientMode ? kTaskbarIconSize : m_iconSize; }
     // Written once the size has stopped changing for a moment, as a slider
     // drags it.
     void setIconSize(int iconSize);

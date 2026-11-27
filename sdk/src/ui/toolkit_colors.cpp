@@ -110,6 +110,9 @@ static void addClassicColors(ColorMixer& mixer, const Theme& theme)
     mixer[ColorId::ToolTipShadow] = kBlack.withAlpha(0.15);
     mixer[ColorId::ToastShadow] = kBlack.withAlpha(0.14);
     mixer[ColorId::AboutDialogBackground] = withAlpha(ColorId::Background, 0.8);
+    // RowComboBox: subtle fill on hover/open, no fill at rest.
+    mixer[ColorId::RowComboBoxHovered] = withAlpha(ColorId::Text, dark ? 0.08 : 0.06);
+    mixer[ColorId::RowComboBoxOpen]    = withAlpha(ColorId::Text, dark ? 0.12 : 0.10);
 }
 
 // Liquid Glass style – frosted-glass material colours.
@@ -150,23 +153,20 @@ static void addLiquidGlassColors(ColorMixer& mixer, const Theme& theme)
                                                                : Color::fromArgb(0xDDF2F4F6);
 
     // --- Buttons ---
-    // The glass surface: very slightly white/grey, mostly transparent.
-    // On dark backdrops the glass appears lighter; on light ones it appears
-    // as a slightly frosted clear surface.
-    mixer[ColorId::ButtonBackground] = dark ? kWhite.withAlpha(0.12) : kWhite.withAlpha(0.60);
-    // Hover adds a brighter specular flash on the top of the glass.
-    mixer[ColorId::ButtonBackgroundHovered] = dark ? kWhite.withAlpha(0.20) : kWhite.withAlpha(0.72);
-    // Press compresses the glass: slightly darker and more saturated.
-    mixer[ColorId::ButtonBackgroundPressed] = dark ? kWhite.withAlpha(0.08) : kWhite.withAlpha(0.48);
+    // Light mode: very subtle dark tint (3%) — clearly visible via shadow+rim,
+    // not grey enough to look "coloured" on a white background.
+    mixer[ColorId::ButtonBackground] = dark ? kWhite.withAlpha(0.12) : kBlack.withAlpha(0.03);
+    mixer[ColorId::ButtonBackgroundHovered] = dark ? kWhite.withAlpha(0.20) : kBlack.withAlpha(0.06);
+    mixer[ColorId::ButtonBackgroundPressed] = dark ? kWhite.withAlpha(0.08) : kBlack.withAlpha(0.09);
     mixer[ColorId::ButtonFocusRing] = withAlpha(ColorId::Highlight, 0.6);
 
     // --- ComboBox (Dropdown) ---
-    mixer[ColorId::ComboBoxBackground] = dark ? kWhite.withAlpha(0.12) : kWhite.withAlpha(0.60);
-    mixer[ColorId::ComboBoxBackgroundPressed] = dark ? kWhite.withAlpha(0.08) : kWhite.withAlpha(0.48);
+    mixer[ColorId::ComboBoxBackground] = dark ? kWhite.withAlpha(0.12) : kBlack.withAlpha(0.03);
+    mixer[ColorId::ComboBoxBackgroundPressed] = dark ? kWhite.withAlpha(0.08) : kBlack.withAlpha(0.09);
     mixer[ColorId::ComboBoxFocusBorder] = ColorId::Highlight;
 
     // --- Checkbox / Radio ---
-    mixer[ColorId::ToggleBackground] = dark ? kWhite.withAlpha(0.14) : kWhite.withAlpha(0.55);
+    mixer[ColorId::ToggleBackground] = dark ? kWhite.withAlpha(0.14) : kBlack.withAlpha(0.04);
     mixer[ColorId::ToggleBackgroundChecked] = ColorId::Highlight;
     mixer[ColorId::ToggleBorder] = dark ? kWhite.withAlpha(0.30) : kBlack.withAlpha(0.14);
     mixer[ColorId::ToggleBorderChecked] = darker(ColorId::Highlight, 1.1);
@@ -196,8 +196,8 @@ static void addLiquidGlassColors(ColorMixer& mixer, const Theme& theme)
     mixer[ColorId::SliderHandleShadowPressed] = kBlack.withAlpha(0.20);
 
     // --- Segmented Control ---
-    // Track: a subtle glass tray.
-    mixer[ColorId::SegmentedControlTrack] = dark ? kWhite.withAlpha(0.09) : kBlack.withAlpha(0.05);
+    // Track: a subtle glass tray, slightly more visible in light mode.
+    mixer[ColorId::SegmentedControlTrack] = dark ? kWhite.withAlpha(0.09) : kBlack.withAlpha(0.04);
     // Selected plate: a bright glass pill inside the tray.
     mixer[ColorId::SegmentedControlPlate] = dark ? kWhite.withAlpha(0.18) : kWhite.withAlpha(0.80);
     mixer[ColorId::SegmentedControlPlateShadow] = kBlack.withAlpha(dark ? 0.22 : 0.10);
@@ -220,11 +220,11 @@ static void addLiquidGlassColors(ColorMixer& mixer, const Theme& theme)
     mixer[ColorId::HeaderButtonTint] = dark ? kWhite : Color::rgb(0x2A2A2F);
 
     // --- Dialog buttons ---
-    mixer[ColorId::DialogButtonBackground] = dark ? kWhite.withAlpha(0.11) : kWhite.withAlpha(0.60);
-    mixer[ColorId::DialogButtonBackgroundHovered] = dark ? kWhite.withAlpha(0.19) : kWhite.withAlpha(0.70);
+    mixer[ColorId::DialogButtonBackground] = dark ? kWhite.withAlpha(0.11) : kBlack.withAlpha(0.03);
+    mixer[ColorId::DialogButtonBackgroundHovered] = dark ? kWhite.withAlpha(0.19) : kBlack.withAlpha(0.06);
     // The edge highlight is the glass rim; replaces the flat border.
-    mixer[ColorId::DialogButtonBorder] = dark ? kWhite.withAlpha(0.22) : kWhite.withAlpha(0.72);
-    mixer[ColorId::DialogButtonInnerEdge] = kWhite.withAlpha(dark ? 0.14 : 0.30);
+    mixer[ColorId::DialogButtonBorder] = dark ? kWhite.withAlpha(0.22) : kBlack.withAlpha(0.08);
+    mixer[ColorId::DialogButtonInnerEdge] = kWhite.withAlpha(dark ? 0.14 : 0.20);
     mixer[ColorId::DialogButtonProminentText] = kWhite;
     mixer[ColorId::DialogButtonProminentInnerEdge] = kWhite.withAlpha(0.28);
     mixer[ColorId::DialogButtonFocusRing] = withAlpha(ColorId::Highlight, 0.40);
@@ -251,6 +251,9 @@ static void addLiquidGlassColors(ColorMixer& mixer, const Theme& theme)
     mixer[ColorId::ToastShadow] = kBlack.withAlpha(0.16);
     mixer[ColorId::AboutDialogBackground] = dark ? Color::fromArgb(0xBB1C1C1E)
                                                  : Color::fromArgb(0xBBF5F6FA);
+    // RowComboBox: subtle fill on hover/open, no fill at rest.
+    mixer[ColorId::RowComboBoxHovered] = withAlpha(ColorId::Text, dark ? 0.08 : 0.06);
+    mixer[ColorId::RowComboBoxOpen]    = withAlpha(ColorId::Text, dark ? 0.12 : 0.10);
 }
 
 void addToolkitColors(ColorMixer& mixer, const Theme& theme)

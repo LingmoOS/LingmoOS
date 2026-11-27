@@ -17,6 +17,7 @@
 #include "shell/launcher/launcher_cell.h"
 #include "shell/launcher/launcher_search_field.h"
 #include "shell/launcher/launcher_wallpaper.h"
+#include "shell/launcher/launcher_folder_view.h"
 #include "ui/application.h"
 #include "ui/bitmap.h"
 #include "ui/drag.h"
@@ -118,350 +119,6 @@ private:
     LauncherView *m_view;
 };
 
-class FolderOverlay final : public ui::View
-{
-public:
-    explicit FolderOverlay(LauncherView *view)
-        : m_view(view)
-    {
-        setName("launcher-folder-overlay");
-        setOpacity(0);
-        m_title = addChild<ui::Label>();
-        m_title->setTextAlignment(ui::Label::TextAlignment::Center);
-        m_title->setVerticallyCentered(true);
-        m_title->setWeight(600);
-        m_title->setFontSize(24);
-        m_titleField = addChild<ui::TextField>();
-        m_titleField->setHorizontallyCentered(true);
-        m_titleField->setVisible(false);
-        m_titleField->onAccepted = [this] { finishRename(true); };
-        m_titleField->onEditingFinished = [this] { finishRename(true); };
-    }
-
-    bool acceptsPointer() const override { return true; }
-    void setBackdrop(ui::Image backdrop)
-    {
-        m_backdrop = std::move(backdrop);
-        requestPaint();
-    }
-    void setItems(const std::vector<LauncherItem> &items)
-    {
-        for (ui::ThemeIcon *icon : m_icons)
-            icon->setVisible(false);
-        while (m_icons.size() < items.size())
-            m_icons.push_back(addChild<ui::ThemeIcon>());
-        while (m_names.size() < items.size()) {
-            auto *name = addChild<ui::Label>();
-            name->setColor(kWhite);
-            name->setTextAlignment(ui::Label::TextAlignment::Center);
-            name->setVerticallyCentered(true);
-            name->setElide(ui::Label::Elide::Right);
-            m_names.push_back(name);
-        }
-        for (size_t i = 0; i < items.size(); ++i) {
-            m_icons[i]->setIconName(items[i].iconName.empty() ? "application-x-desktop" : items[i].iconName);
-            m_icons[i]->setVisible(true);
-            m_names[i]->setText(items[i].name);
-            m_names[i]->setVisible(true);
-        }
-        for (size_t i = items.size(); i < m_names.size(); ++i)
-            m_names[i]->setVisible(false);
-        m_ids.clear();
-        m_ids.reserve(items.size());
-        for (const LauncherItem &item : items)
-            m_ids.push_back(item.id);
-        m_count = items.size();
-        m_page = 0;
-        m_reordering = false;
-        m_dropIndex = -1;
-        m_swiping = false;
-        requestLayout();
-    }
-    void setTitle(std::string title)
-    {
-        m_folderName = title;
-        m_title->setText(std::move(title));
-        requestLayout();
-    }
-    void setFolderId(std::string id) { m_folderId = std::move(id); }
-    void setOrigin(ui::RectF origin) { m_origin = origin; }
-    void beginRename(const std::string &folderId)
-    {
-        m_folderId = folderId;
-        m_titleField->setText(m_folderName);
-        m_title->setVisible(false);
-        m_titleField->setVisible(true);
-        m_titleField->setFocus();
-    }
-    void setProgress(double progress)
-    {
-        m_progress = progress;
-        setOpacity(progress);
-        requestLayout();
-        requestPaint();
-    }
-    ui::RectF panel() const { return m_panel; }
-protected:
-    void layout() override
-    {
-        const double targetWidth = std::min(960.0, std::max(520.0, geometry().width * 0.68));
-        const double targetHeight = std::min(700.0, std::max(420.0, geometry().height * 0.62));
-        const double targetX = (geometry().width - targetWidth) / 2;
-        const double targetY = (geometry().height - targetHeight) / 2;
-        const double width = m_origin.width + (targetWidth - m_origin.width) * m_progress;
-        const double height = m_origin.height + (targetHeight - m_origin.height) * m_progress;
-        const double x = m_origin.x + (targetX - m_origin.x) * m_progress;
-        const double y = m_origin.y + (targetY - m_origin.y) * m_progress;
-        m_panel = {x, y, width, height};
-        const ui::Color backdrop = m_view->m_wallpaper.backdropColor();
-        const double luminance = (0.2126 * backdrop.r + 0.7152 * backdrop.g + 0.0722 * backdrop.b) / 255.0;
-        m_ink = luminance > 0.52 ? ui::Color {20, 20, 22, 255} : kWhite;
-        m_title->setColor(m_ink);
-        for (ui::Label *name : m_names)
-            name->setColor(m_ink);
-        if (m_view->folderBlurChanged)
-            m_view->folderBlurChanged(m_panel, m_progress > 0);
-        const ui::RectF titleRect {x + 24, y + 16, width - 48, std::max(32.0, height * 0.11)};
-        m_title->setGeometry(titleRect);
-        m_titleField->setGeometry(titleRect);
-        const LauncherMetrics &metrics = m_view->m_metrics;
-        const double outerPadding = std::max(20.0, width * 0.035);
-        const double availableWidth = std::max(1.0, width - 2 * outerPadding);
-        const double gridTop = y + height * 0.17;
-        const double availableHeight = std::max(1.0, y + height - gridTop - outerPadding);
-        // Keep the launcher's cell and icon metrics. A narrow card uses more
-        // pages instead of shrinking its icons.
-        m_columns = std::max(1, std::min(metrics.columns,
-                                         int(std::floor(availableWidth / metrics.cellWidth))));
-        m_rows = std::max(1, std::min(metrics.rows,
-                                      int(std::floor(availableHeight / metrics.cellHeight))));
-        const int capacity = std::max(1, m_columns * m_rows);
-        m_pageCount = std::max(1, int((m_count + size_t(capacity) - 1) / size_t(capacity)));
-        m_page = std::clamp(m_page, 0, m_pageCount - 1);
-        const double columnWidth = metrics.cellWidth;
-        const double labelHeight = metrics.labelLineHeight * 2;
-        const double rowHeight = metrics.cellHeight;
-        const double iconSize = metrics.iconSize;
-        const int pageCapacity = std::max(1, m_columns * m_rows);
-        m_slots.resize(m_count);
-        for (size_t i = 0; i < m_icons.size(); ++i) {
-            m_icons[i]->setSize(iconSize);
-            const bool onPage = int(i) / pageCapacity == m_page;
-            m_icons[i]->setVisible(onPage && i < m_count);
-            m_names[i]->setVisible(onPage && i < m_count);
-            if (!onPage || i >= m_count)
-                continue;
-            const int local = int(i) - m_page * pageCapacity;
-            const int col = local % m_columns;
-            const int row = local / m_columns;
-            // Match the launcher's row-major, left-to-right grid.
-            const double cellX = x + outerPadding + col * columnWidth;
-            const double iconX = cellX + (columnWidth - iconSize) / 2;
-            const double iconY = gridTop + row * rowHeight;
-            m_slots[i] = {iconX, iconY, iconSize, iconSize};
-            const bool dragged = m_reordering && int(i) == m_pressIndex;
-            const ui::RectF iconRect = dragged
-                    ? ui::RectF {m_dragPosition.x - iconSize / 2, m_dragPosition.y - iconSize / 2,
-                                 iconSize, iconSize}
-                    : m_slots[i];
-            m_icons[i]->setGeometry(iconRect);
-            m_icons[i]->setOpacity(dragged ? 0.82 : 1.0);
-            m_names[i]->setFontSize(metrics.labelPixelSize);
-            const double labelX = dragged ? m_dragPosition.x - columnWidth / 2 : cellX;
-            const double labelY = dragged ? iconRect.bottom() + 4 : iconY + iconSize + 4;
-            m_names[i]->setGeometry({labelX, labelY, columnWidth, labelHeight});
-        }
-    }
-    void paint(ui::Painter &painter) override
-    {
-        if (m_progress <= 0)
-            return;
-        const double radius = std::min(18.0, std::min(m_panel.width, m_panel.height) * 0.04);
-        const ui::Theme &theme = ui::Theme::current();
-        painter.save();
-        painter.clipRoundedRect(m_panel, radius);
-        if (!m_backdrop.isNull())
-            painter.drawImage(m_backdrop, localRect());
-        else if (m_view->m_wallpaper.isPicture() && !m_view->m_wallpaper.image().isNull()) {
-            painter.drawImage(m_view->m_wallpaper.image(), localRect());
-            painter.fillRect(m_panel, ui::Color {0, 0, 0, 102});
-        } else {
-            painter.fillRect(m_panel, m_view->m_wallpaper.color());
-        }
-        const ui::Color tint = theme.darkMode ? ui::Color {24, 26, 32, 255} : ui::Color {248, 249, 252, 255};
-        painter.fillRect(m_panel, tint.withAlpha(0.34));
-        painter.restore();
-        const ui::Color border = m_ink.r < 128 ? ui::Color {0, 0, 0, 58} : ui::Color {255, 255, 255, 72};
-        painter.drawRoundedRect(m_panel, {radius, 0, ui::Corners::Circular}, {}, 1, border);
-        if (m_reordering && m_dropIndex >= 0 && m_dropIndex < int(m_slots.size())) {
-            const ui::RectF slot = m_slots[size_t(m_dropIndex)];
-            painter.drawRoundedRect({slot.x - 8, slot.y - 8, slot.width + 16, slot.height + 16},
-                                    {16, 0, ui::Corners::Circular}, {}, 2,
-                                    ui::Color {80, 160, 255, 180});
-        }
-    }
-    void pointerMove(const ui::PointerEvent &event) override
-    {
-        if (m_pressIndex < 0 && !m_swiping) {
-            if (std::abs(event.position.x - m_pressPosition.x) > 12 && m_pageCount > 1)
-                m_swiping = true;
-        }
-        if (m_pressIndex < 0 && !m_swiping)
-            return;
-        if (m_swiping)
-            return;
-        const double dx = event.position.x - m_pressPosition.x;
-        if (std::abs(dx) > 12 && !m_reordering) {
-            m_reordering = true;
-            m_view->m_launcher.applications().beginReorder();
-        }
-        if (!m_reordering)
-            return;
-        m_dragPosition = event.position;
-        m_dropIndex = nearestSlot(event.position);
-        requestLayout();
-        requestPaint();
-    }
-    void pointerRelease(const ui::PointerEvent &event) override
-    {
-        if (m_swiping) {
-            const double dx = event.position.x - m_pressPosition.x;
-            if (dx < -24)
-                ++m_page;
-            else if (dx > 24)
-                --m_page;
-            m_page = std::clamp(m_page, 0, m_pageCount - 1);
-            m_swiping = false;
-            m_pressIndex = -1;
-            requestLayout();
-            return;
-        }
-        if (!m_reordering && m_title->isVisible() && m_title->geometry().contains(event.position)) {
-            if (LauncherCell *folder = m_view->cell(m_folderId)) {
-                m_view->closeFolderOverlay();
-                folder->beginRename();
-            }
-            return;
-        }
-        if (m_reordering) {
-            auto &model = m_view->m_launcher.applications();
-            const std::string draggedId = m_ids[size_t(m_pressIndex)];
-            bool changed = false;
-            if (outsidePanel(event.position)) {
-                changed = model.removeFromFolder(m_folderId, draggedId);
-            } else {
-                const int target = nearestSlot(event.position);
-                if (target >= 0 && target != m_pressIndex)
-                    changed = model.moveInFolder(m_folderId, draggedId, target);
-            }
-            model.endReorder(true);
-            m_reordering = false;
-            m_pressIndex = -1;
-            m_dropIndex = -1;
-            if (changed) {
-                const std::vector<LauncherItem> items = model.folderItems(m_folderId);
-                if (model.findById(m_folderId) < 0)
-                    m_view->closeFolderOverlay();
-                else
-                    setItems(items);
-            } else {
-                requestLayout();
-            }
-            requestPaint();
-            return;
-        }
-        for (size_t i = 0; i < m_count && i < m_ids.size(); ++i) {
-            if (m_icons[i]->geometry().contains(event.position)) {
-                m_view->m_launcher.applications().launch(m_ids[i]);
-                m_view->closeFolderOverlay();
-                return;
-            }
-        }
-        m_view->closeFolderOverlay();
-    }
-    void pointerPress(const ui::PointerEvent &event) override
-    {
-        m_pressPosition = event.position;
-        m_pressIndex = -1;
-        m_dropIndex = -1;
-        m_swiping = false;
-        for (size_t i = 0; i < m_count && i < m_icons.size(); ++i) {
-            if (m_icons[i]->isVisible() && m_icons[i]->geometry().contains(event.position)) {
-                m_pressIndex = int(i);
-                break;
-            }
-        }
-    }
-private:
-    int nearestSlot(ui::PointF position) const
-    {
-        const double gridTop = m_panel.y + m_panel.height * 0.17;
-        if (m_pressIndex < 0 || outsidePanel(position) || position.y < gridTop)
-            return -1;
-        const ui::RectF source = m_slots[size_t(m_pressIndex)];
-        if (source.contains(position))
-            return m_pressIndex;
-        int nearest = -1;
-        double bestDistance = std::numeric_limits<double>::max();
-        for (size_t i = 0; i < m_count && i < m_slots.size(); ++i) {
-            if (int(i) == m_pressIndex || !m_icons[i]->isVisible())
-                continue;
-            const ui::RectF slot = m_slots[i];
-            const double dx = position.x - (slot.x + slot.width / 2);
-            const double dy = position.y - (slot.y + slot.height / 2);
-            const double distance = dx * dx + dy * dy;
-            if (distance < bestDistance) {
-                bestDistance = distance;
-                nearest = int(i);
-            }
-        }
-        return nearest;
-    }
-
-    bool outsidePanel(ui::PointF position) const
-    {
-        return position.x < m_panel.x || position.y < m_panel.y || position.x >= m_panel.right()
-                || position.y >= m_panel.bottom();
-    }
-
-    void finishRename(bool save)
-    {
-        const std::string name = m_titleField->text();
-        m_titleField->setVisible(false);
-        m_title->setVisible(true);
-        if (save && !m_folderId.empty() && m_view->m_launcher.applications().renameFolder(m_folderId, name))
-            setTitle(name);
-        else
-            m_titleField->setText(m_folderName);
-        m_view->setFocus();
-    }
-
-    LauncherView *m_view;
-    ui::Image m_backdrop;
-    std::vector<ui::ThemeIcon *> m_icons;
-    std::vector<ui::Label *> m_names;
-    std::vector<std::string> m_ids;
-    std::vector<ui::RectF> m_slots;
-    ui::Label *m_title = nullptr;
-    ui::TextField *m_titleField = nullptr;
-    std::string m_folderId;
-    std::string m_folderName;
-    ui::Color m_ink {255, 255, 255, 255};
-    ui::PointF m_pressPosition;
-    ui::PointF m_dragPosition;
-    int m_pressIndex = -1;
-    int m_dropIndex = -1;
-    bool m_reordering = false;
-    int m_columns = 1;
-    int m_rows = 1;
-    int m_page = 0;
-    int m_pageCount = 1;
-    bool m_swiping = false;
-    ui::RectF m_origin;
-    ui::RectF m_panel;
-    size_t m_count = 0;
-    double m_progress = 0;
-};
 
 // The page indicator: a row of round dots, the current page's lit.
 class LauncherView::Indicator final : public ui::View
@@ -576,10 +233,9 @@ LauncherView::LauncherView(Launcher &launcher, LauncherWallpaper &wallpaper, App
     m_notFound->setVisible(false);
     m_indicator = addChild<Indicator>(this);
     // Keep the folder in the launcher's own surface.  This lets the
-    // compositor blur the desktop below the card without introducing a
-    // full-screen transparent popup surface.
-    m_folderOverlay = addChild<FolderOverlay>(this);
-    m_folderOverlay->setVisible(false);
+    // LauncherFolderView is a full-screen overlay that handles open/close
+    // animation, paged scrolling and cell reorder inside the folder.
+    m_folderView = addChild<LauncherFolderView>(this, m_launcher.applications(), badges, wallpaper);
 
     m_wheelReset.setSingleShot(true);
     m_wheelReset.setInterval(std::chrono::milliseconds(250));
@@ -776,8 +432,10 @@ void LauncherView::layout()
     const bool changed = !(metrics == m_metrics);
     m_metrics = metrics;
     m_pagesView->setGeometry(localRect());
-    if (m_folderOverlay)
-        m_folderOverlay->setGeometry(localRect());
+    if (m_folderView) {
+        m_folderView->setGeometry(localRect());
+        m_folderView->setMetrics(m_metrics);
+    }
 
     const base::Rect row = m_metrics.searchRow;
     m_search->setMetrics(m_metrics);
@@ -813,8 +471,8 @@ void LauncherView::paint(ui::Painter &painter)
                                                            : ui::Color{248, 249, 252, 235});
         return;
     }
-    const bool folderOpen = m_folderOverlay && m_folderOverlay->isVisible() && m_folderProgress > 0;
-    const ui::RectF panel = folderOpen ? m_folderOverlay->panel() : ui::RectF();
+    const bool folderOpen = m_folderView && m_folderView->isOpen();
+    const ui::RectF panel = folderOpen ? m_folderView->panelRect() : ui::RectF();
     const auto drawBackground = [this, &painter, &bounds](const ui::RectF &clip) {
         painter.save();
         painter.clip(clip);
@@ -902,7 +560,7 @@ void LauncherView::syncCells()
         } else {
             samePage = cell->isVisible();
         }
-        cell->setVisible(item.id != m_openFolderId || !m_folderOverlay || !m_folderOverlay->isVisible());
+        cell->setVisible(item.id != m_openFolderId || !m_folderView || !m_folderView->isOpen());
         cell->setItem(item);
         cell->setCount(m_badges.count(item.id));
         cell->setMetrics(m_metrics);
@@ -1217,7 +875,7 @@ bool LauncherView::searchKey(uint32_t key)
 
 bool LauncherView::keyPress(const ui::KeyEvent &event)
 {
-    if (event.key == ui::key::Escape && m_folderOverlay && m_folderOverlay->isVisible()) {
+    if (event.key == ui::key::Escape && m_folderView && m_folderView->isOpen()) {
         closeFolderOverlay();
         return true;
     }
@@ -1381,32 +1039,12 @@ void LauncherView::cellClicked(LauncherCell *cell, ui::MouseButton button, ui::P
                                     [cell](const LauncherItem &item) { return item.id == cell->id(); });
     if (button == ui::MouseButton::Left && found != m_launcher.applications().rows().end()) {
         if (found->folder) {
-            if (m_folderOverlay)
-                {
-                    const ui::RectF icon = cell->iconRect();
-                    const ui::PointF origin = cell->mapToWindow(icon.topLeft());
-                    m_folderOverlay->setOrigin({origin.x, origin.y, icon.width, icon.height});
-                }
-            if (m_folderOverlay)
-                m_folderOverlay->setFolderId(cell->id());
-            if (m_folderOverlay)
-                m_folderOverlay->setTitle(found->name);
-            if (m_folderOverlay)
-                m_folderOverlay->setItems(m_launcher.applications().folderItems(cell->id()));
-            if (m_folderOverlay) {
+            if (m_folderView) {
                 m_openFolderId = cell->id();
                 cell->setVisible(false);
-                ui::Bitmap backdrop = grab(LauncherWallpaper::kQuality);
-                LauncherWallpaper::blur(backdrop);
-                m_folderOverlay->setBackdrop(imageFromBitmap(backdrop));
-                m_folderOverlay->setVisible(true);
-                m_folderProgress = 0;
-                m_folderTween.start(window(), m_folderProgress, 1, std::chrono::milliseconds(300),
-                                    easing::outCubic,
-                                    [this](double value) {
-                                        m_folderProgress = value;
-                                        m_folderOverlay->setProgress(value);
-                                    });
+                const ui::RectF icon = cell->iconRect();
+                const ui::PointF origin = cell->mapToWindow(icon.topLeft());
+                m_folderView->open(cell->id(), true, {origin.x, origin.y, icon.width, icon.height});
             }
         } else {
             m_launcher.applications().launch(cell->id());
@@ -1448,24 +1086,24 @@ void LauncherView::clearInlineRenameDismissGuardSoon()
 
 void LauncherView::closeFolderOverlay()
 {
-    if (!m_folderOverlay || !m_folderOverlay->isVisible())
+    if (!m_folderView || !m_folderView->isOpen())
         return;
-    m_folderTween.start(window(), m_folderProgress, 0, std::chrono::milliseconds(220), easing::inCubic,
-                        [this](double value) {
-                            m_folderProgress = value;
-                            m_folderOverlay->setProgress(value);
-                            if (value <= 0)
-                                 {
-                                     if (folderBlurChanged)
-                                         folderBlurChanged({}, false);
-                                     m_folderOverlay->setVisible(false);
-                                     if (!m_openFolderId.empty()) {
-                                         if (LauncherCell *folder = cell(m_openFolderId))
-                                             folder->setVisible(true);
-                                         m_openFolderId.clear();
-                                     }
-                                 }
-                        });
+    m_folderView->dismiss();
+    if (!m_openFolderId.empty()) {
+        if (LauncherCell *folder = cell(m_openFolderId))
+            folder->setVisible(true);
+        m_openFolderId.clear();
+    }
+}
+
+void LauncherView::openFolderOverlay(const std::string &folderId, ui::RectF from)
+{
+    if (m_folderView && m_folderView->isOpen())
+        closeFolderOverlay();
+    if (LauncherCell *folder = cell(folderId))
+        folder->setVisible(false);
+    m_openFolderId = folderId;
+    m_folderView->open(folderId, true, from);
 }
 
 void LauncherView::openMenu(LauncherCell *cell, ui::PointF windowPosition)

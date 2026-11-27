@@ -784,8 +784,12 @@ TEST_F(StatusBarViewTest, EfficientModeMovesSystemItemsBesideTheDockAndRestoresT
         EXPECT_EQ(left.right(), right.x());
         EXPECT_EQ(right.right(), 1440);
         EXPECT_EQ(dock->panelRect().width(), left.width());
-        EXPECT_EQ(dock->cornerRadius(), 0);
-        EXPECT_EQ(shell->workArea(*shell->output({})), base::Rect(0, 0, 1440, 908));
+        EXPECT_EQ(dock->cornerRadius(), shell::DockSettings::taskbarRadius);
+        // Only the corners facing the desktop round: the strip stands on the
+        // screen's bottom edge, so its bottom corners stay square.
+        EXPECT_EQ(dock->edgeRadii(),
+                  (std::pair<double, double> {shell::DockSettings::taskbarRadius, 0}));
+        EXPECT_EQ(shell->workArea(*shell->output({})), base::Rect(0, 0, 1440, 960 - shell::DockSettings::taskbarHeight));
         EXPECT_TRUE(bar->clock()->isVisible());
         EXPECT_TRUE(bar->notificationIcon()->isVisible());
         bar->togglePanel(Panel::NotificationCenter);

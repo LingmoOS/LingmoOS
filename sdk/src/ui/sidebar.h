@@ -22,6 +22,8 @@ public:
   const std::string &id() const { return m_id; }
   bool isCurrent() const { return m_current; }
   void setCurrent(bool current);
+  // Show or hide the coloured tile behind the icon.
+  void setIconBackgroundVisible(bool visible);
 
   SizeF sizeHint() const override { return {0, 40}; }
   bool acceptsPointer() const override { return true; }
@@ -45,6 +47,7 @@ private:
   Label *m_title;
   bool m_current = false;
   bool m_pressed = false;
+  bool m_iconBackgroundVisible = true;
 };
 
 // A simple navigation list. Applications own page routing and provide stable

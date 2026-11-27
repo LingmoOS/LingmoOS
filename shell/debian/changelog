@@ -1,3 +1,62 @@
+lingmo-aurora (5.2.6+lingmo5u1) unstable; urgency=medium
+
+  * Re-enable efficient mode and restyle the taskbar after the ChromeOS shelf:
+    44px icons, a 64px bar and a 28px glass corner radius on the strip.
+  * Round only the taskbar's top corners and keep the bottom corners square
+    against the screen edge, as the ChromeOS shelf does; the glass mask and
+    input region take separate top and bottom radii.
+  * Align the taskbar icons from the left edge and vertically centred, as the
+    ChromeOS shelf lays them out.
+  * Draw the launcher as the shelf's start button, a plate with a ring inside,
+    in efficient mode only; the floating dock keeps the launchpad artwork.
+  * Light the taskbar's top edge with the glass rim, as the ChromeOS shelf
+    does; the floating dock keeps its edge to the window outline layer.
+  * Drop the opaque theme fill over the dock's panel so the surface glass
+    shows in efficient mode as it does for the floating dock.
+
+ -- Lingmo OS Team <team@lingmo.org>  Fri, 27 Nov 2026 03:20:00 +0800
+
+lingmo-aurora (5.2.5+lingmo5u1) unstable; urgency=medium
+
+  * launcher: port LauncherFolderView from examples/cutefish-compositor,
+    replacing the monolithic FolderOverlay inner class with a proper
+    self-contained component (launcher_folder_view.h/.cpp).
+    - Full paged scroll via swipe, mouse wheel and indicator tap.
+    - 280ms open / 220ms close scale+fade animation from the folder cell.
+    - Inline folder rename via NameField (Escape/Enter/focusOut committed).
+    - detach() keeps cells alive while a drag exits the folder panel.
+    - LauncherPageIndicator extracted as launcher_page_indicator.h/.cpp
+      (supports setDotSize, onPick callback, animated dot brightness).
+
+ -- Lingmo OS Team <team@lingmo.org>  Wed, 26 Nov 2026 20:00:00 +0800
+
+lingmo-aurora (5.2.4+lingmo5u1) unstable; urgency=medium
+
+  * Complete Liquid Glass coverage for compositor shell surfaces:
+    - LauncherSearchField: shadow (sigma 8, y+2) + top-edge rim over wallpaper.
+    - FolderOverlay panel: shadow (sigma 20, y+3) lifts the folder card; remove
+      wallpaper-grab background — use solid themed base instead (fixes black).
+    - BarItem (status-bar hover plate): 1px white rim so the plate reads as a
+      glass bead inside the bar's glass surface (no shadow — already floated).
+    - CaptureToolbar ToolbarButton: shadow+rim on accent/checked/pressed state.
+    - ClipboardPickerView confirm overlay: shadow (sigma 8, y+2).
+
+ -- Lingmo OS Team <team@lingmo.org>  Wed, 26 Nov 2026 18:00:00 +0800
+
+lingmo-aurora (5.2.3+lingmo5u1) unstable; urgency=medium
+
+  * Extend Liquid Glass shadow+rim treatment to all card and control surfaces:
+    - notification_centre: CardFrame and stacked-card peek strips now carry
+      drop shadow (sigma 6, 1.5 px y-offset) and top-edge specular rim.
+    - notification_controls: ClearButton (Kind::Clear) and PillButton receive
+      the same shadow+rim at sigma 4 / 1 px offset, theme-adaptive alpha.
+    - notification_card: action buttons and thumbnail placeholder given
+      shadow+rim for consistent Liquid Glass depth.
+    - status_panel: SettingsLink row background gains shadow+rim when hovered
+      or pressed, using Panel::statusSurfaceColor() for dark-mode detection.
+
+ -- Lingmo OS Team <team@lingmo.org>  Wed, 26 Nov 2026 14:00:00 +0800
+
 lingmo-aurora (5.2.2+lingmo5u1) unstable; urgency=medium
 
   * Add Liquid Glass depth to control centre tiles: drop shadow under each

@@ -37,6 +37,16 @@ void SidebarItem::setCurrent(bool current) {
     return;
   m_current = current;
   m_title->setColor(m_current ? ColorId::HighlightedText : ColorId::Text);
+  if (!m_iconBackgroundVisible)
+    m_icon->setColor(m_current ? ColorId::HighlightedText : ColorId::Text);
+  requestPaint();
+}
+
+void SidebarItem::setIconBackgroundVisible(bool visible) {
+  if (visible == m_iconBackgroundVisible)
+    return;
+  m_iconBackgroundVisible = visible;
+  m_icon->setColor(visible || m_current ? ColorId::HighlightedText : ColorId::Text);
   requestPaint();
 }
 
@@ -57,12 +67,26 @@ void SidebarItem::paint(Painter &painter) {
         m_pressed   ? color(ColorId::ItemPressed)
         : m_current ? theme.highlight
                     : theme.text.withAlpha(theme.darkMode ? 0.065 : 0.05);
+    if (theme.controlStyle == 1 && (m_current || m_pressed)) {
+        // Liquid Glass: lift the selected/active row with a shadow and rim.
+        painter.drawShadow(localRect(), theme.mediumRadius, 5,
+                           theme.darkMode ? Color{0, 0, 0, 55} : Color{0, 0, 0, 25},
+                           {0, 1.0});
+    }
     painter.drawSmoothRectangle(localRect(), theme.mediumRadius, fill);
+    if (theme.controlStyle == 1 && (m_current || m_pressed)) {
+        const double rimA = theme.darkMode ? 0.22 : 0.40;
+        painter.strokeRoundedRect(localRect().shrunk({0.5, 0.5, 0.5, 0.5}),
+                                  theme.mediumRadius - 0.5,
+                                  Color{255, 255, 255, uint8_t(rimA * 255)}, 1);
+    }
   }
-  painter.fillRoundedRect({(kSidebarRowHeight - kIconTile) / 2,
-                           (geometry().height - kIconTile) / 2, kIconTile,
-                           kIconTile},
-                          6, theme.highlight);
+  if (m_iconBackgroundVisible) {
+    painter.fillRoundedRect({(kSidebarRowHeight - kIconTile) / 2,
+                             (geometry().height - kIconTile) / 2, kIconTile,
+                             kIconTile},
+                            6, theme.highlight);
+  }
   if (hasVisibleFocus())
     painter.strokeRoundedRect(localRect().shrunk({1, 1, 1, 1}),
                               theme.mediumRadius, theme.highlight, 2);

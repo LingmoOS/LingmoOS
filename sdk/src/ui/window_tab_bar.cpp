@@ -276,7 +276,19 @@ protected:
             fill = m_bar->hoverColor();
         if (fill.a > 0) {
             const Color edge = selected ? m_bar->colors().get(ColorId::WindowTabBarSelectedEdge) : Color{0, 0, 0, 0};
+            const Theme& theme = Theme::current();
+            if (theme.controlStyle == 1 && selected) {
+                // Liquid Glass: shadow and rim on the raised tab.
+                painter.drawShadow(pill, pill.height / 2, 5,
+                                   theme.darkMode ? Color{0, 0, 0, 55} : Color{0, 0, 0, 28},
+                                   {0, 1.0});
+            }
             painter.drawSmoothRectangle(pill, pill.height / 2, fill, edge.a > 0 ? 1 : 0, edge);
+            if (theme.controlStyle == 1 && selected) {
+                const double rimA = theme.darkMode ? 0.22 : 0.40;
+                painter.strokeRoundedRect(pill.adjusted(0.5, 0.5, -0.5, -0.5), pill.height / 2 - 0.5,
+                                          Color{255, 255, 255, uint8_t(rimA * 255)}, 1);
+            }
         }
         // Between two resting tabs only; a raised or hovered pill has its own edge.
         if (!m_bar->sliding() && i < m_bar->count() - 1 && i != m_bar->m_current && !hovered()
@@ -395,6 +407,13 @@ void WindowTabBar::CloseButton::paint(Painter& painter)
     const Color text = m_bar->textColor();
     if (m_hovered) {
         const Color plate = m_pressed ? withAlpha(text, 0.16) : m_bar->hoverColor();
+        const Theme& theme = Theme::current();
+        if (theme.controlStyle == 1) {
+            // Liquid Glass: subtle shadow under the close button plate.
+            painter.drawShadow(bounds, bounds.height / 2, 3,
+                               theme.darkMode ? Color{0, 0, 0, 50} : Color{0, 0, 0, 22},
+                               {0, 0.5});
+        }
         painter.fillRoundedRect(bounds, bounds.height / 2, plate);
     }
     const Rect box = painter.snappedRect(bounds);

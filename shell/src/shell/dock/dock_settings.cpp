@@ -100,10 +100,7 @@ DockSettings::Values DockSettings::load(const std::string &path)
     settings.sync();
 
     Values values;
-    // Efficient mode is temporarily disabled while the taskbar/start-menu
-    // implementation is being refined. Keep the persisted value intact so it
-    // can be restored when the feature is enabled again.
-    values.efficientMode = false;
+    values.efficientMode = settings.intValue("Desktop/Mode", 0) == 1;
     values.iconSize = int(settings.intValue("Dock/IconSize", kBaseIconSize));
     values.direction = Direction(settings.intValue("Dock/Direction", Bottom));
     values.visibility = Visibility(settings.intValue("Dock/Visibility", AlwaysShow));

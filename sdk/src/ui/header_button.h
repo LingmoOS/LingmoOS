@@ -5,9 +5,11 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 #include <optional>
 #include <string>
 
+#include "ui/animation.h"
 #include "ui/view.h"
 
 namespace Lingmo::ui {
@@ -57,6 +59,8 @@ protected:
     void pointerRelease(const PointerEvent& event) override;
 
 private:
+    void animateHover(double target);
+
     std::string m_artwork;
     std::string m_glyph;
     double m_glyphSize = 16;
@@ -68,6 +72,9 @@ private:
     std::optional<Color> m_glyphColor;
     PlateAlphas m_light = {0.11, 0.21};
     PlateAlphas m_dark = {0.12, 0.06};
+    // Hover fade: 0 = resting, 1 = fully hovered.
+    double m_hoverAmount = 0;
+    std::unique_ptr<Animation> m_hoverAnimation;
 };
 
 } // namespace Lingmo::ui

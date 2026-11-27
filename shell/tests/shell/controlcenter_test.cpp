@@ -304,6 +304,36 @@ TEST_F(ControlCenterTest, TheControlCentreHangsBelowTheBarWithThePanelGlass)
     EXPECT_FALSE(center->isOpen(Panel::ControlCenter));
 }
 
+TEST_F(ControlCenterTest, APanelOpensBesideItsBottomBarNotAtTheTopOfTheScreen)
+{
+    // The efficient taskbar's bar: along the bottom edge. Its panels must hang
+    // from its strip, not open under a top bar's edge at the screen top.
+    center->closePanels();
+    bar->clearExclusiveZone();
+    bar->setGeometry(base::Rect(0, kOutput.height() - kStatusBar, kOutput.width(), kStatusBar));
+    bar->setExclusiveZone(wm::ScreenEdge::Bottom, kStatusBar, true);
+    frame();
+    const base::Rect barRect = bar->geometry();
+
+    // The control centre grows up towards the bar.
+    center->openPanel(Panel::ControlCenter, bar.get(), item(178));
+    frame();
+    ASSERT_TRUE(center->isOpen(Panel::ControlCenter));
+    const base::Rect control = center->popupWindow(Panel::ControlCenter)->drawnBounds();
+    EXPECT_LT(control.bottom(), barRect.y());
+    EXPECT_GT(control.y(), kStatusBar);
+
+    // A status panel hangs above the bar too, from the same edge.
+    center->openPanel(Panel::Volume, bar.get(), item(120));
+    frame();
+    ASSERT_TRUE(center->isOpen(Panel::Volume));
+    const base::Rect volume = center->popupWindow(Panel::Volume)->drawnBounds();
+    EXPECT_LT(volume.bottom(), barRect.y());
+
+    center->closePanels();
+    test::runFor(std::chrono::milliseconds(5));
+}
+
 TEST_F(ControlCenterTest, CardsToggleTheirServicesAndHoldingOpensSettings)
 {
     center->openPanel(Panel::ControlCenter, bar.get(), item(178));

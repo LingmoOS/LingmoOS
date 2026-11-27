@@ -90,6 +90,8 @@ set(LINGMO_TOOLKIT_PUBLIC_HEADERS
     ui/file_chooser.h
     ui/header_backdrop.h
     ui/header_button.h
+    ui/header_button_group.h
+    ui/navigation_buttons.h
     ui/icon.h
     ui/icon_image.h
     ui/image.h
@@ -105,6 +107,7 @@ set(LINGMO_TOOLKIT_PUBLIC_HEADERS
     ui/progress_bar.h
     ui/cell_layout.h
     ui/round_image_button.h
+    ui/row_combo_box.h
     ui/scroll_bar.h
     ui/scroll_view.h
     ui/scroller.h
@@ -168,6 +171,8 @@ add_library(lingmo-sdk SHARED
     ui/file_drop_area.cpp
     ui/header_backdrop.cpp
     ui/header_button.cpp
+    ui/header_button_group.cpp
+    ui/navigation_buttons.cpp
     ui/icon.cpp
     ui/icon_image.cpp
     ui/icon_loader.cpp
@@ -197,6 +202,7 @@ add_library(lingmo-sdk SHARED
     ui/cell_layout.cpp
     ui/smooth_rectangle.cpp
     ui/round_image_button.cpp
+    ui/row_combo_box.cpp
     ui/rounded_path.cpp
     ui/rounded_shape.cpp
     ui/scroll_bar.cpp

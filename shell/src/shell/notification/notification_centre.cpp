@@ -11,6 +11,7 @@
 
 #include "base/i18n.h"
 #include "core/main_loop.h"
+#include "shell/controlcenter/panel_style.h"  // 需要 Panel:: 命名空间
 #include "shell/notification/notification_card.h"
 #include "shell/notification/notification_controls.h"
 #include "shell/notification/notification_models.h"
@@ -68,6 +69,21 @@ static std::string moreText(int count)
 // ---------------------------------------------------------------------------
 // Row
 
+// Liquid Glass treatment for a card plate: a soft drop shadow lifts it off
+// the wallpaper, and a one-pixel rim highlights the top edge.
+static void paintCardGlass(ui::Painter &painter, const ui::RectF &rect, double radius)
+{
+    const bool dark = Panel::isDark(cardColor());
+    painter.drawShadow(rect, radius, 6,
+                       dark ? ui::Color{0, 0, 0, 55} : ui::Color{0, 0, 0, 30},
+                       {0, 1.5});
+    painter.fillRoundedRect(rect, radius, cardColor(), ui::Corners::Continuous);
+    const double rimAlpha = dark ? 0.22 : 0.42;
+    painter.strokeRoundedRect(rect.adjusted(0.5, 0.5, -0.5, -0.5), radius - 0.5,
+                              ui::Color{255, 255, 255, uint8_t(rimAlpha * 255)},
+                              1, ui::Corners::Continuous);
+}
+
 // The row's sliding part: the peeking strips of a stack and the card's frame.
 class NotificationCentre::Row::Content : public ui::View
 {
@@ -92,10 +108,17 @@ protected:
             const int level = index + 1;
             const double x = level * ui::Theme::current().largeSpacing;
             const ui::RectF strip {x, frame + index * kPeekStep, width - x * 2, kPeekStep};
+            const ui::RectF plate {strip.x, strip.bottom() - frame, strip.width, frame};
             painter.save();
             painter.multiplyOpacity(opacity);
             painter.clip(strip);
-            painter.drawRoundedRect({strip.x, strip.bottom() - frame, strip.width, frame}, shape, cardColor());
+            painter.drawRoundedRect(plate, shape, cardColor());
+            // The same rim the card itself gets, on the peek strip's top edge.
+            const bool dark = Panel::isDark(cardColor());
+            const double rimAlpha = dark ? 0.22 : 0.42;
+            painter.strokeRoundedRect(plate.adjusted(0.5, 0.5, -0.5, -0.5), kRadius - 0.5,
+                                      ui::Color{255, 255, 255, uint8_t(rimAlpha * 255)},
+                                      1, ui::Corners::Continuous);
             painter.restore();
         }
     }
@@ -113,7 +136,7 @@ public:
 protected:
     void paint(ui::Painter &painter) override
     {
-        painter.drawRoundedRect(localRect(), {NotificationCentre::kRadius, 0, ui::themeCorners()}, cardColor());
+        paintCardGlass(painter, localRect(), NotificationCentre::kRadius);
     }
 };
 

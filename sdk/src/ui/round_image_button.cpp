@@ -179,8 +179,20 @@ void RoundImageButton::paint(Painter& painter)
         const double margin = std::round(m_size * 0.1);
         const double width = plateLength(bounds.width - margin * 2);
         const double height = plateLength(bounds.height - margin * 2);
-        painter.fillRoundedRect({position.x + (icon - width) / 2, position.y + (icon - height) / 2, width, height},
-                                std::min(width, height) / 2, plate);
+        const RectF plateRect = {position.x + (icon - width) / 2, position.y + (icon - height) / 2, width, height};
+        const double plateRadius = std::min(width, height) / 2;
+        if (theme.controlStyle == 1) {
+            // Liquid Glass: lift the icon plate with a shadow and top-edge rim.
+            painter.drawShadow(plateRect, plateRadius, 5,
+                               theme.darkMode ? Color{0, 0, 0, 55} : Color{0, 0, 0, 25},
+                               {0, 1.0});
+        }
+        painter.fillRoundedRect(plateRect, plateRadius, plate);
+        if (theme.controlStyle == 1) {
+            const double rimA = theme.darkMode ? 0.22 : 0.40;
+            painter.strokeRoundedRect(plateRect.adjusted(0.5, 0.5, -0.5, -0.5), plateRadius - 0.5,
+                                      Color{255, 255, 255, uint8_t(rimA * 255)}, 1);
+        }
     }
 
     if (m_iconName.empty())

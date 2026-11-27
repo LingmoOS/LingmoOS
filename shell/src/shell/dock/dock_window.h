@@ -10,6 +10,7 @@
 #include <optional>
 #include <set>
 #include <string>
+#include <utility>
 #include <vector>
 
 #include "base/geometry.h"
@@ -63,6 +64,9 @@ public:
     // The glass the compositor draws behind the panel.
     render::GlassParams glass() const;
     double cornerRadius() const;
+    // The corner radii at the panel's top and bottom edges: the taskbar rounds
+    // its top corners only, as it stands against the screen edge.
+    std::pair<double, double> edgeRadii() const;
 
     // The items in order along the dock: applications, minimized windows,
     // then the trash. For tests and the window debug service.

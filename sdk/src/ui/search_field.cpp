@@ -82,6 +82,12 @@ void SearchField::paint(Painter& painter)
     const Color fill = m_fill ? m_fill->resolve() : theme.secondBackground;
     const double radius = bounds.height / 2;
     const bool focused = hasFocus();
+    if (theme.controlStyle == 1) {
+        // Liquid Glass: lift the search field off the surface with a soft shadow.
+        painter.drawShadow(bounds, radius, 5,
+                           theme.darkMode ? Color{0, 0, 0, 55} : Color{0, 0, 0, 25},
+                           {0, 1.0});
+    }
     painter.drawRoundedRect(bounds, {radius, 0, Corners::Circular}, fill, 1, focused ? theme.highlight : fill);
     if (focused) {
         painter.drawRoundedRect(bounds.adjusted(-kFocusRing, -kFocusRing, kFocusRing, kFocusRing),

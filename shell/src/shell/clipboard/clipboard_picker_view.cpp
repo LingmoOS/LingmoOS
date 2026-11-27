@@ -272,6 +272,13 @@ protected:
 
     void paint(ui::Painter &painter) override
     {
+        const ui::Theme &theme = ui::Theme::current();
+        if (theme.controlStyle == 1) {
+            // Liquid Glass: soft shadow to separate the confirmation overlay from the rows.
+            painter.drawShadow(localRect(), kCardRadius, 8,
+                               theme.darkMode ? ui::Color{0, 0, 0, 60} : ui::Color{0, 0, 0, 30},
+                               {0, 2.0});
+        }
         painter.drawRoundedRect(localRect(), {kCardRadius, 0, ui::themeCorners()}, surfaceColor().withAlpha(0.92));
     }
 

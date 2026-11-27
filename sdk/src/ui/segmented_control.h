@@ -60,6 +60,9 @@ protected:
     void enabledChanged() override;
     void pointerPress(const PointerEvent& event) override;
     void pointerRelease(const PointerEvent& event) override;
+    void pointerMove(const PointerEvent& event) override;
+    void pointerEnter() override;
+    void pointerLeave() override;
 
 private:
     class Segment;
@@ -74,6 +77,7 @@ private:
     std::vector<Segment*> m_segments;
     int m_current = 0;
     int m_pressed = -1;
+    int m_hovered = -1;
     bool m_pressShown = false;
     int m_pressTimer = 0;
     double m_contentHeight;

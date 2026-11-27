@@ -6,11 +6,13 @@
 #include "ui/header_button.h"
 
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <utility>
 
 #include "include/core/SkImage.h"
 
+#include "ui/animation.h"
 #include "ui/icon_loader.h"
 #include "ui/painter.h"
 #include "ui/theme.h"
@@ -88,22 +90,37 @@ void HeaderButton::paint(Painter& painter)
 
     // The plate keeps the icon's parity, so both stay centred on the same pixel.
     const bool pressed = m_pressed || m_checked;
-    if (isEnabled() && (pressed || m_hovered || m_highlighted)) {
+    const double effectiveHover = pressed ? 1.0 : m_hoverAmount;
+    if (isEnabled() && (pressed || effectiveHover > 0 || m_highlighted)) {
         const PlateAlphas& alphas = dark ? m_dark : m_light;
-        const double alpha = pressed ? alphas.pressed : alphas.hovered;
+        const double alpha = pressed ? alphas.pressed : alphas.hovered * effectiveHover;
         const int margin = int(std::lround(m_size * 0.1 * painter.scale()));
         int plate = std::min(box.width, box.height) - 2 * margin;
         if ((plate - icon.width) % 2 != 0)
             plate -= 1;
         const Rect plateRect = {icon.x + (icon.width - plate) / 2, icon.y + (icon.height - plate) / 2, plate, plate};
         if (Theme::current().controlStyle == 1) {
-            // Liquid Glass: glass bead instead of plain fill.
-            const Color glassFill = Color{255, 255, 255, uint8_t(alpha * 0.65 * 255)};
-            const Color glassRim  = Color{255, 255, 255, uint8_t(alpha * 0.90 * 255)};
+            // Liquid Glass: shadow + glass bead fill + single white rim stroke.
+            // Dark mode: draw a shadow first, then a tint-coloured fill, then 1px rim.
+            // Light mode: same but lighter fill alpha so it doesn't appear white.
+            painter.drawShadow(RectF{double(plateRect.x), double(plateRect.y),
+                                    double(plateRect.width), double(plateRect.height)},
+                               plate / 2.0, 4,
+                               dark ? Color{0, 0, 0, uint8_t(50 * alpha)}
+                                    : Color{0, 0, 0, uint8_t(30 * alpha)},
+                               {0, 1.0});
+            const Color glassFill = dark
+                ? Color{255, 255, 255, uint8_t(alpha * 0.55 * 255)}
+                : tint.withAlpha(alpha);
             painter.fillDeviceRoundedRect(plateRect, plate / 2.0, glassFill);
-            // Top-edge rim highlight.
-            painter.fillDeviceRoundedRect({plateRect.x, plateRect.y, plateRect.width, plateRect.height / 2},
-                                          plate / 2.0, glassRim);
+            // 1px top-edge specular rim — only visible (> 1/255) when alpha > 0.
+            const double rimA = dark ? 0.28 : 0.35;
+            painter.strokeRoundedRect(
+                RectF{double(plateRect.x) + 0.5, double(plateRect.y) + 0.5,
+                      double(plateRect.width) - 1, double(plateRect.height) - 1},
+                plate / 2.0 - 0.5,
+                Color{255, 255, 255, uint8_t(rimA * alpha * 255)},
+                1);
         } else {
             painter.fillDeviceRoundedRect(plateRect, plate / 2.0, tint.withAlpha(alpha));
         }
@@ -124,16 +141,36 @@ void HeaderButton::paint(Painter& painter)
     painter.restore();
 }
 
+void HeaderButton::animateHover(double target)
+{
+    if (!window()) {
+        m_hoverAmount = target;
+        return;
+    }
+    if (!m_hoverAnimation) {
+        m_hoverAnimation = std::make_unique<Animation>(window());
+        m_hoverAnimation->setDuration(std::chrono::milliseconds(110));
+        m_hoverAnimation->setEasing(Animation::Easing::OutCubic);
+    }
+    const double from = m_hoverAmount;
+    m_hoverAnimation->stop();
+    m_hoverAnimation->onUpdate = [this, from, target](double v) {
+        m_hoverAmount = from + (target - from) * v;
+        requestPaint();
+    };
+    m_hoverAnimation->start();
+}
+
 void HeaderButton::pointerEnter()
 {
     m_hovered = true;
-    requestPaint();
+    animateHover(1.0);
 }
 
 void HeaderButton::pointerLeave()
 {
     m_hovered = false;
-    requestPaint();
+    animateHover(0.0);
 }
 
 void HeaderButton::pointerPress(const PointerEvent& event)

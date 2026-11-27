@@ -312,8 +312,18 @@ protected:
     void paint(ui::Painter &painter) override
     {
         const ui::Color background = rowColor(m_pressed, isHovered());
-        if (background.a > 0)
-            painter.fillRoundedRect(localRect(), kBackgroundRadius, background);
+        if (background.a > 0) {
+            const ui::RectF rect = localRect();
+            const bool dark = Panel::isDark(Panel::statusSurfaceColor());
+            painter.drawShadow(rect, kBackgroundRadius, 4,
+                               dark ? ui::Color{0, 0, 0, 55} : ui::Color{0, 0, 0, 25},
+                               {0, 1});
+            painter.fillRoundedRect(rect, kBackgroundRadius, background);
+            const double rimAlpha = dark ? 0.22 : 0.42;
+            painter.strokeRoundedRect(rect.adjusted(0.5, 0.5, -0.5, -0.5), kBackgroundRadius - 0.5,
+                                      ui::Color{255, 255, 255, uint8_t(rimAlpha * 255)},
+                                      1, ui::Corners::Continuous);
+        }
     }
 
     void hoverChanged() override { requestPaint(); }

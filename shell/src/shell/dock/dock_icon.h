@@ -49,6 +49,9 @@ public:
 
     // A theme icon's name, or an SVG file for the launcher.
     void setIcon(std::string name, bool file = false);
+    // The taskbar's launcher drawing, a ring in a plate, in place of the
+    // artwork; only the efficient taskbar asks for it.
+    void setLauncherFace(bool enabled);
     const std::string &iconName() const { return m_iconName; }
     void setToolTip(std::string text) { m_toolTip = std::move(text); }
     const std::string &toolTipText() const { return m_toolTip; }
@@ -114,6 +117,7 @@ protected:
 
 private:
     class SvgFace;
+    class LauncherFace;
     class ThumbnailMask;
 
     void paintThumbnail(ui::Painter &painter);
@@ -140,6 +144,9 @@ private:
     // The icon: a theme icon, or the launcher's artwork.
     ui::ThemeIcon *m_themeFace = nullptr;
     SvgFace *m_svgFace = nullptr;
+    // The taskbar's launcher drawing, in place of the SVG artwork.
+    LauncherFace *m_launcherFace = nullptr;
+    bool m_launcherEnabled = false;
     // The pressed look: the icon's silhouette in black at 0.4 over it.
     ui::ThemeIcon *m_themeMask = nullptr;
     SvgFace *m_svgMask = nullptr;

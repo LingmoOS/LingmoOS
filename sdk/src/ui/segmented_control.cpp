@@ -199,6 +199,15 @@ void SegmentedControl::paint(Painter& painter)
             painter.drawRoundedRect(bounds, {tabRadius, 0, themeCorners()}, color(ColorId::SegmentedTabBackground), 0.5,
                                     Color{255, 255, 255, uint8_t(theme.darkMode ? 44 : 80)});
         }
+        // Hover: a subtle glow on the item under the pointer if it is not current.
+        if (m_hovered >= 0 && m_hovered < int(m_segments.size()) && m_hovered != m_current && m_hovered != m_pressed) {
+            const RectF hi = itemRect(size_t(m_hovered)).adjusted(kPlateInset, kPlateInset, -kPlateInset, -kPlateInset);
+            const Color hoverTint = theme.darkMode ? Color{255, 255, 255, 22} : Color{0, 0, 0, 14};
+            if (m_style == Style::Segmented)
+                painter.drawSmoothRectangle(hi, hi.height / 2, hoverTint);
+            else
+                painter.drawRoundedRect(hi, {tabRadius, kPlateInset, themeCorners()}, hoverTint);
+        }
         if (m_current < 0 || m_current >= int(m_segments.size()))
             return;
         const RectF item = itemRect(size_t(m_current));
@@ -219,6 +228,15 @@ void SegmentedControl::paint(Painter& painter)
                                     m_trackColor ? m_trackColor->resolve() : color(ColorId::SegmentedControlTrack));
         } else {
             painter.drawRoundedRect(bounds, {tabRadius, 0, themeCorners()}, color(ColorId::SegmentedTabBackground));
+        }
+        // Hover: subtle overlay on the item under the pointer.
+        if (m_hovered >= 0 && m_hovered < int(m_segments.size()) && m_hovered != m_current && m_hovered != m_pressed) {
+            const RectF hi = itemRect(size_t(m_hovered)).adjusted(kPlateInset, kPlateInset, -kPlateInset, -kPlateInset);
+            const Color hoverTint = theme.darkMode ? Color{255, 255, 255, 18} : Color{0, 0, 0, 12};
+            if (m_style == Style::Segmented)
+                painter.drawSmoothRectangle(hi, hi.height / 2, hoverTint);
+            else
+                painter.drawRoundedRect(hi, {tabRadius, kPlateInset, themeCorners()}, hoverTint);
         }
         if (m_current < 0 || m_current >= int(m_segments.size()))
             return;
@@ -304,6 +322,28 @@ void SegmentedControl::pointerRelease(const PointerEvent& event)
     setPressed(-1);
     if (pressed >= 0 && itemAt(event.position) == pressed)
         pick(pressed);
+}
+
+void SegmentedControl::pointerMove(const PointerEvent& event)
+{
+    const int index = itemAt(event.position);
+    if (index == m_hovered)
+        return;
+    m_hovered = index;
+    requestPaint();
+}
+
+void SegmentedControl::pointerEnter()
+{
+    // Position is not yet known; wait for the first pointerMove.
+}
+
+void SegmentedControl::pointerLeave()
+{
+    if (m_hovered < 0)
+        return;
+    m_hovered = -1;
+    requestPaint();
 }
 
 } // namespace Lingmo::ui

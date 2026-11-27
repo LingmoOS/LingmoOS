@@ -8,6 +8,7 @@
 #include <cmath>
 
 #include "base/process.h"
+#include "shell/controlcenter/panel_style.h"
 #include "shell/notification/notification_controls.h"
 #include "shell/notification/notification_motion.h"
 #include "ui/icon.h"
@@ -83,8 +84,17 @@ protected:
     void paint(ui::Painter &painter) override
     {
         const ui::RectF rect = localRect();
-        painter.drawRoundedRect(rect, {rect.height / 2, 0, ui::Corners::Circular},
-                                m_card->controlTint(m_pressed ? 2 : m_hovered ? 1 : 0));
+        const double radius = rect.height / 2;
+        const ui::Color surface = m_card->controlTint(m_pressed ? 2 : m_hovered ? 1 : 0);
+        const bool dark = Panel::isDark(ui::Theme::current().background);
+        painter.drawShadow(rect, radius, 4,
+                           dark ? ui::Color{0, 0, 0, 55} : ui::Color{0, 0, 0, 25},
+                           {0, 1});
+        painter.drawRoundedRect(rect, {radius, 0, ui::Corners::Circular}, surface);
+        const double rimAlpha = dark ? 0.22 : 0.42;
+        painter.strokeRoundedRect(rect.adjusted(0.5, 0.5, -0.5, -0.5), radius - 0.5,
+                                  ui::Color{255, 255, 255, uint8_t(rimAlpha * 255)},
+                                  1, ui::Corners::Continuous);
     }
 
 private:
@@ -453,8 +463,17 @@ void NotificationCard::paint(ui::Painter &painter)
 
     // Where the thumbnail goes, while it loads.
     if (showsThumbnail() && !m_thumbnailReady) {
-        painter.drawRoundedRect({g.thumbnailX, g.thumbnailY, kThumbnailSize, kThumbnailSize},
-                                {ui::Theme::current().smallRadius, 0, ui::Corners::Circular}, controlTint(0));
+        const ui::RectF thumb {g.thumbnailX, g.thumbnailY, kThumbnailSize, kThumbnailSize};
+        const double thumbRadius = ui::Theme::current().smallRadius;
+        const bool dark = Panel::isDark(ui::Theme::current().background);
+        painter.drawShadow(thumb, thumbRadius, 4,
+                           dark ? ui::Color{0, 0, 0, 55} : ui::Color{0, 0, 0, 25},
+                           {0, 1});
+        painter.drawRoundedRect(thumb, {thumbRadius, 0, ui::Corners::Circular}, controlTint(0));
+        const double rimAlpha = dark ? 0.22 : 0.42;
+        painter.strokeRoundedRect(thumb.adjusted(0.5, 0.5, -0.5, -0.5), thumbRadius - 0.5,
+                                  ui::Color{255, 255, 255, uint8_t(rimAlpha * 255)},
+                                  1, ui::Corners::Continuous);
     }
 
     if (g.progressY >= 0) {

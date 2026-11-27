@@ -233,9 +233,22 @@ void ToolbarButton::paint(ui::Painter &painter)
         plate = m_pressed ? theme.highlight.darker(1.2) : m_hovered ? theme.highlight.lighter(1.1) : theme.highlight;
         opacity = 1;
     }
-    if (opacity > 0)
-        painter.drawRoundedRect(localRect(), {kRadius, theme.smallSpacing, ui::themeCorners()},
-                                plate.withAlpha(plate.a / 255.0 * opacity));
+    if (opacity > 0) {
+        const ui::RectF rect = localRect();
+        const ui::Color fill = plate.withAlpha(plate.a / 255.0 * opacity);
+        if (theme.controlStyle == 1 && (m_accent || m_checked || m_pressed)) {
+            // Liquid Glass: shadow + rim for the active/accent state.
+            painter.drawShadow(rect, kRadius, 5,
+                               theme.darkMode ? ui::Color{0, 0, 0, 55} : ui::Color{0, 0, 0, 30},
+                               {0, 1.0});
+        }
+        painter.drawRoundedRect(rect, {kRadius, theme.smallSpacing, ui::themeCorners()}, fill);
+        if (theme.controlStyle == 1 && (m_accent || m_checked || m_pressed)) {
+            const double rimA = theme.darkMode ? 0.22 : 0.40;
+            painter.strokeRoundedRect(rect.adjusted(0.5, 0.5, -0.5, -0.5), kRadius - 0.5,
+                                      ui::Color{255, 255, 255, uint8_t(rimA * 255)}, 1, ui::themeCorners());
+        }
+    }
     if (!m_icon.empty()) {
         const ui::RectF rect = localRect();
         painter.drawSvg(shellDataFile(m_icon),

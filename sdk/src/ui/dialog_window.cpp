@@ -95,12 +95,19 @@ void DialogButton::paint(Painter& painter)
 {
     const RectF bounds = localRect();
     const double radius = bounds.height / 2;
+    const Theme& theme = Theme::current();
     const Color surface = m_primary ? actionColor() : color(ColorId::DialogButtonBackground);
     Color fill = surface;
     if (isEnabled() && m_pressed)
         fill = surface.darker(1.08);
     else if (isEnabled() && m_hovered)
         fill = m_primary ? surface.lighter(1.05) : color(ColorId::DialogButtonBackgroundHovered);
+    // Liquid Glass: soft drop shadow to lift the button off the surface.
+    if (theme.controlStyle == 1) {
+        painter.drawShadow(bounds, radius, 6,
+                           theme.darkMode ? Color{0, 0, 0, 60} : Color{0, 0, 0, 35},
+                           {0, 1.5});
+    }
     // Borders are one device pixel, 1 / scale; the inner edge
     // and the focus ring keep the button's shape through RoundedRectangle's inset.
     const double pixel = 1 / painter.scale();

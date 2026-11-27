@@ -113,6 +113,9 @@ enum class ColorId : uint16_t {
     ToastShadow,
     AboutDialogBackground,
 
+    RowComboBoxHovered,
+    RowComboBoxOpen,
+
     ToolkitEnd,
 
     ApplicationFirst = 1024,

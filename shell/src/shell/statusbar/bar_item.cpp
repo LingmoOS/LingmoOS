@@ -113,7 +113,16 @@ void BarItem::paint(ui::Painter &painter)
     const ui::RectF plate = plateRect();
     if (plate.width <= 0 || plate.height <= 0)
         return;
-    painter.drawRoundedRect(plate, {ui::Theme::current().smallRadius, 0, ui::Corners::Circular}, plateColor());
+    const ui::Theme &theme = ui::Theme::current();
+    painter.drawRoundedRect(plate, {theme.smallRadius, 0, ui::Corners::Circular}, plateColor());
+    if (theme.controlStyle == 1) {
+        // Liquid Glass: 1px top-edge rim so the hover plate reads as a glass bead
+        // inside the bar's own glass surface (no drop shadow — it already floats).
+        const bool light = m_bar->lightContents();
+        const double rimA = light ? 0.35 : 0.22;
+        painter.strokeRoundedRect(plate.adjusted(0.5, 0.5, -0.5, -0.5), theme.smallRadius - 0.5,
+                                  ui::Color{255, 255, 255, uint8_t(rimA * 255)}, 1, ui::Corners::Circular);
+    }
 }
 
 void BarItem::pointerEnter()
