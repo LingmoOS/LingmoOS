@@ -7,6 +7,8 @@
 #include <functional>
 
 #include "base/timer.h"
+#include "ui/menu.h"
+#include "ui/round_image_button.h"
 #include "ui/view.h"
 
 namespace Lingmo::ui {
@@ -31,6 +33,8 @@ public:
     static constexpr double kWidth = 360;
     // Between the tiles and round them.
     static constexpr double kGap = 10;
+    // Height of the power button row at the bottom of the control centre.
+    static constexpr double kPowerButtonHeight = 44;
 
     explicit ControlCenterView(ControlCenterServices &services);
     ~ControlCenterView() override;
@@ -41,6 +45,9 @@ public:
     void retranslate();
     // The window height at `scale`: the layout's, on whole device pixels.
     double windowHeight(double scale) const;
+
+    // Show/hide the power button row (efficient mode only).
+    void setEfficientMode(bool efficient);
 
     CardItem *wirelessCard() const { return m_wireless; }
     CardItem *bluetoothCard() const { return m_bluetooth; }
@@ -57,6 +64,8 @@ public:
     std::function<void()> onBluetoothDetailsRequested;
     // The layout's height may have changed.
     std::function<void()> onHeightChanged;
+    // Power action requested: 0=suspend, 1=restart, 2=shutdown, 3=lock, 4=logout.
+    std::function<void(int action)> onPowerRequested;
 
 protected:
     void layout() override;
@@ -87,6 +96,9 @@ private:
     base::Timer m_brightnessTimer;
     bool m_darkModeShown = false;
     bool m_expanded = false;
+    // Power button (visible in efficient mode only).
+    ui::RoundImageButton *m_powerButton = nullptr;
+    std::unique_ptr<ui::Menu> m_powerMenu;
 };
 
 } // namespace Lingmo::Shell

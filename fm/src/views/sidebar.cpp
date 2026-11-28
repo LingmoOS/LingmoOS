@@ -65,6 +65,7 @@ public:
         setName("places");
         m_favorites = addChild<ui::Label>(tr("Favorites"));
         m_computer = addChild<ui::SidebarItem>("computer", tr("Computer"), "computer-symbolic");
+        m_computer->setIconBackgroundVisible(false);
         m_computer->onActivated = [this] {
             if (m_sidebar->onClicked)
                 m_sidebar->onClicked("computer:///");
@@ -188,13 +189,32 @@ protected:
         const double inset = sideInset();
         const double rowHeight = snap(std::max(34.0, style::fontHeight() + 12));
         const double spacing = snap(3);
-
-        styleSection(m_favorites);
         const double headerHeight = snap(32);
-        m_favorites->setGeometry({inset + kSmallSpacing, 0, std::max(0.0, width - inset - kSmallSpacing), headerHeight});
 
-        double y = headerHeight;
+        // Computer
+        m_computerRect = {
+            inset,
+            0,
+            std::max(0.0, width - inset * 2),
+            rowHeight
+        };
+
+        m_computer->setGeometry(m_computerRect);
+
+        double y = rowHeight + spacing;
+
+        // Favorites header
+        styleSection(m_favorites);
+        m_favorites->setGeometry({
+            inset + kSmallSpacing,
+            y,
+            std::max(0.0, width - inset - kSmallSpacing),
+            headerHeight
+        });
+
+        y += headerHeight;
         std::string category = "Favorites";
+
         for (int i = 0; i < places.count() && size_t(i) < m_rows.size(); ++i) {
             const PlacesModel::Place& place = places.at(i);
             Row& row = m_rows[size_t(i)];
@@ -245,11 +265,11 @@ protected:
             row.label->setOpacity(m_dragRow == i ? 0.45 : 1);
 
             y += rowHeight + spacing;
-            if (i == 0) {
-                m_computerRect = {inset, y, std::max(0.0, width - inset * 2), rowHeight};
-                m_computer->setGeometry(m_computerRect);
-                y += rowHeight + spacing;
-            }
+            // if (i == 0) {
+            //     m_computerRect = {inset, y, std::max(0.0, width - inset * 2), rowHeight};
+            //     m_computer->setGeometry(m_computerRect);
+            //     y += rowHeight + spacing;
+            // }
         }
     }
 

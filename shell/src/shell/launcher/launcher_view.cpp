@@ -307,6 +307,8 @@ LauncherView::LauncherView(Launcher &launcher, LauncherWallpaper &wallpaper, App
     m_subscriptions.push_back(m_badges.changed.connect([this] {
         for (const auto &[id, cell] : m_cells)
             cell->setCount(m_badges.count(id));
+        if (m_folderView)
+            m_folderView->sync();
     }));
     m_subscriptions.push_back(ui::Application::instance()->languageChanged.connect([this] { retranslate(); }));
 }
@@ -358,6 +360,15 @@ void LauncherView::setShown(bool shown)
     // so anything deferred would play on the next show.
     if (m_menu)
         m_menu->close();
+    // Close the folder immediately when the launcher hides.
+    if (m_folderView && m_folderView->isOpen()) {
+        m_folderView->close();
+        if (!m_openFolderId.empty()) {
+            if (LauncherCell *folder = cell(m_openFolderId))
+                folder->setVisible(true);
+            m_openFolderId.clear();
+        }
+    }
     stopSwipe();
     m_slide.finish();
     m_searchTimer.stop();
@@ -466,10 +477,10 @@ void LauncherView::paint(ui::Painter &painter)
 {
     const ui::RectF bounds = localRect();
     if (m_compact) {
-        const ui::Theme &theme = ui::Theme::current();
-        painter.fillRoundedRect(bounds, 24, theme.darkMode ? ui::Color{24, 25, 30, 230}
-                                                           : ui::Color{248, 249, 252, 235});
-        return;
+        // In efficient mode the launcher covers the full screen, same as
+        // normal mode.  Draw the wallpaper (or dim it) exactly as normal mode
+        // does — no rounded rect overlay that obscures the glass or causes
+        // flicker when paging.
     }
     const bool folderOpen = m_folderView && m_folderView->isOpen();
     const ui::RectF panel = folderOpen ? m_folderView->panelRect() : ui::RectF();
@@ -620,6 +631,10 @@ void LauncherView::syncCells()
     else
         updateSelection();
     m_notFound->setVisible(isSearching() && rows.empty());
+    // Keep the open folder in sync when the model changes (item added,
+    // removed, renamed or badge count updated).
+    if (m_folderView)
+        m_folderView->sync();
     requestPaint();
 }
 
@@ -1034,11 +1049,8 @@ void LauncherView::backgroundReleased(ui::PointF position)
 
 void LauncherView::cellClicked(LauncherCell *cell, ui::MouseButton button, ui::PointF windowPosition)
 {
-    const auto found = std::find_if(m_launcher.applications().rows().begin(),
-                                    m_launcher.applications().rows().end(),
-                                    [cell](const LauncherItem &item) { return item.id == cell->id(); });
-    if (button == ui::MouseButton::Left && found != m_launcher.applications().rows().end()) {
-        if (found->folder) {
+    if (button == ui::MouseButton::Left) {
+        if (cell->isFolder()) {
             if (m_folderView) {
                 m_openFolderId = cell->id();
                 cell->setVisible(false);
@@ -1049,9 +1061,9 @@ void LauncherView::cellClicked(LauncherCell *cell, ui::MouseButton button, ui::P
         } else {
             m_launcher.applications().launch(cell->id());
         }
-    }
-    else if (button == ui::MouseButton::Right)
+    } else if (button == ui::MouseButton::Right) {
         openMenu(cell, windowPosition);
+    }
 }
 
 void LauncherView::renameFolderInline(const std::string &folderId, std::string name)
@@ -1089,11 +1101,6 @@ void LauncherView::closeFolderOverlay()
     if (!m_folderView || !m_folderView->isOpen())
         return;
     m_folderView->dismiss();
-    if (!m_openFolderId.empty()) {
-        if (LauncherCell *folder = cell(m_openFolderId))
-            folder->setVisible(true);
-        m_openFolderId.clear();
-    }
 }
 
 void LauncherView::openFolderOverlay(const std::string &folderId, ui::RectF from)

@@ -165,7 +165,11 @@ private:
     // Opens/closes the folder overlay — replaces the old FolderOverlay.
     void openFolderOverlay(const std::string &folderId, ui::RectF from);
     void closeFolderOverlay();
+
+public:
     LauncherFolderView *folderView() const { return m_folderView; }
+
+private:
 
     // Pages: the background's press, flick and click.
     void backgroundPressed(ui::PointF position);

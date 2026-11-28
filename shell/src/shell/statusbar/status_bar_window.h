@@ -26,6 +26,7 @@ namespace Lingmo::Shell {
 class ClockItem;
 class DockSettings;
 class DeviceUsage;
+class TaskbarHost;
 class VpnNotifier;
 class ShellWindow;
 class StatusBar;
@@ -36,8 +37,9 @@ class StopItem;
 class SystemTrayView;
 class Wallpaper;
 
-// The status bar: a 32 px strip along the top of the primary output, reserved
-// from the work area. Its background is the user's Gaussian blur from
+// The normal-mode status bar: a 32 px strip along the top of the primary
+// output, reserved from the work area. Efficient mode hosts its status views
+// inside the Dock taskbar. Its background is the user's Gaussian blur from
 // shell.conf (status_bar_settings.h), so what shows through is softened rather
 // than hidden; with no blur it is clear. Left to right: the menu bar, the stop
 // button of an agent's control, the items applications
@@ -53,7 +55,7 @@ public:
     StatusBarWindow(Shell *shell, std::unique_ptr<StatusBar> statusBar);
     ~StatusBarWindow() override;
 
-    void followDesktopMode(DockSettings &settings);
+    void followDesktopMode(DockSettings &settings, TaskbarHost &taskbar);
     bool efficientMode() const { return m_efficientMode; }
     int taskbarWidth() const;
     base::Signal<int> taskbarWidthChanged;
@@ -123,6 +125,9 @@ private:
     void armClock();
     StatusBarPanels *panelsFor(StatusBarPanels::Panel panel) const;
     BarItem *itemFor(StatusBarPanels::Panel panel) const;
+    Root *activeRoot() const { return m_taskbarRoot ? m_taskbarRoot : m_root; }
+    ShellWindow *activeWindow() const;
+    void moveStatusAreaToTaskbar(bool taskbar);
     void updateChecked();
     // Puts the bar's blur, or the plate's when the bar has none, behind the
     // contents.
@@ -133,6 +138,7 @@ private:
 
     bool m_efficientMode = false;
     DockSettings *m_dockSettings = nullptr;
+    TaskbarHost *m_taskbarHost = nullptr;
     bool m_geometryUpdating = false;
     base::Subscription m_modeChanged;
     Shell *m_shell;
@@ -144,6 +150,7 @@ private:
     base::Subscription m_deviceUsageChanged;
     std::unique_ptr<ShellWindow> m_window;
     Root *m_root = nullptr;
+    Root *m_taskbarRoot = nullptr;
     // The slot's placeholder, or the menu bar.
     ui::View *m_menuSlot = nullptr;
     StatusBarMenuBar *m_menuBar = nullptr;

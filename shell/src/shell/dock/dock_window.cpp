@@ -105,57 +105,49 @@ base::Rect fitToWindow(const base::Rect &slot, const base::Rect &window)
     return aligned.intersected(slot);
 }
 
-// A rounded rect as a region, row by row, as a filled polygon covers pixels.
-// `topRadius` is the corner radius on the top edge and `bottomRadius` on the
-// bottom one; a negative bottom radius means the same as the top.
-base::Region roundedRegion(const base::Rect &rect, double topRadius, double bottomRadius = -1)
+// The efficient taskbar's plate: rounded where it leaves the desktop, square
+// where it meets the screen edge.
+ui::Path taskbarPath(const base::Rect &rect, double radius)
 {
-    if (bottomRadius < 0)
-        bottomRadius = topRadius;
+    const double x = rect.x();
+    const double y = rect.y();
+    const double w = rect.width();
+    const double h = rect.height();
+    const double r = std::clamp(radius, 0.0, std::min(w, h) / 2.0);
+
+    ui::Path path;
+    path.moveTo({x, y + h});
+    path.lineTo({x, y + r});
+    path.quadTo({x, y}, {x + r, y});
+    path.lineTo({x + w - r, y});
+    path.quadTo({x + w, y}, {x + w, y + r});
+    path.lineTo({x + w, y + h});
+    path.lineTo({x, y + h});
+    path.close();
+    return path;
+}
+
+// A rounded rect as a region, row by row, as a filled polygon covers pixels.
+base::Region roundedRegion(const base::Rect &rect, double radius)
+{
     base::Region region;
     const int height = rect.height();
-    const double half = std::min(rect.width(), rect.height()) / 2.0;
-    topRadius = std::clamp(topRadius, 0.0, half);
-    bottomRadius = std::clamp(bottomRadius, 0.0, half);
+    radius = std::clamp(radius, 0.0, std::min(rect.width(), rect.height()) / 2.0);
     for (int y = 0; y < height; ++y) {
         const double centre = y + 0.5;
-        // Each edge's circles have their centres one radius inside it; past
-        // them, or on an edge with no radius, the row's edge is straight.
         double inset = 0;
-        if (topRadius > 0 && centre < topRadius) {
-            const double dy = topRadius - centre;
-            inset = topRadius - std::sqrt(std::max(0.0, topRadius * topRadius - dy * dy));
-        } else if (bottomRadius > 0 && centre > height - bottomRadius) {
-            const double dy = centre - (height - bottomRadius);
-            inset = bottomRadius - std::sqrt(std::max(0.0, bottomRadius * bottomRadius - dy * dy));
+        if (radius > 0 && centre < radius) {
+            const double dy = radius - centre;
+            inset = radius - std::sqrt(std::max(0.0, radius * radius - dy * dy));
+        } else if (radius > 0 && centre > height - radius) {
+            const double dy = centre - (height - radius);
+            inset = radius - std::sqrt(std::max(0.0, radius * radius - dy * dy));
         }
         const int left = int(std::lround(inset));
         if (rect.width() - 2 * left > 0)
             region |= base::Rect(rect.x() + left, rect.y() + y, rect.width() - 2 * left, 1);
     }
     return region;
-}
-
-// The outline of a rect rounded by `topRadius` at the top corners and
-// `bottomRadius` at the bottom ones: for a shape whose edges round
-// differently, which a single radius cannot draw.
-ui::Path roundedPath(const ui::RectF &rect, double topRadius, double bottomRadius)
-{
-    ui::Path path;
-    const double half = std::min(rect.width, rect.height) / 2.0;
-    topRadius = std::clamp(topRadius, 0.0, half);
-    bottomRadius = std::clamp(bottomRadius, 0.0, half);
-    const double right = rect.right();
-    const double bottom = rect.bottom();
-    // Clockwise from the top-left corner's end, the arcs bulging out.
-    path.moveTo(rect.x + topRadius, rect.y);
-    path.arcTo({right - 2 * topRadius, rect.y, 2 * topRadius, 2 * topRadius}, -90, 90);
-    path.arcTo({right - 2 * bottomRadius, bottom - 2 * bottomRadius, 2 * bottomRadius, 2 * bottomRadius},
-               0, 90);
-    path.arcTo({rect.x, bottom - 2 * bottomRadius, 2 * bottomRadius, 2 * bottomRadius}, 90, 90);
-    path.arcTo({rect.x, rect.y, 2 * topRadius, 2 * topRadius}, 180, 90);
-    path.close();
-    return path;
 }
 
 } // namespace
@@ -195,23 +187,48 @@ protected:
 
     void paint(ui::Painter &painter) override
     {
-        // Both modes show the panel's glass from the surface blur; it is the
-        // dock's only background.
+        // The taskbar owns the single rounded glass plate behind both areas.
+        if (m_dock->dock().settings().efficientMode()) {
+            const base::Rect panel = m_dock->panelRect();
+
+            if (!panel.isEmpty()) {
+                ui::Color background = ui::Theme::current().background;
+                background.a = 230;
+
+                // Draw the entire translucent background in one pass. The top
+                // corners are rounded; the bottom edge stays square because it
+                // meets the screen edge.
+                painter.fillPath(taskbarPath(panel, m_dock->cornerRadius()), background);
+            }
+
+            return;
+        }
+
+        // Floating dock: divider lines only.
         const ui::Color line = ui::color(toolkit::CompositorColor::DockDivider);
         const base::Rect panel = m_dock->panelRect();
+
         const auto draw = [&](const base::RectF &rect, double opacity) {
             if (rect.isEmpty() || opacity <= 0)
                 return;
+
             ui::Color color = line;
             color.a = uint8_t(std::lround(255 * opacity));
-            painter.drawRoundedRect({panel.x() + rect.x(), panel.y() + rect.y(), rect.width(),
-                                     rect.height()},
-                                    {0, 0, ui::Corners::Circular}, color);
+
+            painter.drawRoundedRect(
+                {
+                    panel.x() + rect.x(),
+                    panel.y() + rect.y(),
+                    rect.width(),
+                    rect.height()
+                },
+                {0, 0, ui::Corners::Circular},
+                color
+            );
         };
-        if (!m_dock->dock().settings().efficientMode()) {
-            draw(m_dock->divider(), 0.18);
-            draw(m_dock->trailingDivider(), m_dock->m_trailingOpacity);
-        }
+
+        draw(m_dock->divider(), 0.18);
+        draw(m_dock->trailingDivider(), m_dock->m_trailingOpacity);
     }
 
     // The whole window takes drags: the application area, and the icons
@@ -355,7 +372,7 @@ DockWindow::DockWindow(Shell *shell, std::unique_ptr<Dock> dock)
         if (m_shell->seat()->drag()->busy()) m_shell->seat()->drag()->cancel();
         if (m_menu) m_menu->close();
         m_bounce->clear(); m_attentionBounce->clear();
-        // The launcher swaps between its artwork and the taskbar's drawing.
+        // Rebuild so mode-dependent taskbar layout is applied.
         rebuild();
         configureMagnification(); resize(false);
     }));
@@ -431,6 +448,8 @@ DockWindow::DockWindow(Shell *shell, std::unique_ptr<Dock> dock)
 DockWindow::~DockWindow()
 {
     *m_alive = false;
+    if (m_taskbarStatusAreaRemoved)
+        m_taskbarStatusAreaRemoved();
     m_subscriptions.clear();
     m_retired.clear();
     m_dock->primaryGeometry = nullptr;
@@ -453,6 +472,31 @@ void DockWindow::setTaskbarRightWidth(int width)
     if (m_dock->settings().efficientMode()) resize(false);
 }
 
+ui::View *DockWindow::setTaskbarStatusArea(std::unique_ptr<ui::View> area,
+                                           std::function<void()> onRemoved)
+{
+    if (m_taskbarStatusArea) {
+        if (m_taskbarStatusAreaRemoved)
+            m_taskbarStatusAreaRemoved();
+        m_panel->takeChild(m_taskbarStatusArea);
+    }
+    m_taskbarStatusArea = area.get();
+    m_taskbarStatusAreaRemoved = std::move(onRemoved);
+    if (area)
+        m_panel->addChild(std::move(area));
+    return m_taskbarStatusArea;
+}
+
+std::unique_ptr<ui::View> DockWindow::takeTaskbarStatusArea()
+{
+    if (!m_taskbarStatusArea)
+        return nullptr;
+    std::unique_ptr<ui::View> area = m_panel->takeChild(m_taskbarStatusArea);
+    m_taskbarStatusArea = nullptr;
+    m_taskbarStatusAreaRemoved = {};
+    return area;
+}
+
 double DockWindow::pixelRatio() const
 {
     return m_window->scale();
@@ -465,9 +509,8 @@ base::Rect DockWindow::primaryGeometry() const
 
 double DockWindow::cornerRadius() const
 {
-    // The taskbar's radius is what its glass is clipped to; it does not change
-    // as the panel grows its input region while the icons magnify.
-    if (m_dock->settings().efficientMode()) return DockSettings::taskbarRadius;
+    if (m_dock->settings().efficientMode())
+        return DockSettings::taskbarRadius;
     // From the panel as drawn, which is between two sizes while it resizes;
     // magnification keeps the bar's base thickness, so its corners come from
     // that thickness.
@@ -478,17 +521,6 @@ double DockWindow::cornerRadius() const
     return (thickness > 0 ? thickness : 1) * 28.0 / 86.0;
 }
 
-std::pair<double, double> DockWindow::edgeRadii() const
-{
-    const double radius = cornerRadius();
-    // The taskbar stands against the screen's bottom edge, as ChromeOS's
-    // shelf does: only the corners facing the desktop round, the ones on the
-    // edge stay square. A floating dock rounds all four.
-    if (m_dock->settings().efficientMode())
-        return {radius, 0};
-    return {radius, radius};
-}
-
 base::Rect DockWindow::baseWindowRect(int thickness) const
 {
     const Shell::Output *output = m_shell->output({});
@@ -497,7 +529,7 @@ base::Rect DockWindow::baseWindowRect(int thickness) const
     const base::Rect screen = output->bounds;
     if (m_dock->settings().efficientMode())
         return base::Rect(screen.x(), screen.bottom() - DockSettings::taskbarHeight,
-                          std::max(1, screen.width() - m_taskbarRightWidth), DockSettings::taskbarHeight);
+                          screen.width(), DockSettings::taskbarHeight);
     const base::Rect available = m_shell->workArea(*output);
     const DockSettings &settings = m_dock->settings();
     const int margins = edgeGap();
@@ -639,9 +671,6 @@ void DockWindow::rebuild()
             icon->setKey(item.id);
         }
         icon->setDraggable(!item.fixed);
-        // The taskbar's launcher is its start button, drawn rather than the
-        // launchpad artwork; the floating dock keeps the artwork.
-        icon->setLauncherFace(item.id == DockModel::kLauncherId && m_dock->settings().efficientMode());
         if (item.id == DockModel::kLauncherId)
             icon->setIcon(shellDataFile("launchpad.svg"), true);
         else
@@ -704,7 +733,7 @@ void DockWindow::updateMetrics(bool animate)
     const bool bottom = settings.direction() == DockSettings::Bottom;
     const int itemCount = applications.count() + 1 + m_dock->minimizedWindows().count();
     const int maxLength = m_dock->settings().efficientMode() && output
-            ? std::max(1, output->bounds.width() - m_taskbarRightWidth) : output ? (bottom ? output->bounds.width()
+            ? std::max(1, output->bounds.width() - 2 * m_taskbarRightWidth) : output ? (bottom ? output->bounds.width()
                                            : m_shell->workArea(*output).height())
                                          - settings.edgeMargins()
                                  : 0;
@@ -840,12 +869,12 @@ void DockWindow::layoutItems()
     // whole row.
     const double launcherPitch = m_metrics.iconSize + m_metrics.iconGap;
     const double settledLength = m_applications->targetLength() + m_applications->targetTrailingExtent();
-    const double centredStart = std::floor((m_surfaceLength - launcherPitch - settledLength) / 2);
+    const double centredStart = std::floor((m_surfaceLength - settledLength) / 2);
     const auto along = [&](double position, double rest) {
         if (!efficient)
             return place(layoutOrigin + position, settled + rest) - layoutOrigin;
-        // `position` counts from the launcher's slot; the launcher stays at
-        // the left edge, and every later icon is moved to its centred place.
+        // The launcher stays at the left edge; the app group is centred on
+        // the full taskbar.
         return position < m_metrics.iconSize ? position + m_drawn.lengthPadding
                                              : position - launcherPitch + centredStart;
     };
@@ -1140,6 +1169,12 @@ void DockWindow::layoutItems()
                        + trailingSeparatorShift)
             : base::RectF();
     m_panel->setGeometry({0, 0, double(m_windowRect.width()), double(m_windowRect.height())});
+    m_panel->setClipsChildren(efficient);
+    // View::paintContent applies the clip radius to this view's own paint too,
+    // which would round the plate's square bottom corners. The plate path
+    // already draws the rounded top corners, so only clip children to the
+    // rectangle here.
+    m_panel->setChildClipRadius(0);
     m_panel->requestPaint();
     updatePanelRect(panelRect, !lifted);
     // Landed windows follow their sliding thumbnails.
@@ -1179,8 +1214,7 @@ void DockWindow::updatePanelRect(const base::Rect &rect, bool notify)
             ? base::Rect::fromEdges(0, rect.y(), rect.x() + rect.width() / 2, rect.bottom())
             : base::Rect::fromEdges(rect.x() + rect.width() / 2, rect.y(), m_windowRect.width(),
                                     rect.bottom());
-    const std::pair<double, double> radii = edgeRadii();
-    m_window->setInputRegion(roundedRegion(rect, radii.first, radii.second) | gap);
+    m_window->setInputRegion(roundedRegion(rect, cornerRadius()) | gap);
     // While the icons magnify the panel moves every frame; the dock's place on
     // the screen is still its rest one, so only a settled panel announces it.
     if (notify)
@@ -1245,18 +1279,18 @@ void DockWindow::updateGlass()
 {
     if (m_panelRect.isEmpty())
         return;
-    // GlassEffect's radius: whole pixels, at most half the region. The taskbar
-    // rounds only the edge away from the screen, through the shape below.
+    // GlassEffect's radius: whole pixels, at most half the region.
     const double radius = std::min(cornerRadius(),
                                    double(std::min(m_panelRect.width(), m_panelRect.height())) / 2);
-    const auto [top, bottom] = edgeRadii();
-    ui::Path shape;
-    if (top != bottom)
-        shape = roundedPath({double(m_panelRect.x()), double(m_panelRect.y()),
-                             double(m_panelRect.width()), double(m_panelRect.height())},
-                            top, bottom);
     m_glassDark = ui::Theme::current().darkMode;
-    m_window->setBackgroundBlur(m_panelRect, int(std::lround(radius)), glass(), shape);
+    if (m_dock->settings().efficientMode()) {
+        // The glass and its rim follow the plate: rounded on top, square where
+        // the taskbar meets the screen edge.
+        m_window->setBackgroundBlur(m_panelRect, int(std::lround(radius)), glass(),
+                                    taskbarPath(m_panelRect, radius));
+        return;
+    }
+    m_window->setBackgroundBlur(m_panelRect, int(std::lround(radius)), glass());
 }
 
 void DockWindow::updateStrut()

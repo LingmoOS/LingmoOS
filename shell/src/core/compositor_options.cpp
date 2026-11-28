@@ -9,6 +9,7 @@
 #include "base/command_line.h"
 #include "base/strings.h"
 #include "core/logging.h"
+#include "version.h"
 
 namespace Lingmo::Core {
 
@@ -16,7 +17,7 @@ std::optional<CompositorOptions> CompositorOptions::parse(int argc, char **argv)
 {
     base::CommandLineParser parser;
     parser.setApplicationDescription("Lingmo Aurora Wayland compositor");
-    parser.setApplicationVersion("1.0");
+    parser.setApplicationVersion(LINGMO_AURORA_VERSION);
     parser.addHelpOption();
     parser.addVersionOption();
     parser.addOption({"socket", "Wayland socket name to listen on.", "name"});

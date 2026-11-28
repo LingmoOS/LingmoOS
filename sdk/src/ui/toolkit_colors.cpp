@@ -32,11 +32,15 @@ static void addClassicColors(ColorMixer& mixer, const Theme& theme)
     mixer[ColorId::TranslucentWindowBackground] = withAlpha(ColorId::Background, dark ? 0.85 : 0.8);
     mixer[ColorId::TranslucentWindowBackgroundInactive] = withAlpha(ColorId::Background, dark ? 0.92 : 0.9);
 
-    mixer[ColorId::ButtonBackground] = ColorId::AlternateBackground;
+    // Classic mode: use pure white for buttons so they stand out on the
+    // window background (#F2F4F5 → #FFFFFF contrast).  A 1px border gives
+    // the edge definition that the fill alone cannot supply.
+    mixer[ColorId::ButtonBackground] = dark ? mixer[ColorId::AlternateBackground] : kWhite;
+    mixer[ColorId::ButtonBorder]     = dark ? kTransparent : kBlack.withAlpha(0.14);
     mixer[ColorId::ButtonBackgroundHovered] = dark ? lighter(ColorId::ButtonBackground, 1.2)
-                                                   : darker(ColorId::ButtonBackground, 1.1);
+                                                   : Color::rgb(0xF5F5F7);
     mixer[ColorId::ButtonBackgroundPressed] = dark ? lighter(ColorId::ButtonBackground, 1.1)
-                                                   : darker(ColorId::ButtonBackground, 1.2);
+                                                   : Color::rgb(0xE8E8EA);
     mixer[ColorId::ButtonFocusRing] = withAlpha(ColorId::Highlight, 0.5);
 
     mixer[ColorId::ComboBoxBackground] = ColorId::AlternateBackground;
@@ -66,9 +70,9 @@ static void addClassicColors(ColorMixer& mixer, const Theme& theme)
     mixer[ColorId::SliderHandleShadow] = kBlack.withAlpha(0.1);
     mixer[ColorId::SliderHandleShadowPressed] = kBlack.withAlpha(0.15);
 
-    mixer[ColorId::SegmentedControlTrack] = dark ? kWhite.withAlpha(0.06) : kBlack.withAlpha(0.04);
+    mixer[ColorId::SegmentedControlTrack] = dark ? kWhite.withAlpha(0.06) : kBlack.withAlpha(0.05);
     mixer[ColorId::SegmentedControlPlate] = dark ? lighter(ColorId::SecondBackground, 2)
-                                                 : ColorRecipe(ColorId::SecondBackground);
+                                                 : kWhite;
     mixer[ColorId::SegmentedControlPlateShadow] = kBlack.withAlpha(dark ? 0.18 : 0.12);
     mixer[ColorId::SegmentedControlTextPressed] = withAlpha(ColorId::Text, 0.5);
     mixer[ColorId::SegmentedTabBackground] = ColorId::AlternateBackground;
@@ -155,7 +159,9 @@ static void addLiquidGlassColors(ColorMixer& mixer, const Theme& theme)
     // --- Buttons ---
     // Light mode: very subtle dark tint (3%) — clearly visible via shadow+rim,
     // not grey enough to look "coloured" on a white background.
-    mixer[ColorId::ButtonBackground] = dark ? kWhite.withAlpha(0.12) : kBlack.withAlpha(0.03);
+    // Liquid Glass: ButtonBorder not used (shadow+rim provide the edge).
+    mixer[ColorId::ButtonBackground] = dark ? kWhite.withAlpha(0.10) : kBlack.withAlpha(0.03);
+    mixer[ColorId::ButtonBorder] = kTransparent;
     mixer[ColorId::ButtonBackgroundHovered] = dark ? kWhite.withAlpha(0.20) : kBlack.withAlpha(0.06);
     mixer[ColorId::ButtonBackgroundPressed] = dark ? kWhite.withAlpha(0.08) : kBlack.withAlpha(0.09);
     mixer[ColorId::ButtonFocusRing] = withAlpha(ColorId::Highlight, 0.6);

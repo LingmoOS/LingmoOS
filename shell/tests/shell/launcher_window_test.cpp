@@ -28,6 +28,7 @@
 #include "shell/common/task_manager.h"
 #include "shell/launcher/launcher.h"
 #include "shell/launcher/launcher_cell.h"
+#include "shell/launcher/launcher_folder_view.h"
 #include "shell/launcher/launcher_metrics.h"
 #include "shell/launcher/launcher_model.h"
 #include "shell/launcher/launcher_search_field.h"
@@ -367,6 +368,76 @@ TEST_F(LauncherWindowTest, BackgroundClickEndsFolderRenameWithoutHidingLauncher)
 
     EXPECT_FALSE(cell->isRenaming());
     EXPECT_TRUE(launcher().isShown());
+}
+
+TEST_F(LauncherWindowTest, DismissingAFolderRestoresItsLauncherCell)
+{
+    open();
+    launcher().show();
+    frame();
+    ASSERT_TRUE(model().makeFolder("app00", "app01"));
+    const auto folder = std::find_if(model().rows().begin(), model().rows().end(),
+                                     [](const shell::LauncherItem &item) { return item.folder; });
+    ASSERT_NE(model().rows().end(), folder);
+    const std::string folderId = folder->id;
+    ASSERT_TRUE(test::runUntil([this, &folderId] { return view()->cell(folderId) != nullptr; }));
+    test::runFor(std::chrono::milliseconds(500));
+    frame();
+
+    shell::LauncherCell *folderCell = view()->cell(folderId);
+    ASSERT_TRUE(folderCell->isFolder());
+    const ui::RectF folderIcon = folderCell->iconRect();
+    const ui::PointF icon = folderCell->mapToWindow(
+            {folderIcon.x + folderIcon.width / 2, folderIcon.y + folderIcon.height / 2});
+    click(icon.x, icon.y);
+    ASSERT_TRUE(view()->folderView()->isOpen());
+    EXPECT_FALSE(view()->cell(folderId)->isVisible());
+
+    const ui::PointF outside {20, 900};
+    ASSERT_FALSE(view()->folderView()->panelRect().contains(outside));
+    click(outside.x, outside.y);
+    test::runFor(std::chrono::milliseconds(300));
+    frame();
+
+    EXPECT_TRUE(launcher().isShown());
+    EXPECT_TRUE(view()->cell(folderId)->isVisible());
+    EXPECT_GE(model().findById(folderId), 0);
+}
+
+TEST_F(LauncherWindowTest, LaunchesAnApplicationFromAnOpenFolder)
+{
+    open();
+    launcher().show();
+    frame();
+    ASSERT_TRUE(model().makeFolder("app00", "app01"));
+    const auto folder = std::find_if(model().rows().begin(), model().rows().end(),
+                                     [](const shell::LauncherItem &item) { return item.folder; });
+    ASSERT_NE(model().rows().end(), folder);
+    const std::string folderId = folder->id;
+    ASSERT_TRUE(test::runUntil([this, &folderId] { return view()->cell(folderId) != nullptr; }));
+    test::runFor(std::chrono::milliseconds(500));
+    frame();
+    shell::LauncherCell *folderCell = view()->cell(folderId);
+    ASSERT_TRUE(folderCell->isFolder());
+    const ui::RectF folderIcon = folderCell->iconRect();
+    const ui::PointF icon = folderCell->mapToWindow(
+            {folderIcon.x + folderIcon.width / 2, folderIcon.y + folderIcon.height / 2});
+    click(icon.x, icon.y);
+    ASSERT_TRUE(view()->folderView()->isOpen());
+    ASSERT_TRUE(test::runUntil([this] { return view()->folderView()->cell("app00") != nullptr; }));
+    test::runFor(std::chrono::milliseconds(300));
+    frame();
+
+    shell::LauncherCell *member = view()->folderView()->cell("app00");
+    const ui::RectF memberIcon = member->iconRect();
+    const ui::PointF position = member->mapToWindow(
+            {memberIcon.x + memberIcon.width / 2, memberIcon.y + memberIcon.height / 2});
+    bool launched = false;
+    auto subscription = model().applicationLaunched.connect([&] { launched = true; });
+    click(position.x, position.y);
+
+    EXPECT_TRUE(launched);
+    EXPECT_FALSE(launcher().isShown());
 }
 
 TEST_F(LauncherWindowTest, TheWheelTurnsAPagePerNotchAndTheDotsPage)

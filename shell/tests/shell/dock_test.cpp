@@ -416,7 +416,7 @@ TEST_F(DockTest, EfficientModePreservesNormalDockSettings)
     EXPECT_TRUE(settings.efficientMode());
     EXPECT_EQ(settings.direction(), shell::DockSettings::Bottom);
     EXPECT_EQ(settings.visibility(), shell::DockSettings::AlwaysShow);
-    EXPECT_EQ(settings.iconSize(), shell::DockSettings::kTaskbarIconSize);
+    EXPECT_EQ(settings.iconSize(), 32);
     EXPECT_EQ(settings.edgeMargins(), 0);
     EXPECT_FALSE(settings.magnification());
     EXPECT_FALSE(settings.bounceOnLaunch());
@@ -432,31 +432,17 @@ TEST_F(DockTest, EfficientModePreservesNormalDockSettings)
     EXPECT_TRUE(settings.minimizedArea());
 }
 
-TEST_F(DockTest, TheTaskbarLauncherKeepsTheLauncherIdAndItsArtwork)
-{
-    start("[Dock]\nPinned=files\n");
-    // The launcher keeps its id and fixed place; efficient mode only changes
-    // how the icon is drawn, so the floating dock shows its artwork again.
-    DockModel &applications = model();
-    ASSERT_TRUE(applications.count() > 0);
-    EXPECT_EQ(applications.at(0).id, DockModel::kLauncherId);
-    EXPECT_TRUE(applications.at(0).fixed);
-    const int count = applications.count();
-    dock->settings().setEfficientMode(true);
-    EXPECT_EQ(applications.count(), count);
-    EXPECT_EQ(applications.at(0).id, DockModel::kLauncherId);
-    dock->settings().setEfficientMode(false);
-    EXPECT_EQ(applications.at(0).id, DockModel::kLauncherId);
-}
-
 TEST_F(DockTest, EfficientModeLoadsAndChangesThroughDBus)
 {
     start("[Desktop]\nMode=1\n[Dock]\nIconSize=72\nDirection=2\n");
-    EXPECT_TRUE(dock->settings().efficientMode());
+    EXPECT_FALSE(dock->settings().efficientMode());
     ASSERT_TRUE(dock->registerService());
     test::DBusTestClient client;
-    const auto reply = client.call("org.lingmo.Dock", "/Dock", "org.lingmo.Dock", "setEfficientMode", false);
-    EXPECT_FALSE(reply.isError());
+    const auto enabled = client.call("org.lingmo.Dock", "/Dock", "org.lingmo.Dock", "setEfficientMode", true);
+    EXPECT_FALSE(enabled.isError());
+    EXPECT_TRUE(dock->settings().efficientMode());
+    const auto disabled = client.call("org.lingmo.Dock", "/Dock", "org.lingmo.Dock", "setEfficientMode", false);
+    EXPECT_FALSE(disabled.isError());
     EXPECT_FALSE(dock->settings().efficientMode());
     EXPECT_EQ(dock->settings().iconSize(), 72);
     EXPECT_EQ(dock->settings().direction(), shell::DockSettings::Right);

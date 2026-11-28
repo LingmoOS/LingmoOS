@@ -762,7 +762,7 @@ TEST_F(StatusBarViewTest, EfficientModeMovesSystemItemsBesideTheDockAndRestoresT
         directory.filePath("shell.conf"));
     auto *dock = shell->addComponent(std::make_unique<shell::DockWindow>(shell.get(), std::move(backend)));
     ASSERT_TRUE(test::runUntil([&] { return dock->dock().settings().isReady(); }));
-    bar->followDesktopMode(dock->dock().settings());
+    bar->followDesktopMode(dock->dock().settings(), *dock);
     auto connection = bar->taskbarWidthChanged.connect([&](int width) { dock->setTaskbarRightWidth(width); });
     dock->setTaskbarRightWidth(bar->taskbarWidth());
     FakeIndicators indicators;
@@ -772,48 +772,45 @@ TEST_F(StatusBarViewTest, EfficientModeMovesSystemItemsBesideTheDockAndRestoresT
     FakePanels panels;
     panels.notifications = true;
     bar->addPanels(&panels);
+    const base::Rect normalDockGeometry = dock->window()->geometry();
     for (int repeat = 0; repeat < 3; ++repeat) {
         dock->dock().settings().setEfficientMode(true);
         frame();
         const auto left = dock->window()->geometry();
         const auto right = bar->window()->geometry();
         EXPECT_EQ(left.y(), 960 - shell::DockSettings::taskbarHeight);
-        EXPECT_EQ(right.y(), left.y());
         EXPECT_EQ(left.height(), shell::DockSettings::taskbarHeight);
         EXPECT_EQ(left.x(), 0);
-        EXPECT_EQ(left.right(), right.x());
-        EXPECT_EQ(right.right(), 1440);
+        EXPECT_EQ(left.width(), 1440);
+        EXPECT_EQ(right.width(), 1);
+        EXPECT_EQ(right.height(), 1);
         EXPECT_EQ(dock->panelRect().width(), left.width());
-        EXPECT_EQ(dock->cornerRadius(), shell::DockSettings::taskbarRadius);
-        // Only the corners facing the desktop round: the strip stands on the
-        // screen's bottom edge, so its bottom corners stay square.
-        EXPECT_EQ(dock->edgeRadii(),
-                  (std::pair<double, double> {shell::DockSettings::taskbarRadius, 0}));
-        EXPECT_EQ(shell->workArea(*shell->output({})), base::Rect(0, 0, 1440, 960 - shell::DockSettings::taskbarHeight));
+        EXPECT_EQ(dock->cornerRadius(), shell::DockSettings::taskbarHeight / 2);
+        EXPECT_EQ(bar->statusItems()->window(), dock->window()->window());
+        EXPECT_EQ(shell->workArea(*shell->output({})), base::Rect(0, 0, 1440, 908));
+        const auto firstApp = dock->applicationIcon("files")->geometry();
+        const auto lastApp = dock->applicationIcon("settings")->geometry();
+        EXPECT_NEAR(720, (firstApp.x + firstApp.width / 2 + lastApp.x + lastApp.width / 2) / 2, 1);
         EXPECT_TRUE(bar->clock()->isVisible());
         EXPECT_TRUE(bar->notificationIcon()->isVisible());
         bar->togglePanel(Panel::NotificationCenter);
         EXPECT_EQ(panels.opened.back(), Panel::NotificationCenter);
+        EXPECT_EQ(panels.lastBar, dock->window());
         EXPECT_EQ(panels.lastAnchor.height(), shell::DockSettings::taskbarHeight);
         EXPECT_TRUE(bar->notificationIcon()->isChecked());
         const char *captures = std::getenv("LINGMO_TASKBAR_CAPTURES");
         if (captures && repeat == 0) {
             std::filesystem::create_directories(captures);
             EXPECT_TRUE(dock->window()->window()->grab().savePng(std::string(captures) + "/taskbar-apps.png"));
-            EXPECT_TRUE(bar->window()->window()->grab().savePng(std::string(captures) + "/taskbar-status.png"));
-            const auto apps = dock->window()->window()->grab();
-            const auto status = bar->window()->window()->grab();
-            ui::Image combined(apps.width() + status.width(), apps.height());
-            for (int y = 0; y < combined.height(); ++y)
-                for (int x = 0; x < combined.width(); ++x)
-                    combined.setPixel(x, y, x < apps.width() ? apps.pixel(x, y) : status.pixel(x - apps.width(), y));
-            EXPECT_TRUE(combined.savePng(std::string(captures) + "/taskbar.png"));
+            EXPECT_TRUE(dock->window()->window()->grab().savePng(std::string(captures) + "/taskbar.png"));
         }
         dock->dock().settings().setEfficientMode(false);
         frame();
         EXPECT_FALSE(panels.isOpen(Panel::NotificationCenter));
         EXPECT_FALSE(bar->notificationIcon()->isVisible());
         EXPECT_EQ(bar->window()->geometry(), base::Rect(0, 0, 1440, 32));
+        EXPECT_EQ(dock->window()->geometry(), normalDockGeometry);
+        EXPECT_EQ(bar->statusItems()->window(), bar->window()->window());
         EXPECT_EQ(shell->workArea(*shell->output({})).y(), 32);
     }
     dock->dock().settings().setEfficientMode(true);

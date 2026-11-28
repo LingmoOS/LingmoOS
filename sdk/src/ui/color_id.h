@@ -96,6 +96,9 @@ enum class ColorId : uint16_t {
     DialogButtonProminentInnerEdge,
     DialogButtonFocusRing,
 
+    // Classic-mode button/combobox border (1px outline for clarity).
+    ButtonBorder,
+
     MenuHighlight,
     MenuSeparator,
     MenuDisabledText,

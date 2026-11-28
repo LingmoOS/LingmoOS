@@ -10,7 +10,6 @@
 #include <optional>
 #include <set>
 #include <string>
-#include <utility>
 #include <vector>
 
 #include "base/geometry.h"
@@ -20,6 +19,7 @@
 #include "shell/dock/dock_icon.h"
 #include "shell/dock/dock_metrics.h"
 #include "shell/dock/minimized_windows.h"
+#include "shell/taskbar_host.h"
 #include "ui/bitmap.h"
 #include "ui/geometry.h"
 #include "shell/shell.h"
@@ -45,17 +45,20 @@ class ShellWindow;
 // with the launcher, the pinned and the running applications, a divider,
 // the minimized windows and the trash. The models and org.lingmo.Dock are
 // the Dock it is given; this is the view, its window and its input.
-class DockWindow : public Component
+class DockWindow : public Component, public TaskbarHost
 {
 public:
     DockWindow(Shell *shell, std::unique_ptr<Dock> dock);
     ~DockWindow() override;
 
     void setTaskbarRightWidth(int width);
+    ui::View *setTaskbarStatusArea(std::unique_ptr<ui::View> area,
+                                   std::function<void()> onRemoved) override;
+    std::unique_ptr<ui::View> takeTaskbarStatusArea() override;
     Dock &dock() { return *m_dock; }
-    ShellWindow *window() const { return m_window.get(); }
+    ShellWindow *window() const override { return m_window.get(); }
     // The panel in the window's coordinates, and on the screen.
-    base::Rect panelRect() const { return m_panelRect; }
+    base::Rect panelRect() const override { return m_panelRect; }
     base::Rect primaryGeometry() const;
     // The window's geometry for a dock of `thickness` (DockWindow::windowRect).
     base::Rect windowRect(int thickness) const;
@@ -64,9 +67,6 @@ public:
     // The glass the compositor draws behind the panel.
     render::GlassParams glass() const;
     double cornerRadius() const;
-    // The corner radii at the panel's top and bottom edges: the taskbar rounds
-    // its top corners only, as it stands against the screen edge.
-    std::pair<double, double> edgeRadii() const;
 
     // The items in order along the dock: applications, minimized windows,
     // then the trash. For tests and the window debug service.
@@ -204,6 +204,8 @@ private:
     std::unique_ptr<Dock> m_dock;
     std::unique_ptr<ShellWindow> m_window;
     Panel *m_panel = nullptr;
+    ui::View *m_taskbarStatusArea = nullptr;
+    std::function<void()> m_taskbarStatusAreaRemoved;
     std::unique_ptr<DockPresentation> m_applications;
     std::unique_ptr<DockPresentation> m_minimized;
     std::unique_ptr<DockMagnification> m_magnification;

@@ -11,6 +11,7 @@
 #include "shell/dock/dock.h"
 #include "shell/launcher/launcher.h"
 #include "shell/launcher/launcher_view.h"
+#include "shell/launcher/launcher_folder_view.h"
 #include "shell/launcher/launcher_search_field.h"
 #include "shell/launcher/launcher_wallpaper.h"
 #include "shell/shell_data.h"
@@ -91,30 +92,32 @@ void LauncherWindow::updateGeometry()
     const bool compact = m_dock && m_dock->settings().efficientMode();
     m_window->setOutput(output->name);
     if (compact) {
+        // Bottom-left panel above the taskbar, like a ChromeOS shelf launcher.
         const int width = std::min(760, std::max(520, output->bounds.width() * 3 / 5));
         const int height = std::min(720, std::max(520, output->bounds.height() * 4 / 5));
-        m_window->setGeometry(base::Rect(output->bounds.right() - width,
+        m_window->setGeometry(base::Rect(output->bounds.x(),
                                          output->bounds.bottom() - DockSettings::taskbarHeight - height,
                                          width, height));
+        const bool dark = ui::Theme::current().darkMode;
         m_window->setBackgroundBlur(base::Rect(0, 0, width, height), 24,
-                                    popupGlass(ui::Theme::current().darkMode ? .13 : .94,
-                                               ui::Theme::current().darkMode ? .13 : .94,
-                                               ui::Theme::current().darkMode ? .14 : .95,
-                                               .86));
+                                    popupGlass(dark ? .13 : .94, dark ? .13 : .94,
+                                               dark ? .14 : .95, .86));
     } else {
         // The normal launcher covers the output, including the top bar.
         m_window->setGeometry(output->bounds);
         m_window->setBackgroundBlur(base::Rect(), 0);
     }
     m_view->setCompact(compact);
-    // The wallpaper is decoded at the device pixel size.
-    m_wallpaper->setSurfaceSize(base::Size(int(std::lround(output->bounds.width() * output->scale)),
-                                           int(std::lround(output->bounds.height() * output->scale))));
+    // The wallpaper is decoded at the device pixel size; use the window size
+    // so compact mode doesn't decode a full-output bitmap.
+    const base::Rect winRect = m_window->geometry();
+    m_wallpaper->setSurfaceSize(base::Size(int(std::lround(winRect.width() * output->scale)),
+                                           int(std::lround(winRect.height() * output->scale))));
 
     // Room for the dock on its edge, and a constant 8 at the top.
     LauncherMetrics::Margins margins;
     const base::Rect dock = m_dock && m_dock->primaryGeometry ? m_dock->primaryGeometry() : base::Rect();
-    if (!compact && !dock.isEmpty()) {
+    if (!dock.isEmpty()) {
         switch (m_dock->settings().direction()) {
         case DockSettings::Left:
             margins.left = dock.width();
@@ -224,6 +227,11 @@ void LauncherWindow::hideWindow()
 bool LauncherWindow::keepsShownWhileInactive() const
 {
     if (m_gestureActive || m_launcher->isDragging() || m_view->isMenuOpen())
+        return true;
+    // A folder overlay being open means the user has interacted with the
+    // launcher; a click elsewhere (e.g. a file manager icon on the dock)
+    // that briefly defocuses the launcher must not dismiss it.
+    if (m_view->folderView() && m_view->folderView()->isOpen())
         return true;
     // Capture tools take the keyboard to picture the launcher, and notification
     // banners are non-interactive overlays. Neither should dismiss the launcher

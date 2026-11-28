@@ -4,6 +4,7 @@
 
 #include "shell/statusbar/status_bar_window.h"
 #include "shell/dock/dock_settings.h"
+#include "shell/taskbar_host.h"
 #include "ui/painter.h"
 
 #include <algorithm>
@@ -55,12 +56,6 @@ public:
     bool acceptsPointer() const override { return true; }
 
 protected:
-    void paint(ui::Painter &painter) override
-    {
-        // The surface blur supplies the taskbar's glass background. Painting
-        // an opaque theme color here defeats it and makes efficient mode a
-        // solid strip.
-    }
     void pointerPress(const ui::PointerEvent &) override { m_bar->closePopups(); }
 
     void layout() override
@@ -148,7 +143,7 @@ StatusBarWindow::StatusBarWindow(Shell *shell, std::unique_ptr<StatusBar> status
     trayHost.closePopups = [this] { closePopups(); };
     trayHost.availableGeometry = [this] { return availableGeometry(); };
     trayHost.origin = [this] {
-        const base::Point origin = m_window->geometry().topLeft();
+        const base::Point origin = activeWindow()->geometry().topLeft();
         return ui::PointF {double(origin.x()), double(origin.y())};
     };
     m_tray = m_root->addChild<SystemTrayView>(this, &m_statusBar->systemTray(), std::move(trayHost));
@@ -231,7 +226,7 @@ StatusBarWindow::StatusBarWindow(Shell *shell, std::unique_ptr<StatusBar> status
     m_window->show();
     if (wm::StatusItems *items = m_shell->windowManager() ? m_shell->windowManager()->statusItems() : nullptr) {
         items->setBar(m_window->surface(), m_window->shellSurface());
-        m_subscriptions.push_back(items->committed.connect([this] { m_window->requestFrame(); }));
+        m_subscriptions.push_back(items->committed.connect([this] { activeWindow()->requestFrame(); }));
         updateStatusItemLimits();
         updateLook();
     }
@@ -245,6 +240,17 @@ StatusBarWindow::~StatusBarWindow()
     m_indicatorsChanged.reset();
     m_deviceUsageChanged.reset();
     m_backdrop->follow(nullptr);
+    if (m_taskbarRoot && m_taskbarHost) {
+        std::unique_ptr<ui::View> root = m_taskbarHost->takeTaskbarStatusArea();
+        if (root) {
+            auto *taskbarRoot = static_cast<Root *>(root.get());
+            while (!taskbarRoot->children().empty()) {
+                ui::View *child = taskbarRoot->children().front().get();
+                m_root->addChild(taskbarRoot->takeChild(child));
+            }
+        }
+        m_taskbarRoot = nullptr;
+    }
     if (wm::StatusItems *items = m_shell->windowManager() ? m_shell->windowManager()->statusItems() : nullptr)
         items->setBar(nullptr, nullptr);
     m_window.reset();
@@ -257,7 +263,7 @@ StatusBarWindow::~StatusBarWindow()
 int StatusBarWindow::taskbarWidth() const
 {
     double width = 12;
-    for (const auto &child : m_root->children()) {
+    for (const auto &child : activeRoot()->children()) {
         if (child.get() != m_menuSlot && child->isVisible())
             width += std::max(0.0, child->layoutHints().preferredWidth);
     }
@@ -265,24 +271,76 @@ int StatusBarWindow::taskbarWidth() const
     return std::clamp(int(std::ceil(width)), 1, output ? std::max(1, output->bounds.width() * 2 / 3) : 600);
 }
 
-void StatusBarWindow::followDesktopMode(DockSettings &settings)
+void StatusBarWindow::followDesktopMode(DockSettings &settings, TaskbarHost &taskbar)
 {
     m_dockSettings = &settings;
+    m_taskbarHost = &taskbar;
     const auto apply = [this, &settings] {
         const bool efficient = settings.efficientMode();
         if (efficient == m_efficientMode) return;
         closePopups();
         m_efficientMode = efficient;
+        moveStatusAreaToTaskbar(efficient);
+        if (efficient) {
+            m_window->setBackgroundBlur(base::Rect(), 0);
+            m_barBlurApplied = false;
+            m_barBlurRect = {};
+            m_barBlurGlass = {};
+            m_blurPlate = {};
+        }
         if (m_menuBar) m_menuBar->closeMenu();
         m_menuSlot->setVisible(!efficient);
         m_notification->setVisible(efficient);
         m_statusBar->appMenuRegistrar().setEnabled(!efficient);
-        updateClock(); layoutRow(); updateGeometry(); updateLook();
+        if (wm::StatusItems *items = m_shell->windowManager()
+                                             ? m_shell->windowManager()->statusItems()
+                                             : nullptr) {
+            ShellWindow *host = activeWindow();
+            items->setBar(host->surface(), host->shellSurface());
+        }
+        updateClock();
+        layoutRow();
+        updateGeometry();
+        updateStatusItemLimits();
+        updateLook();
     };
     m_modeChanged = settings.efficientModeChanged.connect(apply);
     m_subscriptions.push_back(settings.taskbarAlignmentChanged.connect([this] { updateGeometry(); layoutRow(); }));
     m_subscriptions.push_back(settings.taskbarSearchChanged.connect([this] { layoutRow(); }));
     apply();
+}
+
+ShellWindow *StatusBarWindow::activeWindow() const
+{
+    return m_efficientMode && m_taskbarHost ? m_taskbarHost->window() : m_window.get();
+}
+
+void StatusBarWindow::moveStatusAreaToTaskbar(bool taskbar)
+{
+    if (taskbar) {
+        auto root = std::make_unique<Root>(this);
+        m_taskbarRoot = root.get();
+        while (!m_root->children().empty()) {
+            ui::View *child = m_root->children().front().get();
+            root->addChild(m_root->takeChild(child));
+        }
+        m_taskbarHost->setTaskbarStatusArea(std::move(root), [this] {
+            m_taskbarRoot = nullptr;
+            m_taskbarHost = nullptr;
+            m_dockSettings = nullptr;
+        });
+        return;
+    }
+
+    std::unique_ptr<ui::View> root = m_taskbarHost->takeTaskbarStatusArea();
+    if (!root)
+        return;
+    auto *taskbarRoot = static_cast<Root *>(root.get());
+    while (!taskbarRoot->children().empty()) {
+        ui::View *child = taskbarRoot->children().front().get();
+        m_root->addChild(taskbarRoot->takeChild(child));
+    }
+    m_taskbarRoot = nullptr;
 }
 
 void StatusBarWindow::updateGeometry()
@@ -294,16 +352,21 @@ void StatusBarWindow::updateGeometry()
     m_window->setOutput(output->name);
     if (m_efficientMode) {
         const int width = taskbarWidth();
+        const base::Rect panel = m_taskbarHost->panelRect();
         const int x = m_dockSettings && m_dockSettings->taskbarAlignment() == DockSettings::AlignCenter
-                ? output->bounds.x() + (output->bounds.width() - width) / 2
-                : output->bounds.right() - width;
-        m_window->setGeometry(base::Rect(x,
-            output->bounds.bottom() - DockSettings::taskbarHeight, width, DockSettings::taskbarHeight));
-        m_window->setExclusiveZone(wm::ScreenEdge::Bottom, DockSettings::taskbarHeight);
+                ? panel.x() + (panel.width() - width) / 2
+                : panel.right() - width;
+        if (m_taskbarRoot)
+            m_taskbarRoot->setGeometry({double(x), double(panel.y()), double(width), double(panel.height())});
+        m_window->setGeometry(base::Rect(output->bounds.x(), output->bounds.y(), 1, 1));
+        m_window->clearExclusiveZone();
+        m_window->setInputRegion(base::Region{});
+        m_window->setBackgroundBlur(base::Rect(), 0);
         taskbarWidthChanged(width);
     } else {
         m_window->setGeometry(base::Rect(output->bounds.x(), output->bounds.y(), output->bounds.width(), kHeight));
         m_window->setExclusiveZone(wm::ScreenEdge::Top, kHeight);
+        m_window->setInputRegion(std::nullopt);
     }
     updateGlass(); updateStatusItemLimits();
     m_geometryUpdating = false;
@@ -315,7 +378,8 @@ void StatusBarWindow::updateStatusItemLimits()
     if (!items || !m_window)
         return;
     // An item may take up to a third of the bar.
-    const base::Rect geometry = m_window->geometry();
+    ShellWindow *host = activeWindow();
+    const base::Rect geometry = host->geometry();
     items->setBarOrigin(geometry.topLeft());
     items->setLimits(m_efficientMode ? DockSettings::taskbarHeight : kHeight,
                      std::max(kHeight, geometry.width() / 3));
@@ -398,6 +462,8 @@ void StatusBarWindow::updateGlass()
 {
     if (!m_window || !m_root)
         return;
+    if (m_efficientMode)
+        return;
     const StatusBarSettings &settings = m_statusBar->statusSettings();
     const double sigma = settings.blurSigma();
     const double opacity = settings.opacity();
@@ -435,7 +501,7 @@ void StatusBarWindow::updatePlateBlur()
         return;
     // A surface has one blur, and one plate shows at a time: opening a panel
     // or a menu closes the others.
-    const BarItem *item = findPlate(m_root);
+    const BarItem *item = findPlate(activeRoot());
     ui::RectF plate = item ? item->plateRect() : ui::RectF();
     if (plate.width > 0 && plate.height > 0) {
         const ui::PointF origin = item->mapToWindow({plate.x, plate.y});
@@ -447,7 +513,7 @@ void StatusBarWindow::updatePlateBlur()
         return;
     m_blurPlate = plate;
     if (plate.width <= 0) {
-        m_window->setBackgroundBlur(base::Rect(), 0);
+        activeWindow()->setBackgroundBlur(base::Rect(), 0);
         return;
     }
     // The rectangle in whole logical pixels; the shape clips the blur to the
@@ -459,7 +525,7 @@ void StatusBarWindow::updatePlateBlur()
                           int(std::ceil(plate.y + plate.height)) - top);
     ui::Path shape;
     shape.addRoundedRect(plate, radius, radius);
-    m_window->setBackgroundBlur(rect, int(std::lround(radius)), {}, shape);
+    activeWindow()->setBackgroundBlur(rect, int(std::lround(radius)), {}, shape);
 }
 
 void StatusBarWindow::updateBattery()
@@ -550,7 +616,7 @@ void StatusBarWindow::layoutRow()
                              && m_dockSettings->taskbarSearch() == DockSettings::SearchShown);
         preferred(m_search, m_search->preferredWidth());
     }
-    m_root->requestLayout();
+    activeRoot()->requestLayout();
     if (m_efficientMode) updateGeometry();
 }
 
@@ -560,7 +626,7 @@ void StatusBarWindow::updateClock()
     const int64_t seconds = std::chrono::duration_cast<std::chrono::seconds>(now.time_since_epoch()).count();
     const base::Locale locale(m_statusBar->timeLocale());
     m_clock->setText(locale.toString(base::DateTime::fromSecondsSinceEpoch(seconds), m_efficientMode ? (m_statusBar->twentyFourTime() ? "HH:mm" : "h:mm AP") : m_statusBar->timeFormat()));
-    m_clock->setDate(m_efficientMode ? locale.toString(base::DateTime::fromSecondsSinceEpoch(seconds), "yyyy/MM/dd") : std::string());
+    m_clock->setDate(m_efficientMode ? locale.toString(base::DateTime::fromSecondsSinceEpoch(seconds), "MMM d") : std::string());
     armClock();
 }
 
@@ -647,7 +713,7 @@ void StatusBarWindow::togglePanel(Panel panel)
     const ui::PointF origin = item->mapToWindow({0, 0});
     const base::Rect anchor(int(std::lround(origin.x)), int(std::lround(origin.y)),
                             int(std::lround(item->geometry().width)), int(std::lround(item->geometry().height)));
-    panels->openPanel(panel, m_window.get(), anchor);
+    panels->openPanel(panel, activeWindow(), anchor);
 }
 
 void StatusBarWindow::closePanels()
@@ -695,11 +761,12 @@ void StatusBarWindow::setMenuBar(std::unique_ptr<StatusBarMenuBar> menuBar)
 ui::RectF StatusBarWindow::availableGeometry() const
 {
     // The menus stay inside the work area the shell reserves.
-    const Shell::Output *output = m_shell->output(m_window->outputName());
+    ShellWindow *host = activeWindow();
+    const Shell::Output *output = m_shell->output(host->outputName());
     if (!output)
         return {};
     const base::Rect area = m_shell->workArea(*output);
-    const base::Point origin = m_window->geometry().topLeft();
+    const base::Point origin = host->geometry().topLeft();
     return {double(area.x() - origin.x()), double(area.y() - origin.y()), double(area.width()),
             double(area.height())};
 }

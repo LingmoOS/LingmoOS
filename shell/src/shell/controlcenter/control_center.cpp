@@ -160,22 +160,23 @@ ShellWindow *ControlCenter::popupWindow(Panel panel) const
 base::Rect ControlCenter::panelGeometry(Panel panel, ShellWindow *bar, const base::Rect &anchor) const
 {
     const base::Point barOrigin = bar ? bar->geometry().topLeft() : base::Point();
-    // The left edge of the item's plate, at the bar's bottom.
-    const base::Point position(barOrigin.x() + anchor.x() + 3, barOrigin.y() + anchor.y() + anchor.height());
     const Shell::Output *output = m_shell->output(bar ? bar->outputName() : std::string());
     const base::Rect screen = output ? output->bounds : base::Rect(0, 0, 1440, 960);
     const int margin = int(::Lingmo::Shell::Panel::kPopupMargin);
+
+    // In efficient mode the bar is at the bottom; panels open upward above it.
+    const bool bottomBar = bar && bar->geometry().y() > screen.y() + screen.height() / 2;
 
     if (panel == Panel::ControlCenter) {
         const int width = int(ControlCenterView::kWidth);
         const double scale = bar ? bar->scale() : 1;
         const int height = m_open[0].controlCenter ? int(m_open[0].controlCenter->windowHeight(scale)) : 0;
-        int x = position.x();
+        // The left edge of the item's plate; for bottom bar align to anchor's right.
+        int x = barOrigin.x() + anchor.x() + 3;
         if (x + width >= screen.x() + screen.width())
             x = screen.x() + screen.width() - width - margin;
         x = std::max(x, screen.x() + margin);
-        // The bar sits at the top of its own screen, which need not be at y 0.
-        const bool bottomBar = bar && bar->geometry().y() > screen.y() + screen.height() / 2;
+        // Bottom bar: popup grows upward from the bar's top edge.
         const int y = bottomBar ? std::max(screen.y() + margin, bar->geometry().y() - height - margin)
                                 : screen.y() + kBarHeight + margin;
         return base::Rect(x, y, width, height);
@@ -183,11 +184,20 @@ base::Rect ControlCenter::panelGeometry(Panel panel, ShellWindow *bar, const bas
 
     const base::Rect area = output ? m_shell->workArea(*output) : screen;
     const int width = int(status_panel::kWidth);
-    // As tall as the work area allows the panel to grow; the window is as
-    // tall as the panel is drawn.
     const int height = std::max(0, area.height() - margin * 2);
-    const int x = std::max(area.x() + margin, std::min(position.x(), area.x() + area.width() - width - margin));
-    const int y = std::max(area.y() + margin, std::min(position.y() + margin, area.y() + area.height() - height - margin));
+    int x, y;
+    if (bottomBar) {
+        // Efficient mode: anchor the panel to the bar's top edge and clamp
+        // horizontally so it does not go off-screen.
+        x = barOrigin.x() + anchor.x() + 3;
+        x = std::max(area.x() + margin, std::min(x, area.x() + area.width() - width - margin));
+        y = std::max(area.y() + margin, bar->geometry().y() - height - margin);
+    } else {
+        // Normal mode: existing logic — below the top bar.
+        const base::Point position(barOrigin.x() + anchor.x() + 3, barOrigin.y() + anchor.y() + anchor.height());
+        x = std::max(area.x() + margin, std::min(position.x(), area.x() + area.width() - width - margin));
+        y = std::max(area.y() + margin, std::min(position.y() + margin, area.y() + area.height() - height - margin));
+    }
     return base::Rect(x, y, width, height);
 }
 
@@ -220,6 +230,25 @@ void ControlCenter::openPanel(Panel panel, ShellWindow *bar, const base::Rect &a
             openPanel(Panel::Bluetooth, bar, anchor);
         };
         view->onHeightChanged = [this] { resizeControlCenter(); };
+        // In efficient mode (bottom bar), show the power button.
+        if (bar) {
+            const Shell::Output *output = m_shell->output(bar->outputName());
+            const bool bottomBar = output && bar->geometry().y() > output->bounds.y() + output->bounds.height() / 2;
+            view->setEfficientMode(bottomBar);
+        }
+        if (m_powerActions) {
+            view->onPowerRequested = [this](int action) {
+                close(Panel::ControlCenter);
+                switch (action) {
+                case 0: m_powerActions->suspend();   break;
+                case 1: m_powerActions->request(PowerActions::Reboot);   break;
+                case 2: m_powerActions->request(PowerActions::Shutdown);  break;
+                case 3: m_powerActions->lockScreen(); break;
+                case 4: m_powerActions->request(PowerActions::Logout);   break;
+                default: break;
+                }
+            };
+        }
         content = std::move(view);
         break;
     }
@@ -249,8 +278,6 @@ void ControlCenter::openPanel(Panel panel, ShellWindow *bar, const base::Rect &a
     open.geometry = panelGeometry(panel, bar, anchor);
     if (open.panel)
         open.panel->setMaximumHeight(open.geometry.height());
-    // The bar's edge decides which way the panel grows; a bar off any screen
-    // falls back to growing downwards, as a top bar's does.
     const base::Point origin = bar->geometry().topLeft();
     const Shell::Output *output = m_shell->output(bar->outputName());
     const bool bottomBar = output && bar->geometry().y() > output->bounds.y() + output->bounds.height() / 2;
@@ -346,9 +373,7 @@ void ControlCenter::resizeControlCenter()
         return;
     open.geometry = panelGeometry(Panel::ControlCenter, open.bar, open.anchor);
     open.window->resize({double(open.geometry.width()), double(height)});
-    const auto origin = open.bar->geometry().topLeft();
-    // The same edge the panel was opened along: a bottom bar's control centre
-    // grows upwards and must not flip to growing downwards as it resizes.
+    const auto origin = open.bar ? open.bar->geometry().topLeft() : base::Point();
     const Shell::Output *output = open.bar ? m_shell->output(open.bar->outputName()) : nullptr;
     const bool bottomBar =
             output && open.bar->geometry().y() > output->bounds.y() + output->bounds.height() / 2;

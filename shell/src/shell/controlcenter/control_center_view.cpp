@@ -13,6 +13,8 @@
 #include "shell/controlcenter/panel_style.h"
 #include "shell/controlcenter/tiles.h"
 #include "ui/label.h"
+#include "ui/menu.h"
+#include "ui/round_image_button.h"
 #include "ui/theme.h"
 #include "ui/window.h"
 
@@ -130,6 +132,24 @@ ControlCenterView::ControlCenterView(ControlCenterServices &services)
         m_services.setMuted(value == 0);
     };
 
+    // Power button — only shown in efficient mode (setEfficientMode(true)).
+    m_powerButton = addChild<ui::RoundImageButton>();
+    m_powerButton->setIconName("system-shutdown");
+    m_powerButton->setButtonSize(kPowerButtonHeight);
+    m_powerButton->setVisible(false);
+    m_powerButton->onClicked = [this] {
+        if (!m_powerMenu)
+            m_powerMenu = std::make_unique<ui::Menu>();
+        m_powerMenu->clear();
+        m_powerMenu->addItem(tr("Suspend"),    [this] { if (onPowerRequested) onPowerRequested(0); });
+        m_powerMenu->addItem(tr("Restart"),    [this] { if (onPowerRequested) onPowerRequested(1); });
+        m_powerMenu->addItem(tr("Shut Down"),  [this] { if (onPowerRequested) onPowerRequested(2); });
+        m_powerMenu->addSeparator();
+        m_powerMenu->addItem(tr("Lock Screen"),[this] { if (onPowerRequested) onPowerRequested(3); });
+        m_powerMenu->addItem(tr("Log Out"),    [this] { if (onPowerRequested) onPowerRequested(4); });
+        m_powerMenu->popupFor(m_powerButton);
+    };
+
     applyExpanded();
     refresh();
 }
@@ -162,6 +182,14 @@ void ControlCenterView::retranslate()
     m_sound->setTitle(tr("Sound"));
     m_users->retranslate();
     refresh();
+}
+
+void ControlCenterView::setEfficientMode(bool efficient)
+{
+    if (m_powerButton)
+        m_powerButton->setVisible(efficient);
+    if (onHeightChanged)
+        onHeightChanged();
 }
 
 void ControlCenterView::refresh()
@@ -283,6 +311,9 @@ double ControlCenterView::layoutHeight() const
     if (m_sound->isVisible())
         add(m_sound->heightForWidth(width));
 
+    if (m_powerButton && m_powerButton->isVisible())
+        add(kPowerButtonHeight);
+
     return height + (sections - 1) * kGap;
 }
 
@@ -354,6 +385,13 @@ void ControlCenterView::layout()
         const double height = slider->heightForWidth(width);
         slider->setGeometry({kGap, y, width, height});
         y += height + kGap;
+    }
+
+    // Power button row (efficient mode only) — centred at the bottom.
+    if (m_powerButton && m_powerButton->isVisible()) {
+        const double btnSize = kPowerButtonHeight;
+        m_powerButton->setGeometry({(kWidth - btnSize) / 2, y, btnSize, btnSize});
+        y += btnSize + kGap;
     }
 }
 

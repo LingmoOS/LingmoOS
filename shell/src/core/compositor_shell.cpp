@@ -740,7 +740,7 @@ void CompositorShell::initShell()
     auto *bar = m_shell->addComponent(
             std::make_unique<shell::StatusBarWindow>(m_shell.get(), std::move(statusBar)));
     bar->setWallpaper(wallpaper);
-    bar->followDesktopMode(dockService->settings());
+    bar->followDesktopMode(dockService->settings(), *dockWindow);
     dockWindow->setTaskbarRightWidth(bar->taskbarWidth());
     m_shellSubscriptions.push_back(bar->taskbarWidthChanged.connect(
         [dockWindow](int width) { dockWindow->setTaskbarRightWidth(width); }));

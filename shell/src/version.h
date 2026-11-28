@@ -6,4 +6,4 @@
 // Aurora follows Semantic Versioning: MAJOR.MINOR.PATCH.
 // Raise MAJOR for incompatible releases, MINOR for compatible features, and
 // PATCH for compatible fixes. Pre-releases append -alpha.N, -beta.N or -rc.N.
-#define LINGMO_AURORA_VERSION "1.2.1"
+#define LINGMO_AURORA_VERSION "1.2.3"

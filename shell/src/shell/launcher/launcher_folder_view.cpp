@@ -189,6 +189,11 @@ void LauncherFolderView::dismiss()
     commitName();
     m_closing = true;
     setEnabled(false);
+    if (m_view->m_openFolderId == m_folder) {
+        if (LauncherCell *folder = m_view->cell(m_folder))
+            folder->setVisible(true);
+        m_view->m_openFolderId.clear();
+    }
     if (focused)
         m_view->setFocus();
     const int serial = ++m_closeSerial;
@@ -209,6 +214,9 @@ void LauncherFolderView::setProgress(double progress)
 {
     m_progress = progress;
     setOpacity(progress);
+    // Notify the window so it can update the background blur region.
+    if (m_view->folderBlurChanged)
+        m_view->folderBlurChanged(panelRect(), progress > 0);
     const ui::RectF panel = panelRect();
     if (panel.width <= 0)
         return;
@@ -404,8 +412,6 @@ double LauncherFolderView::nameHeight() const
 
 double LauncherFolderView::titleHeight() const
 {
-    // The name field's own height, and the gap above the panel. A text field
-    // has no text baseline to measure from, unlike a label.
     return nameHeight() + nameGap();
 }
 

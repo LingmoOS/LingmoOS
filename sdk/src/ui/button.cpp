@@ -123,6 +123,13 @@ void Button::paint(Painter& painter)
             surface = surface.withAlpha(surface.a / 255.0 * 0.38);
         painter.fillRoundedRect(bounds, radius, surface, themeCorners());
 
+        // 1px border for edge definition in classic mode (transparent = no-op).
+        const Color border = color(ColorId::ButtonBorder);
+        if (border.a > 0)
+            painter.strokeRoundedRect(bounds.adjusted(0.5, 0.5, -0.5, -0.5), radius - 0.5,
+                                      border.withAlpha(enabled ? border.a / 255.0 : border.a / 255.0 * 0.38),
+                                      1, themeCorners());
+
         if (enabled) {
             const double stateOpacity = std::max(m_hoverAmount * 0.08, m_pressed ? 0.12 : 0.0);
             if (stateOpacity > 0)
